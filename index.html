@@ -1096,6 +1096,16 @@ function build(){
 }
 
 function t(key){ return (T[LANG]&&T[LANG][key]!==undefined)?T[LANG][key]:(T.fr[key]||key); }
+function setRegionFromSelect() {
+  // Juste prévisualiser, pas encore confirmer
+}
+
+function confirmRegion() {
+  var select = document.getElementById('region-select');
+  if (!select || !select.value) return;
+  setRegion(select.value);
+}
+
 function setRegion(r) {
   REGION = r;
   var flags = {fr:'🇫🇷',dz:'🇩🇿',ma:'🇲🇦',gb:'🇬🇧',es:'🇪🇸',de:'🇩🇪',other:'🌍'};
@@ -1924,7 +1934,7 @@ function renderResult(){
             <span>${t('fiche_btn')}</span>
           </button>
         <button onclick="showWhyAI('${s.key}','${s.nom}','${s.marque}')" style="width:100%;margin-top:10px;padding:12px 16px;border-radius:50px;border:none;background:#C4726A;color:#fff;font-size:13px;font-weight:700;cursor:pointer;font-family:var(--sans);display:flex;align-items:center;justify-content:center;gap:8px">
-          <span>${LANG==="en"?"Why this product?":"Pourquoi ce produit ?"}</span>
+          <span>${LANG==="en"?"Why this product?":"Mon Skin Match"}</span>
         </button>
         <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:4px">
           ${s.yuka>=75
@@ -2179,6 +2189,16 @@ function closeVideo() {
 function showRegionModal() {
   var m = document.getElementById('region-modal');
   if (m) m.style.display = 'flex';
+}
+
+function setRegionFromSelect() {
+  // Juste prévisualiser, pas encore confirmer
+}
+
+function confirmRegion() {
+  var select = document.getElementById('region-select');
+  if (!select || !select.value) return;
+  setRegion(select.value);
 }
 
 function setRegion(r) {
@@ -3102,38 +3122,64 @@ setTimeout(applyWelcomeLang, 50);
       <h2 style="font-family:Georgia,serif;font-size:22px;font-weight:700;color:#3D2B1F;margin-bottom:6px">Où êtes-vous ?</h2>
       <p style="font-size:13px;color:#8B6F5E">Les produits sont adaptés à votre pays.</p>
     </div>
-    <div style="display:flex;flex-direction:column;gap:10px">
-      <button onclick="setRegion('fr')" style="width:100%;padding:14px 18px;border-radius:14px;border:1.5px solid #EDD9D4;background:#fff;cursor:pointer;display:flex;align-items:center;gap:12px;font-family:inherit">
-        <span style="font-size:24px">🇫🇷</span>
-        <div style="text-align:left;flex:1"><div style="font-size:14px;font-weight:700;color:#3D2B1F">France</div><div style="font-size:11px;color:#9A8A85">Belgique · Suisse</div></div>
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="#C4726A"><path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6z"/></svg>
-      </button>
-      <button onclick="setRegion('dz')" style="width:100%;padding:14px 18px;border-radius:14px;border:1.5px solid #EDD9D4;background:#fff;cursor:pointer;display:flex;align-items:center;gap:12px;font-family:inherit">
-        <span style="font-size:24px">🇩🇿</span>
-        <div style="text-align:left;flex:1"><div style="font-size:14px;font-weight:700;color:#3D2B1F">Algérie</div><div style="font-size:11px;color:#9A8A85">Produits locaux inclus</div></div>
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="#C4726A"><path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6z"/></svg>
-      </button>
-      <button onclick="setRegion('ma')" style="width:100%;padding:14px 18px;border-radius:14px;border:1.5px solid #EDD9D4;background:#fff;cursor:pointer;display:flex;align-items:center;gap:12px;font-family:inherit">
-        <span style="font-size:24px">🇲🇦</span>
-        <div style="text-align:left;flex:1"><div style="font-size:14px;font-weight:700;color:#3D2B1F">Maroc</div><div style="font-size:11px;color:#9A8A85">Tunisie · Maghreb</div></div>
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="#C4726A"><path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6z"/></svg>
-      </button>
-      <button onclick="setRegion('gb')" style="width:100%;padding:14px 18px;border-radius:14px;border:1.5px solid #EDD9D4;background:#fff;cursor:pointer;display:flex;align-items:center;gap:12px;font-family:inherit">
-        <span style="font-size:24px">🇬🇧</span>
-        <div style="text-align:left;flex:1"><div style="font-size:14px;font-weight:700;color:#3D2B1F">UK / International</div><div style="font-size:11px;color:#9A8A85">USA · Canada · Europe</div></div>
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="#C4726A"><path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6z"/></svg>
-      </button>
-      <button onclick="setRegion('es')" style="width:100%;padding:14px 18px;border-radius:14px;border:1.5px solid #EDD9D4;background:#fff;cursor:pointer;display:flex;align-items:center;gap:12px;font-family:inherit">
-        <span style="font-size:24px">🇪🇸</span>
-        <div style="text-align:left;flex:1"><div style="font-size:14px;font-weight:700;color:#3D2B1F">España</div><div style="font-size:11px;color:#9A8A85">Portugal · Latinoamérica</div></div>
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="#C4726A"><path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6z"/></svg>
-      </button>
-      <button onclick="setRegion('de')" style="width:100%;padding:14px 18px;border-radius:14px;border:1.5px solid #EDD9D4;background:#fff;cursor:pointer;display:flex;align-items:center;gap:12px;font-family:inherit">
-        <span style="font-size:24px">🇩🇪</span>
-        <div style="text-align:left;flex:1"><div style="font-size:14px;font-weight:700;color:#3D2B1F">Deutschland</div><div style="font-size:11px;color:#9A8A85">Austria · Switzerland</div></div>
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="#C4726A"><path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6z"/></svg>
-      </button>
-    </div>
+    <!-- Liste déroulante -->
+    <select id="region-select" onchange="setRegionFromSelect()" style="width:100%;padding:14px 16px;border:1.5px solid #EDD9D4;border-radius:14px;font-size:15px;font-family:'Outfit',sans-serif;color:#3D2B1F;background:#fff;appearance:none;-webkit-appearance:none;background-image:url('data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2224%22 height=%2224%22 viewBox=%220 0 24 24%22 fill=%22%23C4726A%22><path d=%22M7 10l5 5 5-5z%22/></svg>');background-repeat:no-repeat;background-position:right 14px center;cursor:pointer;outline:none;margin-bottom:16px">
+      <option value="">-- Choisissez votre pays --</option>
+      <optgroup label="🌍 Europe">
+        <option value="fr">🇫🇷 France</option>
+        <option value="fr">🇧🇪 Belgique</option>
+        <option value="fr">🇨🇭 Suisse</option>
+        <option value="de">🇩🇪 Allemagne</option>
+        <option value="de">🇦🇹 Autriche</option>
+        <option value="es">🇪🇸 Espagne</option>
+        <option value="es">🇵🇹 Portugal</option>
+        <option value="gb">🇬🇧 Royaume-Uni</option>
+        <option value="gb">🇮🇪 Irlande</option>
+        <option value="gb">🇮🇹 Italie</option>
+        <option value="gb">🇳🇱 Pays-Bas</option>
+        <option value="gb">🇸🇪 Suède</option>
+        <option value="gb">🇳🇴 Norvège</option>
+        <option value="gb">🇩🇰 Danemark</option>
+        <option value="gb">🇵🇱 Pologne</option>
+      </optgroup>
+      <optgroup label="🌍 Maghreb">
+        <option value="dz">🇩🇿 Algérie</option>
+        <option value="ma">🇲🇦 Maroc</option>
+        <option value="ma">🇹🇳 Tunisie</option>
+        <option value="ma">🇱🇾 Libye</option>
+      </optgroup>
+      <optgroup label="🌍 Moyen-Orient">
+        <option value="gb">🇸🇦 Arabie Saoudite</option>
+        <option value="gb">🇦🇪 Émirats Arabes Unis</option>
+        <option value="gb">🇶🇦 Qatar</option>
+        <option value="gb">🇰🇼 Koweït</option>
+        <option value="gb">🇱🇧 Liban</option>
+        <option value="gb">🇪🇬 Égypte</option>
+      </optgroup>
+      <optgroup label="🌍 Amériques">
+        <option value="gb">🇺🇸 États-Unis</option>
+        <option value="gb">🇨🇦 Canada</option>
+        <option value="es">🇲🇽 Mexique</option>
+        <option value="es">🇧🇷 Brésil</option>
+        <option value="es">🇦🇷 Argentine</option>
+        <option value="es">🇨🇴 Colombie</option>
+      </optgroup>
+      <optgroup label="🌍 Asie &amp; Océanie">
+        <option value="gb">🇯🇵 Japon</option>
+        <option value="gb">🇰🇷 Corée du Sud</option>
+        <option value="gb">🇨🇳 Chine</option>
+        <option value="gb">🇮🇳 Inde</option>
+        <option value="gb">🇦🇺 Australie</option>
+      </optgroup>
+      <optgroup label="🌍 Afrique">
+        <option value="gb">🇸🇳 Sénégal</option>
+        <option value="gb">🇨🇮 Côte d'Ivoire</option>
+        <option value="gb">🇨🇲 Cameroun</option>
+        <option value="gb">🇬🇦 Gabon</option>
+        <option value="gb">🇲🇱 Mali</option>
+      </optgroup>
+    </select>
+    <button onclick="confirmRegion()" style="width:100%;padding:14px;border-radius:50px;border:none;background:#C4726A;color:#fff;font-size:15px;font-weight:700;cursor:pointer;font-family:'Outfit',sans-serif">Confirmer</button>
   </div>
 </div>
 
