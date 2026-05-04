@@ -500,7 +500,7 @@ h2{font-family:var(--serif);font-size:20px;font-weight:700;margin-bottom:3px}
 
 <!-- ══ RESULT ══ -->
 <div id="sc-result" class="hidden">
-  <div class="topbar"><button class="btn-back" onclick="go('q5')">← Retour</button><div class="logo"><div class="logo-icon">SM</div>Skin<span>Match</span></div></div>
+  <div class="topbar"><button class="btn-back" onclick="go('q5')">← Retour</button><div class="logo"><div class="logo-icon">SM</div>Skin<span>Match</span></div><button onclick="openCompare()" id="btn-compare-top" style="background:#C4726A;border:none;border-radius:20px;padding:6px 12px;font-size:11px;font-weight:700;color:#fff;cursor:pointer;font-family:var(--sans)">⚖️ Comparer</button></div>
   <div class="content" id="result-content"></div>
 </div>
 
@@ -594,7 +594,7 @@ const T = {
     suivi_btn:"Refaire le diagnostic",
     fiche_btn:"En savoir plus",note_yuka:"🥕 Note Yuka",
     budget_total:"Budget estimé :",compatible:"compatible",
-    morning_only:"Matin seulement",evening_only:"Soir seulement",both:"Matin & Soir",
+    morning_only:"Matin seulement",result_routine:"Votre routine personnalisée",result_hello:"Bonjour",evening_only:"Soir seulement",both:"Matin & Soir",
     register_title:"Créer votre compte",register_sub:"Enregistrez votre profil pour accéder à vos recommandations.",
     login_title:"Bon retour",login_sub:"Connectez-vous pour accéder à votre profil.",
     placeholder_name:"Prénom",placeholder_email:"Adresse email",
@@ -695,7 +695,7 @@ const T = {
     suivi_btn:"Redo the diagnosis",
     fiche_btn:"Learn more",note_yuka:"🥕 Yuka score",
     budget_total:"Estimated budget:",compatible:"compatible",
-    morning_only:"Morning only",evening_only:"Evening only",both:"Morning & Evening",
+    morning_only:"Morning only",result_routine:"Your personalized routine",result_hello:"Hello",evening_only:"Evening only",both:"Morning & Evening",
     register_title:"Create your account",register_sub:"Save your profile to access your recommendations.",
     login_title:"Welcome back",login_sub:"Sign in to access your profile.",
     placeholder_name:"First name",placeholder_email:"Email address",
@@ -1242,6 +1242,8 @@ function applyWelcomeLang(){
       b.textContent = LANG==='en' ? '← Back' : '← Retour';
   });
   // Bouton scan
+  const compareTop = document.getElementById('btn-compare-top');
+  if(compareTop) compareTop.innerHTML = '⚖️ ' + (LANG==='en' ? 'Compare' : 'Comparer');
   const scanBtn = document.getElementById('btn-scan-text');
   if(scanBtn) scanBtn.textContent = LANG==='en' ? 'Scan my skin with AI' : 'Scanner ma peau avec l\'IA';
   // Écran scan
@@ -1308,113 +1310,82 @@ function initQuestions(){
 
     seche: `<div style="width:64px;height:64px;border-radius:16px;background:#EEF6FB;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;flex-shrink:0">
       <svg width="38" height="38" viewBox="0 0 38 38" fill="none">
-        <!-- visage -->
+        <ellipse cx="19" cy="21" rx="11" ry="13" fill="#B8D8E8" stroke="#8ABCD4" stroke-width="1.2"/>
+        <ellipse cx="15" cy="19" rx="1.5" ry="1.8" fill="#5A9AB5"/>
+        <ellipse cx="23" cy="19" rx="1.5" ry="1.8" fill="#5A9AB5"/>
+        <path d="M16 26 Q19 24 22 26" stroke="#5A9AB5" stroke-width="1.3" fill="none" stroke-linecap="round"/>
+        <!-- Tiraillements partout : front, joues gauche, joues droite, menton -->
+        <path d="M14 9 L13 7 M19 8.5 L19 6.5 M24 9 L25 7" stroke="#8ABCD4" stroke-width="1.2" stroke-linecap="round"/>
+        <path d="M8 16 L6 15.5 M8 20 L6 20 M8 24 L6 24.5" stroke="#8ABCD4" stroke-width="1.2" stroke-linecap="round"/>
+        <path d="M30 16 L32 15.5 M30 20 L32 20 M30 24 L32 24.5" stroke="#8ABCD4" stroke-width="1.2" stroke-linecap="round"/>
+        <path d="M14 33 L13 35 M19 33.5 L19 35.5 M24 33 L25 35" stroke="#8ABCD4" stroke-width="1.2" stroke-linecap="round"/>
+      </svg>
+      <div style="font-size:9px;font-weight:700;color:#5A9AB5;letter-spacing:.3px">${LANG==="en"?"DRY":"SÈCHE"}</div>
+    </div>`,
+
+    grasse: `<div style="width:64px;height:64px;border-radius:16px;background:#FFFBE8;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;flex-shrink:0">
+      <svg width="38" height="38" viewBox="0 0 38 38" fill="none">
+        <ellipse cx="19" cy="21" rx="11" ry="13" fill="#F5E090" stroke="#C8A830" stroke-width="1.2"/>
+        <ellipse cx="15" cy="19" rx="1.5" ry="1.8" fill="#A08020"/>
+        <ellipse cx="23" cy="19" rx="1.5" ry="1.8" fill="#A08020"/>
+        <path d="M16 26 Q19 28 22 26" stroke="#A08020" stroke-width="1.3" fill="none" stroke-linecap="round"/>
+        <ellipse cx="10" cy="20" rx="3.5" ry="2" fill="#FFD840" opacity=".6"/>
+        <ellipse cx="28" cy="20" rx="3.5" ry="2" fill="#FFD840" opacity=".6"/>
+        <circle cx="19" cy="10" r="2" fill="#FFD840" opacity=".5"/>
+        <circle cx="13" cy="13" r="1.2" fill="#FFD840" opacity=".4"/>
+        <circle cx="25" cy="13" r="1.2" fill="#FFD840" opacity=".4"/>
+      </svg>
+      <div style="font-size:9px;font-weight:700;color:#A08020;letter-spacing:.3px">${LANG==="en"?"OILY":"GRASSE"}</div>
+    </div>`,
+
+    mixte: `<div style="width:64px;height:64px;border-radius:16px;background:#F0F8F0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;flex-shrink:0">
+      <svg width="38" height="38" viewBox="0 0 38 38" fill="none">
+        <ellipse cx="19" cy="21" rx="11" ry="13" fill="#C8E8C8" stroke="#70B870" stroke-width="1.2"/>
+        <ellipse cx="15" cy="19" rx="1.5" ry="1.8" fill="#3A8050"/>
+        <ellipse cx="23" cy="19" rx="1.5" ry="1.8" fill="#3A8050"/>
+        <path d="M16 26 Q19 27 22 26" stroke="#3A8050" stroke-width="1.3" fill="none" stroke-linecap="round"/>
+        <!-- Zone T grasse au milieu -->
+        <ellipse cx="19" cy="14" rx="3" ry="4" fill="#70B870" opacity=".4"/>
+        <!-- Ligne de séparation -->
+        <line x1="19" y1="9" x2="19" y2="33" stroke="#70B870" stroke-width="1" stroke-dasharray="2,2" opacity=".5"/>
+      </svg>
+      <div style="font-size:9px;font-weight:700;color:#3A8050;letter-spacing:.3px">${LANG==="en"?"COMBO":"MIXTE"}</div>
+    </div>`,
+
+    normale: `<div style="width:64px;height:64px;border-radius:16px;background:#F4F0FF;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;flex-shrink:0">
+      <svg width="38" height="38" viewBox="0 0 38 38" fill="none">
+        <ellipse cx="19" cy="21" rx="11" ry="13" fill="#D8D0F0" stroke="#9080C0" stroke-width="1.2"/>
+        <ellipse cx="15" cy="19" rx="1.5" ry="1.8" fill="#6050A0"/>
+        <ellipse cx="23" cy="19" rx="1.5" ry="1.8" fill="#6050A0"/>
+        <path d="M16 26 Q19 28 22 26" stroke="#6050A0" stroke-width="1.3" fill="none" stroke-linecap="round"/>
+        <path d="M13 16 Q15 14.5 17 16" stroke="#9080C0" stroke-width="1" fill="none" stroke-linecap="round"/>
+        <path d="M21 16 Q23 14.5 25 16" stroke="#9080C0" stroke-width="1" fill="none" stroke-linecap="round"/>
+      </svg>
+      <div style="font-size:9px;font-weight:700;color:#6050A0;letter-spacing:.3px">${LANG==="en"?"NORMAL":"NORMALE"}</div>
+    </div>`,
+
+    sensible: `<div style="width:64px;height:64px;border-radius:16px;background:#FFF0F0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;flex-shrink:0">
+      <svg width="38" height="38" viewBox="0 0 38 38" fill="none">
         <ellipse cx="19" cy="21" rx="11" ry="13" fill="#F5CFC8" stroke="#E0A89E" stroke-width="1.2"/>
-        <!-- yeux -->
+        <!-- Grosses rougeurs très visibles sur les joues -->
+        <ellipse cx="10" cy="23" rx="5.5" ry="3.5" fill="#E84040" opacity=".5"/>
+        <ellipse cx="28" cy="23" rx="5.5" ry="3.5" fill="#E84040" opacity=".5"/>
+        <!-- Yeux -->
         <ellipse cx="15" cy="19" rx="1.5" ry="1.8" fill="#6B3F35"/>
         <ellipse cx="23" cy="19" rx="1.5" ry="1.8" fill="#6B3F35"/>
-        <!-- bouche neutre -->
-        <path d="M16 26 Q19 27.5 22 26" stroke="#6B3F35" stroke-width="1.2" fill="none" stroke-linecap="round"/>
-        <!-- craquelures sécheresse joue gauche -->
-        <path d="M9 20 L11 19.5 M9 22 L11 21.5" stroke="#C4887F" stroke-width="1" stroke-linecap="round"/>
-        <!-- craquelures sécheresse joue droite -->
-        <path d="M27 20 L29 19.5 M27 22 L29 21.5" stroke="#C4887F" stroke-width="1" stroke-linecap="round"/>
-        <!-- 3 gouttes d'eau au-dessus = besoin hydratation -->
-        <path d="M13 5 Q13.6 3 14.2 5 Q14.2 6.3 13 6.3 Q11.8 6.3 11.8 5 Q12.4 3 13 5z" fill="#74B9D6"/>
-        <path d="M19 4 Q19.6 2 20.2 4 Q20.2 5.3 19 5.3 Q17.8 5.3 17.8 4 Q18.4 2 19 4z" fill="#74B9D6"/>
-        <path d="M25 5 Q25.6 3 26.2 5 Q26.2 6.3 25 6.3 Q23.8 6.3 23.8 5 Q24.4 3 25 5z" fill="#74B9D6"/>
-      </svg>
-      <div style="font-size:9px;font-weight:700;color:#74B9D6;letter-spacing:.3px">${LANG==="en"?"DRY":"SÈCHE"}</div>
-    </div>`,
-
-    grasse: `<div style="width:64px;height:64px;border-radius:16px;background:#FFFBEE;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;flex-shrink:0">
-      <svg width="38" height="38" viewBox="0 0 38 38" fill="none">
-        <!-- visage -->
-        <ellipse cx="19" cy="21" rx="11" ry="13" fill="#F5CFC8" stroke="#E0A89E" stroke-width="1.2"/>
-        <!-- brillance front -->
-        <ellipse cx="19" cy="13" rx="5" ry="2.5" fill="#FFE566" opacity=".8"/>
-        <!-- brillance joues -->
-        <ellipse cx="11" cy="22" rx="3" ry="1.8" fill="#FFE566" opacity=".65"/>
-        <ellipse cx="27" cy="22" rx="3" ry="1.8" fill="#FFE566" opacity=".65"/>
-        <!-- pores visibles nez -->
-        <circle cx="17" cy="24" r=".9" fill="#C4887F" opacity=".7"/>
-        <circle cx="19" cy="25" r=".9" fill="#C4887F" opacity=".7"/>
-        <circle cx="21" cy="24" r=".9" fill="#C4887F" opacity=".7"/>
-        <!-- yeux -->
-        <ellipse cx="15" cy="19" rx="1.5" ry="1.8" fill="#6B3F35"/>
-        <ellipse cx="23" cy="19" rx="1.5" ry="1.8" fill="#6B3F35"/>
-        <!-- bouche -->
-        <path d="M16 26 Q19 27.5 22 26" stroke="#6B3F35" stroke-width="1.2" fill="none" stroke-linecap="round"/>
-        <!-- goutte sébum qui coule front -->
-        <path d="M19 5 Q19.7 2.5 20.4 5 Q20.4 6.6 19 6.6 Q17.6 6.6 17.6 5 Q18.3 2.5 19 5z" fill="#FFD700"/>
-      </svg>
-      <div style="font-size:9px;font-weight:700;color:#C9A800;letter-spacing:.3px">${LANG==="en"?"OILY":"GRASSE"}</div>
-    </div>`,
-
-    mixte: `<div style="width:64px;height:64px;border-radius:16px;background:#F5F9F4;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;flex-shrink:0">
-      <svg width="38" height="38" viewBox="0 0 38 38" fill="none">
-        <!-- moitié gauche sèche -->
-        <path d="M19 8 Q10 9 8 21 Q8 30 19 34 Z" fill="#F0D4CE" stroke="#E0A89E" stroke-width="1"/>
-        <!-- moitié droite grasse -->
-        <path d="M19 8 Q28 9 30 21 Q30 30 19 34 Z" fill="#F5E5A0" opacity=".7" stroke="#E0A89E" stroke-width="1"/>
-        <!-- contour visage -->
-        <ellipse cx="19" cy="21" rx="11" ry="13" fill="none" stroke="#D4907F" stroke-width="1.2"/>
-        <!-- zone T brillante -->
-        <rect x="17.5" y="8" width="3" height="20" rx="1.5" fill="#FFE566" opacity=".5"/>
-        <!-- yeux -->
-        <ellipse cx="15" cy="19" rx="1.5" ry="1.8" fill="#6B3F35"/>
-        <ellipse cx="23" cy="19" rx="1.5" ry="1.8" fill="#6B3F35"/>
-        <!-- bouche -->
-        <path d="M16 26 Q19 27.5 22 26" stroke="#6B3F35" stroke-width="1.2" fill="none" stroke-linecap="round"/>
-        <!-- label T -->
-        <text x="19" y="31" text-anchor="middle" font-size="6" font-weight="800" fill="#B07030" font-family="Arial,sans-serif">T</text>
-      </svg>
-      <div style="font-size:9px;font-weight:700;color:#7AA670;letter-spacing:.3px">${LANG==="en"?"COMBO":"MIXTE"}</div>
-    </div>`,
-
-    normale: `<div style="width:64px;height:64px;border-radius:16px;background:#F4FBF4;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;flex-shrink:0">
-      <svg width="38" height="38" viewBox="0 0 38 38" fill="none">
-        <!-- visage sain -->
-        <ellipse cx="19" cy="21" rx="11" ry="13" fill="#F5CFC8" stroke="#E0A89E" stroke-width="1.2"/>
-        <!-- yeux souriants en arc -->
-        <path d="M13.5 18.5 Q15 16.5 16.5 18.5" stroke="#6B3F35" stroke-width="1.5" fill="none" stroke-linecap="round"/>
-        <path d="M21.5 18.5 Q23 16.5 24.5 18.5" stroke="#6B3F35" stroke-width="1.5" fill="none" stroke-linecap="round"/>
-        <!-- grand sourire -->
-        <path d="M15 25 Q19 30 23 25" stroke="#6B3F35" stroke-width="1.5" fill="none" stroke-linecap="round"/>
-        <!-- joues roses équilibrées -->
-        <ellipse cx="12" cy="24" rx="3.5" ry="2" fill="#F0A0A0" opacity=".5"/>
-        <ellipse cx="26" cy="24" rx="3.5" ry="2" fill="#F0A0A0" opacity=".5"/>
-        <!-- couronne/étoile équilibre -->
-        <path d="M19 5 L20 8 L23 8 L21 10 L22 13 L19 11 L16 13 L17 10 L15 8 L18 8 Z" fill="#7DC67D" opacity=".9"/>
-      </svg>
-      <div style="font-size:9px;font-weight:700;color:#5A9E5A;letter-spacing:.3px">${LANG==="en"?"NORMAL":"NORMALE"}</div>
-    </div>`,
-
-    sensible: `<div style="width:64px;height:64px;border-radius:16px;background:#FFF4F4;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;flex-shrink:0">
-      <svg width="38" height="38" viewBox="0 0 38 38" fill="none">
-        <!-- visage doux -->
-        <ellipse cx="19" cy="21" rx="11" ry="13" fill="#F9DDD7" stroke="#E8B4AC" stroke-width="1.2"/>
-        <!-- joues roses délicates -->
-        <ellipse cx="12" cy="24" rx="4" ry="2.5" fill="#F4A0A0" opacity=".5"/>
-        <ellipse cx="26" cy="24" rx="4" ry="2.5" fill="#F4A0A0" opacity=".5"/>
-        <!-- yeux doux légèrement tristes -->
-        <ellipse cx="15" cy="19" rx="1.5" ry="1.8" fill="#6B3F35"/>
-        <ellipse cx="23" cy="19" rx="1.5" ry="1.8" fill="#6B3F35"/>
-        <!-- sourcils légèrement froncés, pas agressifs -->
-        <path d="M13.5 17 Q15.5 16 17 17" stroke="#6B3F35" stroke-width="1" fill="none" stroke-linecap="round"/>
-        <path d="M21 17 Q22.5 16 24.5 17" stroke="#6B3F35" stroke-width="1" fill="none" stroke-linecap="round"/>
-        <!-- bouche neutre légèrement triste -->
-        <path d="M16 27 Q19 25.5 22 27" stroke="#6B3F35" stroke-width="1.2" fill="none" stroke-linecap="round"/>
-        <!-- petits points de rougeur discrets sur front -->
-        <circle cx="17" cy="13" r="1.2" fill="#F4A0A0" opacity=".7"/>
-        <circle cx="19" cy="12" r="1" fill="#F4A0A0" opacity=".6"/>
-        <circle cx="21" cy="13" r="1.2" fill="#F4A0A0" opacity=".7"/>
-        <!-- feuille apaisante -->
-        <path d="M5 20 Q7 16 9 20 Q7 22 5 20Z" fill="#B5C4B1" opacity=".8"/>
-        <path d="M29 20 Q31 16 33 20 Q31 22 29 20Z" fill="#B5C4B1" opacity=".8"/>
+        <!-- Sourcils légèrement froncés -->
+        <path d="M13 16.5 Q15 15.5 17 16.5" stroke="#6B3F35" stroke-width="1.2" fill="none" stroke-linecap="round"/>
+        <path d="M21 16.5 Q23 15.5 25 16.5" stroke="#6B3F35" stroke-width="1.2" fill="none" stroke-linecap="round"/>
+        <!-- Bouche légèrement triste -->
+        <path d="M16 27 Q19 25 22 27" stroke="#6B3F35" stroke-width="1.3" fill="none" stroke-linecap="round"/>
+        <!-- Petits points rougeur sur le front -->
+        <circle cx="16" cy="12" r="1.2" fill="#E84040" opacity=".5"/>
+        <circle cx="19" cy="11" r="1" fill="#E84040" opacity=".4"/>
+        <circle cx="22" cy="12" r="1.2" fill="#E84040" opacity=".5"/>
       </svg>
       <div style="font-size:9px;font-weight:700;color:#D04444;letter-spacing:.3px">${LANG==="en"?"SENSITIVE":"SENSIBLE"}</div>
     </div>`,
+
   };
   const skinTypes=[
     {id:"seche",    label:l.skin_seche||"Sèche",       sub:l.skin_seche_sub||"Tiraillements"},
