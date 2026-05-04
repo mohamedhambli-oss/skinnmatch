@@ -2012,7 +2012,8 @@ function renderResult(){
             : `<button class="btn-fiche" onclick="toggleYuka('yuka-${s.key}')"><span>${t("note_yuka")}</span></button>`
           }
           <a href="${s.link}" target="_blank" class="btn-buy"><span>${buyLabel}</span></a>
-          <button onclick="showVideo('${s.video||''}','${s.nom}','${s.marque}')" title="${LANG==='en'?'Watch video':'Voir la vidéo'}" style="display:inline-flex;align-items:center;justify-content:center;width:36px;height:36px;border-radius:50%;background:#FF0000;color:#fff;font-size:16px;flex-shrink:0;border:none;cursor:pointer;margin-left:4px">▶</button>
+          <button onclick="showVideo('${s.video||''}','${s.nom}','${s.marque}','yt')" title="YouTube" style="display:inline-flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:50%;background:#FF0000;color:#fff;font-size:13px;flex-shrink:0;border:none;cursor:pointer;margin-left:4px;font-weight:700">▶</button>
+          <button onclick="showVideo('${s.video||''}','${s.nom}','${s.marque}','tk')" title="TikTok" style="display:inline-flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:50%;background:#000;color:#fff;font-size:15px;flex-shrink:0;border:none;cursor:pointer;margin-left:4px">♪</button>
         </div>
         <div id="yuka-${s.key}" style="display:none;margin-top:8px;padding:10px 12px;border-radius:8px;background:#F7F3EF;border:1px solid #E8E0D6">
           <div style="font-size:10px;font-weight:700;color:#9A8B7C;text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px">${t('note_yuka')||'Yuka score'}</div>
@@ -2231,21 +2232,30 @@ function showWhyAI(key, nom, marque) {
 }
 
 
-function showVideo(url, nom, marque) {
+function showVideo(url, nom, marque, platform) {
     var modal = document.getElementById('video-modal');
     var iframe = document.getElementById('video-iframe');
     var title = document.getElementById('video-title');
     if (!modal || !iframe) return;
-    
+
+    var query = encodeURIComponent((nom || '') + ' ' + (marque || '') + ' skincare');
+
+    if (platform === 'tk') {
+        // TikTok → recherche TikTok sur ce produit
+        window.open('https://www.tiktok.com/search?q=' + query, '_blank');
+        return;
+    }
+
+    // YouTube
     if (url && url.indexOf('youtube.com/embed') !== -1) {
-        // Vidéo directe disponible → jouer dans l'app
+        // Vidéo directe → jouer dans l'app
         iframe.src = url + '?autoplay=1&rel=0';
         title.textContent = nom;
         modal.style.display = 'flex';
     } else {
-        // Pas de vidéo directe → recherche YouTube ciblée sur ce produit exact
-        var query = encodeURIComponent((nom || '') + ' ' + (marque || '') + ' review soin skincare');
-        window.open('https://www.youtube.com/results?search_query=' + query, '_blank');
+        // Recherche YouTube ciblée sur ce produit
+        var ytQuery = encodeURIComponent((nom || '') + ' ' + (marque || '') + ' review soin');
+        window.open('https://www.youtube.com/results?search_query=' + ytQuery, '_blank');
     }
 }
 
