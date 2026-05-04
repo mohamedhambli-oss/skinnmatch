@@ -1096,14 +1096,84 @@ function build(){
 }
 
 function t(key){ return (T[LANG]&&T[LANG][key]!==undefined)?T[LANG][key]:(T.fr[key]||key); }
-function setRegionFromSelect() {
-  // Juste prévisualiser, pas encore confirmer
+var selectedRegionValue = '';
+
+var REGIONS = [
+  {group:'🌍 Europe', items:[
+    {val:'fr',flag:'🇫🇷',name:'France'},
+    {val:'fr',flag:'🇧🇪',name:'Belgique'},
+    {val:'fr',flag:'🇨🇭',name:'Suisse'},
+    {val:'de',flag:'🇩🇪',name:'Allemagne'},
+    {val:'es',flag:'🇪🇸',name:'Espagne'},
+    {val:'gb',flag:'🇬🇧',name:'Royaume-Uni'},
+    {val:'gb',flag:'🇮🇹',name:'Italie'},
+    {val:'gb',flag:'🇳🇱',name:'Pays-Bas'},
+  ]},
+  {group:'🌍 Maghreb', items:[
+    {val:'dz',flag:'🇩🇿',name:'Algérie'},
+    {val:'ma',flag:'🇲🇦',name:'Maroc'},
+    {val:'ma',flag:'🇹🇳',name:'Tunisie'},
+    {val:'ma',flag:'🇱🇾',name:'Libye'},
+  ]},
+  {group:'🌍 Moyen-Orient', items:[
+    {val:'gb',flag:'🇸🇦',name:'Arabie Saoudite'},
+    {val:'gb',flag:'🇦🇪',name:'Émirats Arabes Unis'},
+    {val:'gb',flag:'🇶🇦',name:'Qatar'},
+    {val:'gb',flag:'🇱🇧',name:'Liban'},
+    {val:'gb',flag:'🇪🇬',name:'Égypte'},
+  ]},
+  {group:'🌍 Amériques', items:[
+    {val:'gb',flag:'🇺🇸',name:'États-Unis'},
+    {val:'gb',flag:'🇨🇦',name:'Canada'},
+    {val:'es',flag:'🇲🇽',name:'Mexique'},
+    {val:'es',flag:'🇧🇷',name:'Brésil'},
+  ]},
+  {group:'🌍 Afrique', items:[
+    {val:'gb',flag:'🇸🇳',name:'Sénégal'},
+    {val:'gb',flag:'🇨🇮',name:"Côte d'Ivoire"},
+    {val:'gb',flag:'🇨🇲',name:'Cameroun'},
+  ]},
+  {group:'🌍 Asie & Océanie', items:[
+    {val:'gb',flag:'🇯🇵',name:'Japon'},
+    {val:'gb',flag:'🇰🇷',name:'Corée du Sud'},
+    {val:'gb',flag:'🇦🇺',name:'Australie'},
+  ]},
+];
+
+function buildRegionList() {
+  var container = document.getElementById('region-list');
+  if (!container) return;
+  container.innerHTML = '';
+  REGIONS.forEach(function(group) {
+    var groupLabel = document.createElement('div');
+    groupLabel.style.cssText = 'font-size:10px;font-weight:700;color:#B0958F;text-transform:uppercase;letter-spacing:.5px;padding:4px 0 2px';
+    groupLabel.textContent = group.group;
+    container.appendChild(groupLabel);
+    group.items.forEach(function(item) {
+      var btn = document.createElement('button');
+      btn.style.cssText = 'width:100%;padding:12px 16px;border-radius:12px;border:2px solid ' + (selectedRegionValue === item.val + '_' + item.name ? '#C4726A' : '#EDD9D4') + ';background:' + (selectedRegionValue === item.val + '_' + item.name ? '#FDF0E6' : '#fff') + ';cursor:pointer;display:flex;align-items:center;gap:10px;font-family:inherit;text-align:left';
+      btn.innerHTML = '<span style="font-size:22px">' + item.flag + '</span><span style="font-size:14px;font-weight:600;color:#3D2B1F">' + item.name + '</span>';
+      btn.onclick = (function(v, n) {
+        return function() {
+          selectedRegionValue = v + '_' + n;
+          document.querySelectorAll('#region-list button').forEach(function(b) {
+            b.style.borderColor = '#EDD9D4';
+            b.style.background = '#fff';
+          });
+          btn.style.borderColor = '#C4726A';
+          btn.style.background = '#FDF0E6';
+          // Stocker juste la valeur région
+          selectedRegionValue = v;
+        };
+      })(item.val, item.name);
+      container.appendChild(btn);
+    });
+  });
 }
 
 function confirmRegion() {
-  var select = document.getElementById('region-select');
-  if (!select || !select.value) return;
-  setRegion(select.value);
+  if (!selectedRegionValue) return;
+  setRegion(selectedRegionValue);
 }
 
 function setRegion(r) {
@@ -2187,18 +2257,90 @@ function closeVideo() {
 }
 
 function showRegionModal() {
+  selectedRegionValue = '';
+  buildRegionList();
   var m = document.getElementById('region-modal');
   if (m) m.style.display = 'flex';
 }
 
-function setRegionFromSelect() {
-  // Juste prévisualiser, pas encore confirmer
+var selectedRegionValue = '';
+
+var REGIONS = [
+  {group:'🌍 Europe', items:[
+    {val:'fr',flag:'🇫🇷',name:'France'},
+    {val:'fr',flag:'🇧🇪',name:'Belgique'},
+    {val:'fr',flag:'🇨🇭',name:'Suisse'},
+    {val:'de',flag:'🇩🇪',name:'Allemagne'},
+    {val:'es',flag:'🇪🇸',name:'Espagne'},
+    {val:'gb',flag:'🇬🇧',name:'Royaume-Uni'},
+    {val:'gb',flag:'🇮🇹',name:'Italie'},
+    {val:'gb',flag:'🇳🇱',name:'Pays-Bas'},
+  ]},
+  {group:'🌍 Maghreb', items:[
+    {val:'dz',flag:'🇩🇿',name:'Algérie'},
+    {val:'ma',flag:'🇲🇦',name:'Maroc'},
+    {val:'ma',flag:'🇹🇳',name:'Tunisie'},
+    {val:'ma',flag:'🇱🇾',name:'Libye'},
+  ]},
+  {group:'🌍 Moyen-Orient', items:[
+    {val:'gb',flag:'🇸🇦',name:'Arabie Saoudite'},
+    {val:'gb',flag:'🇦🇪',name:'Émirats Arabes Unis'},
+    {val:'gb',flag:'🇶🇦',name:'Qatar'},
+    {val:'gb',flag:'🇱🇧',name:'Liban'},
+    {val:'gb',flag:'🇪🇬',name:'Égypte'},
+  ]},
+  {group:'🌍 Amériques', items:[
+    {val:'gb',flag:'🇺🇸',name:'États-Unis'},
+    {val:'gb',flag:'🇨🇦',name:'Canada'},
+    {val:'es',flag:'🇲🇽',name:'Mexique'},
+    {val:'es',flag:'🇧🇷',name:'Brésil'},
+  ]},
+  {group:'🌍 Afrique', items:[
+    {val:'gb',flag:'🇸🇳',name:'Sénégal'},
+    {val:'gb',flag:'🇨🇮',name:"Côte d'Ivoire"},
+    {val:'gb',flag:'🇨🇲',name:'Cameroun'},
+  ]},
+  {group:'🌍 Asie & Océanie', items:[
+    {val:'gb',flag:'🇯🇵',name:'Japon'},
+    {val:'gb',flag:'🇰🇷',name:'Corée du Sud'},
+    {val:'gb',flag:'🇦🇺',name:'Australie'},
+  ]},
+];
+
+function buildRegionList() {
+  var container = document.getElementById('region-list');
+  if (!container) return;
+  container.innerHTML = '';
+  REGIONS.forEach(function(group) {
+    var groupLabel = document.createElement('div');
+    groupLabel.style.cssText = 'font-size:10px;font-weight:700;color:#B0958F;text-transform:uppercase;letter-spacing:.5px;padding:4px 0 2px';
+    groupLabel.textContent = group.group;
+    container.appendChild(groupLabel);
+    group.items.forEach(function(item) {
+      var btn = document.createElement('button');
+      btn.style.cssText = 'width:100%;padding:12px 16px;border-radius:12px;border:2px solid ' + (selectedRegionValue === item.val + '_' + item.name ? '#C4726A' : '#EDD9D4') + ';background:' + (selectedRegionValue === item.val + '_' + item.name ? '#FDF0E6' : '#fff') + ';cursor:pointer;display:flex;align-items:center;gap:10px;font-family:inherit;text-align:left';
+      btn.innerHTML = '<span style="font-size:22px">' + item.flag + '</span><span style="font-size:14px;font-weight:600;color:#3D2B1F">' + item.name + '</span>';
+      btn.onclick = (function(v, n) {
+        return function() {
+          selectedRegionValue = v + '_' + n;
+          document.querySelectorAll('#region-list button').forEach(function(b) {
+            b.style.borderColor = '#EDD9D4';
+            b.style.background = '#fff';
+          });
+          btn.style.borderColor = '#C4726A';
+          btn.style.background = '#FDF0E6';
+          // Stocker juste la valeur région
+          selectedRegionValue = v;
+        };
+      })(item.val, item.name);
+      container.appendChild(btn);
+    });
+  });
 }
 
 function confirmRegion() {
-  var select = document.getElementById('region-select');
-  if (!select || !select.value) return;
-  setRegion(select.value);
+  if (!selectedRegionValue) return;
+  setRegion(selectedRegionValue);
 }
 
 function setRegion(r) {
@@ -3116,69 +3258,14 @@ setTimeout(applyWelcomeLang, 50);
 
 <!-- MODALE RÉGION -->
 <div id="region-modal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.6);z-index:9999;align-items:flex-end;justify-content:center">
-  <div style="background:#FDF8F5;border-radius:24px 24px 0 0;padding:28px 24px 40px;width:100%;max-width:460px">
-    <div style="text-align:center;margin-bottom:24px">
-      <div style="font-size:10px;font-weight:700;color:#C4726A;text-transform:uppercase;letter-spacing:3px;margin-bottom:10px">🌍 Région</div>
-      <h2 style="font-family:Georgia,serif;font-size:22px;font-weight:700;color:#3D2B1F;margin-bottom:6px">Où êtes-vous ?</h2>
+  <div style="background:#FDF8F5;border-radius:24px 24px 0 0;padding:28px 24px 40px;width:100%;max-width:460px;max-height:85vh;overflow-y:auto">
+    <div style="text-align:center;margin-bottom:20px">
+      <div style="font-size:10px;font-weight:700;color:#C4726A;text-transform:uppercase;letter-spacing:3px;margin-bottom:8px">🌍 Région</div>
+      <h2 style="font-family:Georgia,serif;font-size:22px;font-weight:700;color:#3D2B1F;margin-bottom:4px">Où êtes-vous ?</h2>
       <p style="font-size:13px;color:#8B6F5E">Les produits sont adaptés à votre pays.</p>
     </div>
-    <!-- Liste déroulante -->
-    <select id="region-select" onchange="setRegionFromSelect()" style="width:100%;padding:14px 16px;border:1.5px solid #EDD9D4;border-radius:14px;font-size:15px;font-family:'Outfit',sans-serif;color:#3D2B1F;background:#fff;appearance:none;-webkit-appearance:none;background-image:url('data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2224%22 height=%2224%22 viewBox=%220 0 24 24%22 fill=%22%23C4726A%22><path d=%22M7 10l5 5 5-5z%22/></svg>');background-repeat:no-repeat;background-position:right 14px center;cursor:pointer;outline:none;margin-bottom:16px">
-      <option value="">-- Choisissez votre pays --</option>
-      <optgroup label="🌍 Europe">
-        <option value="fr">🇫🇷 France</option>
-        <option value="fr">🇧🇪 Belgique</option>
-        <option value="fr">🇨🇭 Suisse</option>
-        <option value="de">🇩🇪 Allemagne</option>
-        <option value="de">🇦🇹 Autriche</option>
-        <option value="es">🇪🇸 Espagne</option>
-        <option value="es">🇵🇹 Portugal</option>
-        <option value="gb">🇬🇧 Royaume-Uni</option>
-        <option value="gb">🇮🇪 Irlande</option>
-        <option value="gb">🇮🇹 Italie</option>
-        <option value="gb">🇳🇱 Pays-Bas</option>
-        <option value="gb">🇸🇪 Suède</option>
-        <option value="gb">🇳🇴 Norvège</option>
-        <option value="gb">🇩🇰 Danemark</option>
-        <option value="gb">🇵🇱 Pologne</option>
-      </optgroup>
-      <optgroup label="🌍 Maghreb">
-        <option value="dz">🇩🇿 Algérie</option>
-        <option value="ma">🇲🇦 Maroc</option>
-        <option value="ma">🇹🇳 Tunisie</option>
-        <option value="ma">🇱🇾 Libye</option>
-      </optgroup>
-      <optgroup label="🌍 Moyen-Orient">
-        <option value="gb">🇸🇦 Arabie Saoudite</option>
-        <option value="gb">🇦🇪 Émirats Arabes Unis</option>
-        <option value="gb">🇶🇦 Qatar</option>
-        <option value="gb">🇰🇼 Koweït</option>
-        <option value="gb">🇱🇧 Liban</option>
-        <option value="gb">🇪🇬 Égypte</option>
-      </optgroup>
-      <optgroup label="🌍 Amériques">
-        <option value="gb">🇺🇸 États-Unis</option>
-        <option value="gb">🇨🇦 Canada</option>
-        <option value="es">🇲🇽 Mexique</option>
-        <option value="es">🇧🇷 Brésil</option>
-        <option value="es">🇦🇷 Argentine</option>
-        <option value="es">🇨🇴 Colombie</option>
-      </optgroup>
-      <optgroup label="🌍 Asie &amp; Océanie">
-        <option value="gb">🇯🇵 Japon</option>
-        <option value="gb">🇰🇷 Corée du Sud</option>
-        <option value="gb">🇨🇳 Chine</option>
-        <option value="gb">🇮🇳 Inde</option>
-        <option value="gb">🇦🇺 Australie</option>
-      </optgroup>
-      <optgroup label="🌍 Afrique">
-        <option value="gb">🇸🇳 Sénégal</option>
-        <option value="gb">🇨🇮 Côte d'Ivoire</option>
-        <option value="gb">🇨🇲 Cameroun</option>
-        <option value="gb">🇬🇦 Gabon</option>
-        <option value="gb">🇲🇱 Mali</option>
-      </optgroup>
-    </select>
+    <!-- Liste custom mobile-friendly -->
+    <div id="region-list" style="display:flex;flex-direction:column;gap:8px;margin-bottom:16px"></div>
     <button onclick="confirmRegion()" style="width:100%;padding:14px;border-radius:50px;border:none;background:#C4726A;color:#fff;font-size:15px;font-weight:700;cursor:pointer;font-family:'Outfit',sans-serif">Confirmer</button>
   </div>
 </div>
