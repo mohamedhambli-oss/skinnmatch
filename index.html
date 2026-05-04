@@ -1919,6 +1919,10 @@ function renderResult(){
         <div class="btns" style="flex-wrap:wrap;gap:6px">
 
         </div>
+        <button class="btn-fiche" onclick="openModal('${s.key}')">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="#9A8B7C"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
+            <span>${t('fiche_btn')}</span>
+          </button>
         <button onclick="showWhyAI('${s.key}','${s.nom}','${s.marque}')" style="width:100%;margin-top:10px;padding:12px 16px;border-radius:50px;border:none;background:#C4726A;color:#fff;font-size:13px;font-weight:700;cursor:pointer;font-family:var(--sans);display:flex;align-items:center;justify-content:center;gap:8px">
           <span>${LANG==="en"?"Why this product?":"Pourquoi ce produit ?"}</span>
         </button>
