@@ -2839,6 +2839,38 @@ function buildCompareCards(query) {
 
 
 
+
+function toggleCompareCard(key) {
+    var idx = compareSelected.indexOf(key);
+    if (idx !== -1) {
+        compareSelected.splice(idx, 1);
+        document.getElementById("compare-result").innerHTML = "";
+    } else {
+        if (compareSelected.length >= 2) return;
+        compareSelected.push(key);
+    }
+
+    // Vider la recherche et rebuilder
+    var searchEl = document.getElementById("compare-search");
+    if (searchEl) searchEl.value = "";
+    buildCompareCards("");
+
+    var sub = document.getElementById("compare-sub");
+    if (compareSelected.length === 0) {
+        sub.textContent = LANG === "en" ? "Tap 2 products to compare." : "Touchez 2 produits pour les comparer.";
+        document.getElementById("compare-result").innerHTML = "";
+    } else if (compareSelected.length === 1) {
+        sub.textContent = LANG === "en" ? "Select one more product." : "Sélectionnez encore un produit.";
+    } else {
+        sub.textContent = "";
+        renderCompare();
+        setTimeout(function() {
+            var res = document.getElementById("compare-result");
+            if (res) res.scrollIntoView({ behavior: "smooth", block: "start" });
+        }, 150);
+    }
+}
+
 function renderCompare() {
     var keyA = compareSelected[0];
     var keyB = compareSelected[1];
