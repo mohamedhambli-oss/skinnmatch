@@ -630,13 +630,12 @@ h2{font-family:var(--serif);font-size:20px;font-weight:700;margin-bottom:3px}
     </div>
 
     <!-- Zone de scan -->
-    <div id="scan-zone" style="background:#1F3864;border-radius:20px;padding:32px 24px;text-align:center;margin-bottom:20px;position:relative;overflow:hidden">
-      <div style="position:absolute;top:0;left:0;right:0;bottom:0;opacity:.1;background:repeating-linear-gradient(0deg,transparent,transparent 20px,rgba(255,255,255,.1) 20px,rgba(255,255,255,.1) 21px)"></div>
+    <div id="scan-zone" style="background:#1F3864;border-radius:20px;padding:32px 24px;text-align:center;margin-bottom:20px">
       <div style="font-size:48px;margin-bottom:12px">📷</div>
       <p style="color:rgba(255,255,255,.9);font-size:14px;font-weight:600;margin-bottom:4px">Caméra disponible après installation PWA</p>
       <p style="color:rgba(255,255,255,.6);font-size:12px;margin-bottom:20px">En attendant, entre le nom du produit manuellement</p>
       <div style="display:flex;gap:8px">
-        <input id="product-search-input" type="text" placeholder="Ex: CeraVe Gel Moussant..." style="flex:1;padding:12px 16px;border-radius:50px;border:none;font-size:13px;font-family:inherit;outline:none" oninput="searchProductScan(this.value)">
+        <input id="product-search-input" type="text" placeholder="Ex: CeraVe Gel Moussant..." autocomplete="off" autocorrect="off" autocapitalize="off" style="flex:1;padding:12px 16px;border-radius:50px;border:none;font-size:16px;font-family:inherit;outline:none;-webkit-appearance:none;touch-action:manipulation" oninput="searchProductScan(this.value)">
         <button onclick="simulateScan()" style="padding:12px 16px;border-radius:50px;background:#C4726A;border:none;color:#fff;font-weight:700;cursor:pointer;font-size:13px;font-family:inherit;white-space:nowrap">Analyser</button>
       </div>
     </div>
