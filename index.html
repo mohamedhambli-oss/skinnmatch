@@ -2875,20 +2875,46 @@ function searchProductScan(query) {
 
 function simulateScan() {
   var input = document.getElementById('product-search-input');
-  var query = (input && input.value || '').toLowerCase();
+  var query = (input && input.value || '').toLowerCase().trim();
+  if (!query) return;
   
   var matchedKey = null;
-  if (query.includes('cerave') || query.includes('gel moussant')) matchedKey = 'cerave-gel';
-  else if (query.includes('effaclar') || query.includes('lrp') || query.includes('la roche')) matchedKey = 'lrp-effaclar';
-  else if (query.includes('skinceuticals') || query.includes('ce ferulic') || query.includes('ferulic')) matchedKey = 'skinceuticals-ce';
+  var bestScore = 0;
   
-  if (!matchedKey && query.length > 0) {
-    // Chercher dans la DB
-    Object.keys(DB).forEach(function(key) {
-      var p = DB[key];
-      if (p.nom && p.nom.toLowerCase().includes(query)) matchedKey = key;
-      if (p.marque && p.marque.toLowerCase().includes(query)) matchedKey = matchedKey || key;
+  // Chercher dans toute la DB - correspondance partielle sur nom ET marque
+  Object.keys(DB).forEach(function(key) {
+    var p = DB[key];
+    var score = 0;
+    var nom = (p.nom || '').toLowerCase();
+    var marque = (p.marque || '').toLowerCase();
+    var usage = (p.usage || '').toLowerCase();
+    
+    // Score exact
+    if (nom === query) score = 100;
+    else if (nom.includes(query)) score = 80;
+    else if (marque.includes(query)) score = 60;
+    else if (usage.includes(query)) score = 40;
+    
+    // Correspondance par mots
+    var words = query.split(' ');
+    words.forEach(function(w) {
+      if (w.length < 3) return;
+      if (nom.includes(w)) score += 20;
+      if (marque.includes(w)) score += 15;
     });
+    
+    if (score > bestScore) {
+      bestScore = score;
+      matchedKey = key;
+    }
+  });
+  
+  // Fallback sur les démos connues
+  if (!matchedKey || bestScore < 20) {
+    if (query.includes('cerave')) matchedKey = 'cv-gel';
+    else if (query.includes('effaclar')) matchedKey = 'lrp-effduo';
+    else if (query.includes('skinceuticals') || query.includes('ferulic')) matchedKey = 'skc-cef';
+    else matchedKey = Object.keys(DB)[0];
   }
   
   simulateScanWithKey(matchedKey);
@@ -3121,8 +3147,12 @@ function displayScanResult(data) {
   
   // Scroll vers le résultat
   setTimeout(function() {
-    document.getElementById('scan-result').scrollIntoView({behavior:'smooth', block:'start'});
-  }, 200);
+    var res = document.getElementById('scan-result');
+    if (res) {
+      res.style.display = 'block';
+      res.scrollIntoView({behavior:'smooth', block:'start'});
+    }
+  }, 300);
 }
 
 function updateScanHistory() {
