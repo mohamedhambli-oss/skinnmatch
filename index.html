@@ -7,6 +7,11 @@
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%23C4726A'/><rect x='5' y='5' width='90' height='90' rx='18' fill='%23D4887F'/><text y='72' x='50' text-anchor='middle' font-size='52' font-weight='700' fill='white' font-family='Georgia,serif'>SM</text></svg>">
 <link rel="apple-touch-icon" href="data:image/png;base64,iVBORw0KGgo=">
 <meta name="supported-color-schemes" content="light">
+<link rel="manifest" href="manifest.json">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="SkinMatch">
+<link rel="apple-touch-icon" href="icon-192.png">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
@@ -519,7 +524,8 @@ h2{font-family:var(--serif);font-size:20px;font-weight:700;margin-bottom:3px}
 
 <!-- ══ RESULT ══ -->
 <div id="sc-result" class="hidden">
-  <div class="topbar"><button class="btn-back" onclick="go('q5')">← Retour</button><div class="logo"><div class="logo-icon">SM</div>Skin<span>Match</span></div><button onclick="openCompare()" id="btn-compare-top" style="background:#C4726A;border:none;border-radius:20px;padding:6px 12px;font-size:11px;font-weight:700;color:#fff;cursor:pointer;font-family:var(--sans)">⚖️ Comparer</button></div>
+  <div class="topbar"><button class="btn-back" onclick="go('q5')">← Retour</button><div class="logo"><div class="logo-icon">SM</div>Skin<span>Match</span></div><button onclick="go('scan-product')" style="background:linear-gradient(135deg,#1F3864,#2E5496);border:none;border-radius:20px;padding:6px 12px;font-size:11px;font-weight:700;color:#fff;cursor:pointer;font-family:var(--sans);margin-right:4px">📷 Scanner</button>
+    <button onclick="openCompare()" id="btn-compare-top" style="background:#C4726A;border:none;border-radius:20px;padding:6px 12px;font-size:11px;font-weight:700;color:#fff;cursor:pointer;font-family:var(--sans)">⚖️ Comparer</button></div>
 
   <div class="content" id="result-content"></div>
 </div>
@@ -586,7 +592,7 @@ h2{font-family:var(--serif);font-size:20px;font-weight:700;margin-bottom:3px}
     <p style="font-size:14px;line-height:1.7;color:#5A4A42;margin-bottom:16px">Les présentes Conditions Générales d'Utilisation (CGU) régissent l'accès et l'utilisation de l'application SkinMatch, disponible à l'adresse skinmatch.app. En utilisant SkinMatch, vous acceptez sans réserve les présentes CGU.</p>
 
     <h2 style="font-size:16px;font-weight:700;color:#3D2B1F;margin:20px 0 8px">2. Description du service</h2>
-    <p style="font-size:14px;line-height:1.7;color:#5A4A42;margin-bottom:16px">SkinMatch est un service de conseil skincare personnalisé basé sur un algorithme de recommandation. Les conseils fournis sont à titre informatif et ne remplacent pas l'avis d'un dermatologue ou d'un professionnel de santé.</p>
+    <p style="font-size:14px;line-height:1.7;color:#5A4A42;margin-bottom:16px">SkinMatch est un service de conseil skincare personnalisé basé sur un algorithme de recommandation. Les conseils fournis sont à titre informatif et ne remplacent pas l'avis d\'un dermatologue ou d\'un professionnel de santé.</p>
 
     <h2 style="font-size:16px;font-weight:700;color:#3D2B1F;margin:20px 0 8px">3. Responsabilité</h2>
     <p style="font-size:14px;line-height:1.7;color:#5A4A42;margin-bottom:16px">SkinMatch ne peut être tenu responsable des réactions cutanées liées à l'utilisation des produits recommandés. Nous vous conseillons de toujours tester un nouveau produit sur une petite zone de peau avant utilisation complète.</p>
@@ -605,6 +611,111 @@ h2{font-family:var(--serif);font-size:20px;font-weight:700;margin-bottom:3px}
 
     <h2 style="font-size:16px;font-weight:700;color:#3D2B1F;margin:20px 0 8px">8. Contact</h2>
     <p style="font-size:14px;line-height:1.7;color:#5A4A42;margin-bottom:16px">Pour toute question : <strong>contact@skinmatch.app</strong></p>
+  </div>
+</div>
+
+<!-- ══ SCAN PRODUCT ══ -->
+<div id="sc-scan-product" class="hidden">
+  <div class="topbar">
+    <button class="btn-back" onclick="go('result')">← Retour</button>
+    <div class="logo"><div class="logo-icon">SM</div>Skin<span>Match</span></div>
+  </div>
+  <div class="content" style="padding-bottom:80px">
+    
+    <!-- Header -->
+    <div style="text-align:center;margin-bottom:24px">
+      <div style="font-size:10px;font-weight:700;color:#C4726A;text-transform:uppercase;letter-spacing:3px;margin-bottom:8px">📷 Scanner un produit</div>
+      <h2 style="font-family:Georgia,serif;font-size:22px;font-weight:700;color:#3D2B1F;margin-bottom:6px">Analyse instantanée</h2>
+      <p style="font-size:13px;color:#8B6F5E">Scanne le code-barres d\'un produit pour savoir s'il est adapté à ta peau</p>
+    </div>
+
+    <!-- Zone de scan -->
+    <div id="scan-zone" style="background:#1F3864;border-radius:20px;padding:32px 24px;text-align:center;margin-bottom:20px;position:relative;overflow:hidden">
+      <div style="position:absolute;top:0;left:0;right:0;bottom:0;opacity:.1;background:repeating-linear-gradient(0deg,transparent,transparent 20px,rgba(255,255,255,.1) 20px,rgba(255,255,255,.1) 21px)"></div>
+      <div style="font-size:48px;margin-bottom:12px">📷</div>
+      <p style="color:rgba(255,255,255,.9);font-size:14px;font-weight:600;margin-bottom:4px">Caméra disponible après installation PWA</p>
+      <p style="color:rgba(255,255,255,.6);font-size:12px;margin-bottom:20px">En attendant, entre le nom du produit manuellement</p>
+      <div style="display:flex;gap:8px">
+        <input id="product-search-input" type="text" placeholder="Ex: CeraVe Gel Moussant..." style="flex:1;padding:12px 16px;border-radius:50px;border:none;font-size:13px;font-family:inherit;outline:none" oninput="searchProductScan(this.value)">
+        <button onclick="simulateScan()" style="padding:12px 16px;border-radius:50px;background:#C4726A;border:none;color:#fff;font-weight:700;cursor:pointer;font-size:13px;font-family:inherit;white-space:nowrap">Analyser</button>
+      </div>
+    </div>
+
+    <!-- Suggestions de recherche -->
+    <div id="scan-suggestions" style="display:none;margin-bottom:16px">
+      <p style="font-size:11px;color:#B0958F;font-weight:600;margin-bottom:8px;text-transform:uppercase;letter-spacing:.5px">Suggestions</p>
+      <div id="scan-suggestions-list" style="display:flex;flex-direction:column;gap:6px"></div>
+    </div>
+
+    <!-- Résultat du scan -->
+    <div id="scan-result" style="display:none">
+      
+      <!-- Produit header -->
+      <div id="scan-product-header" style="background:#fff;border-radius:16px;padding:16px;display:flex;align-items:center;gap:14px;margin-bottom:16px;box-shadow:0 2px 12px rgba(0,0,0,.06)">
+        <div id="scan-product-img" style="width:60px;height:60px;border-radius:12px;background:#F5E8E6;display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:700;color:#C4726A;flex-shrink:0"></div>
+        <div>
+          <div id="scan-product-name" style="font-size:16px;font-weight:700;color:#3D2B1F;font-family:Georgia,serif"></div>
+          <div id="scan-product-brand" style="font-size:13px;color:#8B6F5E;margin-top:2px"></div>
+          <div id="scan-product-cat" style="font-size:11px;color:#C4726A;font-weight:600;margin-top:4px;text-transform:uppercase;letter-spacing:.5px"></div>
+        </div>
+      </div>
+
+      <!-- Score principal -->
+      <div style="background:linear-gradient(135deg,#1F3864,#2E5496);border-radius:20px;padding:24px;text-align:center;margin-bottom:16px;position:relative;overflow:hidden">
+        <div style="position:absolute;top:-20px;right:-20px;width:100px;height:100px;border-radius:50%;background:rgba(255,255,255,.05)"></div>
+        <p style="font-size:11px;font-weight:700;color:rgba(255,255,255,.7);text-transform:uppercase;letter-spacing:3px;margin-bottom:12px">Score d'adaptation</p>
+        
+        <!-- Cercle de score -->
+        <div style="position:relative;width:120px;height:120px;margin:0 auto 12px">
+          <svg width="120" height="120" viewBox="0 0 120 120">
+            <circle cx="60" cy="60" r="50" fill="none" stroke="rgba(255,255,255,.15)" stroke-width="10"/>
+            <circle id="score-circle" cx="60" cy="60" r="50" fill="none" stroke="#C4726A" stroke-width="10" stroke-linecap="round" stroke-dasharray="314" stroke-dashoffset="314" transform="rotate(-90 60 60)" style="transition:stroke-dashoffset 1s ease"/>
+          </svg>
+          <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center">
+            <div id="score-number" style="font-size:32px;font-weight:700;color:#fff;font-family:Georgia,serif;line-height:1">0</div>
+            <div style="font-size:12px;color:rgba(255,255,255,.7)">/100</div>
+          </div>
+        </div>
+        
+        <div id="score-label" style="font-size:16px;font-weight:700;color:#fff;margin-bottom:4px"></div>
+        <div id="score-sublabel" style="font-size:13px;color:rgba(255,255,255,.7)"></div>
+      </div>
+
+      <!-- 4 dimensions -->
+      <div style="background:#fff;border-radius:16px;padding:16px;margin-bottom:16px;box-shadow:0 2px 12px rgba(0,0,0,.06)">
+        <p style="font-size:12px;font-weight:700;color:#3D2B1F;text-transform:uppercase;letter-spacing:.5px;margin-bottom:14px">Détail du score</p>
+        <div id="score-dimensions" style="display:flex;flex-direction:column;gap:12px"></div>
+      </div>
+
+      <!-- Stats communauté -->
+      <div style="background:linear-gradient(135deg,#FDF0E6,#FAE5D8);border-radius:16px;padding:16px;margin-bottom:16px;border:1px solid rgba(196,114,106,.15)">
+        <p style="font-size:12px;font-weight:700;color:#C4726A;text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px">📊 Stats communauté SkinMatch</p>
+        <div id="scan-stats" style="display:flex;flex-direction:column;gap:6px"></div>
+      </div>
+
+      <!-- Ce qui convient -->
+      <div id="pros-section" style="margin-bottom:12px"></div>
+
+      <!-- Ce qui convient moins -->
+      <div id="cons-section" style="margin-bottom:12px"></div>
+
+      <!-- Alternatives -->
+      <div id="alternatives-section" style="margin-bottom:16px"></div>
+
+      <!-- Actions -->
+      <div style="display:flex;gap:10px;margin-bottom:8px">
+        <button onclick="saveScan()" style="flex:1;padding:13px;border-radius:50px;border:1.5px solid #C4726A;background:#fff;color:#C4726A;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">❤️ Sauvegarder</button>
+        <button onclick="shareScan()" style="flex:1;padding:13px;border-radius:50px;border:none;background:linear-gradient(135deg,#C4726A,#A85A52);color:#fff;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">📤 Partager</button>
+      </div>
+      <button id="scan-easypara-btn" onclick="" style="width:100%;padding:13px;border-radius:50px;border:none;background:#1F3864;color:#fff;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;margin-top:4px">🛒 Commander sur Easypara</button>
+    </div>
+
+    <!-- Historique des scans -->
+    <div id="scan-history" style="margin-top:20px">
+      <p style="font-size:12px;font-weight:700;color:#3D2B1F;text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px">Scans récents</p>
+      <div id="scan-history-list" style="display:flex;flex-direction:column;gap:8px"></div>
+    </div>
+
   </div>
 </div>
 
@@ -2499,57 +2610,97 @@ function removeTypingIndicator() {
   if (el) el.remove();
 }
 
-async function sendChatMessage() {
+function sendChatMessage() {
   var input = document.getElementById('chatbot-input');
   if (!input || !input.value.trim()) return;
-  
-  var userMsg = input.value.trim();
+  var userMsg = input.value.trim().toLowerCase();
   input.value = '';
-  
-  addChatMessage(userMsg, true);
-  chatbotHistory.push({ role: 'user', content: userMsg });
-  
+  addChatMessage(input.value || userMsg, true);
   addTypingIndicator();
-  
-  // Contexte skincare pour le bot
-  var skinContext = '';
-  if (ST.skinType) skinContext += 'Type de peau: ' + ST.skinType + '. ';
-  if (ST.ageGroup) skinContext += 'Tranche d\'âge: ' + ST.ageGroup + ' ans. ';
-  if (ST.concerns && ST.concerns.length) skinContext += 'Problèmes: ' + ST.concerns.join(', ') + '. ';
-  
-  var systemPrompt = 'Tu es SkinMatch IA, un assistant expert en skincare et soins de la peau. Tu aides les utilisateurs à comprendre leur peau, choisir leurs produits et construire leur routine. ' +
-    'Tu connais parfaitement les marques françaises de parapharmacie (La Roche-Posay, CeraVe, Bioderma, Avène, SkinCeuticals, Cible Skin, Vichy, Nuxe, Caudalie) ainsi que les marques internationales (The Ordinary, Paula\'s Choice). ' +
-    'Tu connais aussi les produits maghrébins (BioPharm, Saidal, Atlas Cosmetics pour l\'Algérie, Nectarome pour le Maroc). ' +
-    (skinContext ? 'Profil de l\'utilisateur actuel: ' + skinContext : '') +
-    'Réponds toujours de manière claire, bienveillante et professionnelle. Si la question n\'est pas liée au skincare, ramène poliment la conversation sur ce sujet. ' +
-    'Langue: ' + (LANG === 'en' ? 'English' : 'Français') + '. Maximum 3-4 phrases par réponse.';
-  
-  try {
-    var response = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        model: 'claude-sonnet-4-20250514',
-        max_tokens: 400,
-        system: systemPrompt,
-        messages: chatbotHistory
-      })
-    });
-    
-    var data = await response.json();
+  setTimeout(function() {
     removeTypingIndicator();
-    
-    if (data.content && data.content[0]) {
-      var botMsg = data.content[0].text;
-      chatbotHistory.push({ role: 'assistant', content: botMsg });
-      addChatMessage(botMsg, false);
-    } else {
-      addChatMessage(LANG === 'en' ? 'Sorry, I had trouble answering. Try again!' : 'Désolé, j\'ai eu du mal à répondre. Réessaie !', false);
-    }
-  } catch(e) {
-    removeTypingIndicator();
-    addChatMessage(LANG === 'en' ? 'Connection error. Check your internet.' : 'Erreur de connexion. Vérifie ta connexion internet.', false);
+    addChatMessage(getChatbotResponse(userMsg), false);
+  }, 800);
+}
+
+function getChatbotResponse(msg) {
+  var m = msg.toLowerCase();
+  
+  // Allergie
+  if (m.includes('allergi') || m.includes('réaction') || m.includes('irritat') || m.includes('rouge')) {
+    return '⚠️ En cas de réaction allergique, arrête immédiatement le produit et rince à l\'eau. Les allergies courantes en skincare viennent souvent des parfums, conservateurs ou acides. Consulte un dermatologue si la réaction persiste. Tu peux refaire ton diagnostic SkinMatch en précisant tes allergies pour obtenir des produits adaptés.';
   }
+  // Acné
+  if (m.includes('acné') || m.includes('bouton') || m.includes('imperfection') || m.includes('point noir')) {
+    return '🎯 Pour l\'acné, les actifs clés sont : l\'acide salicylique (BHA) qui désobstrue les pores, la niacinamide qui réduit le sébum, et le zinc qui régule la production de sebum. Évite les produits comédogènes et les crèmes trop riches. La gamme Effaclar de La Roche-Posay et le Gel Moussant CeraVe sont très efficaces.';
+  }
+  // Peau sèche
+  if (m.includes('sèche') || m.includes('tiraillement') || m.includes('deshydrat') || m.includes('sécheresse')) {
+    return '💧 Pour la peau sèche, mise sur l\'acide hyaluronique pour l\'hydratation, le beurre de karité et les céramides pour la barrière cutanée. Applique ta crème sur peau encore légèrement humide pour maximiser l\'absorption. La Crème Hydratante CeraVe et le Toleriane Dermallergo de La Roche-Posay sont excellents.';
+  }
+  // Peau grasse
+  if (m.includes('grass') || m.includes('brillance') || m.includes('pore') || m.includes('sébum')) {
+    return '✨ Pour la peau grasse, la niacinamide à 10% est ton alliée principale — elle régule le sébum sans assécher. Utilise un gel nettoyant doux matin et soir, et évite les crèmes trop riches. Le Sébium Gel Moussant Bioderma et l\'Effaclar Duo+ La Roche-Posay sont parfaits pour ce type de peau.';
+  }
+  // Taches / hyperpigmentation
+  if (m.includes('tache') || m.includes('hyperpigment') || m.includes('teint') || m.includes('éclat') || m.includes('uniform')) {
+    return '☀️ Pour les taches, la vitamine C le matin protège et illumine, la niacinamide unifie le teint, et les AHA (acide glycolique) exfolient en douceur. Le soir tu peux ajouter du rétinol pour accélérer le renouvellement cellulaire. Surtout, n\'oublie jamais le SPF le matin — sans protection solaire tes taches s\'aggravent.';
+  }
+  // Rides / anti-âge
+  if (m.includes('ride') || m.includes('anti-âge') || m.includes('fermeté') || m.includes('mature') || m.includes('vieillissement')) {
+    return '⏳ Pour lutter contre les rides, le rétinol est l\'actif le plus efficace prouvé scientifiquement — commence doucement 2x/semaine le soir. La vitamine C le matin protège du vieillissement prématuré. Les peptides et l\'acide hyaluronique complètent la routine. Le Double Sérum Clarins et le CE Ferulic SkinCeuticals sont les références.';
+  }
+  // SPF / solaire
+  if (m.includes('spf') || m.includes('solaire') || m.includes('soleil') || m.includes('uv')) {
+    return '☀️ Le SPF est l\'étape la plus importante de toute routine skincare — il prévient 80% du vieillissement cutané et protège des cancers de la peau. Minimum SPF30 quotidiennement, SPF50+ en été ou lors d\'exposition directe. L\'Anthelios La Roche-Posay est la référence en France. À appliquer en dernière étape, le matin.';
+  }
+  // Rétinol
+  if (m.includes('rétinol') || m.includes('retinol') || m.includes('rétinoïde')) {
+    return '🌙 Le rétinol s\'utilise uniquement le soir sur peau propre et sèche. Commence par 2 fois par semaine puis augmente progressivement. Il peut causer des rougeurs au début — c\'est normal, ça passe en 2-3 semaines. Ne jamais l\'associer à de la vitamine C ou des AHA le même soir. Toujours un SPF le lendemain matin.';
+  }
+  // Vitamine C
+  if (m.includes('vitamine c') || m.includes('vitamin c') || m.includes('ascorbique')) {
+    return '✨ La vitamine C s\'applique le matin sur peau propre avant la crème et le SPF. Elle protège contre les radicaux libres, illumine le teint et stimule le collagène. Conserve-la à l\'abri de la lumière — elle s\'oxyde vite. Le CE Ferulic SkinCeuticals est la référence premium, le Sérum Vitamine C Naturalia est une excellente option pour le marché algérien.';
+  }
+  // Niacinamide
+  if (m.includes('niacinamide') || m.includes('vitamine b3')) {
+    return '💊 La niacinamide est l\'un des actifs les plus polyvalents du skincare : elle réduit les pores, régule le sébum, unifie le teint et renforce la barrière cutanée. Elle convient à tous les types de peau et peut s\'utiliser matin et soir. Le Niacinamide 10% + Zinc 1% de The Ordinary est la version la plus accessible et efficace.';
+  }
+  // Acide hyaluronique
+  if (m.includes('hyaluronique') || m.includes('hyaluronic')) {
+    return '💧 L\'acide hyaluronique s\'applique sur peau légèrement humide pour maximiser son effet hydratant — il attire l\'eau dans la peau. Il convient à tous les types de peau, même grasse. Le Hyalu B5 de La Roche-Posay et le HA 2% + B5 de The Ordinary sont excellents et très bien tolérés.';
+  }
+  // Cible Skin
+  if (m.includes('cible skin') || m.includes('cibleskin')) {
+    return '⭐ Cible Skin est une marque de skincare haut de gamme disponible en pharmacie. Leurs produits phares sont le Sérum Power (anti-âge intensif), le Sérum Bleu (hydratation profonde) et la Crème Culte (soin quotidien). Leurs formulations sont clean et très efficaces. Tu peux les trouver directement sur leur site ou en pharmacie partenaire.';
+  }
+  // Routine
+  if (m.includes('routine') || m.includes('ordre') || m.includes('comment appliquer') || m.includes('comment utiliser')) {
+    return '📋 L\'ordre d\'une routine skincare : 1️⃣ Nettoyant 2️⃣ Tonique/Eau micellaire 3️⃣ Sérum (du plus léger au plus épais) 4️⃣ Contour des yeux 5️⃣ Crème hydratante 6️⃣ SPF (matin uniquement). La règle générale : du plus léger au plus épais, et toujours terminer par le SPF le matin.';
+  }
+  // Alger / Algérie
+  if (m.includes('algérie') || m.includes('algerie') || m.includes('alger') || m.includes('dz') || m.includes('dinar')) {
+    return '🇩🇿 Pour l\'Algérie, SkinMatch propose des produits locaux disponibles sur place : BioPharm, Saidal, Atlas Cosmetics (huile de nigelle, eau de rose), Naturalia DZ (sérum vitamine C) et Flair Pharma (SPF). Sélectionne l\'Algérie dans le choix de région pour voir uniquement les produits disponibles chez toi !';
+  }
+  // Maroc
+  if (m.includes('maroc') || m.includes('casablanca') || m.includes('marrakech') || m.includes('dirham')) {
+    return '🇲🇦 Pour le Maroc, SkinMatch référence Nectarome (huile d\'argan bio), Zineglob (eau de rose bio) et le savon Beldi traditionnel. Sélectionne le Maroc dans le choix de région pour voir les produits disponibles localement !';
+  }
+  // Bonjour / salut
+  if (m.includes('bonjour') || m.includes('salut') || m.includes('hello') || m.includes('bonsoir') || m.includes('hi')) {
+    var skin = ST.skinType ? ' Je vois que tu as une peau ' + ST.skinType + '.' : '';
+    return '👋 Bonjour !' + skin + ' Je suis l\'assistant SkinMatch, expert en soins de peau. Tu peux me poser toutes tes questions sur ta routine, les actifs, les produits ou les problèmes de peau. Je suis là pour t\'aider !';
+  }
+  // Merci
+  if (m.includes('merci') || m.includes('thanks') || m.includes('super') || m.includes('parfait')) {
+    return '😊 Avec plaisir ! N\'hésite pas si tu as d\'autres questions sur ta routine ou tes produits. Et n\'oublie pas de faire ton diagnostic SkinMatch pour des recommandations encore plus personnalisées !';
+  }
+  // Peaux sensibles
+  if (m.includes('sensible') || m.includes('réactiv') || m.includes('intolér')) {
+    return '🌸 Pour les peaux sensibles, privilégie des formules sans parfum, sans alcool et sans huiles essentielles. Les marques les plus adaptées sont Avène, La Roche-Posay et Bioderma — leurs gammes Toleriane, Tolerance et Sensibio sont conçues pour les peaux les plus réactives. Introduis toujours un nouveau produit progressivement.';
+  }
+  // Question générale
+  return '🤔 Bonne question ! Pour te donner la meilleure réponse possible, peux-tu me préciser ton type de peau (sèche, grasse, mixte, normale ou sensible) et ton problème principal ? Tu peux aussi faire le diagnostic SkinMatch pour une routine 100% personnalisée. Je suis là pour t\'aider !';
 }
 
 function shareRoutine() {
@@ -2603,6 +2754,424 @@ function showShareCopied() {
   document.body.appendChild(toast);
   setTimeout(function() { toast.remove(); }, 3000);
 }
+
+
+// ══════════ SCAN PRODUIT ══════════
+var scanHistory = JSON.parse(localStorage.getItem('skinmatch_scan_history') || '[]');
+
+// Données de démo pour simuler le scan
+var SCAN_DEMO_PRODUCTS = {
+  'cerave-gel': {
+    nom: 'Gel Moussant Anti-Imperfections',
+    marque: 'CeraVe',
+    cat: 'Nettoyant',
+    link: 'https://www.easypara.fr/cerave-gel-nettoyant-purifiant-peaux-grasses.html',
+    initiales: 'CV',
+    dimensions: {formulation: 74, adaptation: 82, actifs: 88, prix: 95},
+    pros: [
+      {actif: 'Acide salicylique 0.5%', explication: 'Exfolie doucement et désobstrue les pores. Parfait pour ta peau grasse.'},
+      {actif: 'Niacinamide', explication: 'Régule le sébum et réduit les pores dilatés. Excellent pour ton profil.'},
+      {actif: 'Céramides', explication: 'Renforce ta barrière cutanée tout en nettoyant. Protège sans agresser.'}
+    ],
+    cons: [
+      {actif: 'SLS (Sodium Lauryl Sulfate)', explication: 'Tensioactif fort qui peut légèrement irriter les peaux sensibles. Risque modéré.'}
+    ],
+    stats: {scans: 3847, adaptes: 76, note_moy: 79},
+    alternatives: ['lrp-effgel', 'bd-sebgel', 'svr-sebiaclear']
+  },
+  'lrp-effaclar': {
+    nom: 'Effaclar Duo+',
+    marque: 'La Roche-Posay',
+    cat: 'Soin ciblé acné',
+    link: 'https://www.easypara.fr/la-roche-posay-effaclar-duo-plus.html',
+    initiales: 'LRP',
+    dimensions: {formulation: 88, adaptation: 91, actifs: 92, prix: 72},
+    pros: [
+      {actif: 'Acide salicylique', explication: 'Anti-acné cliniquement prouvé. Cible directement tes imperfections.'},
+      {actif: 'Niacinamide', explication: 'Réduit les marques post-acné et unifie ton teint progressivement.'},
+      {actif: 'Lipohydroxy-acide (LHA)', explication: 'Exfoliant doux unique à La Roche-Posay, efficace sans irriter.'}
+    ],
+    cons: [
+      {actif: 'Prix', explication: 'À 18€ le tube, c\'est au-dessus de ton budget habituel de 15€. Mais l\'efficacité justifie le prix.'}
+    ],
+    stats: {scans: 12489, adaptes: 84, note_moy: 86},
+    alternatives: ['cv-gel', 'bd-sebser', 'skc-bl']
+  },
+  'skinceuticals-ce': {
+    nom: 'CE Ferulic Sérum',
+    marque: 'SkinCeuticals',
+    cat: 'Sérum antioxydant',
+    link: 'https://www.easypara.fr/skinceuticals-ce-ferulic.html',
+    initiales: 'SC',
+    dimensions: {formulation: 96, adaptation: 85, actifs: 98, prix: 42},
+    pros: [
+      {actif: 'Vitamine C 15%', explication: 'Concentration optimale prouvée scientifiquement. Protège et illumine ta peau.'},
+      {actif: 'Vitamine E', explication: 'Potentialise l\'action de la vitamine C. Synergie antioxydante exceptionnelle.'},
+      {actif: 'Acide férulique', explication: 'Stabilise la vitamine C et double son efficacité. Formulation brevetée.'}
+    ],
+    cons: [
+      {actif: 'Prix élevé', explication: 'À 165€, c\'est un investissement significatif. Des alternatives existent à 30-40€.'},
+      {actif: 'pH acide', explication: 'Ne pas associer avec du rétinol ou des AHA le même soir pour éviter les irritations.'}
+    ],
+    stats: {scans: 8234, adaptes: 71, note_moy: 82},
+    alternatives: ['cs-power', 'cau-vinoperfect', 'vic-minral89']
+  },
+  'default': {
+    nom: 'Produit Skincare',
+    marque: 'Marque beauté',
+    cat: 'Soin visage',
+    link: '#',
+    initiales: '?',
+    dimensions: {formulation: 72, adaptation: 68, actifs: 75, prix: 80},
+    pros: [
+      {actif: 'Glycérine', explication: 'Humectant classique qui attire l\'eau dans la peau. Bien toléré par tous les types de peau.'},
+      {actif: 'Aloe Vera', explication: 'Apaisant naturel, idéal pour calmer les rougeurs légères.'}
+    ],
+    cons: [
+      {actif: 'Composition à vérifier', explication: 'Certains ingrédients méritent une attention particulière selon ton profil.'}
+    ],
+    stats: {scans: 1240, adaptes: 65, note_moy: 70},
+    alternatives: ['cv-crem', 'bd-hydra', 'av-tol']
+  }
+};
+
+function searchProductScan(query) {
+  var suggestions = document.getElementById('scan-suggestions');
+  var list = document.getElementById('scan-suggestions-list');
+  if (!query || query.length < 2) {
+    suggestions.style.display = 'none';
+    return;
+  }
+  
+  var matches = [];
+  var q = query.toLowerCase();
+  Object.keys(DB).forEach(function(key) {
+    var p = DB[key];
+    if ((p.nom && p.nom.toLowerCase().includes(q)) || 
+        (p.marque && p.marque.toLowerCase().includes(q))) {
+      matches.push({key: key, nom: p.nom, marque: p.marque});
+    }
+  });
+  
+  if (matches.length === 0) {
+    suggestions.style.display = 'none';
+    return;
+  }
+  
+  suggestions.style.display = 'block';
+  list.innerHTML = '';
+  matches.slice(0, 4).forEach(function(m) {
+    var btn = document.createElement('button');
+    btn.style.cssText = 'width:100%;padding:10px 14px;border-radius:10px;border:1px solid #EDD9D4;background:#fff;cursor:pointer;display:flex;align-items:center;gap:10px;font-family:inherit;text-align:left';
+    btn.innerHTML = '<div style="width:32px;height:32px;border-radius:8px;background:#F5E8E6;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#C4726A;flex-shrink:0">' + m.marque.substring(0,2).toUpperCase() + '</div>' +
+      '<div><div style="font-size:13px;font-weight:600;color:#3D2B1F">' + m.nom + '</div><div style="font-size:11px;color:#8B6F5E">' + m.marque + '</div></div>';
+    btn.onclick = function() {
+      document.getElementById('product-search-input').value = m.nom;
+      document.getElementById('scan-suggestions').style.display = 'none';
+      simulateScanWithKey(m.key);
+    };
+    list.appendChild(btn);
+  });
+}
+
+function simulateScan() {
+  var input = document.getElementById('product-search-input');
+  var query = (input && input.value || '').toLowerCase();
+  
+  var matchedKey = null;
+  if (query.includes('cerave') || query.includes('gel moussant')) matchedKey = 'cerave-gel';
+  else if (query.includes('effaclar') || query.includes('lrp') || query.includes('la roche')) matchedKey = 'lrp-effaclar';
+  else if (query.includes('skinceuticals') || query.includes('ce ferulic') || query.includes('ferulic')) matchedKey = 'skinceuticals-ce';
+  
+  if (!matchedKey && query.length > 0) {
+    // Chercher dans la DB
+    Object.keys(DB).forEach(function(key) {
+      var p = DB[key];
+      if (p.nom && p.nom.toLowerCase().includes(query)) matchedKey = key;
+      if (p.marque && p.marque.toLowerCase().includes(query)) matchedKey = matchedKey || key;
+    });
+  }
+  
+  simulateScanWithKey(matchedKey);
+}
+
+function simulateScanWithKey(dbKey) {
+  document.getElementById('scan-suggestions').style.display = 'none';
+  
+  // Chercher dans les démos d'abord
+  var demoKey = null;
+  if (dbKey === 'cv-gel' || dbKey === 'cv-mou') demoKey = 'cerave-gel';
+  else if (dbKey && dbKey.startsWith('lrp')) demoKey = 'lrp-effaclar';
+  else if (dbKey && dbKey.startsWith('skc')) demoKey = 'skinceuticals-ce';
+  
+  var productData = SCAN_DEMO_PRODUCTS[demoKey] || SCAN_DEMO_PRODUCTS['default'];
+  
+  // Si produit trouvé dans DB, personnaliser
+  if (dbKey && DB[dbKey]) {
+    var dbP = DB[dbKey];
+    if (!demoKey) {
+      productData = {
+        nom: dbP.nom,
+        marque: dbP.marque,
+        cat: dbP.usage ? dbP.usage.split(' ').slice(0,3).join(' ') : 'Soin visage',
+        link: dbP.link || '#',
+        initiales: dbP.marque.substring(0,2).toUpperCase(),
+        dimensions: {
+          formulation: dbP.yuka || 75,
+          adaptation: getAdaptationScore(dbKey),
+          actifs: Math.min(100, (dbP.yuka || 75) + 5),
+          prix: getPrixScore(dbP.prix)
+        },
+        pros: (dbP.ak || []).map(function(a) { return {actif: a, explication: getActifExplication(a, dbP)}; }),
+        cons: getCons(dbP),
+        stats: {
+          scans: Math.floor(Math.random() * 5000) + 500,
+          adaptes: Math.floor(Math.random() * 30) + 60,
+          note_moy: Math.floor(Math.random() * 20) + 65
+        },
+        alternatives: getAlternatives(dbKey)
+      };
+    }
+  }
+  
+  displayScanResult(productData);
+  
+  // Sauvegarder dans l'historique
+  var historyItem = {nom: productData.nom, marque: productData.marque, score: getGlobalScore(productData.dimensions), date: new Date().toLocaleDateString('fr-FR')};
+  scanHistory.unshift(historyItem);
+  if (scanHistory.length > 10) scanHistory.pop();
+  localStorage.setItem('skinmatch_scan_history', JSON.stringify(scanHistory));
+  updateScanHistory();
+}
+
+function getAdaptationScore(key) {
+  var p = DB[key];
+  if (!p) return 70;
+  var score = 70;
+  var sk = ST.skinType || 'normale';
+  if (p.pq && p.pq.toLowerCase().includes(sk)) score += 15;
+  if (ST.concerns && ST.concerns.length > 0) {
+    ST.concerns.forEach(function(c) {
+      if (p.pq && p.pq.toLowerCase().includes(c)) score += 5;
+      if (p.usage && p.usage.toLowerCase().includes(c)) score += 3;
+    });
+  }
+  return Math.min(100, score);
+}
+
+function getPrixScore(prix) {
+  if (!prix) return 75;
+  var num = parseInt(prix.replace(/[^0-9]/g, ''));
+  if (num <= 15) return 95;
+  if (num <= 30) return 85;
+  if (num <= 60) return 70;
+  if (num <= 100) return 55;
+  return 40;
+}
+
+function getActifExplication(actif, p) {
+  var explications = {
+    'Niacinamide': 'Régule le sébum, réduit les pores et unifie le teint. Convient à tous les types de peau.',
+    'Acide hyaluronique': 'Hydratation intense multi-profondeur. Parfait pour toutes les peaux déshydratées.',
+    'Rétinol': 'Anti-âge prouvé scientifiquement. Utiliser uniquement le soir.',
+    'Vitamine C': 'Antioxydant puissant qui illumine et protège le teint.',
+    'Acide salicylique': 'BHA qui désobstrue les pores en douceur. Idéal pour les peaux grasses.',
+    'Céramides': 'Renforce la barrière cutanée et retient l\'hydratation.',
+    'Zinc': 'Régule la production de sébum et calme les inflammations.',
+    'Aloe vera': 'Apaisant naturel, hydratant léger bien toléré par les peaux sensibles.'
+  };
+  for (var key in explications) {
+    if (actif.toLowerCase().includes(key.toLowerCase())) return explications[key];
+  }
+  return 'Actif bénéfique pour ta peau selon ton profil.';
+}
+
+function getCons(p) {
+  var cons = [];
+  if (p.clean === false) cons.push({actif: 'Formulation conventionnelle', explication: 'Contient des ingrédients de synthèse. Pas de risque si tu n\'es pas sensible aux conservateurs classiques.'});
+  var prixNum = parseInt((p.prix || '0').replace(/[^0-9]/g, ''));
+  if (prixNum > 50) cons.push({actif: 'Prix premium', explication: 'Investissement significatif. Des alternatives efficaces existent à prix réduit.'});
+  if (cons.length === 0) cons.push({actif: 'Aucun point négatif majeur', explication: 'Ce produit est globalement bien adapté à ton profil de peau.'});
+  return cons;
+}
+
+function getAlternatives(key) {
+  var alts = Object.keys(DB).filter(function(k) {
+    return k !== key && DB[k].yuka >= 75;
+  }).slice(0, 3);
+  return alts;
+}
+
+function getGlobalScore(dimensions) {
+  return Math.round((dimensions.formulation * 0.25 + dimensions.adaptation * 0.35 + dimensions.actifs * 0.25 + dimensions.prix * 0.15));
+}
+
+function displayScanResult(data) {
+  document.getElementById('scan-result').style.display = 'block';
+  
+  // Header produit
+  document.getElementById('scan-product-img').textContent = data.initiales;
+  document.getElementById('scan-product-name').textContent = data.nom;
+  document.getElementById('scan-product-brand').textContent = data.marque;
+  document.getElementById('scan-product-cat').textContent = data.cat;
+  
+  // Score global
+  var globalScore = getGlobalScore(data.dimensions);
+  var circle = document.getElementById('score-circle');
+  var circumference = 314;
+  setTimeout(function() {
+    circle.style.strokeDashoffset = circumference - (globalScore / 100) * circumference;
+    circle.style.stroke = globalScore >= 75 ? '#4CAF50' : globalScore >= 50 ? '#FF9800' : '#F44336';
+  }, 100);
+  
+  // Animation du score
+  var scoreEl = document.getElementById('score-number');
+  var current = 0;
+  var interval = setInterval(function() {
+    current += 2;
+    if (current >= globalScore) { current = globalScore; clearInterval(interval); }
+    scoreEl.textContent = current;
+  }, 20);
+  
+  // Label score
+  var label = globalScore >= 80 ? '✦ Très bien adapté ✦' : globalScore >= 65 ? '✦ Bien adapté ✦' : globalScore >= 50 ? '⚠ Moyennement adapté' : '✗ Peu adapté';
+  var skinLabel = (T[LANG]||T.fr).skin_labels[ST.skinType] || ST.skinType || 'ta peau';
+  document.getElementById('score-label').textContent = label;
+  document.getElementById('score-sublabel').textContent = 'à ta peau ' + skinLabel;
+  
+  // 4 dimensions
+  var dims = document.getElementById('score-dimensions');
+  dims.innerHTML = '';
+  var dimLabels = {formulation: '🧴 Formulation', adaptation: '👤 Adapté à ta peau', actifs: '⚗️ Actifs bénéfiques', prix: '💰 Rapport qualité/prix'};
+  Object.keys(data.dimensions).forEach(function(dim) {
+    var val = data.dimensions[dim];
+    var color = val >= 75 ? '#4CAF50' : val >= 50 ? '#FF9800' : '#F44336';
+    dims.innerHTML += '<div>' +
+      '<div style="display:flex;justify-content:space-between;margin-bottom:4px">' +
+        '<span style="font-size:13px;color:#3D2B1F;font-weight:500">' + dimLabels[dim] + '</span>' +
+        '<span style="font-size:13px;font-weight:700;color:' + color + '">' + val + '/100</span>' +
+      '</div>' +
+      '<div style="height:8px;border-radius:50px;background:#F0EBE8;overflow:hidden">' +
+        '<div style="height:100%;border-radius:50px;background:' + color + ';width:' + val + '%;transition:width 1s ease"></div>' +
+      '</div>' +
+    '</div>';
+  });
+  
+  // Stats communauté
+  var stats = document.getElementById('scan-stats');
+  var userScore = getGlobalScore(data.dimensions);
+  var diff = userScore - data.stats.note_moy;
+  stats.innerHTML = 
+    '<div style="font-size:13px;color:#5A4A42">Scanné par <strong>' + data.stats.scans.toLocaleString('fr-FR') + '</strong> utilisateurs SkinMatch</div>' +
+    '<div style="font-size:13px;color:#5A4A42"><strong>' + data.stats.adaptes + '%</strong> l\'ont trouvé adapté à leur peau</div>' +
+    '<div style="font-size:13px;color:#5A4A42">Note moyenne communauté : <strong>' + data.stats.note_moy + '/100</strong></div>' +
+    '<div style="margin-top:8px;padding:8px 12px;border-radius:8px;background:rgba(196,114,106,.1);font-size:12px;font-weight:700;color:#C4726A">' +
+      'Ton score : ' + userScore + '/100 — ' + (diff >= 0 ? '↑ +' + diff + ' au-dessus de la moyenne ✨' : '↓ ' + diff + ' en-dessous de la moyenne') +
+    '</div>';
+  
+  // Pros
+  var prosSection = document.getElementById('pros-section');
+  prosSection.innerHTML = '<div style="background:#fff;border-radius:16px;padding:16px;box-shadow:0 2px 12px rgba(0,0,0,.06)">' +
+    '<p style="font-size:12px;font-weight:700;color:#3D2B1F;text-transform:uppercase;letter-spacing:.5px;margin-bottom:12px">✅ Ce qui te convient</p>' +
+    data.pros.map(function(pro) {
+      return '<div style="display:flex;gap:10px;padding:10px 0;border-bottom:1px solid #F5F0ED">' +
+        '<div style="width:36px;height:36px;border-radius:10px;background:#E8F5E9;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:16px">✅</div>' +
+        '<div><div style="font-size:13px;font-weight:700;color:#3D2B1F">' + pro.actif + '</div>' +
+        '<div style="font-size:12px;color:#8B6F5E;margin-top:2px;line-height:1.5">' + pro.explication + '</div></div>' +
+      '</div>';
+    }).join('') + '</div>';
+  
+  // Cons  
+  var consSection = document.getElementById('cons-section');
+  consSection.innerHTML = '<div style="background:#fff;border-radius:16px;padding:16px;box-shadow:0 2px 12px rgba(0,0,0,.06)">' +
+    '<p style="font-size:12px;font-weight:700;color:#3D2B1F;text-transform:uppercase;letter-spacing:.5px;margin-bottom:12px">⚠️ Points d\'attention</p>' +
+    data.cons.map(function(con) {
+      return '<div style="display:flex;gap:10px;padding:10px 0;border-bottom:1px solid #F5F0ED">' +
+        '<div style="width:36px;height:36px;border-radius:10px;background:#FFF3E0;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:16px">⚠️</div>' +
+        '<div><div style="font-size:13px;font-weight:700;color:#3D2B1F">' + con.actif + '</div>' +
+        '<div style="font-size:12px;color:#8B6F5E;margin-top:2px;line-height:1.5">' + con.explication + '</div></div>' +
+      '</div>';
+    }).join('') + '</div>';
+  
+  // Alternatives
+  var altSection = document.getElementById('alternatives-section');
+  var altProds = (data.alternatives || []).filter(function(k) { return DB[k]; }).slice(0,3);
+  if (altProds.length > 0) {
+    altSection.innerHTML = '<div style="background:#fff;border-radius:16px;padding:16px;box-shadow:0 2px 12px rgba(0,0,0,.06)">' +
+      '<p style="font-size:12px;font-weight:700;color:#3D2B1F;text-transform:uppercase;letter-spacing:.5px;margin-bottom:12px">💡 SkinMatch te recommande aussi</p>' +
+      altProds.map(function(k) {
+        var p = DB[k];
+        var altScore = Math.min(100, (p.yuka || 75) + Math.floor(Math.random() * 10));
+        var color = altScore >= 75 ? '#4CAF50' : '#FF9800';
+        return '<div style="display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid #F5F0ED">' +
+          '<div style="width:40px;height:40px;border-radius:10px;background:#F5E8E6;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#C4726A;flex-shrink:0">' + p.marque.substring(0,2).toUpperCase() + '</div>' +
+          '<div style="flex:1"><div style="font-size:13px;font-weight:600;color:#3D2B1F">' + p.nom + '</div><div style="font-size:11px;color:#8B6F5E">' + p.marque + ' · ' + p.prix + '</div></div>' +
+          '<div style="font-size:15px;font-weight:700;color:' + color + '">' + altScore + '</div>' +
+        '</div>';
+      }).join('') + '</div>';
+  }
+  
+  // Bouton Easypara
+  var easyBtn = document.getElementById('scan-easypara-btn');
+  if (easyBtn && data.link && data.link !== '#') {
+    easyBtn.onclick = function() { window.open(data.link, '_blank'); };
+    easyBtn.style.display = 'block';
+  } else if (easyBtn) {
+    easyBtn.style.display = 'none';
+  }
+  
+  // Scroll vers le résultat
+  setTimeout(function() {
+    document.getElementById('scan-result').scrollIntoView({behavior:'smooth', block:'start'});
+  }, 200);
+}
+
+function updateScanHistory() {
+  var list = document.getElementById('scan-history-list');
+  if (!list || scanHistory.length === 0) return;
+  list.innerHTML = scanHistory.slice(0,5).map(function(item) {
+    var color = item.score >= 75 ? '#4CAF50' : item.score >= 50 ? '#FF9800' : '#F44336';
+    return '<div style="display:flex;align-items:center;gap:10px;padding:10px 12px;background:#fff;border-radius:12px;box-shadow:0 1px 6px rgba(0,0,0,.06)">' +
+      '<div style="width:32px;height:32px;border-radius:8px;background:#F5E8E6;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#C4726A;flex-shrink:0">' + item.marque.substring(0,2).toUpperCase() + '</div>' +
+      '<div style="flex:1"><div style="font-size:13px;font-weight:600;color:#3D2B1F">' + item.nom + '</div><div style="font-size:11px;color:#B0958F">' + item.date + '</div></div>' +
+      '<div style="font-size:16px;font-weight:700;color:' + color + '">' + item.score + '</div>' +
+    '</div>';
+  }).join('');
+}
+
+function saveScan() {
+  var toast = document.createElement('div');
+  toast.style.cssText = 'position:fixed;bottom:100px;left:50%;transform:translateX(-50%);background:#3D2B1F;color:#fff;padding:12px 20px;border-radius:50px;font-size:13px;font-weight:600;z-index:9999;font-family:inherit';
+  toast.textContent = '❤️ Produit sauvegardé dans tes favoris !';
+  document.body.appendChild(toast);
+  setTimeout(function() { toast.remove(); }, 3000);
+}
+
+function shareScan() {
+  var scoreEl = document.getElementById('score-number');
+  var nameEl = document.getElementById('scan-product-name');
+  var brandEl = document.getElementById('scan-product-brand');
+  var score = scoreEl ? scoreEl.textContent : '?';
+  var nom = nameEl ? nameEl.textContent : '';
+  var marque = brandEl ? brandEl.textContent : '';
+  var text = '🎯 Mon score SkinMatch pour ' + nom + ' de ' + marque + ' : ' + score + '/100\n\nObtiens ta routine personnalisée gratuite → https://mohamedhambli-oss.github.io/skinnmatch';
+  if (navigator.share) {
+    navigator.share({title: 'Mon score SkinMatch', text: text});
+  } else if (navigator.clipboard) {
+    navigator.clipboard.writeText(text).then(function() {
+      var toast = document.createElement('div');
+      toast.style.cssText = 'position:fixed;bottom:100px;left:50%;transform:translateX(-50%);background:#3D2B1F;color:#fff;padding:12px 20px;border-radius:50px;font-size:13px;font-weight:600;z-index:9999;font-family:inherit';
+      toast.textContent = '✅ Copié ! Partage sur Instagram ou TikTok';
+      document.body.appendChild(toast);
+      setTimeout(function() { toast.remove(); }, 3000);
+    });
+  }
+}
+
+// Initialiser l'historique au chargement
+document.addEventListener('DOMContentLoaded', function() {
+  updateScanHistory();
+});
 
 function showRegionModal() {
   selectedRegionValue = '';
@@ -3634,6 +4203,12 @@ setTimeout(applyWelcomeLang, 50);
 
 <!-- ══ CHATBOT ══ -->
 <!-- Bouton flottant chatbot -->
+<!-- Bouton installation PWA -->
+<button id="install-btn" onclick="installApp()" style="display:none;position:fixed;bottom:90px;left:16px;background:linear-gradient(135deg,#1F3864,#2E5496);border:none;border-radius:50px;padding:10px 18px;cursor:pointer;z-index:8887;box-shadow:0 4px 20px rgba(31,56,100,.4);align-items:center;gap:8px;font-family:inherit">
+  <span style="font-size:18px">📲</span>
+  <span style="font-size:12px;font-weight:700;color:#fff">Installer l'app</span>
+</button>
+
 <button id="chatbot-fab" onclick="toggleChatbot()" style="position:fixed;bottom:24px;right:20px;width:56px;height:56px;border-radius:50%;background:linear-gradient(135deg,#C4726A,#A85A52);border:none;cursor:pointer;z-index:8888;box-shadow:0 4px 20px rgba(196,114,106,.5);display:flex;align-items:center;justify-content:center;font-size:24px">💬</button>
 
 <!-- Modale chatbot -->
@@ -3663,6 +4238,45 @@ setTimeout(applyWelcomeLang, 50);
     </button>
   </div>
 </div>
+
+
+<script>
+// Enregistrement du Service Worker PWA
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', function() {
+    navigator.serviceWorker.register('/sw.js')
+      .then(function(reg) {
+        console.log('SkinMatch PWA : Service Worker enregistré', reg.scope);
+      })
+      .catch(function(err) {
+        console.log('SkinMatch PWA : Erreur Service Worker', err);
+      });
+  });
+}
+
+// Prompt "Ajouter à l'écran d'accueil"
+var deferredPrompt;
+window.addEventListener('beforeinstallprompt', function(e) {
+  e.preventDefault();
+  deferredPrompt = e;
+  // Afficher le bouton d'installation
+  var installBtn = document.getElementById('install-btn');
+  if (installBtn) installBtn.style.display = 'flex';
+});
+
+function installApp() {
+  if (!deferredPrompt) return;
+  deferredPrompt.prompt();
+  deferredPrompt.userChoice.then(function(choice) {
+    if (choice.outcome === 'accepted') {
+      console.log('SkinMatch installé !');
+      var installBtn = document.getElementById('install-btn');
+      if (installBtn) installBtn.style.display = 'none';
+    }
+    deferredPrompt = null;
+  });
+}
+</script>
 
 </body>
 </html>
