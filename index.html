@@ -647,7 +647,7 @@ h2{font-family:var(--serif);font-size:20px;font-weight:700;margin-bottom:3px}
     </div>
 
     <!-- Résultat du scan -->
-    <div id="scan-result" style="display:none">
+    <div id="scan-product-result" style="display:none">
       
       <!-- Produit header -->
       <div id="scan-product-header" style="background:#fff;border-radius:16px;padding:16px;display:flex;align-items:center;gap:14px;margin-bottom:16px;box-shadow:0 2px 12px rgba(0,0,0,.06)">
@@ -1839,7 +1839,7 @@ function resetScan() {
     scanResult = null;
     document.getElementById("scan-upload-zone").style.display = "block";
     document.getElementById("scan-preview").style.display = "none";
-    document.getElementById("scan-result").style.display = "none";
+    document.getElementById("scan-product-result").style.display = "none";
     document.getElementById("scan-btn").disabled = true;
     document.getElementById("scan-file-input").value = "";
 }
@@ -1847,7 +1847,7 @@ function resetScan() {
 function analyzeSkin() {
     if (!scanBase64) return;
     var isEN = LANG === "en";
-    document.getElementById("scan-result").style.display = "block";
+    document.getElementById("scan-product-result").style.display = "block";
     document.getElementById("scan-loading").style.display = "block";
     document.getElementById("scan-analysis").style.display = "none";
     document.getElementById("scan-btn").disabled = true;
@@ -3032,128 +3032,150 @@ function getGlobalScore(dimensions) {
 }
 
 function displayScanResult(data) {
-  document.getElementById('scan-result').style.display = 'block';
-  
-  // Header produit
-  document.getElementById('scan-product-img').textContent = data.initiales;
-  document.getElementById('scan-product-name').textContent = data.nom;
-  document.getElementById('scan-product-brand').textContent = data.marque;
-  document.getElementById('scan-product-cat').textContent = data.cat;
-  
-  // Score global
+  var resultDiv = document.getElementById('scan-product-result');
+  if (!resultDiv) return;
+  resultDiv.style.display = 'block';
+
   var globalScore = getGlobalScore(data.dimensions);
-  var circle = document.getElementById('score-circle');
-  var circumference = 314;
-  setTimeout(function() {
-    circle.style.strokeDashoffset = circumference - (globalScore / 100) * circumference;
-    circle.style.stroke = globalScore >= 75 ? '#4CAF50' : globalScore >= 50 ? '#FF9800' : '#F44336';
-  }, 100);
-  
-  // Animation du score
-  var scoreEl = document.getElementById('score-number');
-  var current = 0;
-  var interval = setInterval(function() {
-    current += 2;
-    if (current >= globalScore) { current = globalScore; clearInterval(interval); }
-    scoreEl.textContent = current;
-  }, 20);
-  
-  // Label score
-  var label = globalScore >= 80 ? '✦ Très bien adapté ✦' : globalScore >= 65 ? '✦ Bien adapté ✦' : globalScore >= 50 ? '⚠ Moyennement adapté' : '✗ Peu adapté';
   var skinLabel = (T[LANG]||T.fr).skin_labels[ST.skinType] || ST.skinType || 'ta peau';
-  document.getElementById('score-label').textContent = label;
-  document.getElementById('score-sublabel').textContent = 'à ta peau ' + skinLabel;
-  
-  // 4 dimensions
-  var dims = document.getElementById('score-dimensions');
-  dims.innerHTML = '';
-  var dimLabels = {formulation: '🧴 Formulation', adaptation: '👤 Adapté à ta peau', actifs: '⚗️ Actifs bénéfiques', prix: '💰 Rapport qualité/prix'};
-  Object.keys(data.dimensions).forEach(function(dim) {
+  var scoreColor = globalScore >= 75 ? '#4CAF50' : globalScore >= 50 ? '#FF9800' : '#F44336';
+  var scoreBg = globalScore >= 75 ? '#E8F5E9' : globalScore >= 50 ? '#FFF3E0' : '#FFEBEE';
+  var scoreLabel = globalScore >= 80 ? 'Excellent choix' : globalScore >= 65 ? 'Bien adapte' : globalScore >= 50 ? 'Moyennement adapte' : 'Peu recommande';
+  var diffMoy = globalScore - data.stats.note_moy;
+
+  var html = '';
+
+  // En-tete produit
+  html += '<div style="background:#fff;border-radius:18px;padding:16px;display:flex;align-items:center;gap:14px;margin-bottom:14px;box-shadow:0 2px 12px rgba(0,0,0,.07)">';
+  html += '<div style="width:56px;height:56px;border-radius:14px;background:#F5E8E6;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:800;color:#C4726A;flex-shrink:0">' + data.initiales + '</div>';
+  html += '<div style="flex:1"><div style="font-size:16px;font-weight:700;color:#3D2B1F;font-family:Georgia,serif">' + data.nom + '</div>';
+  html += '<div style="font-size:13px;color:#8B6F5E;margin-top:3px">' + data.marque + '</div>';
+  html += '<div style="display:inline-block;margin-top:5px;padding:3px 10px;background:#F5E8E6;border-radius:20px;font-size:10px;font-weight:700;color:#C4726A">' + data.cat + '</div></div>';
+  html += '<div style="text-align:center;background:' + scoreBg + ';border-radius:14px;padding:8px 12px;flex-shrink:0">';
+  html += '<div style="font-size:28px;font-weight:800;color:' + scoreColor + ';font-family:Georgia,serif;line-height:1">' + globalScore + '</div>';
+  html += '<div style="font-size:10px;color:' + scoreColor + ';font-weight:600">/100</div></div></div>';
+
+  // Score gauge SVG
+  var arcLen = Math.PI * 60;
+  var fillLen = arcLen * globalScore / 100;
+  html += '<div style="background:linear-gradient(135deg,#1F3864,#2E5496);border-radius:20px;padding:20px;margin-bottom:14px;text-align:center">';
+  html += '<p style="font-size:10px;font-weight:700;color:rgba(255,255,255,.6);text-transform:uppercase;letter-spacing:3px;margin-bottom:14px">Score d\'adaptation — peau ' + skinLabel + '</p>';
+  html += '<div style="display:flex;align-items:center;justify-content:center;gap:20px;flex-wrap:wrap">';
+  html += '<svg width="140" height="85" viewBox="0 0 140 85">';
+  html += '<path d="M10 78 A60 60 0 0 1 130 78" fill="none" stroke="rgba(255,255,255,.15)" stroke-width="12" stroke-linecap="round"/>';
+  html += '<path d="M10 78 A60 60 0 0 1 130 78" fill="none" stroke="' + scoreColor + '" stroke-width="12" stroke-linecap="round" stroke-dasharray="' + fillLen.toFixed(1) + ' ' + arcLen.toFixed(1) + '"/>';
+  html += '<text x="70" y="72" text-anchor="middle" fill="white" font-size="22" font-weight="bold" font-family="Georgia,serif">' + globalScore + '</text>';
+  html += '<text x="70" y="83" text-anchor="middle" fill="rgba(255,255,255,.6)" font-size="10">/100</text>';
+  html += '</svg>';
+  html += '<div style="text-align:left"><div style="font-size:18px;font-weight:700;color:#fff;margin-bottom:4px">' + scoreLabel + '</div>';
+  html += '<div style="font-size:12px;color:rgba(255,255,255,.7)">pour ta peau ' + skinLabel + '</div>';
+  if (globalScore >= 75) html += '<div style="margin-top:8px;background:#4CAF50;color:#fff;padding:4px 12px;border-radius:20px;font-size:11px;font-weight:700;display:inline-block">Recommande</div>';
+  html += '</div></div></div>';
+
+  // Graphique barres 4 dimensions
+  html += '<div style="background:#fff;border-radius:18px;padding:16px;margin-bottom:14px;box-shadow:0 2px 12px rgba(0,0,0,.07)">';
+  html += '<p style="font-size:12px;font-weight:700;color:#3D2B1F;text-transform:uppercase;letter-spacing:.5px;margin-bottom:14px">Analyse detaillee</p>';
+  var dimLabels = {formulation:'Formulation', adaptation:'Adaptation peau', actifs:'Actifs benefiques', prix:'Qualite / Prix'};
+  var dimIcons = {formulation:'🧴', adaptation:'👤', actifs:'⚗️', prix:'💰'};
+  var dims = Object.keys(data.dimensions);
+  dims.forEach(function(dim) {
     var val = data.dimensions[dim];
-    var color = val >= 75 ? '#4CAF50' : val >= 50 ? '#FF9800' : '#F44336';
-    dims.innerHTML += '<div>' +
-      '<div style="display:flex;justify-content:space-between;margin-bottom:4px">' +
-        '<span style="font-size:13px;color:#3D2B1F;font-weight:500">' + dimLabels[dim] + '</span>' +
-        '<span style="font-size:13px;font-weight:700;color:' + color + '">' + val + '/100</span>' +
-      '</div>' +
-      '<div style="height:8px;border-radius:50px;background:#F0EBE8;overflow:hidden">' +
-        '<div style="height:100%;border-radius:50px;background:' + color + ';width:' + val + '%;transition:width 1s ease"></div>' +
-      '</div>' +
-    '</div>';
+    var col = val >= 75 ? '#4CAF50' : val >= 50 ? '#FF9800' : '#F44336';
+    html += '<div style="margin-bottom:12px">';
+    html += '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px">';
+    html += '<span style="font-size:13px;color:#3D2B1F">' + (dimIcons[dim]||'') + ' ' + (dimLabels[dim]||dim) + '</span>';
+    html += '<span style="font-size:14px;font-weight:800;color:' + col + '">' + val + '/100</span></div>';
+    html += '<div style="height:10px;border-radius:50px;background:#F0EBE8;overflow:hidden">';
+    html += '<div style="height:100%;border-radius:50px;background:' + col + ';width:' + val + '%;transition:width 1s ease"></div></div></div>';
   });
-  
-  // Stats communauté
-  var stats = document.getElementById('scan-stats');
-  var userScore = getGlobalScore(data.dimensions);
-  var diff = userScore - data.stats.note_moy;
-  stats.innerHTML = 
-    '<div style="font-size:13px;color:#5A4A42">Scanné par <strong>' + data.stats.scans.toLocaleString('fr-FR') + '</strong> utilisateurs SkinMatch</div>' +
-    '<div style="font-size:13px;color:#5A4A42"><strong>' + data.stats.adaptes + '%</strong> l\'ont trouvé adapté à leur peau</div>' +
-    '<div style="font-size:13px;color:#5A4A42">Note moyenne communauté : <strong>' + data.stats.note_moy + '/100</strong></div>' +
-    '<div style="margin-top:8px;padding:8px 12px;border-radius:8px;background:rgba(196,114,106,.1);font-size:12px;font-weight:700;color:#C4726A">' +
-      'Ton score : ' + userScore + '/100 — ' + (diff >= 0 ? '↑ +' + diff + ' au-dessus de la moyenne ✨' : '↓ ' + diff + ' en-dessous de la moyenne') +
-    '</div>';
-  
-  // Pros
-  var prosSection = document.getElementById('pros-section');
-  prosSection.innerHTML = '<div style="background:#fff;border-radius:16px;padding:16px;box-shadow:0 2px 12px rgba(0,0,0,.06)">' +
-    '<p style="font-size:12px;font-weight:700;color:#3D2B1F;text-transform:uppercase;letter-spacing:.5px;margin-bottom:12px">✅ Ce qui te convient</p>' +
-    data.pros.map(function(pro) {
-      return '<div style="display:flex;gap:10px;padding:10px 0;border-bottom:1px solid #F5F0ED">' +
-        '<div style="width:36px;height:36px;border-radius:10px;background:#E8F5E9;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:16px">✅</div>' +
-        '<div><div style="font-size:13px;font-weight:700;color:#3D2B1F">' + pro.actif + '</div>' +
-        '<div style="font-size:12px;color:#8B6F5E;margin-top:2px;line-height:1.5">' + pro.explication + '</div></div>' +
-      '</div>';
-    }).join('') + '</div>';
-  
-  // Cons  
-  var consSection = document.getElementById('cons-section');
-  consSection.innerHTML = '<div style="background:#fff;border-radius:16px;padding:16px;box-shadow:0 2px 12px rgba(0,0,0,.06)">' +
-    '<p style="font-size:12px;font-weight:700;color:#3D2B1F;text-transform:uppercase;letter-spacing:.5px;margin-bottom:12px">⚠️ Points d\'attention</p>' +
-    data.cons.map(function(con) {
-      return '<div style="display:flex;gap:10px;padding:10px 0;border-bottom:1px solid #F5F0ED">' +
-        '<div style="width:36px;height:36px;border-radius:10px;background:#FFF3E0;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:16px">⚠️</div>' +
-        '<div><div style="font-size:13px;font-weight:700;color:#3D2B1F">' + con.actif + '</div>' +
-        '<div style="font-size:12px;color:#8B6F5E;margin-top:2px;line-height:1.5">' + con.explication + '</div></div>' +
-      '</div>';
-    }).join('') + '</div>';
-  
+
+  // Mini bar chart SVG
+  html += '<div style="margin-top:14px;padding-top:12px;border-top:1px solid #F0EBE8">';
+  html += '<p style="font-size:11px;color:#B0958F;margin-bottom:8px;font-weight:600">Vue graphique</p>';
+  html += '<svg width="100%" height="65" viewBox="0 0 280 65" preserveAspectRatio="xMidYMid meet">';
+  var dimVals = dims.map(function(d) { return data.dimensions[d]; });
+  dimVals.forEach(function(val, i) {
+    var col = val >= 75 ? '#4CAF50' : val >= 50 ? '#FF9800' : '#F44336';
+    var x = 10 + i * 65;
+    var barH = Math.round(val * 0.5);
+    html += '<rect x="' + x + '" y="' + (55-barH) + '" width="50" height="' + barH + '" rx="6" fill="' + col + '" opacity=".85"/>';
+    html += '<text x="' + (x+25) + '" y="62" text-anchor="middle" fill="#8B6F5E" font-size="9">' + val + '</text>';
+  });
+  html += '</svg></div></div>';
+
+  // Stats communaute
+  html += '<div style="background:linear-gradient(135deg,#FDF0E6,#FAE5D8);border-radius:18px;padding:16px;margin-bottom:14px;border:1px solid rgba(196,114,106,.15)">';
+  html += '<p style="font-size:12px;font-weight:700;color:#C4726A;text-transform:uppercase;letter-spacing:.5px;margin-bottom:12px">Communaute SkinMatch</p>';
+  html += '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:10px">';
+  html += '<div style="background:rgba(255,255,255,.7);border-radius:12px;padding:10px;text-align:center"><div style="font-size:18px;font-weight:800;color:#C4726A">' + data.stats.scans.toLocaleString('fr-FR') + '</div><div style="font-size:10px;color:#8B6F5E">utilisateurs</div></div>';
+  html += '<div style="background:rgba(255,255,255,.7);border-radius:12px;padding:10px;text-align:center"><div style="font-size:18px;font-weight:800;color:#4CAF50">' + data.stats.adaptes + '%</div><div style="font-size:10px;color:#8B6F5E">l\'ont aime</div></div>';
+  html += '<div style="background:rgba(255,255,255,.7);border-radius:12px;padding:10px;text-align:center"><div style="font-size:18px;font-weight:800;color:#1F3864">' + data.stats.note_moy + '</div><div style="font-size:10px;color:#8B6F5E">moy. community</div></div>';
+  html += '</div>';
+  html += '<div style="background:rgba(255,255,255,.8);border-radius:12px;padding:10px;display:flex;align-items:center;gap:10px">';
+  html += '<div style="font-size:20px">' + (diffMoy >= 0 ? '🏆' : '📈') + '</div>';
+  html += '<div><div style="font-size:12px;font-weight:700;color:#3D2B1F">Ton score : ' + globalScore + '/100</div>';
+  html += '<div style="font-size:11px;font-weight:600;color:' + (diffMoy >= 0 ? '#4CAF50' : '#FF9800') + '">' + (diffMoy >= 0 ? '+ ' + diffMoy + ' au-dessus de la moyenne' : diffMoy + ' en-dessous de la moyenne') + '</div></div></div></div>';
+
+  // Points positifs
+  if (data.pros && data.pros.length > 0) {
+    html += '<div style="background:#fff;border-radius:18px;padding:16px;margin-bottom:14px;box-shadow:0 2px 12px rgba(0,0,0,.07)">';
+    html += '<p style="font-size:12px;font-weight:700;color:#3D2B1F;text-transform:uppercase;letter-spacing:.5px;margin-bottom:12px">Ce qui te convient</p>';
+    data.pros.forEach(function(pro) {
+      html += '<div style="display:flex;gap:12px;padding:10px 0;border-bottom:1px solid #F8F3F0">';
+      html += '<div style="width:36px;height:36px;border-radius:10px;background:#E8F5E9;display:flex;align-items:center;justify-content:center;flex-shrink:0">✅</div>';
+      html += '<div><div style="font-size:13px;font-weight:700;color:#3D2B1F">' + pro.actif + '</div>';
+      html += '<div style="font-size:12px;color:#5A7A5A;margin-top:3px;line-height:1.5">' + pro.explication + '</div></div></div>';
+    });
+    html += '</div>';
+  }
+
+  // Points attention
+  if (data.cons && data.cons.length > 0) {
+    html += '<div style="background:#fff;border-radius:18px;padding:16px;margin-bottom:14px;box-shadow:0 2px 12px rgba(0,0,0,.07)">';
+    html += '<p style="font-size:12px;font-weight:700;color:#3D2B1F;text-transform:uppercase;letter-spacing:.5px;margin-bottom:12px">Points d attention</p>';
+    data.cons.forEach(function(con) {
+      html += '<div style="display:flex;gap:12px;padding:10px 0;border-bottom:1px solid #F8F3F0">';
+      html += '<div style="width:36px;height:36px;border-radius:10px;background:#FFF3E0;display:flex;align-items:center;justify-content:center;flex-shrink:0">⚠️</div>';
+      html += '<div><div style="font-size:13px;font-weight:700;color:#3D2B1F">' + con.actif + '</div>';
+      html += '<div style="font-size:12px;color:#9A7A45;margin-top:3px;line-height:1.5">' + con.explication + '</div></div></div>';
+    });
+    html += '</div>';
+  }
+
   // Alternatives
-  var altSection = document.getElementById('alternatives-section');
-  var altProds = (data.alternatives || []).filter(function(k) { return DB[k]; }).slice(0,3);
-  if (altProds.length > 0) {
-    altSection.innerHTML = '<div style="background:#fff;border-radius:16px;padding:16px;box-shadow:0 2px 12px rgba(0,0,0,.06)">' +
-      '<p style="font-size:12px;font-weight:700;color:#3D2B1F;text-transform:uppercase;letter-spacing:.5px;margin-bottom:12px">💡 SkinMatch te recommande aussi</p>' +
-      altProds.map(function(k) {
-        var p = DB[k];
-        var altScore = Math.min(100, (p.yuka || 75) + Math.floor(Math.random() * 10));
-        var color = altScore >= 75 ? '#4CAF50' : '#FF9800';
-        return '<div style="display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid #F5F0ED">' +
-          '<div style="width:40px;height:40px;border-radius:10px;background:#F5E8E6;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#C4726A;flex-shrink:0">' + p.marque.substring(0,2).toUpperCase() + '</div>' +
-          '<div style="flex:1"><div style="font-size:13px;font-weight:600;color:#3D2B1F">' + p.nom + '</div><div style="font-size:11px;color:#8B6F5E">' + p.marque + ' · ' + p.prix + '</div></div>' +
-          '<div style="font-size:15px;font-weight:700;color:' + color + '">' + altScore + '</div>' +
-        '</div>';
-      }).join('') + '</div>';
+  var alts = (data.alternatives || []).filter(function(k) { return DB[k]; }).slice(0,3);
+  if (alts.length > 0) {
+    html += '<div style="background:#fff;border-radius:18px;padding:16px;margin-bottom:14px;box-shadow:0 2px 12px rgba(0,0,0,.07)">';
+    html += '<p style="font-size:12px;font-weight:700;color:#3D2B1F;text-transform:uppercase;letter-spacing:.5px;margin-bottom:12px">Alternatives recommandees</p>';
+    alts.forEach(function(k) {
+      var p = DB[k];
+      var altScore = Math.min(100, (p.yuka||75) + 8);
+      var col = altScore >= 75 ? '#4CAF50' : '#FF9800';
+      html += '<div style="display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid #F8F3F0">';
+      html += '<div style="width:40px;height:40px;border-radius:10px;background:#F5E8E6;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:#C4726A;flex-shrink:0">' + p.marque.substring(0,2).toUpperCase() + '</div>';
+      html += '<div style="flex:1"><div style="font-size:13px;font-weight:600;color:#3D2B1F">' + p.nom + '</div>';
+      html += '<div style="font-size:11px;color:#8B6F5E">' + p.marque + ' · ' + p.prix + '</div></div>';
+      html += '<div style="font-size:18px;font-weight:800;color:' + col + '">' + altScore + '</div></div>';
+    });
+    html += '</div>';
   }
-  
-  // Bouton Easypara
-  var easyBtn = document.getElementById('scan-easypara-btn');
-  if (easyBtn && data.link && data.link !== '#') {
-    easyBtn.onclick = function() { window.open(data.link, '_blank'); };
-    easyBtn.style.display = 'block';
-  } else if (easyBtn) {
-    easyBtn.style.display = 'none';
+
+  // Actions
+  html += '<div style="display:flex;gap:10px;margin-bottom:10px">';
+  html += '<button onclick="saveScan()" style="flex:1;padding:14px;border-radius:50px;border:1.5px solid #C4726A;background:#fff;color:#C4726A;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">Sauvegarder</button>';
+  html += '<button onclick="shareScan()" style="flex:1;padding:14px;border-radius:50px;border:none;background:linear-gradient(135deg,#C4726A,#A85A52);color:#fff;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">Partager</button>';
+  html += '</div>';
+  if (data.link && data.link !== '#') {
+    html += '<button onclick="window.open(\'' + data.link.replace(/'/g, "\\'") + '\',\'_blank\')" style="width:100%;padding:14px;border-radius:50px;border:none;background:#1F3864;color:#fff;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">Commander sur Easypara</button>';
   }
-  
-  // Scroll vers le résultat
+
+  resultDiv.innerHTML = html;
+
   setTimeout(function() {
-    var res = document.getElementById('scan-result');
-    if (res) {
-      res.style.display = 'block';
-      res.scrollIntoView({behavior:'smooth', block:'start'});
-    }
-  }, 300);
+    resultDiv.scrollIntoView({behavior:'smooth', block:'start'});
+  }, 200);
 }
+
 
 function updateScanHistory() {
   var list = document.getElementById('scan-history-list');
