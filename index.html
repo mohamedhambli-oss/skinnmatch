@@ -1415,19 +1415,11 @@ function buildRegionList() {
       var btn = document.createElement('button');
       btn.style.cssText = 'width:100%;padding:12px 16px;border-radius:12px;border:2px solid ' + (selectedRegionValue === item.val + '_' + item.name ? '#C4726A' : '#EDD9D4') + ';background:' + (selectedRegionValue === item.val + '_' + item.name ? '#FDF0E6' : '#fff') + ';cursor:pointer;display:flex;align-items:center;gap:10px;font-family:inherit;text-align:left';
       btn.innerHTML = '<span style="font-size:22px">' + item.flag + '</span><span style="font-size:14px;font-weight:600;color:#3D2B1F">' + item.name + '</span>';
-      btn.onclick = (function(v, n) {
+      btn.onclick = (function(v) {
         return function() {
-          selectedRegionValue = v + '_' + n;
-          document.querySelectorAll('#region-list button').forEach(function(b) {
-            b.style.borderColor = '#EDD9D4';
-            b.style.background = '#fff';
-          });
-          btn.style.borderColor = '#C4726A';
-          btn.style.background = '#FDF0E6';
-          // Stocker juste la valeur région
-          selectedRegionValue = v;
+          setRegion(v);
         };
-      })(item.val, item.name);
+      })(item.val);
       container.appendChild(btn);
     });
   });
@@ -3288,19 +3280,11 @@ function buildRegionList() {
       var btn = document.createElement('button');
       btn.style.cssText = 'width:100%;padding:12px 16px;border-radius:12px;border:2px solid ' + (selectedRegionValue === item.val + '_' + item.name ? '#C4726A' : '#EDD9D4') + ';background:' + (selectedRegionValue === item.val + '_' + item.name ? '#FDF0E6' : '#fff') + ';cursor:pointer;display:flex;align-items:center;gap:10px;font-family:inherit;text-align:left';
       btn.innerHTML = '<span style="font-size:22px">' + item.flag + '</span><span style="font-size:14px;font-weight:600;color:#3D2B1F">' + item.name + '</span>';
-      btn.onclick = (function(v, n) {
+      btn.onclick = (function(v) {
         return function() {
-          selectedRegionValue = v + '_' + n;
-          document.querySelectorAll('#region-list button').forEach(function(b) {
-            b.style.borderColor = '#EDD9D4';
-            b.style.background = '#fff';
-          });
-          btn.style.borderColor = '#C4726A';
-          btn.style.background = '#FDF0E6';
-          // Stocker juste la valeur région
-          selectedRegionValue = v;
+          setRegion(v);
         };
-      })(item.val, item.name);
+      })(item.val);
       container.appendChild(btn);
     });
   });
@@ -4234,7 +4218,7 @@ setTimeout(applyWelcomeLang, 50);
     </div>
     <!-- Liste custom mobile-friendly -->
     <div id="region-list" style="display:flex;flex-direction:column;gap:8px;margin-bottom:16px"></div>
-    <button onclick="confirmRegion()" style="width:100%;padding:14px;border-radius:50px;border:none;background:#C4726A;color:#fff;font-size:15px;font-weight:700;cursor:pointer;font-family:'Outfit',sans-serif">Confirmer</button>
+
   </div>
 </div>
 
