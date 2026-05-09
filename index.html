@@ -3982,8 +3982,33 @@ function toggleCompareCard(key) {
         renderCompare();
         setTimeout(function() {
             var res = document.getElementById("compare-result");
-            if (res) res.scrollIntoView({ behavior: "smooth", block: "start" });
+            if (res) {
+              // Injecter bouton retour en haut du résultat
+              var backBtn = '<div style="margin-bottom:14px"><button onclick="resetCompare()" style="background:linear-gradient(135deg,#C4726A,#A85A52);border:none;border-radius:50px;padding:10px 20px;color:#fff;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:6px">← Nouvelle comparaison</button></div>';
+              if (!document.getElementById('compare-back-btn')) {
+                res.insertAdjacentHTML('afterbegin', '<div id="compare-back-btn">' + backBtn + '</div>');
+              }
+              res.scrollIntoView({ behavior: "smooth", block: "start" });
+            }
         }, 150);
+    }
+}
+
+function resetCompare() {
+    compareSelected = [];
+    document.getElementById("compare-result").innerHTML = "";
+    var backBtn = document.getElementById("compare-back-btn");
+    if (backBtn) backBtn.remove();
+    var sub = document.getElementById("compare-sub");
+    if (sub) sub.textContent = LANG === "en" ? "Tap 2 products to compare." : "Touchez 2 produits pour les comparer.";
+    buildCompareCards("");
+    // Scroller vers la barre de recherche
+    var searchEl = document.getElementById("compare-search");
+    if (searchEl) {
+      setTimeout(function() {
+        searchEl.scrollIntoView({ behavior: "smooth", block: "start" });
+        searchEl.focus();
+      }, 100);
     }
 }
 
