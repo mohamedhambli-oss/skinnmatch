@@ -322,10 +322,16 @@ h2{font-family:var(--serif);font-size:20px;font-weight:700;margin-bottom:3px}
         <button onclick="go('register')" style="padding:10px 20px;border-radius:50px;border:none;background:#C4726A;color:#fff;font-size:13px;font-weight:600;cursor:pointer;font-family:'Outfit',sans-serif" id="btn-reg">Créer un compte</button>
       </div>
 
-      <div style="margin-top:16px;display:flex;align-items:flex-start;gap:10px;padding:12px;background:#fff;border-radius:12px;border:1.5px solid #EDD9D4">
-        <input type="checkbox" id="accept-terms" onchange="toggleStartBtn()" style="width:18px;height:18px;margin-top:1px;accent-color:#C4726A;cursor:pointer;flex-shrink:0">
-        <label for="accept-terms" style="font-size:12px;color:#5A4A42;line-height:1.6;cursor:pointer">
-          J'accepte les <button onclick="go('cgu')" style="background:none;border:none;color:#C4726A;font-size:12px;cursor:pointer;text-decoration:underline;padding:0;font-weight:600">Conditions d'utilisation</button> et la <button onclick="go('privacy')" style="background:none;border:none;color:#C4726A;font-size:12px;cursor:pointer;text-decoration:underline;padding:0;font-weight:600">Politique de confidentialité</button> de SkinMatch.
+      <div style="margin-top:20px;background:#fff;border-radius:16px;padding:20px;border:2px solid #EDD9D4;text-align:center">
+        <div style="font-size:13px;color:#8B6F5E;margin-bottom:14px;line-height:1.5">
+          Avant de commencer, merci d'accepter nos<br>
+          <button onclick="go('cgu')" style="background:none;border:none;color:#C4726A;font-size:13px;cursor:pointer;text-decoration:underline;padding:0;font-weight:700">Conditions d'utilisation</button>
+          &nbsp;et notre&nbsp;
+          <button onclick="go('privacy')" style="background:none;border:none;color:#C4726A;font-size:13px;cursor:pointer;text-decoration:underline;padding:0;font-weight:700">Politique de confidentialité</button>
+        </div>
+        <label style="display:flex;align-items:center;justify-content:center;gap:12px;cursor:pointer;padding:12px;background:#FDF8F5;border-radius:12px;border:1.5px solid #EDD9D4">
+          <input type="checkbox" id="accept-terms" onchange="toggleStartBtn()" style="width:22px;height:22px;accent-color:#C4726A;cursor:pointer;flex-shrink:0">
+          <span style="font-size:14px;color:#3D2B1F;font-weight:600;line-height:1.4">J'ai lu et j'accepte les conditions</span>
         </label>
       </div>
     </div>
@@ -2275,7 +2281,7 @@ function renderResult(){
           }
           <a href="${s.link}" target="_blank" class="btn-buy"><span>${buyLabel}</span></a>
           <button onclick="showVideo('${s.video||''}','${s.nom}','${s.marque}','yt')" title="YouTube" style="display:inline-flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:50%;background:#FF0000;color:#fff;font-size:13px;flex-shrink:0;border:none;cursor:pointer;margin-left:4px;font-weight:700">▶</button>
-          <button onclick="showVideo('${s.video||''}','${s.nom}','${s.marque}','tk')" title="TikTok" style="display:inline-flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:50%;background:#000;color:#fff;font-size:15px;flex-shrink:0;border:none;cursor:pointer;margin-left:4px">♪</button>
+          <button onclick="showVideo('${s.video||''}','${s.nom}','${s.marque}','tk')" title="TikTok" style="display:inline-flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:50%;background:#010101;flex-shrink:0;border:none;cursor:pointer;margin-left:4px;overflow:hidden"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-2.88 2.5 2.89 2.89 0 01-2.89-2.89 2.89 2.89 0 012.89-2.89c.28 0 .54.04.79.1V9.01a6.33 6.33 0 00-.79-.05 6.34 6.34 0 00-6.34 6.34 6.34 6.34 0 006.34 6.34 6.34 6.34 0 006.33-6.34V8.75a8.18 8.18 0 004.78 1.52V6.82a4.85 4.85 0 01-1.01-.13z" fill="#ffffff"/><path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-2.88 2.5 2.89 2.89 0 01-2.89-2.89 2.89 2.89 0 012.89-2.89c.28 0 .54.04.79.1V9.01a6.33 6.33 0 00-.79-.05 6.34 6.34 0 00-6.34 6.34 6.34 6.34 0 006.34 6.34 6.34 6.34 0 006.33-6.34V8.75a8.18 8.18 0 004.78 1.52V6.82a4.85 4.85 0 01-1.01-.13z" fill="#EE1D52" opacity="0.5"/><path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-2.88 2.5 2.89 2.89 0 01-2.89-2.89 2.89 2.89 0 012.89-2.89c.28 0 .54.04.79.1V9.01a6.33 6.33 0 00-.79-.05 6.34 6.34 0 00-6.34 6.34 6.34 6.34 0 006.34 6.34 6.34 6.34 0 006.33-6.34V8.75a8.18 8.18 0 004.78 1.52V6.82a4.85 4.85 0 01-1.01-.13z" fill="#69C9D0" opacity="0.5"/></svg></button>
         </div>
         <div id="yuka-${s.key}" style="display:none;margin-top:8px;padding:10px 12px;border-radius:8px;background:#F7F3EF;border:1px solid #E8E0D6">
           <div style="font-size:10px;font-weight:700;color:#9A8B7C;text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px">${t('note_yuka')||'Yuka score'}</div>
@@ -2507,24 +2513,27 @@ function showVideo(url, nom, marque, platform) {
     var title = document.getElementById('video-title');
     if (!modal || !iframe) return;
 
-    var query = encodeURIComponent((nom || '') + ' ' + (marque || '') + ' skincare');
-
     if (platform === 'tk') {
-        // TikTok → format qui ouvre directement la recherche
-        var tkQuery = encodeURIComponent((nom || '') + ' ' + (marque || '') + ' review');
-        window.open('https://www.tiktok.com/search/video?q=' + tkQuery, '_blank');
+        // TikTok → hashtag du produit = résultats bien plus pertinents
+        // Transformer "CeraVe Gel Moussant" → "#CeraVe #GelMoussant"
+        var nomClean = (nom || '').replace(/[^a-zA-ZÀ-ÿ0-9\s]/g, '').trim();
+        var marqueClean = (marque || '').replace(/[^a-zA-ZÀ-ÿ0-9]/g, '').trim();
+        // Chercher via hashtag marque + nom sans espaces
+        var nomTag = nomClean.replace(/\s+/g, '');
+        var tkQuery = encodeURIComponent(marqueClean + ' ' + nomClean);
+        // Utiliser le tag search de TikTok qui est plus fiable
+        window.open('https://www.tiktok.com/search?q=' + tkQuery + '&type=video', '_blank');
         return;
     }
 
     // YouTube
     if (url && url.indexOf('youtube.com/embed') !== -1) {
-        // Vidéo directe → jouer dans l'app
         iframe.src = url + '?autoplay=1&rel=0';
         title.textContent = nom;
         modal.style.display = 'flex';
     } else {
-        // Recherche YouTube ciblée sur ce produit
-        var ytQuery = encodeURIComponent((nom || '') + ' ' + (marque || '') + ' review soin');
+        // Recherche YouTube avec avis + nom produit
+        var ytQuery = encodeURIComponent((nom || '') + ' ' + (marque || '') + ' avis test 2026');
         window.open('https://www.youtube.com/results?search_query=' + ytQuery, '_blank');
     }
 }
