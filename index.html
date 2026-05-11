@@ -283,7 +283,57 @@ h2{font-family:var(--serif);font-size:20px;font-weight:700;margin-bottom:3px}
 
       <h1 style="font-family:Georgia,serif;font-size:34px;font-weight:700;color:#3D2B1F;line-height:1.2;margin-bottom:16px" id="welcome-headline">Analyse ta peau<br>en 60 secondes</h1>
 
-      <p style="font-size:15px;color:#8B6F5E;line-height:1.7;margin-bottom:40px;max-width:300px" id="welcome-tagline">Découvre ta routine parfaite, personnalisée selon ton type de peau, ton âge et ton budget.</p>
+      <p style="font-size:15px;color:#8B6F5E;line-height:1.7;margin-bottom:28px;max-width:300px" id="welcome-tagline">SkinMatch analyse ton profil de peau et te recommande les produits exactement adaptés à toi — parmi 160+ références de grandes marques. <strong style="color:#C4726A">Gratuit, en 60 secondes.</strong></p>
+
+      <!-- Preuves sociales -->
+      <div style="display:flex;gap:16px;margin-bottom:28px;justify-content:center">
+        <div style="display:flex;align-items:center;gap:6px;background:#fff;border-radius:50px;padding:8px 14px;box-shadow:0 2px 8px rgba(0,0,0,.06)">
+          <span style="font-size:14px">🎯</span>
+          <span style="font-size:12px;font-weight:700;color:#3D2B1F">Pour ta peau, pas la marque</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:6px;background:#fff;border-radius:50px;padding:8px 14px;box-shadow:0 2px 8px rgba(0,0,0,.06)">
+          <span style="font-size:14px">🆓</span>
+          <span style="font-size:12px;font-weight:700;color:#3D2B1F">100% Gratuit</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:6px;background:#fff;border-radius:50px;padding:8px 14px;box-shadow:0 2px 8px rgba(0,0,0,.06)">
+          <span style="font-size:14px">🇫🇷</span>
+          <span style="font-size:12px;font-weight:700;color:#3D2B1F">Made in France</span>
+        </div>
+      </div>
+
+      <!-- Mini tutoriel 3 étapes -->
+      <div style="width:100%;max-width:340px;margin-bottom:28px">
+        <p style="font-size:11px;font-weight:700;color:#C4726A;text-transform:uppercase;letter-spacing:2px;margin-bottom:16px">Comment ça marche</p>
+        <div style="display:flex;flex-direction:column;gap:12px;text-align:left">
+          <div style="display:flex;align-items:center;gap:14px;background:#fff;border-radius:16px;padding:14px 16px;box-shadow:0 2px 10px rgba(0,0,0,.06)">
+            <div style="width:40px;height:40px;border-radius:12px;background:linear-gradient(135deg,#C4726A,#A85A52);display:flex;align-items:center;justify-content:center;flex-shrink:0">
+              <span style="font-size:18px">📋</span>
+            </div>
+            <div>
+              <div style="font-size:13px;font-weight:700;color:#3D2B1F">Réponds à 5 questions</div>
+              <div style="font-size:12px;color:#8B6F5E;margin-top:2px">Type de peau, âge, problèmes, allergies, budget</div>
+            </div>
+          </div>
+          <div style="display:flex;align-items:center;gap:14px;background:#fff;border-radius:16px;padding:14px 16px;box-shadow:0 2px 10px rgba(0,0,0,.06)">
+            <div style="width:40px;height:40px;border-radius:12px;background:linear-gradient(135deg,#1F3864,#2E5496);display:flex;align-items:center;justify-content:center;flex-shrink:0">
+              <span style="font-size:18px">🤖</span>
+            </div>
+            <div>
+              <div style="font-size:13px;font-weight:700;color:#3D2B1F">L'IA analyse ton profil</div>
+              <div style="font-size:12px;color:#8B6F5E;margin-top:2px">Parmi 160+ produits de 30+ marques</div>
+            </div>
+          </div>
+          <div style="display:flex;align-items:center;gap:14px;background:#fff;border-radius:16px;padding:14px 16px;box-shadow:0 2px 10px rgba(0,0,0,.06)">
+            <div style="width:40px;height:40px;border-radius:12px;background:linear-gradient(135deg,#2E7D32,#388E3C);display:flex;align-items:center;justify-content:center;flex-shrink:0">
+              <span style="font-size:18px">✨</span>
+            </div>
+            <div>
+              <div style="font-size:13px;font-weight:700;color:#3D2B1F">Ta routine personnalisée</div>
+              <div style="font-size:12px;color:#8B6F5E;margin-top:2px">Produits adaptés à toi, liens d'achat directs</div>
+            </div>
+          </div>
+        </div>
+      </div>
 
       <!-- Bouton principal CTA -->
       <button onclick="showTermsModal()" id="btn-start" style="width:100%;max-width:320px;padding:18px 24px;border-radius:50px;border:none;background:linear-gradient(135deg,#C4726A,#A85A52);color:#fff;font-size:16px;font-weight:700;cursor:pointer;font-family:'Outfit',sans-serif;box-shadow:0 8px 30px rgba(196,114,106,.45);margin-bottom:14px;display:flex;align-items:center;justify-content:center;gap:10px;opacity:1">
@@ -796,7 +846,7 @@ const T = {
     suivi_title:"Suivi à 4 semaines",
     suivi_text:"Votre peau évolue. Revenez dans 4 semaines pour ajuster votre routine.",
     suivi_btn:"Refaire le diagnostic",
-    fiche_btn:"En savoir plus",note_yuka:"🥕 Note Yuka",
+    fiche_btn:"En savoir plus",note_yuka:"🔬 Analyse INCI",
     budget_total:"Budget estimé :",compatible:"compatible",
     morning_only:"Matin seulement",result_routine:"Votre routine personnalisée",result_hello:"Bonjour",evening_only:"Soir seulement",both:"Matin & Soir",
     register_title:"Créer votre compte",register_sub:"Enregistrez votre profil pour accéder à vos recommandations.",
@@ -1200,6 +1250,16 @@ const DB = {
   "dz-naturalia-serum": {nom:"Sérum Vitamine C Naturalia DZ",marque:"Naturalia DZ",prix:"1500 DA",link:"https://www.google.com/search?q=Naturalia+DZ+serum+vitamine+C+acheter&tbm=shop",yuka:80,yl:"Excellent",usage:"Sérum éclat anti-taches",texture:"Sérum",ak:["Vitamine C","Niacinamide","Acide hyaluronique"],comp:["Ascorbic Acid","Niacinamide","Hyaluronic Acid"],clean:false,vegan:true,pq:"Peaux avec taches, teint terne.",ben:"Illumine et unifie le teint progressivement.",app:"Matin sur peau propre avant crème.",moment:"AM",ben_en:"Brightens and evens skin tone.",region:["dz"],video:"https://www.youtube.com/results?search_query=serum+vitamine+C+peau+algerienne"},
   "dz-flair-spf": {nom:"Fluide SPF50+ Flair Pharma",marque:"Flair Pharma DZ",prix:"1100 DA",link:"https://www.google.com/search?q=Flair+Pharma+SPF50+acheter&tbm=shop",yuka:72,yl:"Bon",usage:"Protection solaire légère SPF50+",texture:"Fluide",ak:["Filtres UV","Vitamine E","Aloe vera"],comp:["UV Filters","Vitamin E","Aloe Vera"],clean:false,vegan:false,pq:"Tous types de peau.",ben:"Protection haute sans effet blanc, texture légère.",app:"Le matin en dernière étape de routine.",moment:"AM",ben_en:"High protection without white cast.",region:["dz"],video:"https://www.youtube.com/results?search_query=Flair+Pharma+SPF+Algerie"},
   "dz-ghassoul": {nom:"Masque Argile Ghassoul & Henné",marque:"Terrafine Algérie",prix:"450 DA",link:"https://www.google.com/search?q=masque+ghassoul+henne+acheter&tbm=shop",yuka:85,yl:"Excellent",usage:"Masque purifiant argile & henné",texture:"Masque",ak:["Argile ghassoul","Henné","Huile d'olive"],comp:["Ghassoul Clay","Henna","Olive Oil"],clean:true,vegan:true,pq:"Peaux grasses à mixtes.",ben:"Purifie et matifie en profondeur.",app:"1-2x/semaine, laisser 10-15 min puis rincer.",moment:"PM",ben_en:"Deep purifies and mattifies skin.",region:["dz"],video:"https://www.youtube.com/results?search_query=masque+ghassoul+peau+grasse"},
+"dz-avene-spray":{nom:"Avène Eau Thermale Spray",marque:"Avène DZ",cat:"Soin",prix:"1 200 DA",pq:"Tous types de peau",sk:["grasse","seche","mixte","sensible","normale"],age:["15-20","21-30","31-45","46+"],c:["sensibilite","hydratation"],ak:["Eau thermale"],ben:"Apaise et rafraîchit instantanément.",app:"Vaporiser à tout moment sur le visage.",moment:"AM+PM",comp:["Avene Thermal Spring Water"],clean:true,vegan:true,yuka:90,region:["dz"],link:"https://www.google.com/search?q=Avene+eau+thermale+Algerie+pharmacie&tbm=shop"},
+"dz-vichy-dz":{nom:"Vichy Minéral 89",marque:"Vichy DZ",cat:"Sérum",prix:"2 500 DA",pq:"Tous types de peau",sk:["grasse","seche","mixte","sensible","normale"],age:["21-30","31-45"],c:["hydratation","sensibilite"],ak:["Acide hyaluronique","Niacinamide"],ben:"Booste hydratation et renforce la barrière cutanée.",app:"Matin et soir avant la crème.",moment:"AM+PM",comp:["Aqua","Glycerin","Niacinamide","Sodium Hyaluronate"],clean:true,vegan:true,yuka:85,region:["dz"],link:"https://www.google.com/search?q=Vichy+Mineral+89+Algerie+pharmacie&tbm=shop"},
+"dz-cerave-dz":{nom:"CeraVe Crème Hydratante",marque:"CeraVe DZ",cat:"Crème",prix:"1 800 DA",pq:"Peaux sèches",sk:["seche","sensible","normale"],age:["15-20","21-30","31-45","46+"],c:["hydratation","sensibilite"],ak:["Ceramides","Acide hyaluronique","Niacinamide"],ben:"Hydrate et restaure la barrière cutanée.",app:"Matin et soir sur visage propre.",moment:"AM+PM",comp:["Aqua","Glycerin","Ceramide NP","Ceramide AP","Ceramide EOP","Niacinamide","Sodium Hyaluronate"],clean:true,vegan:false,yuka:82,region:["dz"],link:"https://www.google.com/search?q=CeraVe+Algerie+pharmacie&tbm=shop"},
+"dz-bioderma-dz":{nom:"Bioderma Sensibio H2O",marque:"Bioderma DZ",cat:"Nettoyant",prix:"1 300 DA",pq:"Peaux sensibles",sk:["sensible","normale","mixte"],age:["15-20","21-30","31-45","46+"],c:["sensibilite"],ak:["Fructooligosaccharides"],ben:"Démaquille et nettoie en douceur.",app:"Appliquer sur coton et passer sur le visage.",moment:"AM+PM",comp:["Aqua","PEG-6 Caprylic/Capric Glycerides","Fructooligosaccharides"],clean:true,vegan:true,yuka:88,region:["dz"],link:"https://www.google.com/search?q=Bioderma+Sensibio+Algerie+pharmacie&tbm=shop"},
+"dz-lrp-cica-dz":{nom:"La Roche-Posay Cicaplast B5",marque:"La Roche-Posay DZ",cat:"Soin",prix:"1 600 DA",pq:"Peaux sensibles",sk:["sensible","seche"],age:["15-20","21-30","31-45","46+"],c:["sensibilite","hydratation"],ak:["Panthenol","Madecassoside"],ben:"Répare et apaise les peaux irritées.",app:"Appliquer matin et soir.",moment:"AM+PM",comp:["Aqua","Glycerin","Panthenol","Madecassoside"],clean:true,vegan:true,yuka:86,region:["dz"],link:"https://www.google.com/search?q=La+Roche+Posay+Cicaplast+Algerie+pharmacie&tbm=shop"},
+"dz-huile-argan":{nom:"Huile d'Argan Pure Bio",marque:"Nature & Bio DZ",cat:"Huile",prix:"800 DA",pq:"Tous types de peau",sk:["seche","normale","mixte"],age:["21-30","31-45","46+"],c:["hydratation","eclat","rides"],ak:["Vitamine E"],ben:"Nourrit, hydrate et illumine.",app:"2-3 gouttes le soir.",moment:"PM",comp:["Argania Spinosa Kernel Oil","Tocopherol"],clean:true,vegan:true,yuka:92,region:["dz"],link:"https://www.google.com/search?q=huile+argan+bio+Algerie+acheter&tbm=shop"},
+"dz-nigelle-pure":{nom:"Huile de Nigelle Pure",marque:"Pharmashifa DZ",cat:"Huile",prix:"700 DA",pq:"Peaux à imperfections",sk:["grasse","mixte"],age:["15-20","21-30"],c:["acne","imperfections"],ak:["Thymoquinone"],ben:"Antibactérienne, réduit les imperfections.",app:"1-2 gouttes sur les zones concernées le soir.",moment:"PM",comp:["Nigella Sativa Seed Oil"],clean:true,vegan:true,yuka:90,region:["dz"],link:"https://www.google.com/search?q=huile+nigelle+Algerie+acheter&tbm=shop"},
+"dz-aloe-gel":{nom:"Gel Aloe Vera 99%",marque:"Biocosma DZ",cat:"Soin",prix:"600 DA",pq:"Tous types de peau",sk:["grasse","mixte","sensible","normale"],age:["15-20","21-30","31-45"],c:["acne","sensibilite","hydratation"],ak:["Aloe Vera"],ben:"Apaise, hydrate et calme les irritations.",app:"Appliquer après nettoyage.",moment:"AM+PM",comp:["Aloe Barbadensis Leaf Juice","Allantoin","Glycerin"],clean:true,vegan:true,yuka:91,region:["dz"],link:"https://www.google.com/search?q=gel+aloe+vera+Algerie+acheter&tbm=shop"},
+"dz-spf50-dz":{nom:"Crème Solaire SPF50+",marque:"Pharmashifa DZ",cat:"Solaire",prix:"1 100 DA",pq:"Tous types de peau",sk:["grasse","seche","mixte","sensible","normale"],age:["15-20","21-30","31-45","46+"],c:["sensibilite"],ak:["Filtres UV"],ben:"Protection maximale pour le climat algérien.",app:"Appliquer 30min avant exposition.",moment:"AM",comp:["Aqua","Octocrylene","Titanium Dioxide","Glycerin"],clean:false,vegan:true,yuka:75,region:["dz"],link:"https://www.google.com/search?q=creme+solaire+SPF50+Algerie+pharmacie&tbm=shop"},
+"dz-bepanthen":{nom:"Bepanthen Crème",marque:"Bayer DZ",cat:"Soin",prix:"1 100 DA",pq:"Peaux sèches",sk:["seche","sensible"],age:["15-20","21-30","31-45","46+"],c:["sensibilite","hydratation"],ak:["Panthenol"],ben:"Répare et apaise les peaux irritées.",app:"2 fois par jour sur les zones irritées.",moment:"AM+PM",comp:["Aqua","Panthenol","Glycerin"],clean:false,vegan:false,yuka:68,region:["dz"],link:"https://www.google.com/search?q=Bepanthen+Algerie+pharmacie&tbm=shop"},
 
   // ══════════════════════════════════════════════════════════════════
   // 🇲🇦 MAROC — Produits locaux
@@ -1277,12 +1337,44 @@ function getWhy(key,skin,concern,age){
 }
 
 function getCompat(key,skin,concern,age,allergies){
-  let s=70;
-  const p=DB[key];
-  if(p.clean&&allergies.length>0)s+=10;
-  if(skin==="sensible"&&p.yuka>=75)s+=8;
-  if(age==="46+"&&(p.ak||[]).some(a=>a.includes("ride")||a.includes("Proxylane")))s+=7;
-  return Math.min(99,Math.max(72,s+Math.floor(Math.random()*8)));
+  var p = DB[key];
+  if (!p) return 70;
+
+  // Vérifier allergies via INCI_DB
+  var AMAP = {
+    'Parfums / Fragrances':'parfum','Fragrances / Perfumes':'parfum',
+    'Parabènes':'paraben','Parabens':'paraben',
+    'Alcool':'alcohol','Alcohol':'alcohol',
+    'Sulfates (SLS/SLES)':'sulfate','Silicones':'silicone',
+    'Rétinol':'retinol','Retinol':'retinol',
+    'Vitamine C':'vitc','Vitamin C':'vitc',
+    'Acide salicylique':'salicylic','Salicylic acid':'salicylic',
+    'Acides (AHA/BHA)':'aha_bha','Acids (AHA/BHA)':'aha_bha',
+    'Huiles essentielles':'parfum','Essential oils':'parfum',
+  };
+  var inciProd = INCI_DB[key];
+  var hasAllergenInProduct = (allergies||[]).some(function(allergy) {
+    if (allergy === 'Aucune allergie connue' || allergy === 'No known allergies') return false;
+    if (inciProd) {
+      var field = AMAP[allergy];
+      return field && inciProd[field] === true;
+    }
+    // Fallback
+    var allText = ((p.comp||[]).join(' ')+(p.ak||[]).join(' ')).toLowerCase();
+    var FALLBACK = {'Rétinol':['retinol','retinyl'],'Vitamine C':['ascorbic acid'],'Acide salicylique':['salicylic acid'],'Parfums / Fragrances':['parfum','fragrance']};
+    return (FALLBACK[allergy]||[]).some(function(ing){return allText.includes(ing);});
+  });
+  if (hasAllergenInProduct) return 15;
+
+  var s = 72;
+  if (p.clean) s += 8;
+  if (skin === 'sensible' && p.yuka >= 75) s += 8;
+  if (skin === 'grasse' && (p.ak||[]).some(function(a){return a.toLowerCase().includes('niacinamide');})) s += 7;
+  if (skin === 'seche' && (p.ak||[]).some(function(a){return a.toLowerCase().includes('hyaluronique') || a.toLowerCase().includes('ceramide');})) s += 7;
+  if (age === '46+' && (p.ak||[]).some(function(a){return a.includes('ride')||a.includes('Proxylane')||a.includes('retinol');})) s += 7;
+  if (concern === 'acne' && (p.ak||[]).some(function(a){return a.toLowerCase().includes('salicylique')||a.toLowerCase().includes('niacinamide');})) s += 8;
+  if (concern === 'taches' && (p.ak||[]).some(function(a){return a.toLowerCase().includes('vitamine c')||a.toLowerCase().includes('niacinamide');})) s += 8;
+  return Math.min(99, Math.max(72, s));
 }
 
 function getRegionProducts() {
@@ -1311,6 +1403,51 @@ function build(){
   // Filtre région : seuls les produits disponibles pour la région courante
   const regionKeys = new Set(getRegionProducts());
   const avail = (key) => regionKeys.has(key) && DB[key];
+
+  // Mapping allergie → champ INCI_DB
+  const ALLERGY_INCI_MAP_BUILD = {
+    'Parfums / Fragrances':'parfum','Fragrances / Perfumes':'parfum',
+    'Parabènes':'paraben','Parabens':'paraben',
+    'Alcool':'alcohol','Alcohol':'alcohol',
+    'Sulfates (SLS/SLES)':'sulfate',
+    'Silicones':'silicone',
+    'Rétinol':'retinol','Retinol':'retinol',
+    'Vitamine C':'vitc','Vitamin C':'vitc',
+    'Acide salicylique':'salicylic','Salicylic acid':'salicylic',
+    'Acides (AHA/BHA)':'aha_bha','Acids (AHA/BHA)':'aha_bha',
+    'Huiles essentielles':'parfum','Essential oils':'parfum',
+  };
+
+  // Filtre allergies : exclure les produits qui contiennent un allergène déclaré
+  const hasAllergen = (key) => {
+    if (!DB[key]) return false;
+    const userAllergies = ST.allergies || [];
+    if (userAllergies.length === 0) return false;
+    // Vérifier via INCI_DB en priorité
+    const inciProd = INCI_DB[key];
+    if (inciProd) {
+      return userAllergies.some(function(allergy) {
+        if (allergy === 'Aucune allergie connue' || allergy === 'No known allergies') return false;
+        const field = ALLERGY_INCI_MAP_BUILD[allergy];
+        return field && inciProd[field] === true;
+      });
+    }
+    // Fallback sur comp[]
+    const p = DB[key];
+    const allText = ((p.comp||[]).join(' ') + ' ' + (p.ak||[]).join(' ')).toLowerCase();
+    const ALLERGY_MAP_FALLBACK = {
+      'Parfums / Fragrances':['parfum','fragrance'],
+      'Parabènes':['paraben'],'Alcool':['alcohol denat'],
+      'Rétinol':['retinol','retinyl'],'Vitamine C':['ascorbic acid'],
+      'Acide salicylique':['salicylic acid'],'Acides (AHA/BHA)':['glycolic acid','lactic acid','salicylic acid'],
+    };
+    return userAllergies.some(function(allergy) {
+      if (allergy === 'Aucune allergie connue') return false;
+      return (ALLERGY_MAP_FALLBACK[allergy]||[]).some(ing => allText.includes(ing));
+    });
+  };
+
+  const safeAvail = (key) => avail(key) && !hasAllergen(key);
   const mk=(key,etape,moment)=>({etape,moment,key,...DB[key],img:IMGS[key],pourquoi:getWhy(key,sk,c[0],ST.ageGroup),compat:getCompat(key,sk,c[0],ST.ageGroup,ST.allergies)});
   const addStep=(key,etape,moment)=>{
     if(!key||!DB[key])return;
@@ -1358,8 +1495,8 @@ var selectedRegionValue = '';
 var REGIONS = [
   {group:'🌍 Europe', items:[
     {val:'fr',flag:'🇫🇷',name:'France'},
-    {val:'fr',flag:'🇧🇪',name:'Belgique'},
-    {val:'fr',flag:'🇨🇭',name:'Suisse'},
+    {val:'be',flag:'🇧🇪',name:'Belgique'},
+    {val:'ch',flag:'🇨🇭',name:'Suisse'},
     {val:'de',flag:'🇩🇪',name:'Allemagne'},
     {val:'es',flag:'🇪🇸',name:'Espagne'},
     {val:'gb',flag:'🇬🇧',name:'Royaume-Uni'},
@@ -1398,6 +1535,7 @@ var REGIONS = [
 ];
 
 function buildRegionList() {
+  var ACTIVE = ['fr', 'dz'];
   var container = document.getElementById('region-list');
   if (!container) return;
   container.innerHTML = '';
@@ -1407,14 +1545,17 @@ function buildRegionList() {
     groupLabel.textContent = group.group;
     container.appendChild(groupLabel);
     group.items.forEach(function(item) {
+      var isActive = ACTIVE.indexOf(item.val) !== -1;
       var btn = document.createElement('button');
-      btn.style.cssText = 'width:100%;padding:12px 16px;border-radius:12px;border:2px solid ' + (selectedRegionValue === item.val + '_' + item.name ? '#C4726A' : '#EDD9D4') + ';background:' + (selectedRegionValue === item.val + '_' + item.name ? '#FDF0E6' : '#fff') + ';cursor:pointer;display:flex;align-items:center;gap:10px;font-family:inherit;text-align:left';
-      btn.innerHTML = '<span style="font-size:22px">' + item.flag + '</span><span style="font-size:14px;font-weight:600;color:#3D2B1F">' + item.name + '</span>';
-      btn.onclick = (function(v) {
-        return function() {
-          setRegion(v);
-        };
-      })(item.val);
+      btn.style.cssText = 'width:100%;padding:12px 16px;border-radius:12px;border:2px solid #EDD9D4;background:' + (isActive ? '#fff' : '#F5F2F0') + ';cursor:' + (isActive ? 'pointer' : 'not-allowed') + ';display:flex;align-items:center;gap:10px;font-family:inherit;text-align:left;opacity:' + (isActive ? '1' : '0.45') + ';position:relative';
+      btn.innerHTML = '<span style="font-size:22px">' + item.flag + '</span>' +
+        '<span style="font-size:14px;font-weight:600;color:' + (isActive ? '#3D2B1F' : '#B0958F') + '">' + item.name + '</span>' +
+        (!isActive ? '<span style="margin-left:auto;font-size:10px;font-weight:700;color:#B0958F;background:#EDD9D4;padding:2px 8px;border-radius:20px;flex-shrink:0">Bientôt</span>' : '');
+      if (isActive) {
+        btn.onclick = (function(v) {
+          return function() { setRegion(v); };
+        })(item.val);
+      }
       container.appendChild(btn);
     });
   });
@@ -2201,15 +2342,19 @@ function translateEtape(etape){
   return map[etape]||etape;
 }
 
-function imgHtml(key,marque,size=88){
-  const src=IMGS[key]||"";
-  const init=(marque||"").split(" ").map(w=>w[0]).join("").slice(0,2).toUpperCase();
-  if(!src)return `<div class="pif"><div class="bi">${init}</div><div class="bn">${marque}</div></div>`;
-  return `<div style="position:relative;width:${size}px;height:${size}px">
-    <img src="${src}" alt="${marque}" style="width:${size}px;height:${size}px;object-fit:contain;display:block" onload="this.style.opacity=1" onerror="this.style.display='none';var fb=this.parentNode.querySelector('.pif-fb');if(fb)fb.style.display='flex'">
-    <div class="pif pif-fb" style="display:none;position:absolute;top:0;left:0;width:100%;height:100%"><div class="bi">${init}</div><div class="bn">${marque}</div></div>
-  </div>`;
+function imgHtml(key,marque,size){
+  size = size || 88;
+  var src = IMGS[key] || "";
+  var words = (marque||"").replace(/[^a-zA-Z ]/g,'').trim().split(" ");
+  var init = words.length >= 2 && words[1] ? (words[0][0]+words[1][0]).toUpperCase() : (marque||"SK").substring(0,2).toUpperCase();
+  var style = getBrandStyle(marque);
+  return '<div style="width:'+size+'px;height:'+size+'px;border-radius:14px;background:'+style.bg+';display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;flex-shrink:0;overflow:hidden;position:relative">' +
+    (src ? '<img src="'+src+'" alt="'+marque+'" style="position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;border-radius:14px" />' : '') +
+    '<span style="font-size:'+(size>60?22:16)+'px;font-weight:900;color:'+style.tx+';letter-spacing:.5px;position:relative;z-index:1">'+init+'</span>' +
+    '<span style="font-size:9px;font-weight:600;color:'+style.tx+';opacity:.8;text-align:center;padding:0 4px;max-width:'+(size-8)+'px;overflow:hidden;white-space:nowrap;position:relative;z-index:1">'+marque+'</span>' +
+  '</div>';
 }
+
 
 function yukaBadge(yuka,yl){
   const cls=yuka>=75?"ye":yuka>=50?"yg":"ym";
@@ -2491,7 +2636,7 @@ function showWhyAI(key, nom, marque) {
     compatBlock.style.cssText = "margin-top:4px;padding:12px;background:#E8F5E9;border-radius:14px;text-align:center";
     var compat = p.yuka >= 75
         ? (isEN ? "🟢 Excellent Yuka score: " + p.yuka + "/100" : "🟢 Excellente note Yuka : " + p.yuka + "/100")
-        : (isEN ? "🥕 Yuka score: " + p.yuka + "/100" : "🥕 Note Yuka : " + p.yuka + "/100");
+        : (isEN ? "🥕 Yuka score: " + p.yuka + "/100" : "🥕 Analyse INCI : " + p.yuka + "/100");
     compatBlock.innerHTML = "<div style='font-size:13px;font-weight:700;color:#2E7D32'>" + compat + "</div>";
     contentEl.appendChild(compatBlock);
 }
@@ -3023,148 +3168,276 @@ function getGlobalScore(dimensions) {
 }
 
 function displayScanResult(data) {
-  var resultDiv = document.getElementById('scan-product-result');
+  var resultDiv = document.getElementById("scan-product-result");
   if (!resultDiv) return;
-  resultDiv.style.display = 'block';
+  resultDiv.style.display = "block";
 
   var globalScore = getGlobalScore(data.dimensions);
-  var skinLabel = (T[LANG]||T.fr).skin_labels[ST.skinType] || ST.skinType || 'ta peau';
-  var scoreColor = globalScore >= 75 ? '#4CAF50' : globalScore >= 50 ? '#FF9800' : '#F44336';
-  var scoreBg = globalScore >= 75 ? '#E8F5E9' : globalScore >= 50 ? '#FFF3E0' : '#FFEBEE';
-  var scoreLabel = globalScore >= 80 ? 'Excellent choix' : globalScore >= 65 ? 'Bien adapte' : globalScore >= 50 ? 'Moyennement adapte' : 'Peu recommande';
-  var diffMoy = globalScore - data.stats.note_moy;
+  var skinLabel = ((T[LANG]||T.fr).skin_labels||{})[ST.skinType] || ST.skinType || "ta peau";
+  var ageLabel = ST.ageGroup || "";
+  var concerns = ST.concerns && ST.concerns.length > 0 ? ST.concerns : [];
+  var allergies = ST.allergies && ST.allergies.length > 0 ? ST.allergies : [];
+  var scoreColor = globalScore >= 75 ? "#2E7D32" : globalScore >= 50 ? "#E65100" : "#C62828";
+  var scoreBg = globalScore >= 75 ? "#E8F5E9" : globalScore >= 50 ? "#FFF3E0" : "#FFEBEE";
+  var style = getBrandStyle(data.marque);
 
-  var html = '';
+  function getVerdict() {
+    if (globalScore >= 80) return "Excellent choix pour ta peau " + skinLabel + (ageLabel ? " (" + ageLabel + " ans)" : "") + ". Ce produit cible directement tes besoins et ses actifs sont parfaitement adaptés à ton profil.";
+    if (globalScore >= 65) return "Bon choix pour ta peau " + skinLabel + ". Quelques points à surveiller mais globalement ce produit te conviendra bien.";
+    if (globalScore >= 50) return "Produit moyen pour ton profil. Certains ingrédients peuvent ne pas convenir à ta peau " + skinLabel + ". Teste sur une petite zone avant.";
+    return "Ce produit n\'est pas idéal pour ta peau " + skinLabel + ". Regarde les alternatives recommandées plus bas — elles seront mieux adaptées.";
+  }
 
-  // En-tete produit
-  html += '<div style="background:#fff;border-radius:18px;padding:16px;display:flex;align-items:center;gap:14px;margin-bottom:14px;box-shadow:0 2px 12px rgba(0,0,0,.07)">';
-  html += '<div style="width:56px;height:56px;border-radius:14px;background:#F5E8E6;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:800;color:#C4726A;flex-shrink:0">' + data.initiales + '</div>';
-  html += '<div style="flex:1"><div style="font-size:16px;font-weight:700;color:#3D2B1F;font-family:Georgia,serif">' + data.nom + '</div>';
-  html += '<div style="font-size:13px;color:#8B6F5E;margin-top:3px">' + data.marque + '</div>';
-  html += '<div style="display:inline-block;margin-top:5px;padding:3px 10px;background:#F5E8E6;border-radius:20px;font-size:10px;font-weight:700;color:#C4726A">' + data.cat + '</div></div>';
-  html += '<div style="text-align:center;background:' + scoreBg + ';border-radius:14px;padding:8px 12px;flex-shrink:0">';
-  html += '<div style="font-size:28px;font-weight:800;color:' + scoreColor + ';font-family:Georgia,serif;line-height:1">' + globalScore + '</div>';
-  html += '<div style="font-size:10px;color:' + scoreColor + ';font-weight:600">/100</div></div></div>';
+  function getSkinAnswer() {
+    var ans = [];
+    var sk = ST.skinType || "";
+    var comp = (data.comp || []).join(" ").toLowerCase();
+    var ak = (data.pros || []).map(function(p){return p.actif.toLowerCase();}).join(" ");
+    if (sk === "grasse") {
+      if (ak.includes("niacinamide") || ak.includes("salicylique") || ak.includes("zinc") || ak.includes("bha")) {
+        ans.push("✅ Actifs anti-sébum présents (niacinamide, BHA) — parfait pour réguler ta brillance et tes pores.");
+      } else {
+        ans.push("⚠️ Pas les actifs anti-sébum idéaux pour peau grasse — efficacité limitée sur la brillance.");
+      }
+    } else if (sk === "seche") {
+      if (ak.includes("hyaluronique") || ak.includes("glycerin") || ak.includes("ceramide") || ak.includes("shea")) {
+        ans.push("✅ Riche en agents hydratants (acide hyaluronique, céramides) — idéal pour nourrir ta peau sèche.");
+      } else {
+        ans.push("⚠️ Les actifs hydratants sont limités — peut ne pas suffire seul pour ta peau sèche.");
+      }
+    } else if (sk === "sensible") {
+      if (comp.includes("parfum") || comp.includes("fragrance") || comp.includes("alcohol denat")) {
+        ans.push("⚠️ Contient du parfum ou de l\'alcool — peut irriter ta peau sensible. Patch test obligatoire avant utilisation.");
+      } else {
+        ans.push("✅ Formulation sans parfum apparent — bien tolérée par les peaux sensibles.");
+      }
+    } else if (sk === "mixte") {
+      ans.push("✅ Compatible avec ta peau mixte. Applique sur les zones sèches, en quantité moindre sur la zone T.");
+    } else {
+      ans.push("✅ Compatible avec ton type de peau " + skinLabel + ".");
+    }
+    return ans;
+  }
 
-  // Score gauge SVG
-  var arcLen = Math.PI * 60;
+  function getConcernAnswer() {
+    if (concerns.length === 0) return [];
+    var ans = [];
+    var ak = (data.pros || []).map(function(p){return p.actif.toLowerCase();}).join(" ");
+    concerns.forEach(function(c) {
+      if (c === "acne" || c === "imperfections") {
+        if (ak.includes("salicylique") || ak.includes("niacinamide") || ak.includes("zinc") || ak.includes("bha")) {
+          ans.push("✅ Acné : actifs anti-acné cliniquement prouvés présents — ce produit cible directement tes imperfections.");
+        } else {
+          ans.push("⚠️ Acné : les actifs anti-acné spécifiques sont limités. Ce produit complète ta routine mais ne la remplace pas.");
+        }
+      }
+      if (c === "taches") {
+        if (ak.includes("vitamine c") || ak.includes("niacinamide") || ak.includes("kojic") || ak.includes("arbutin")) {
+          ans.push("✅ Taches : actifs dépigmentants efficaces présents — résultats visibles en 4 à 8 semaines d\'utilisation régulière.");
+        } else {
+          ans.push("⚠️ Taches : produit non spécialisé anti-taches. Associe-le à un sérum vitamine C le matin pour de meilleurs résultats.");
+        }
+      }
+      if (c === "rides" || c === "antiage") {
+        if (ak.includes("retinol") || ak.includes("peptide") || ak.includes("collagene")) {
+          ans.push("✅ Anti-âge : actifs anti-rides reconnus scientifiquement (rétinol, peptides) — stimule le renouvellement cellulaire.");
+        } else {
+          ans.push("⚠️ Anti-âge : les actifs anti-rides sont limités. Pour lutter contre les rides, ajoute un rétinol le soir dans ta routine.");
+        }
+      }
+      if (c === "deshydratation" || c === "hydratation") {
+        if (ak.includes("hyaluronique") || ak.includes("glycerin") || ak.includes("aloe")) {
+          ans.push("✅ Hydratation : excellent — acide hyaluronique et humectants présents, hydratation jusqu\'à 24h.");
+        } else {
+          ans.push("⚠️ Hydratation : actifs hydratants insuffisants pour résoudre ta déshydratation seuls.");
+        }
+      }
+      if (c === "rougeurs") {
+        if (ak.includes("aloe") || ak.includes("centella") || ak.includes("bisabolol") || ak.includes("camomille")) {
+          ans.push("✅ Rougeurs : actifs apaisants présents (aloe, bisabolol) — aide à réduire les rougeurs progressivement.");
+        } else {
+          ans.push("⚠️ Rougeurs : peu d\'actifs apaisants spécifiques. Pas le plus adapté pour cet objectif précis.");
+        }
+      }
+    });
+    return ans;
+  }
+
+  function getRoutineAnswer() {
+    var moment = data.moment || "AM+PM";
+    var app = data.app || "";
+    var lines = [];
+    if (moment === "AM") lines.push("🌅 Matin uniquement — applique en dernière étape avant de sortir.");
+    else if (moment === "PM") lines.push("🌙 Soir uniquement — laisse agir toute la nuit pour de meilleurs résultats.");
+    else lines.push("🌅🌙 Matin et soir — intègre-le dans tes deux routines quotidiennes.");
+    if (app) lines.push("👆 Application : " + app);
+    var cat = (data.cat || "").toLowerCase();
+    if (cat.includes("serum")) lines.push("📋 Ordre : après nettoyage et tonique, avant la crème hydratante.");
+    else if (cat.includes("creme") || cat.includes("hydrat")) lines.push("📋 Ordre : dernière étape le matin (avant SPF), avant-dernière le soir.");
+    else if (cat.includes("nettoy") || cat.includes("gel") || cat.includes("mousse")) lines.push("📋 Ordre : première étape de ta routine, visage mouillé ou sec selon le produit.");
+    else if (cat.includes("spf") || cat.includes("solaire")) lines.push("📋 Ordre : dernière étape absolue le matin. Renouvelle toutes les 2h en extérieur.");
+    return lines;
+  }
+
+  function getWarnings() {
+    var warnings = [];
+    var comp = (data.comp || []).join(" ").toLowerCase();
+    var ak = (data.pros || []).map(function(p){return p.actif.toLowerCase();}).join(" ");
+    if (allergies.length > 0) warnings.push("⚠️ Allergies déclarées (" + allergies.join(", ") + ") : vérifie impérativement la liste INCI complète avant achat. En cas de doute, demande à ton pharmacien.");
+    if (ak.includes("retinol")) warnings.push("⚠️ Rétinol : commence 2x/semaine le soir, jamais le matin. Augmente progressivement. SPF obligatoire le lendemain matin.");
+    if (ak.includes("vitamine c") || ak.includes("acide ascorbique")) warnings.push("⚠️ Vitamine C : ne pas associer avec du rétinol le même soir. Conserve à l\'abri de la lumière et de la chaleur.");
+    if (ak.includes("salicylique") || ak.includes("aha") || ak.includes("glycolique")) warnings.push("⚠️ Acide exfoliant : commence 2-3x/semaine. Évite les associations avec d\'autres acides. SPF indispensable.");
+    if ((comp.includes("parfum") || comp.includes("fragrance")) && (ST.skinType === "sensible")) warnings.push("⚠️ Peau sensible + parfum : patch test 24h sur l\'intérieur du poignet avant première utilisation complète.");
+    if (warnings.length === 0) warnings.push("✅ Aucune précaution particulière pour ton profil — ce produit est globalement bien toléré.");
+    return warnings;
+  }
+
+  var html = "";
+
+  // En-tête produit
+  html += "<div style='background:#fff;border-radius:18px;padding:16px;display:flex;align-items:center;gap:14px;margin-bottom:14px;box-shadow:0 2px 12px rgba(0,0,0,.07)'>";
+  html += "<div style='width:60px;height:60px;border-radius:14px;background:" + style.bg + ";display:flex;flex-direction:column;align-items:center;justify-content:center;flex-shrink:0'>";
+  html += "<span style='font-size:18px;font-weight:900;color:" + style.tx + "'>" + data.initiales + "</span>";
+  html += "<span style='font-size:8px;color:" + style.tx + ";opacity:.8;text-align:center;padding:0 2px;line-height:1.1'>" + data.marque + "</span></div>";
+  html += "<div style='flex:1'><div style='font-size:16px;font-weight:700;color:#3D2B1F;font-family:Georgia,serif'>" + data.nom + "</div>";
+  html += "<div style='font-size:13px;color:#8B6F5E;margin-top:2px'>" + data.marque + "</div>";
+  html += "<div style='display:inline-block;margin-top:5px;padding:3px 10px;background:#F5E8E6;border-radius:20px;font-size:10px;font-weight:700;color:#C4726A'>" + data.cat + "</div></div>";
+  html += "<div style='text-align:center;background:" + scoreBg + ";border-radius:14px;padding:10px 14px;flex-shrink:0'>";
+  html += "<div style='font-size:32px;font-weight:900;color:" + scoreColor + ";font-family:Georgia,serif;line-height:1'>" + globalScore + "</div>";
+  html += "<div style='font-size:10px;color:" + scoreColor + ";font-weight:700'>/100</div>";
+  html += "<div style='font-size:9px;color:" + scoreColor + ";margin-top:2px'>" + (globalScore>=75?"Excellent":globalScore>=65?"Bien adapté":globalScore>=50?"Moyen":"Peu adapté") + "</div></div></div>";
+
+  // Score principal avec jauge SVG
+  var arcLen = Math.PI * 55;
   var fillLen = arcLen * globalScore / 100;
-  html += '<div style="background:linear-gradient(135deg,#1F3864,#2E5496);border-radius:20px;padding:20px;margin-bottom:14px;text-align:center">';
-  html += '<p style="font-size:10px;font-weight:700;color:rgba(255,255,255,.6);text-transform:uppercase;letter-spacing:3px;margin-bottom:14px">Score d\'adaptation — peau ' + skinLabel + '</p>';
-  html += '<div style="display:flex;align-items:center;justify-content:center;gap:20px;flex-wrap:wrap">';
-  html += '<svg width="140" height="85" viewBox="0 0 140 85">';
-  html += '<path d="M10 78 A60 60 0 0 1 130 78" fill="none" stroke="rgba(255,255,255,.15)" stroke-width="12" stroke-linecap="round"/>';
-  html += '<path d="M10 78 A60 60 0 0 1 130 78" fill="none" stroke="' + scoreColor + '" stroke-width="12" stroke-linecap="round" stroke-dasharray="' + fillLen.toFixed(1) + ' ' + arcLen.toFixed(1) + '"/>';
-  html += '<text x="70" y="72" text-anchor="middle" fill="white" font-size="22" font-weight="bold" font-family="Georgia,serif">' + globalScore + '</text>';
-  html += '<text x="70" y="83" text-anchor="middle" fill="rgba(255,255,255,.6)" font-size="10">/100</text>';
-  html += '</svg>';
-  html += '<div style="text-align:left"><div style="font-size:18px;font-weight:700;color:#fff;margin-bottom:4px">' + scoreLabel + '</div>';
-  html += '<div style="font-size:12px;color:rgba(255,255,255,.7)">pour ta peau ' + skinLabel + '</div>';
-  if (globalScore >= 75) html += '<div style="margin-top:8px;background:#4CAF50;color:#fff;padding:4px 12px;border-radius:20px;font-size:11px;font-weight:700;display:inline-block">Recommande</div>';
-  html += '</div></div></div>';
+  html += "<div style='background:linear-gradient(135deg,#1F3864,#2E5496);border-radius:18px;padding:20px;margin-bottom:14px'>";
+  html += "<p style='font-size:11px;font-weight:700;color:rgba(255,255,255,.6);text-transform:uppercase;letter-spacing:2px;margin-bottom:10px'>Mon analyse pour toi</p>";
+  html += "<div style='display:flex;align-items:center;gap:16px'>";
+  html += "<svg width='110' height='70' viewBox='0 0 110 70' style='flex-shrink:0'>";
+  html += "<path d='M8 65 A47 47 0 0 1 102 65' fill='none' stroke='rgba(255,255,255,.15)' stroke-width='10' stroke-linecap='round'/>";
+  html += "<path d='M8 65 A47 47 0 0 1 102 65' fill='none' stroke='" + scoreColor + "' stroke-width='10' stroke-linecap='round' stroke-dasharray='" + fillLen.toFixed(1) + " " + arcLen.toFixed(1) + "'/>";
+  html += "<text x='55' y='60' text-anchor='middle' fill='white' font-size='20' font-weight='bold' font-family='Georgia,serif'>" + globalScore + "</text>";
+  html += "</svg>";
+  html += "<p style='font-size:14px;color:#fff;line-height:1.6;margin:0'>" + getVerdict() + "</p></div></div>";
 
-  // Graphique barres 4 dimensions
-  html += '<div style="background:#fff;border-radius:18px;padding:16px;margin-bottom:14px;box-shadow:0 2px 12px rgba(0,0,0,.07)">';
-  html += '<p style="font-size:12px;font-weight:700;color:#3D2B1F;text-transform:uppercase;letter-spacing:.5px;margin-bottom:14px">Analyse detaillee</p>';
-  var dimLabels = {formulation:'Formulation', adaptation:'Adaptation peau', actifs:'Actifs benefiques', prix:'Qualite / Prix'};
-  var dimIcons = {formulation:'🧴', adaptation:'👤', actifs:'⚗️', prix:'💰'};
-  var dims = Object.keys(data.dimensions);
-  dims.forEach(function(dim) {
+  // 4 dimensions
+  html += "<div style='background:#fff;border-radius:18px;padding:16px;margin-bottom:14px;box-shadow:0 2px 12px rgba(0,0,0,.07)'>";
+  html += "<p style='font-size:12px;font-weight:700;color:#3D2B1F;text-transform:uppercase;letter-spacing:.5px;margin-bottom:14px'>📊 Détail du score</p>";
+  var dimLabels = {formulation:"🧴 Qualité formulation", adaptation:"👤 Adapté à ta peau", actifs:"⚗️ Actifs bénéfiques", prix:"💰 Rapport qualité/prix"};
+  var dimDesc = {formulation:"Qualité et sécurité des ingrédients", adaptation:"Compatibilité avec ton profil", actifs:"Efficacité pour tes problèmes", prix:"Rapport entre le prix et les bénéfices"};
+  Object.keys(data.dimensions).forEach(function(dim) {
     var val = data.dimensions[dim];
-    var col = val >= 75 ? '#4CAF50' : val >= 50 ? '#FF9800' : '#F44336';
-    html += '<div style="margin-bottom:12px">';
-    html += '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px">';
-    html += '<span style="font-size:13px;color:#3D2B1F">' + (dimIcons[dim]||'') + ' ' + (dimLabels[dim]||dim) + '</span>';
-    html += '<span style="font-size:14px;font-weight:800;color:' + col + '">' + val + '/100</span></div>';
-    html += '<div style="height:10px;border-radius:50px;background:#F0EBE8;overflow:hidden">';
-    html += '<div style="height:100%;border-radius:50px;background:' + col + ';width:' + val + '%;transition:width 1s ease"></div></div></div>';
+    var col = val >= 75 ? "#2E7D32" : val >= 50 ? "#E65100" : "#C62828";
+    html += "<div style='margin-bottom:14px'>";
+    html += "<div style='display:flex;justify-content:space-between;align-items:center;margin-bottom:3px'>";
+    html += "<div><div style='font-size:13px;font-weight:600;color:#3D2B1F'>" + (dimLabels[dim]||dim) + "</div>";
+    html += "<div style='font-size:11px;color:#B0958F'>" + (dimDesc[dim]||"") + "</div></div>";
+    html += "<span style='font-size:16px;font-weight:900;color:" + col + "'>" + val + "</span></div>";
+    html += "<div style='height:8px;border-radius:50px;background:#F0EBE8;overflow:hidden'>";
+    html += "<div style='height:100%;border-radius:50px;background:" + col + ";width:" + val + "%;transition:width 1.2s ease'></div></div></div>";
   });
-
   // Mini bar chart SVG
-  html += '<div style="margin-top:14px;padding-top:12px;border-top:1px solid #F0EBE8">';
-  html += '<p style="font-size:11px;color:#B0958F;margin-bottom:8px;font-weight:600">Vue graphique</p>';
-  html += '<svg width="100%" height="65" viewBox="0 0 280 65" preserveAspectRatio="xMidYMid meet">';
-  var dimVals = dims.map(function(d) { return data.dimensions[d]; });
-  dimVals.forEach(function(val, i) {
-    var col = val >= 75 ? '#4CAF50' : val >= 50 ? '#FF9800' : '#F44336';
-    var x = 10 + i * 65;
-    var barH = Math.round(val * 0.5);
-    html += '<rect x="' + x + '" y="' + (55-barH) + '" width="50" height="' + barH + '" rx="6" fill="' + col + '" opacity=".85"/>';
-    html += '<text x="' + (x+25) + '" y="62" text-anchor="middle" fill="#8B6F5E" font-size="9">' + val + '</text>';
+  html += "<div style='margin-top:12px;padding-top:12px;border-top:1px solid #F0EBE8'>";
+  html += "<p style='font-size:11px;color:#B0958F;margin-bottom:8px;font-weight:600'>Vue comparative</p>";
+  html += "<svg width='100%' height='70' viewBox='0 0 300 70' preserveAspectRatio='xMidYMid meet'>";
+  var dims = Object.keys(data.dimensions);
+  dims.forEach(function(dim, i) {
+    var val = data.dimensions[dim];
+    var col = val >= 75 ? "#2E7D32" : val >= 50 ? "#E65100" : "#C62828";
+    var x = 8 + i * 72;
+    var barH = Math.round(val * 0.52);
+    html += "<rect x='" + x + "' y='" + (58-barH) + "' width='55' height='" + barH + "' rx='6' fill='" + col + "' opacity='.85'/>";
+    html += "<text x='" + (x+27) + "' y='67' text-anchor='middle' fill='#8B6F5E' font-size='9'>" + val + "</text>";
   });
-  html += '</svg></div></div>';
+  html += "</svg></div></div>";
 
-  // Stats communaute
-  html += '<div style="background:linear-gradient(135deg,#FDF0E6,#FAE5D8);border-radius:18px;padding:16px;margin-bottom:14px;border:1px solid rgba(196,114,106,.15)">';
-  html += '<p style="font-size:12px;font-weight:700;color:#C4726A;text-transform:uppercase;letter-spacing:.5px;margin-bottom:12px">Communaute SkinMatch</p>';
-  html += '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:10px">';
-  html += '<div style="background:rgba(255,255,255,.7);border-radius:12px;padding:10px;text-align:center"><div style="font-size:18px;font-weight:800;color:#C4726A">' + data.stats.scans.toLocaleString('fr-FR') + '</div><div style="font-size:10px;color:#8B6F5E">utilisateurs</div></div>';
-  html += '<div style="background:rgba(255,255,255,.7);border-radius:12px;padding:10px;text-align:center"><div style="font-size:18px;font-weight:800;color:#4CAF50">' + data.stats.adaptes + '%</div><div style="font-size:10px;color:#8B6F5E">l\'ont aime</div></div>';
-  html += '<div style="background:rgba(255,255,255,.7);border-radius:12px;padding:10px;text-align:center"><div style="font-size:18px;font-weight:800;color:#1F3864">' + data.stats.note_moy + '</div><div style="font-size:10px;color:#8B6F5E">moy. community</div></div>';
-  html += '</div>';
-  html += '<div style="background:rgba(255,255,255,.8);border-radius:12px;padding:10px;display:flex;align-items:center;gap:10px">';
-  html += '<div style="font-size:20px">' + (diffMoy >= 0 ? '🏆' : '📈') + '</div>';
-  html += '<div><div style="font-size:12px;font-weight:700;color:#3D2B1F">Ton score : ' + globalScore + '/100</div>';
-  html += '<div style="font-size:11px;font-weight:600;color:' + (diffMoy >= 0 ? '#4CAF50' : '#FF9800') + '">' + (diffMoy >= 0 ? '+ ' + diffMoy + ' au-dessus de la moyenne' : diffMoy + ' en-dessous de la moyenne') + '</div></div></div></div>';
+  // Est-ce fait pour ma peau ?
+  var skinAns = getSkinAnswer();
+  if (skinAns.length > 0) {
+    html += "<div style='background:#fff;border-radius:18px;padding:16px;margin-bottom:14px;box-shadow:0 2px 12px rgba(0,0,0,.07)'>";
+    html += "<p style='font-size:12px;font-weight:700;color:#3D2B1F;text-transform:uppercase;letter-spacing:.5px;margin-bottom:12px'>🧬 Est-ce fait pour ma peau " + skinLabel + " ?</p>";
+    skinAns.forEach(function(line) {
+      html += "<div style='font-size:13px;color:#3D2B1F;padding:8px 0;border-bottom:1px solid #F5F0ED;line-height:1.6'>" + line + "</div>";
+    });
+    html += "</div>";
+  }
 
-  // Points positifs
+  // Efficace pour mes problèmes ?
+  var concernAns = getConcernAnswer();
+  if (concernAns.length > 0) {
+    html += "<div style='background:#fff;border-radius:18px;padding:16px;margin-bottom:14px;box-shadow:0 2px 12px rgba(0,0,0,.07)'>";
+    html += "<p style='font-size:12px;font-weight:700;color:#3D2B1F;text-transform:uppercase;letter-spacing:.5px;margin-bottom:12px'>🎯 Efficace pour mes problèmes ?</p>";
+    concernAns.forEach(function(line) {
+      html += "<div style='font-size:13px;color:#3D2B1F;padding:8px 0;border-bottom:1px solid #F5F0ED;line-height:1.6'>" + line + "</div>";
+    });
+    html += "</div>";
+  }
+
+  // Comment l'utiliser ?
+  var routineAns = getRoutineAnswer();
+  if (routineAns.length > 0) {
+    html += "<div style='background:#fff;border-radius:18px;padding:16px;margin-bottom:14px;box-shadow:0 2px 12px rgba(0,0,0,.07)'>";
+    html += "<p style='font-size:12px;font-weight:700;color:#3D2B1F;text-transform:uppercase;letter-spacing:.5px;margin-bottom:12px'>📋 Comment l\'utiliser dans ma routine ?</p>";
+    routineAns.forEach(function(line) {
+      html += "<div style='font-size:13px;color:#3D2B1F;padding:8px 0;border-bottom:1px solid #F5F0ED;line-height:1.6'>" + line + "</div>";
+    });
+    html += "</div>";
+  }
+
+  // Actifs clés
   if (data.pros && data.pros.length > 0) {
-    html += '<div style="background:#fff;border-radius:18px;padding:16px;margin-bottom:14px;box-shadow:0 2px 12px rgba(0,0,0,.07)">';
-    html += '<p style="font-size:12px;font-weight:700;color:#3D2B1F;text-transform:uppercase;letter-spacing:.5px;margin-bottom:12px">Ce qui te convient</p>';
+    html += "<div style='background:#fff;border-radius:18px;padding:16px;margin-bottom:14px;box-shadow:0 2px 12px rgba(0,0,0,.07)'>";
+    html += "<p style='font-size:12px;font-weight:700;color:#3D2B1F;text-transform:uppercase;letter-spacing:.5px;margin-bottom:12px'>✅ Les actifs clés et leurs bénéfices</p>";
     data.pros.forEach(function(pro) {
-      html += '<div style="display:flex;gap:12px;padding:10px 0;border-bottom:1px solid #F8F3F0">';
-      html += '<div style="width:36px;height:36px;border-radius:10px;background:#E8F5E9;display:flex;align-items:center;justify-content:center;flex-shrink:0">✅</div>';
-      html += '<div><div style="font-size:13px;font-weight:700;color:#3D2B1F">' + pro.actif + '</div>';
-      html += '<div style="font-size:12px;color:#5A7A5A;margin-top:3px;line-height:1.5">' + pro.explication + '</div></div></div>';
+      html += "<div style='display:flex;gap:12px;padding:10px 0;border-bottom:1px solid #F5F0ED'>";
+      html += "<div style='width:36px;height:36px;border-radius:10px;background:#E8F5E9;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:15px'>⚗️</div>";
+      html += "<div><div style='font-size:13px;font-weight:700;color:#2E7D32'>" + pro.actif + "</div>";
+      html += "<div style='font-size:12px;color:#5A4A42;margin-top:3px;line-height:1.6'>" + pro.explication + "</div></div></div>";
     });
-    html += '</div>';
+    html += "</div>";
   }
 
-  // Points attention
-  if (data.cons && data.cons.length > 0) {
-    html += '<div style="background:#fff;border-radius:18px;padding:16px;margin-bottom:14px;box-shadow:0 2px 12px rgba(0,0,0,.07)">';
-    html += '<p style="font-size:12px;font-weight:700;color:#3D2B1F;text-transform:uppercase;letter-spacing:.5px;margin-bottom:12px">Points d attention</p>';
-    data.cons.forEach(function(con) {
-      html += '<div style="display:flex;gap:12px;padding:10px 0;border-bottom:1px solid #F8F3F0">';
-      html += '<div style="width:36px;height:36px;border-radius:10px;background:#FFF3E0;display:flex;align-items:center;justify-content:center;flex-shrink:0">⚠️</div>';
-      html += '<div><div style="font-size:13px;font-weight:700;color:#3D2B1F">' + con.actif + '</div>';
-      html += '<div style="font-size:12px;color:#9A7A45;margin-top:3px;line-height:1.5">' + con.explication + '</div></div></div>';
-    });
-    html += '</div>';
-  }
+  // Points d'attention
+  var warnings = getWarnings();
+  html += "<div style='background:#fff;border-radius:18px;padding:16px;margin-bottom:14px;box-shadow:0 2px 12px rgba(0,0,0,.07)'>";
+  html += "<p style='font-size:12px;font-weight:700;color:#3D2B1F;text-transform:uppercase;letter-spacing:.5px;margin-bottom:12px'>⚠️ Points d\'attention pour ton profil</p>";
+  warnings.forEach(function(line) {
+    html += "<div style='font-size:13px;color:#3D2B1F;padding:8px 0;border-bottom:1px solid #F5F0ED;line-height:1.6'>" + line + "</div>";
+  });
+  html += "</div>";
 
   // Alternatives
   var alts = (data.alternatives || []).filter(function(k) { return DB[k]; }).slice(0,3);
   if (alts.length > 0) {
-    html += '<div style="background:#fff;border-radius:18px;padding:16px;margin-bottom:14px;box-shadow:0 2px 12px rgba(0,0,0,.07)">';
-    html += '<p style="font-size:12px;font-weight:700;color:#3D2B1F;text-transform:uppercase;letter-spacing:.5px;margin-bottom:12px">Alternatives recommandees</p>';
+    html += "<div style='background:#fff;border-radius:18px;padding:16px;margin-bottom:14px;box-shadow:0 2px 12px rgba(0,0,0,.07)'>";
+    html += "<p style='font-size:12px;font-weight:700;color:#3D2B1F;text-transform:uppercase;letter-spacing:.5px;margin-bottom:12px'>💡 Alternatives mieux adaptées à explorer</p>";
     alts.forEach(function(k) {
-      var p = DB[k];
-      var altScore = Math.min(100, (p.yuka||75) + 8);
-      var col = altScore >= 75 ? '#4CAF50' : '#FF9800';
-      html += '<div style="display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid #F8F3F0">';
-      html += '<div style="width:40px;height:40px;border-radius:10px;background:#F5E8E6;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:#C4726A;flex-shrink:0">' + p.marque.substring(0,2).toUpperCase() + '</div>';
-      html += '<div style="flex:1"><div style="font-size:13px;font-weight:600;color:#3D2B1F">' + p.nom + '</div>';
-      html += '<div style="font-size:11px;color:#8B6F5E">' + p.marque + ' · ' + p.prix + '</div></div>';
-      html += '<div style="font-size:18px;font-weight:800;color:' + col + '">' + altScore + '</div></div>';
+      var pr = DB[k];
+      var altScore = getAdaptationScore(k);
+      var col = altScore >= 75 ? "#2E7D32" : "#E65100";
+      var st = getBrandStyle(pr.marque);
+      html += "<div style='display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid #F5F0ED'>";
+      html += "<div style='width:40px;height:40px;border-radius:10px;background:" + st.bg + ";display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:" + st.tx + ";flex-shrink:0'>" + pr.marque.substring(0,2).toUpperCase() + "</div>";
+      html += "<div style='flex:1'><div style='font-size:13px;font-weight:600;color:#3D2B1F'>" + pr.nom + "</div>";
+      html += "<div style='font-size:11px;color:#8B6F5E'>" + pr.marque + " · " + pr.prix + "</div></div>";
+      html += "<div style='text-align:center;background:" + (altScore>=75?"#E8F5E9":"#FFF3E0") + ";border-radius:10px;padding:6px 10px'>";
+      html += "<div style='font-size:16px;font-weight:900;color:" + col + "'>" + altScore + "</div>";
+      html += "<div style='font-size:9px;color:" + col + "'>score</div></div></div>";
     });
-    html += '</div>';
+    html += "</div>";
   }
 
   // Actions
-  html += '<div style="display:flex;gap:10px;margin-bottom:10px">';
-  html += '<button onclick="saveScan()" style="flex:1;padding:14px;border-radius:50px;border:1.5px solid #C4726A;background:#fff;color:#C4726A;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">Sauvegarder</button>';
-  html += '<button onclick="shareScan()" style="flex:1;padding:14px;border-radius:50px;border:none;background:linear-gradient(135deg,#C4726A,#A85A52);color:#fff;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">Partager</button>';
-  html += '</div>';
-  if (data.link && data.link !== '#') {
-    html += '<button onclick="window.open(\'' + data.link.replace(/'/g, "\\'") + '\',\'_blank\')" style="width:100%;padding:14px;border-radius:50px;border:none;background:#1F3864;color:#fff;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">Commander sur Easypara</button>';
+  html += "<div style='display:flex;gap:10px;margin-bottom:10px'>";
+  html += "<button onclick='saveScan()' style='flex:1;padding:14px;border-radius:50px;border:1.5px solid #C4726A;background:#fff;color:#C4726A;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit'>❤️ Sauvegarder</button>";
+  html += "<button onclick='shareScan()' style='flex:1;padding:14px;border-radius:50px;border:none;background:linear-gradient(135deg,#C4726A,#A85A52);color:#fff;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit'>📤 Partager</button>";
+  html += "</div>";
+  if (data.link && data.link !== "#") {
+    html += "<button onclick=\"window.open('" + data.link.replace(/'/g, "\\'") + "','_blank')\" style='width:100%;padding:14px;border-radius:50px;border:none;background:#1F3864;color:#fff;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit'>🛒 Acheter ce produit</button>";
   }
 
   resultDiv.innerHTML = html;
-
-  setTimeout(function() {
-    resultDiv.scrollIntoView({behavior:'smooth', block:'start'});
-  }, 200);
+  setTimeout(function() { resultDiv.scrollIntoView({behavior:"smooth", block:"start"}); }, 200);
 }
 
 
@@ -3271,6 +3544,193 @@ function confirmTerms() {
   go('q1');
 }
 
+
+
+var INCI_DB = {
+  "cv-gel": {retinol:false,parfum:false,paraben:false,alcohol:false,sulfate:false,silicone:false,vitc:false,salicylic:true,aha_bha:true},
+  "cv-crem": {retinol:false,parfum:false,paraben:true,alcohol:true,sulfate:false,silicone:false,vitc:false,salicylic:false,aha_bha:false},
+  "cv-ret": {retinol:true,parfum:false,paraben:false,alcohol:true,sulfate:false,silicone:false,vitc:false,salicylic:false,aha_bha:false},
+  "cv-mou": {retinol:false,parfum:false,paraben:false,alcohol:true,sulfate:false,silicone:true,vitc:false,salicylic:false,aha_bha:false},
+  "cv-vitc": {retinol:false,parfum:false,paraben:false,alcohol:true,sulfate:false,silicone:false,vitc:true,salicylic:false,aha_bha:false},
+  "cv-eye": {retinol:false,parfum:false,paraben:false,alcohol:true,sulfate:false,silicone:false,vitc:false,salicylic:false,aha_bha:false},
+  "lrp-effgel": {retinol:false,parfum:false,paraben:false,alcohol:false,sulfate:true,silicone:false,vitc:false,salicylic:false,aha_bha:false},
+  "lrp-effduo": {retinol:false,parfum:true,paraben:false,alcohol:true,sulfate:false,silicone:true,vitc:false,salicylic:false,aha_bha:false},
+  "lrp-cica": {retinol:false,parfum:false,paraben:false,alcohol:false,sulfate:false,silicone:true,vitc:false,salicylic:false,aha_bha:false},
+  "lrp-tol": {retinol:false,parfum:false,paraben:false,alcohol:false,sulfate:false,silicone:false,vitc:false,salicylic:false,aha_bha:false},
+  "lrp-anth": {retinol:false,parfum:false,paraben:false,alcohol:true,sulfate:false,silicone:true,vitc:false,salicylic:false,aha_bha:false},
+  "lrp-hyalu": {retinol:false,parfum:true,paraben:false,alcohol:true,sulfate:false,silicone:false,vitc:false,salicylic:false,aha_bha:true},
+  "bd-sens": {retinol:false,parfum:false,paraben:false,alcohol:false,sulfate:false,silicone:false,vitc:false,salicylic:false,aha_bha:false},
+  "bd-sebgel": {retinol:false,parfum:false,paraben:false,alcohol:false,sulfate:false,silicone:false,vitc:false,salicylic:true,aha_bha:true},
+  "bd-hydra": {retinol:false,parfum:false,paraben:false,alcohol:false,sulfate:false,silicone:false,vitc:false,salicylic:false,aha_bha:false},
+  "bd-sebser": {retinol:false,parfum:false,paraben:false,alcohol:true,sulfate:false,silicone:false,vitc:false,salicylic:true,aha_bha:true},
+  "av-tol": {retinol:false,parfum:false,paraben:false,alcohol:true,sulfate:false,silicone:false,vitc:false,salicylic:false,aha_bha:false},
+  "av-lait": {retinol:false,parfum:false,paraben:false,alcohol:false,sulfate:false,silicone:false,vitc:false,salicylic:false,aha_bha:false},
+  "vic-minral89": {retinol:false,parfum:false,paraben:false,alcohol:true,sulfate:false,silicone:false,vitc:false,salicylic:false,aha_bha:false},
+  "vic-normaderm": {retinol:false,parfum:true,paraben:false,alcohol:true,sulfate:false,silicone:true,vitc:false,salicylic:true,aha_bha:true},
+  "vic-liftactiv": {retinol:false,parfum:true,paraben:false,alcohol:true,sulfate:false,silicone:false,vitc:false,salicylic:false,aha_bha:false},
+  "vic-capital": {retinol:false,parfum:true,paraben:false,alcohol:true,sulfate:false,silicone:true,vitc:false,salicylic:false,aha_bha:false},
+  "vic-slow-age": {retinol:false,parfum:true,paraben:false,alcohol:true,sulfate:false,silicone:false,vitc:false,salicylic:false,aha_bha:false},
+  "nux-huile-prodigieuse": {retinol:false,parfum:true,paraben:false,alcohol:false,sulfate:false,silicone:false,vitc:false,salicylic:false,aha_bha:false},
+  "nux-creme-fraiche": {retinol:false,parfum:true,paraben:false,alcohol:true,sulfate:false,silicone:false,vitc:false,salicylic:false,aha_bha:false},
+  "nux-reve-de-miel": {retinol:false,parfum:true,paraben:false,alcohol:false,sulfate:false,silicone:false,vitc:false,salicylic:false,aha_bha:false},
+  "nux-merveillance": {retinol:false,parfum:true,paraben:false,alcohol:true,sulfate:false,silicone:false,vitc:false,salicylic:false,aha_bha:false},
+  "cau-vinoperfect": {retinol:false,parfum:true,paraben:false,alcohol:true,sulfate:false,silicone:false,vitc:false,salicylic:false,aha_bha:false},
+  "cau-vinosource": {retinol:false,parfum:true,paraben:false,alcohol:true,sulfate:false,silicone:false,vitc:false,salicylic:false,aha_bha:false},
+  "cau-resveratrol": {retinol:false,parfum:true,paraben:false,alcohol:true,sulfate:false,silicone:false,vitc:false,salicylic:false,aha_bha:false},
+  "cau-spf": {retinol:false,parfum:true,paraben:false,alcohol:true,sulfate:false,silicone:true,vitc:false,salicylic:false,aha_bha:false},
+  "cla-double-serum": {retinol:false,parfum:true,paraben:false,alcohol:true,sulfate:false,silicone:false,vitc:false,salicylic:false,aha_bha:false},
+  "cla-hydra-essentiel": {retinol:false,parfum:true,paraben:false,alcohol:true,sulfate:false,silicone:false,vitc:false,salicylic:false,aha_bha:false},
+  "cla-multi-active": {retinol:false,parfum:true,paraben:false,alcohol:false,sulfate:false,silicone:false,vitc:false,salicylic:false,aha_bha:false},
+  "cla-spf": {retinol:false,parfum:true,paraben:false,alcohol:true,sulfate:false,silicone:true,vitc:false,salicylic:false,aha_bha:false},
+  "skc-cef": {retinol:false,parfum:false,paraben:false,alcohol:true,sulfate:false,silicone:false,vitc:true,salicylic:false,aha_bha:false},
+  "skc-ph": {retinol:false,parfum:false,paraben:false,alcohol:true,sulfate:false,silicone:false,vitc:true,salicylic:false,aha_bha:false},
+  "skc-sil": {retinol:false,parfum:false,paraben:false,alcohol:true,sulfate:false,silicone:false,vitc:false,salicylic:true,aha_bha:true},
+  "skc-ha": {retinol:false,parfum:false,paraben:false,alcohol:false,sulfate:false,silicone:false,vitc:false,salicylic:false,aha_bha:false},
+  "skc-dis": {retinol:false,parfum:false,paraben:false,alcohol:true,sulfate:false,silicone:false,vitc:false,salicylic:false,aha_bha:false},
+  "skc-age": {retinol:false,parfum:true,paraben:false,alcohol:true,sulfate:false,silicone:false,vitc:false,salicylic:false,aha_bha:true},
+  "skc-bl": {retinol:false,parfum:false,paraben:false,alcohol:true,sulfate:false,silicone:false,vitc:false,salicylic:true,aha_bha:true},
+  "skc-phy": {retinol:false,parfum:false,paraben:false,alcohol:false,sulfate:false,silicone:false,vitc:false,salicylic:false,aha_bha:false},
+  "skc-met": {retinol:false,parfum:false,paraben:false,alcohol:false,sulfate:false,silicone:false,vitc:false,salicylic:false,aha_bha:false},
+  "skc-spf": {retinol:false,parfum:false,paraben:false,alcohol:false,sulfate:false,silicone:true,vitc:false,salicylic:false,aha_bha:false},
+  "cs-power": {retinol:true,parfum:false,paraben:false,alcohol:false,sulfate:false,silicone:false,vitc:false,salicylic:false,aha_bha:false},
+  "cs-bleu": {retinol:false,parfum:false,paraben:false,alcohol:false,sulfate:false,silicone:false,vitc:false,salicylic:false,aha_bha:false},
+  "cs-skin2": {retinol:false,parfum:false,paraben:false,alcohol:false,sulfate:false,silicone:false,vitc:false,salicylic:false,aha_bha:false},
+  "cs-u": {retinol:false,parfum:false,paraben:false,alcohol:false,sulfate:false,silicone:false,vitc:false,salicylic:false,aha_bha:false},
+  "cs-eye": {retinol:false,parfum:false,paraben:false,alcohol:false,sulfate:false,silicone:false,vitc:false,salicylic:false,aha_bha:false},
+  "cs-culte": {retinol:false,parfum:false,paraben:false,alcohol:false,sulfate:false,silicone:false,vitc:false,salicylic:false,aha_bha:false},
+  "cs-mousse": {retinol:false,parfum:false,paraben:false,alcohol:false,sulfate:false,silicone:false,vitc:false,salicylic:false,aha_bha:false},
+  "cs-crev": {retinol:false,parfum:false,paraben:false,alcohol:false,sulfate:false,silicone:false,vitc:false,salicylic:false,aha_bha:false},
+  "int-ord-ha": {retinol:false,parfum:false,paraben:false,alcohol:false,sulfate:false,silicone:false,vitc:false,salicylic:false,aha_bha:false},
+  "int-ord-niac": {retinol:false,parfum:false,paraben:false,alcohol:false,sulfate:false,silicone:false,vitc:false,salicylic:false,aha_bha:true},
+  "int-ord-ret": {retinol:true,parfum:false,paraben:false,alcohol:false,sulfate:false,silicone:false,vitc:false,salicylic:false,aha_bha:false},
+  "euc-hyaluron": {retinol:false,parfum:false,paraben:false,alcohol:true,sulfate:false,silicone:false,vitc:false,salicylic:false,aha_bha:false},
+  "euc-aquaphor": {retinol:false,parfum:false,paraben:false,alcohol:false,sulfate:false,silicone:false,vitc:false,salicylic:false,aha_bha:false},
+  "euc-dermopure": {retinol:false,parfum:false,paraben:false,alcohol:false,sulfate:false,silicone:false,vitc:false,salicylic:true,aha_bha:true},
+  "euc-urearepair": {retinol:false,parfum:false,paraben:false,alcohol:false,sulfate:false,silicone:false,vitc:false,salicylic:false,aha_bha:true},
+  "euc-sun": {retinol:false,parfum:false,paraben:false,alcohol:true,sulfate:false,silicone:true,vitc:false,salicylic:false,aha_bha:false},
+  "int-paula-bha": {retinol:false,parfum:false,paraben:false,alcohol:false,sulfate:false,silicone:false,vitc:false,salicylic:true,aha_bha:true},
+  "svr-hydra": {retinol:false,parfum:true,paraben:false,alcohol:false,sulfate:false,silicone:false,vitc:false,salicylic:false,aha_bha:false},
+  "svr-sebiaclear": {retinol:false,parfum:false,paraben:false,alcohol:false,sulfate:false,silicone:false,vitc:false,salicylic:true,aha_bha:true},
+  "svr-xerial": {retinol:false,parfum:false,paraben:false,alcohol:false,sulfate:false,silicone:false,vitc:false,salicylic:false,aha_bha:true},
+  "svr-cicavit": {retinol:false,parfum:false,paraben:false,alcohol:false,sulfate:false,silicone:false,vitc:false,salicylic:false,aha_bha:false},
+  "svr-sun-secure": {retinol:false,parfum:false,paraben:false,alcohol:true,sulfate:false,silicone:true,vitc:false,salicylic:false,aha_bha:false},
+  "uri-eau-thermale": {retinol:false,parfum:false,paraben:false,alcohol:false,sulfate:false,silicone:false,vitc:false,salicylic:false,aha_bha:false},
+  "uri-bariesun": {retinol:false,parfum:false,paraben:false,alcohol:false,sulfate:false,silicone:true,vitc:false,salicylic:false,aha_bha:false},
+  "uri-roseliane": {retinol:false,parfum:false,paraben:false,alcohol:false,sulfate:false,silicone:false,vitc:false,salicylic:false,aha_bha:false},
+  "uri-isdin": {retinol:false,parfum:false,paraben:false,alcohol:false,sulfate:false,silicone:false,vitc:false,salicylic:true,aha_bha:true},
+  "uri-prederma": {retinol:false,parfum:false,paraben:false,alcohol:false,sulfate:false,silicone:false,vitc:false,salicylic:false,aha_bha:false},
+  "duc-melascreen": {retinol:false,parfum:true,paraben:false,alcohol:true,sulfate:false,silicone:false,vitc:false,salicylic:false,aha_bha:false},
+  "duc-ictyane": {retinol:false,parfum:false,paraben:false,alcohol:false,sulfate:false,silicone:false,vitc:false,salicylic:false,aha_bha:false},
+  "duc-anaphase": {retinol:false,parfum:false,paraben:false,alcohol:false,sulfate:false,silicone:false,vitc:false,salicylic:false,aha_bha:false},
+  "ader-epitheliale": {retinol:false,parfum:false,paraben:false,alcohol:false,sulfate:false,silicone:false,vitc:false,salicylic:false,aha_bha:false},
+  "ader-protect": {retinol:false,parfum:false,paraben:false,alcohol:true,sulfate:false,silicone:true,vitc:false,salicylic:false,aha_bha:false},
+  "ader-exomega": {retinol:false,parfum:false,paraben:false,alcohol:false,sulfate:false,silicone:false,vitc:false,salicylic:false,aha_bha:false},
+  "ader-dermalibour": {retinol:false,parfum:false,paraben:false,alcohol:false,sulfate:false,silicone:false,vitc:false,salicylic:false,aha_bha:false},
+  "lie-premium": {retinol:true,parfum:true,paraben:false,alcohol:true,sulfate:false,silicone:false,vitc:false,salicylic:false,aha_bha:false},
+  "lie-hydragenist": {retinol:false,parfum:false,paraben:false,alcohol:false,sulfate:false,silicone:false,vitc:false,salicylic:false,aha_bha:false},
+  "lie-sebologie": {retinol:false,parfum:false,paraben:false,alcohol:false,sulfate:false,silicone:false,vitc:false,salicylic:true,aha_bha:true},
+  "pay-pate-grise": {retinol:false,parfum:true,paraben:false,alcohol:true,sulfate:false,silicone:false,vitc:false,salicylic:true,aha_bha:true},
+  "pay-hydra24": {retinol:false,parfum:true,paraben:false,alcohol:false,sulfate:false,silicone:false,vitc:false,salicylic:false,aha_bha:false},
+  "pay-serum-eclat": {retinol:false,parfum:true,paraben:false,alcohol:true,sulfate:false,silicone:false,vitc:false,salicylic:false,aha_bha:false},
+  "ng-spf": {retinol:false,parfum:false,paraben:false,alcohol:true,sulfate:false,silicone:true,vitc:false,salicylic:false,aha_bha:false},
+  "ng-bha": {retinol:false,parfum:false,paraben:false,alcohol:true,sulfate:false,silicone:false,vitc:false,salicylic:true,aha_bha:true},
+  "bio-aquasource": {retinol:false,parfum:false,paraben:false,alcohol:true,sulfate:false,silicone:false,vitc:false,salicylic:false,aha_bha:false},
+  "bio-blue-therapy": {retinol:true,parfum:true,paraben:false,alcohol:true,sulfate:false,silicone:false,vitc:false,salicylic:false,aha_bha:false},
+  "bio-life-plankton": {retinol:false,parfum:true,paraben:false,alcohol:true,sulfate:false,silicone:false,vitc:false,salicylic:false,aha_bha:false},
+  "lan-advanced-genifique": {retinol:false,parfum:true,paraben:false,alcohol:true,sulfate:false,silicone:false,vitc:false,salicylic:false,aha_bha:false},
+  "lan-renergie": {retinol:true,parfum:true,paraben:false,alcohol:true,sulfate:false,silicone:false,vitc:false,salicylic:false,aha_bha:false},
+  "lan-absolue": {retinol:true,parfum:true,paraben:false,alcohol:false,sulfate:false,silicone:true,vitc:false,salicylic:false,aha_bha:false},
+  "es-isdin-spf": {retinol:false,parfum:false,paraben:false,alcohol:true,sulfate:false,silicone:true,vitc:false,salicylic:false,aha_bha:false},
+  "de-nivea-creme": {retinol:false,parfum:true,paraben:false,alcohol:true,sulfate:false,silicone:false,vitc:false,salicylic:false,aha_bha:false},
+  "de-weleda-huile": {retinol:false,parfum:true,paraben:false,alcohol:false,sulfate:false,silicone:false,vitc:false,salicylic:false,aha_bha:false},
+  "tal-eye-therapy": {retinol:false,parfum:false,paraben:false,alcohol:true,sulfate:false,silicone:false,vitc:false,salicylic:false,aha_bha:false},
+  "tal-lash": {retinol:false,parfum:false,paraben:false,alcohol:true,sulfate:false,silicone:false,vitc:false,salicylic:false,aha_bha:false},
+  "acm-sebionex": {retinol:false,parfum:false,paraben:false,alcohol:false,sulfate:false,silicone:false,vitc:false,salicylic:true,aha_bha:true},
+  "acm-depiwhite": {retinol:false,parfum:true,paraben:false,alcohol:false,sulfate:false,silicone:false,vitc:false,salicylic:false,aha_bha:false},
+  "acm-sterilak": {retinol:false,parfum:false,paraben:false,alcohol:false,sulfate:false,silicone:false,vitc:false,salicylic:false,aha_bha:false},
+  "aha-dead-sea": {retinol:false,parfum:false,paraben:false,alcohol:false,sulfate:false,silicone:false,vitc:false,salicylic:false,aha_bha:true},
+  "aha-mineral": {retinol:false,parfum:true,paraben:false,alcohol:false,sulfate:false,silicone:false,vitc:false,salicylic:false,aha_bha:false},
+  "aha-mud": {retinol:false,parfum:true,paraben:false,alcohol:false,sulfate:false,silicone:false,vitc:false,salicylic:false,aha_bha:false},
+  "gar-potion-magique": {retinol:false,parfum:false,paraben:false,alcohol:false,sulfate:false,silicone:false,vitc:false,salicylic:false,aha_bha:false},
+  "gar-boum-boum": {retinol:false,parfum:true,paraben:false,alcohol:false,sulfate:false,silicone:false,vitc:false,salicylic:false,aha_bha:false},
+  "jon-rehydrate": {retinol:false,parfum:false,paraben:false,alcohol:false,sulfate:false,silicone:false,vitc:false,salicylic:false,aha_bha:false},
+  "jon-pure": {retinol:false,parfum:false,paraben:false,alcohol:false,sulfate:false,silicone:false,vitc:false,salicylic:true,aha_bha:true},
+  "jon-nutritive": {retinol:false,parfum:false,paraben:false,alcohol:false,sulfate:false,silicone:false,vitc:false,salicylic:false,aha_bha:false},
+  "pat-absolis": {retinol:false,parfum:true,paraben:false,alcohol:false,sulfate:false,silicone:false,vitc:false,salicylic:false,aha_bha:false},
+  "pat-ageless": {retinol:false,parfum:false,paraben:false,alcohol:false,sulfate:false,silicone:false,vitc:false,salicylic:false,aha_bha:false},
+  "sos-hydra": {retinol:false,parfum:false,paraben:false,alcohol:false,sulfate:false,silicone:false,vitc:false,salicylic:false,aha_bha:false},
+  "sos-protect": {retinol:false,parfum:false,paraben:false,alcohol:true,sulfate:false,silicone:true,vitc:false,salicylic:false,aha_bha:false},
+  "isis-uveblock": {retinol:false,parfum:false,paraben:false,alcohol:true,sulfate:false,silicone:true,vitc:false,salicylic:false,aha_bha:false},
+  "isis-yday": {retinol:false,parfum:false,paraben:false,alcohol:false,sulfate:false,silicone:false,vitc:false,salicylic:false,aha_bha:false},
+  "isis-teinte": {retinol:false,parfum:false,paraben:false,alcohol:false,sulfate:false,silicone:true,vitc:false,salicylic:false,aha_bha:false},
+  "ona-soin-quotidien": {retinol:false,parfum:false,paraben:false,alcohol:false,sulfate:false,silicone:false,vitc:false,salicylic:false,aha_bha:false},
+  "ona-huile": {retinol:false,parfum:false,paraben:false,alcohol:false,sulfate:false,silicone:false,vitc:false,salicylic:false,aha_bha:false},
+  "top-base": {retinol:false,parfum:false,paraben:false,alcohol:false,sulfate:false,silicone:false,vitc:false,salicylic:false,aha_bha:false},
+  "top-soin-mains": {retinol:false,parfum:false,paraben:false,alcohol:false,sulfate:false,silicone:false,vitc:false,salicylic:false,aha_bha:false},
+  "dz-biophar-creme": {retinol:false,parfum:false,paraben:false,alcohol:false,sulfate:false,silicone:false,vitc:false,salicylic:false,aha_bha:false},
+  "dz-biophar-gel": {retinol:false,parfum:false,paraben:false,alcohol:false,sulfate:false,silicone:false,vitc:false,salicylic:false,aha_bha:false},
+  "dz-saidal-huile": {retinol:false,parfum:false,paraben:false,alcohol:false,sulfate:false,silicone:false,vitc:false,salicylic:false,aha_bha:false},
+  "dz-atlas-rose": {retinol:false,parfum:false,paraben:false,alcohol:false,sulfate:false,silicone:false,vitc:false,salicylic:false,aha_bha:false},
+  "dz-atlas-nigelle": {retinol:false,parfum:false,paraben:false,alcohol:false,sulfate:false,silicone:false,vitc:false,salicylic:false,aha_bha:false},
+  "ma-nectarome-argan": {retinol:false,parfum:true,paraben:false,alcohol:false,sulfate:false,silicone:false,vitc:false,salicylic:false,aha_bha:false},
+  "ma-zineglob-rose": {retinol:false,parfum:false,paraben:false,alcohol:false,sulfate:false,silicone:false,vitc:false,salicylic:false,aha_bha:false},
+  "ma-beldi-savon": {retinol:false,parfum:true,paraben:false,alcohol:false,sulfate:false,silicone:false,vitc:false,salicylic:false,aha_bha:false},
+  "ma-argan-id": {retinol:false,parfum:false,paraben:false,alcohol:false,sulfate:false,silicone:false,vitc:false,salicylic:false,aha_bha:false},
+};
+
+var BRAND_COLORS = {
+  'Cible Skin':       {bg:'#1A1A2E', tx:'#C4726A'},
+  'SkinCeuticals':    {bg:'#2C2C54', tx:'#FFFFFF'},
+  'La Roche-Posay':   {bg:'#004B93', tx:'#FFFFFF'},
+  'Avene':            {bg:'#7BB3D4', tx:'#FFFFFF'},
+  'Avène':            {bg:'#7BB3D4', tx:'#FFFFFF'},
+  'Bioderma':         {bg:'#009FE3', tx:'#FFFFFF'},
+  'CeraVe':           {bg:'#003087', tx:'#FFFFFF'},
+  'Neutrogena':       {bg:'#F5A800', tx:'#000000'},
+  'SVR':              {bg:'#E30613', tx:'#FFFFFF'},
+  'Uriage':           {bg:'#00A3C8', tx:'#FFFFFF'},
+  'Eucerin':          {bg:'#0057A8', tx:'#FFFFFF'},
+  'ACM':              {bg:'#1D3557', tx:'#FFFFFF'},
+  'Ducray':           {bg:'#005B8E', tx:'#FFFFFF'},
+  'A-Derma':          {bg:'#8B6914', tx:'#FFFFFF'},
+  'Payot':            {bg:'#C8A96E', tx:'#FFFFFF'},
+  'Talika':           {bg:'#2D2D2D', tx:'#FFFFFF'},
+  'Clarins':          {bg:'#E8003D', tx:'#FFFFFF'},
+  'Vichy':            {bg:'#005EB8', tx:'#FFFFFF'},
+  'Biotherm':         {bg:'#0077B6', tx:'#FFFFFF'},
+  'Nuxe':             {bg:'#8B7355', tx:'#FFFFFF'},
+  'Caudalie':         {bg:'#6B4226', tx:'#FFFFFF'},
+  'Lierac':           {bg:'#2D5016', tx:'#FFFFFF'},
+  'Patyka':           {bg:'#1C3A2A', tx:'#FFFFFF'},
+  'Garancia':         {bg:'#8B1A4A', tx:'#FFFFFF'},
+  'Jonzac':           {bg:'#2E7D32', tx:'#FFFFFF'},
+  'The Ordinary':     {bg:'#000000', tx:'#FFFFFF'},
+  'Paula s Choice':   {bg:'#8D1F3C', tx:'#FFFFFF'},
+  'ISDIN':            {bg:'#003D7A', tx:'#FFFFFF'},
+  'NIVEA':            {bg:'#003399', tx:'#FFFFFF'},
+  'Weleda':           {bg:'#2E5902', tx:'#FFFFFF'},
+  'Nectarome Maroc':  {bg:'#827717', tx:'#FFFFFF'},
+  'Atlas Cosmetics':  {bg:'#4A148C', tx:'#FFFFFF'},
+  'BioPharm Algerie': {bg:'#1B5E20', tx:'#FFFFFF'},
+  'BioPharm Algérie': {bg:'#1B5E20', tx:'#FFFFFF'},
+  'Saidal':           {bg:'#00695C', tx:'#FFFFFF'},
+  'Lancôme':          {bg:'#1A1A1A', tx:'#C8A96E'},
+  'SVR Laboratoire':  {bg:'#E30613', tx:'#FFFFFF'},
+};
+
+function getBrandStyle(marque) {
+  var c = BRAND_COLORS[marque] || {bg:'#C4726A', tx:'#FFFFFF'};
+  return {bg: c.bg || c.bg, tx: c.tx || c.text || '#FFFFFF'};
+}
+
+function getInitials(nom, marque) {
+  if (marque) {
+    var words = marque.split(' ');
+    if (words.length >= 2) return (words[0][0] + words[1][0]).toUpperCase();
+    return marque.substring(0, 2).toUpperCase();
+  }
+  return (nom || 'SK').substring(0, 2).toUpperCase();
+}
 function showRegionModal() {
   selectedRegionValue = '';
   buildRegionList();
@@ -3283,8 +3743,8 @@ var selectedRegionValue = '';
 var REGIONS = [
   {group:'🌍 Europe', items:[
     {val:'fr',flag:'🇫🇷',name:'France'},
-    {val:'fr',flag:'🇧🇪',name:'Belgique'},
-    {val:'fr',flag:'🇨🇭',name:'Suisse'},
+    {val:'be',flag:'🇧🇪',name:'Belgique'},
+    {val:'ch',flag:'🇨🇭',name:'Suisse'},
     {val:'de',flag:'🇩🇪',name:'Allemagne'},
     {val:'es',flag:'🇪🇸',name:'Espagne'},
     {val:'gb',flag:'🇬🇧',name:'Royaume-Uni'},
@@ -3323,6 +3783,7 @@ var REGIONS = [
 ];
 
 function buildRegionList() {
+  var ACTIVE = ['fr', 'dz'];
   var container = document.getElementById('region-list');
   if (!container) return;
   container.innerHTML = '';
@@ -3332,14 +3793,17 @@ function buildRegionList() {
     groupLabel.textContent = group.group;
     container.appendChild(groupLabel);
     group.items.forEach(function(item) {
+      var isActive = ACTIVE.indexOf(item.val) !== -1;
       var btn = document.createElement('button');
-      btn.style.cssText = 'width:100%;padding:12px 16px;border-radius:12px;border:2px solid ' + (selectedRegionValue === item.val + '_' + item.name ? '#C4726A' : '#EDD9D4') + ';background:' + (selectedRegionValue === item.val + '_' + item.name ? '#FDF0E6' : '#fff') + ';cursor:pointer;display:flex;align-items:center;gap:10px;font-family:inherit;text-align:left';
-      btn.innerHTML = '<span style="font-size:22px">' + item.flag + '</span><span style="font-size:14px;font-weight:600;color:#3D2B1F">' + item.name + '</span>';
-      btn.onclick = (function(v) {
-        return function() {
-          setRegion(v);
-        };
-      })(item.val);
+      btn.style.cssText = 'width:100%;padding:12px 16px;border-radius:12px;border:2px solid #EDD9D4;background:' + (isActive ? '#fff' : '#F5F2F0') + ';cursor:' + (isActive ? 'pointer' : 'not-allowed') + ';display:flex;align-items:center;gap:10px;font-family:inherit;text-align:left;opacity:' + (isActive ? '1' : '0.45') + ';position:relative';
+      btn.innerHTML = '<span style="font-size:22px">' + item.flag + '</span>' +
+        '<span style="font-size:14px;font-weight:600;color:' + (isActive ? '#3D2B1F' : '#B0958F') + '">' + item.name + '</span>' +
+        (!isActive ? '<span style="margin-left:auto;font-size:10px;font-weight:700;color:#B0958F;background:#EDD9D4;padding:2px 8px;border-radius:20px;flex-shrink:0">Bientôt</span>' : '');
+      if (isActive) {
+        btn.onclick = (function(v) {
+          return function() { setRegion(v); };
+        })(item.val);
+      }
       container.appendChild(btn);
     });
   });
@@ -4361,7 +4825,7 @@ if ('serviceWorker' in navigator) {
   window.addEventListener('load', function() {
     navigator.serviceWorker.register('/sw.js')
       .then(function(reg) {
-        console.log('SkinMatch PWA : Service Worker enregistré', reg.scope);
+        // console.log('SkinMatch PWA : Service Worker enregistré', reg.scope);
       })
       .catch(function(err) {
         console.log('SkinMatch PWA : Erreur Service Worker', err);
