@@ -873,7 +873,7 @@ const T = {
       {id:"rides",label:"Rides & anti-âge"},{id:"pores",label:"Pores dilatés"},
       {id:"rougeurs",label:"Rougeurs / Couperose"},{id:"cernes",label:"Cernes & poches"},
       {id:"eclat",label:"Teint terne / Éclat"},{id:"deshydratation",label:"Déshydratation"},
-      {id:"imperfections",label:"Points noirs"},{id:"sensibilite",label:"Réactivité / Irritations"},
+      {id:"imperfections",label:"Points noirs"},{id:"sensibilite",label:"Réactivité / Irritations"},{id:"autre",label:"Autre..."},
     ],
     budgets:[
       {id:"low", label:"Économique",    sub:"< 15€ / produit",    phrase:"Les meilleures formules ne coûtent pas forcément cher 💛"},
@@ -893,7 +893,7 @@ const T = {
     age3:"36 – 45 ans",age3_sub:"Anti-âge précoce",
     age4:"46 ans et +",age4_sub:"Correction intense",
     concerns:["Acné / Boutons","Taches & hyperpigmentation","Rides & anti-âge","Pores dilatés","Rougeurs / Couperose","Cernes & poches","Teint terne / Éclat","Déshydratation","Points noirs","Réactivité / Irritations"],
-    allergies:["Parfums / Fragrances","Parabènes","Alcool","Sulfates (SLS/SLES)","Silicones","Huiles essentielles","Acide salicylique","Rétinol","Vitamine C","Acides (AHA/BHA)","Aucune allergie connue"],
+    allergies:["Parfums / Fragrances","Parabènes","Alcool","Sulfates (SLS/SLES)","Silicones","Huiles essentielles","Acide salicylique","Rétinol","Vitamine C","Acides (AHA/BHA)","Aucune allergie connue","Autre..."],
     budgets:[
       {id:"low",label:"Économique",sub:"Efficace sans se ruiner"},
       {id:"mid",label:"Modéré ",sub:"Le meilleur compromis"},
@@ -974,7 +974,7 @@ const T = {
       {id:"rides",label:"Wrinkles & anti-aging"},{id:"pores",label:"Enlarged pores"},
       {id:"rougeurs",label:"Redness / Rosacea"},{id:"cernes",label:"Dark circles & puffiness"},
       {id:"eclat",label:"Dull complexion / Radiance"},{id:"deshydratation",label:"Dehydration"},
-      {id:"imperfections",label:"Blackheads"},{id:"sensibilite",label:"Sensitivity / Irritations"},
+      {id:"imperfections",label:"Blackheads"},{id:"sensibilite",label:"Sensitivity / Irritations"},{id:"autre",label:"Other..."},
     ],
     budgets:[
       {id:"low", label:"Budget-friendly",sub:"< €15 / product",   phrase:"Great skincare doesn't have to break the bank 💛"},
@@ -1395,6 +1395,92 @@ function getRegionProducts() {
   }
   return available;
 }
+
+
+async function normalizeAutreWithAI(autreTexte, type) {
+  // Appel à Claude pour analyser le texte libre
+  var systemPrompt = type === 'concern'
+    ? "Tu es un expert skincare. L'utilisateur décrit un problème de peau en texte libre. Retourne UNIQUEMENT une liste JSON des clés correspondantes parmi : acne, taches, rides, pores, rougeurs, cernes, eclat, deshydratation, imperfections, sensibilite. Exemple: [\"rougeurs\",\"sensibilite\"]. Si aucune correspondance, retourne []."
+    : "Tu es un expert cosmétique. L'utilisateur décrit une allergie en texte libre. Retourne UNIQUEMENT une liste JSON des catégories correspondantes parmi : Parfums / Fragrances, Parabènes, Alcool, Sulfates (SLS/SLES), Silicones, Huiles essentielles, Acide salicylique, Rétinol, Vitamine C, Acides (AHA/BHA). Exemple: [\"Parfums / Fragrances\"]. Si aucune correspondance, retourne [].";
+
+  try {
+    var response = await fetch("https://api.anthropic.com/v1/messages", {
+      method: "POST",
+      headers: {"Content-Type": "application/json"},
+      body: JSON.stringify({
+        model: "claude-sonnet-4-20250514",
+        max_tokens: 200,
+        system: systemPrompt,
+        messages: [{role: "user", content: autreTexte}]
+      })
+    });
+    var data = await response.json();
+    var text = data.content && data.content[0] ? data.content[0].text : "[]";
+    text = text.replace(/```json|```/g, "").trim();
+    return JSON.parse(text);
+  } catch(e) {
+    return [];
+  }
+}
+
+function normalizeAutreConcerns(concerns) {
+  // Mapping mots-clés basique comme fallback
+  var CONCERN_MAP = [
+    {keywords:['rosac','couperose','rougeur'],key:'rougeurs'},
+    {keywords:['cicatrice','tache','hyperpigment','melasma'],key:'taches'},
+    {keywords:['ride','ridule','anti-age','vieilliss'],key:'rides'},
+    {keywords:['pore','point noir','comédon'],key:'pores'},
+    {keywords:['acne','bouton','imperfection','kyste'],key:'acne'},
+    {keywords:['cerne','poche','yeux'],key:'cernes'},
+    {keywords:['terne','eclat','luminosit'],key:'eclat'},
+    {keywords:['déshydrat','deshydrat','tiraillement'],key:'deshydratation'},
+    {keywords:['sensib','réactif','irritation','eczema','kératose','psoriasis'],key:'sensibilite'},
+  ];
+  var normalized = concerns.filter(function(c){ return !c.startsWith('Autre:'); });
+  var autreItems = concerns.filter(function(c){ return c.startsWith('Autre:'); });
+  autreItems.forEach(function(autre) {
+    var texte = autre.replace('Autre:', '').trim().toLowerCase();
+    var matched = false;
+    CONCERN_MAP.forEach(function(mapping) {
+      if (!matched && mapping.keywords.some(function(kw){ return texte.includes(kw); })) {
+        if (normalized.indexOf(mapping.key) === -1) normalized.push(mapping.key);
+        matched = true;
+      }
+    });
+    if (!matched) normalized.push(autre);
+  });
+  return normalized;
+}
+
+function normalizeAutreAllergies(allergies) {
+  var ALLERGY_MAP = [
+    {keywords:['parfum','fragrance','lavande','rose','citrus'],key:'Parfums / Fragrances'},
+    {keywords:['paraben'],key:'Parabènes'},
+    {keywords:['alcool','alcohol','ethanol'],key:'Alcool'},
+    {keywords:['sulfate','sls','sles','lauryl'],key:'Sulfates (SLS/SLES)'},
+    {keywords:['silicone','dimethicone'],key:'Silicones'},
+    {keywords:['retinol','rétinol','retinyl','vitamine a'],key:'Rétinol'},
+    {keywords:['vitamine c','acide ascorbique','ascorbic'],key:'Vitamine C'},
+    {keywords:['salicylique','salicylic'],key:'Acide salicylique'},
+    {keywords:['aha','bha','glycolique','lactique'],key:'Acides (AHA/BHA)'},
+    {keywords:['huile essentielle','menthe','eucalyptus'],key:'Huiles essentielles'},
+  ];
+  var normalized = allergies.filter(function(a){ return !a.startsWith('Autre:'); });
+  var autreItems = allergies.filter(function(a){ return a.startsWith('Autre:'); });
+  autreItems.forEach(function(autre) {
+    var texte = autre.replace('Autre:', '').trim().toLowerCase();
+    var matched = false;
+    ALLERGY_MAP.forEach(function(mapping) {
+      if (!matched && mapping.keywords.some(function(kw){ return texte.includes(kw); })) {
+        if (normalized.indexOf(mapping.key) === -1) normalized.push(mapping.key);
+        matched = true;
+      }
+    });
+    if (!matched) normalized.push(autre);
+  });
+  return normalized;
+}
+
 
 function build(){
   const b=gB(ST.budget),sk=ST.skinType||"normale",steps=[];
@@ -1895,15 +1981,43 @@ function initQuestions(){
   const ages=ageData;
   document.getElementById("q2-opts").innerHTML=ages.map(a=>`<button class="sr" onclick="pickAge('${a.id}',this)"><div><div class="rl">${a.label}</div><div class="rs">${a.sub}</div></div><svg class="ck" viewBox="0 0 24 24" fill="#2C2C2C"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg></button>`).join("");
   // Q3 - concerns
-  const cIds=["acne","taches","rides","pores","rougeurs","cernes","eclat","deshydratation","imperfections","sensibilite"];
+  const cIds=["acne","taches","rides","pores","rougeurs","cernes","eclat","deshydratation","imperfections","sensibilite","autre"];
   const concernsRaw=l.concerns||[];
   const concerns=cIds.map((id,i)=>{
     const raw=concernsRaw[i];
     return {id, label: typeof raw==='object'?raw.label:raw||id};
   });
-  document.getElementById("q3-concerns").innerHTML=concerns.map(c=>`<button class="chip" onclick="togConcern('${c.id}',this)">${c.label}</button>`).join("");
+  document.getElementById("q3-concerns").innerHTML=concerns.map(c=>{
+    if (c.id === "autre") {
+      return `<button class="chip" id="concern-autre-btn" onclick="toggleAutreConcern(this)">${c.label}</button>
+              <div id="concern-autre-input" style="display:none;width:100%;margin-top:8px">
+                <input type="text" id="concern-autre-text" placeholder="Ex: Rosacée, Kératose pilaire..." 
+                  style="width:100%;padding:10px 14px;border-radius:12px;border:2px solid #EDD9D4;font-size:14px;font-family:inherit;outline:none;box-sizing:border-box;margin-bottom:8px"
+                  oninput="saveAutreConcern(this.value)"
+                  onfocus="this.style.borderColor='#C4726A'"
+                  onblur="this.style.borderColor='#EDD9D4'">
+                <button onclick="validerAutreConcern()" style="width:100%;padding:11px;border-radius:12px;border:none;background:#C4726A;color:#fff;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit">✓ Valider</button>
+                <div id="concern-autre-confirmed" style="display:none;margin-top:8px;padding:8px 12px;background:#E8F5E9;border-radius:10px;font-size:13px;color:#2E7D32;font-weight:600"></div>
+              </div>`;
+    }
+    return `<button class="chip" onclick="togConcern('${c.id}',this)">${c.label}</button>`;
+  }).join("");
   const allergies=l.allergies;
-  document.getElementById("q3-allergies").innerHTML=allergies.map(a=>`<button class="chip" onclick="togAllergy(this)">${a}</button>`).join("");
+  document.getElementById("q3-allergies").innerHTML=allergies.map(a=>{
+    if (a === "Autre...") {
+      return `<button class="chip" id="allergy-autre-btn" onclick="toggleAutreAllergy(this)">${a}</button>
+              <div id="allergy-autre-input" style="display:none;width:100%;margin-top:8px">
+                <input type="text" id="allergy-autre-text" placeholder="Ex: Lanoline, Phénoxyéthanol..." 
+                  style="width:100%;padding:10px 14px;border-radius:12px;border:2px solid #EDD9D4;font-size:14px;font-family:inherit;outline:none;box-sizing:border-box;margin-bottom:8px"
+                  oninput="saveAutreAllergy(this.value)"
+                  onfocus="this.style.borderColor='#C4726A'"
+                  onblur="this.style.borderColor='#EDD9D4'">
+                <button onclick="validerAutreAllergy()" style="width:100%;padding:11px;border-radius:12px;border:none;background:#C4726A;color:#fff;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit">✓ Valider</button>
+                <div id="allergy-autre-confirmed" style="display:none;margin-top:8px;padding:8px 12px;background:#E8F5E9;border-radius:10px;font-size:13px;color:#2E7D32;font-weight:600"></div>
+              </div>`;
+    }
+    return `<button class="chip" onclick="togAllergy(this)">${a}</button>`;
+  }).join("");
   // Q4 - budget
   const budgetsRaw=l.budgets||[];
   const budgets=budgetsRaw.length?budgetsRaw:[
@@ -2311,6 +2425,125 @@ function restartDiag(){
 
 function pickSkin(id,el){ST.skinType=id;document.querySelectorAll("#q1-opts .sr").forEach(b=>b.classList.remove("on"));el.classList.add("on");document.getElementById("q1-next").disabled=false;setTimeout(function(){go("q2");},300);}
 function pickAge(id,el){ST.ageGroup=id;document.querySelectorAll("#q2-opts .sr").forEach(b=>b.classList.remove("on"));el.classList.add("on");document.getElementById("q2-next").disabled=false;setTimeout(function(){go("q3");},300);}
+
+function toggleAutreAllergy(btn) {
+  var inputDiv = document.getElementById("allergy-autre-input");
+  var isOpen = inputDiv.style.display !== "none";
+  if (isOpen) {
+    inputDiv.style.display = "none";
+    btn.classList.remove("on");
+    // Retirer "autre" des allergies
+    ST.allergies = ST.allergies.filter(function(a){ return !a.startsWith("Autre:"); });
+  } else {
+    inputDiv.style.display = "block";
+    btn.classList.add("on");
+    document.getElementById("allergy-autre-text").focus();
+  }
+  document.getElementById('q3-next').disabled = false;
+}
+
+function saveAutreAllergy(val) {
+  ST.allergies = ST.allergies.filter(function(a){ return !a.startsWith("Autre:"); });
+  if (val.trim()) {
+    ST.allergies.push("Autre: " + val.trim());
+  }
+  document.getElementById('q3-next').disabled = false;
+}
+
+async function validerAutreAllergy() {
+  var input = document.getElementById("allergy-autre-text");
+  var confirmed = document.getElementById("allergy-autre-confirmed");
+  if (!input || !input.value.trim()) return;
+  var val = input.value.trim();
+
+  if (confirmed) {
+    confirmed.style.display = "block";
+    confirmed.style.background = "#FDF0E6";
+    confirmed.style.color = "#C4726A";
+    confirmed.textContent = "⏳ Analyse en cours...";
+  }
+  input.blur();
+
+  var aiKeys = await normalizeAutreWithAI(val, 'allergy');
+
+  ST.allergies = ST.allergies.filter(function(a){ return !a.startsWith("Autre:"); });
+  ST.allergies.push("Autre: " + val);
+
+  if (aiKeys && aiKeys.length > 0) {
+    aiKeys.forEach(function(key) {
+      if (ST.allergies.indexOf(key) === -1) ST.allergies.push(key);
+    });
+  }
+
+  if (confirmed) {
+    confirmed.style.display = "block";
+    confirmed.style.background = "#E8F5E9";
+    confirmed.style.color = "#2E7D32";
+    confirmed.textContent = "✅ Enregistré : " + val + (aiKeys && aiKeys.length > 0 ? " → pris en compte" : "");
+  }
+  document.getElementById('q3-next').disabled = false;
+}
+
+function toggleAutreConcern(btn) {
+  var inputDiv = document.getElementById("concern-autre-input");
+  var isOpen = inputDiv.style.display !== "none";
+  if (isOpen) {
+    inputDiv.style.display = "none";
+    btn.classList.remove("on");
+    ST.concerns = ST.concerns.filter(function(c){ return c !== "autre" && !c.startsWith("Autre:"); });
+  } else {
+    inputDiv.style.display = "block";
+    btn.classList.add("on");
+    document.getElementById("concern-autre-text").focus();
+  }
+  document.getElementById('q3-next').disabled = false;
+}
+
+function saveAutreConcern(val) {
+  ST.concerns = ST.concerns.filter(function(c){ return c !== "autre" && !c.startsWith("Autre:"); });
+  if (val.trim()) {
+    ST.concerns.push("Autre: " + val.trim());
+  }
+  document.getElementById('q3-next').disabled = false;
+}
+
+async function validerAutreConcern() {
+  var input = document.getElementById("concern-autre-text");
+  var confirmed = document.getElementById("concern-autre-confirmed");
+  if (!input || !input.value.trim()) return;
+  var val = input.value.trim();
+  
+  // Afficher chargement
+  if (confirmed) {
+    confirmed.style.display = "block";
+    confirmed.style.background = "#FDF0E6";
+    confirmed.style.color = "#C4726A";
+    confirmed.textContent = "⏳ Analyse en cours...";
+  }
+  input.blur();
+
+  // Appel IA pour mapper le texte vers des clés connues
+  var aiKeys = await normalizeAutreWithAI(val, 'concern');
+  
+  ST.concerns = ST.concerns.filter(function(c){ return c !== "autre" && !c.startsWith("Autre:"); });
+  ST.concerns.push("Autre: " + val);
+  
+  // Ajouter aussi les clés mappées par l'IA
+  if (aiKeys && aiKeys.length > 0) {
+    aiKeys.forEach(function(key) {
+      if (ST.concerns.indexOf(key) === -1) ST.concerns.push(key);
+    });
+  }
+  
+  if (confirmed) {
+    confirmed.style.display = "block";
+    confirmed.style.background = "#E8F5E9";
+    confirmed.style.color = "#2E7D32";
+    confirmed.textContent = "✅ Enregistré : " + val + (aiKeys && aiKeys.length > 0 ? " → analyse prise en compte" : "");
+  }
+  document.getElementById('q3-next').disabled = false;
+}
+
 function togConcern(id,el){const i=ST.concerns.indexOf(id);if(i>-1){ST.concerns.splice(i,1);el.classList.remove("on");}else{ST.concerns.push(id);el.classList.add("on");}document.getElementById("q3-next").disabled=ST.concerns.length===0;}
 function togAllergy(el){const a=el.textContent;const i=ST.allergies.indexOf(a);if(i>-1){ST.allergies.splice(i,1);el.classList.remove("on");}else{ST.allergies.push(a);el.classList.add("on");}}
 function pickBudget(id,el){
@@ -2402,10 +2635,7 @@ function renderResult(){
         <div class="btns" style="flex-wrap:wrap;gap:6px">
 
         </div>
-        <button class="btn-fiche" onclick="openModal('${s.key}')">
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="#9A8B7C"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
-            <span>${t('fiche_btn')}</span>
-          </button>
+        
         <button onclick="showWhyAI('${s.key}','${s.nom}','${s.marque}')" style="width:100%;margin-top:10px;padding:12px 16px;border-radius:50px;border:none;background:#C4726A;color:#fff;font-size:13px;font-weight:700;cursor:pointer;font-family:var(--sans);display:flex;align-items:center;justify-content:center;gap:8px">
           <span>${LANG==="en"?"Why this product?":"Mon Skin Match"}</span>
         </button>
@@ -2565,80 +2795,216 @@ function openModal(key){
   document.getElementById("modal-overlay").classList.remove("hidden");
 }
 function showWhyAI(key, nom, marque) {
-    var p = DB[key];
-    if (!p) return;
+  var p = DB[key];
+  if (!p) return;
+  var modal = document.getElementById("why-modal");
+  if (!modal) return;
+  modal.style.display = "flex";
 
-    var modal = document.getElementById("why-modal");
-    if (!modal) return;
-    modal.style.display = "flex";
+  var l = T[LANG] || T.fr;
+  var skinLabel = (l.skin_labels||{})[ST.skinType] || ST.skinType || "";
+  var age = ST.ageGroup || "";
+  var concerns = ST.concerns && ST.concerns.length > 0
+    ? ST.concerns.map(function(c){ return (l.concern_labels||{})[c]||c; })
+    : [];
+  var allergies = ST.allergies && ST.allergies.length > 0
+    ? ST.allergies.filter(function(a){ return a !== "Aucune allergie connue"; })
+    : [];
+  var budget = ST.budget || "";
+  var budgetLabels = {petit:"Petit budget (< 15€)", moyen:"Budget moyen (15-40€)", mid:"Budget moyen (15-40€)", premium:"Budget premium (40-80€)", luxe:"Budget luxe (> 80€)"};
 
-    var isEN = LANG === "en";
-    var l = T[LANG] || T.fr;
-    var skinLabel = l.skin_labels[ST.skinType] || ST.skinType || "";
-    var age = ST.ageGroup || "";
-    var concerns = ST.concerns.length > 0
-        ? ST.concerns.map(function(c){ return (l.concern_labels||{})[c] || c; }).join(", ")
-        : (isEN ? "general skin care" : "soin général");
+  document.getElementById("why-product-name").textContent = nom + " — " + marque;
+  document.getElementById("why-loading").style.display = "none";
 
-    document.getElementById("why-product-name").textContent = nom + " — " + marque;
-    document.getElementById("why-loading").style.display = "none";
+  var aktifs = (p.ak || []).join(", ");
+  var benefit = p.ben || "";
+  var pq = p.pq || "";
+  var app = p.app || "";
+  var moment = p.moment || "";
+  var momentLabel = moment === "AM" ? "☀️ Matin uniquement" : moment === "PM" ? "🌙 Soir uniquement" : "☀️🌙 Matin et soir";
+  var prix = p.prix || "";
 
-    var contentEl = document.getElementById("why-content");
-    contentEl.innerHTML = "";
-
-    var aktifs = (p.ak || []).join(", ");
-    var benefit = isEN ? (p.ben_en || p.ben || "") : (p.ben || "");
-    var usage = p.usage || "";
-    var pq = p.pq || "";
-
-    var sections = [
-        {
-            icon: "",
-            title: isEN ? "Why this product for you" : "Pourquoi ce produit pour vous",
-            text: isEN
-                ? "Your skin is " + skinLabel + (age ? ", " + age + " years old" : "") + ". You are concerned about " + concerns + ". " + usage + " makes it perfectly adapted to your profile."
-                : "Votre peau est " + skinLabel + (age ? ", " + age : "") + ". Vous êtes concerné(e) par " + concerns + ". " + (usage || "Ce produit") + " le rend parfaitement adapté à votre profil."
-        },
-        {
-            icon: "⚗️",
-            title: isEN ? "Key active ingredients" : "Actifs clés",
-            text: aktifs
-        },
-        {
-            icon: "",
-            title: isEN ? "Expected benefits" : "Bénéfices attendus",
-            text: benefit || usage
-        },
-        {
-            icon: "👤",
-            title: isEN ? "Ideal for" : "Idéal pour",
-            text: pq
-        }
-    ];
-
-    sections.forEach(function(s) {
-        if (!s.text) return;
-        var block = document.createElement("div");
-        block.style.cssText = "margin-bottom:12px;padding:14px;background:#FDF0E6;border-radius:14px;border-left:3px solid #C4726A";
-        var title = document.createElement("div");
-        title.style.cssText = "font-size:11px;font-weight:700;color:#C4726A;text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px";
-        title.textContent = s.icon + "  " + s.title;
-        var text = document.createElement("div");
-        text.style.cssText = "font-size:14px;line-height:1.65;color:#3D2B1F";
-        text.textContent = s.text;
-        block.appendChild(title);
-        block.appendChild(text);
-        contentEl.appendChild(block);
+  // Vérifier allergie dans ce produit
+  var AMAP = {"Parfums / Fragrances":"parfum","Parabènes":"paraben","Alcool":"alcohol","Rétinol":"retinol","Vitamine C":"vitc","Acide salicylique":"salicylic","Acides (AHA/BHA)":"aha_bha"};
+  var inciProd = INCI_DB[key];
+  var allergenWarning = "";
+  if (allergies.length > 0 && inciProd) {
+    var detected = allergies.filter(function(a){
+      var field = AMAP[a];
+      return field && inciProd[field] === true;
     });
+    if (detected.length > 0) {
+      allergenWarning = detected.join(", ");
+    }
+  }
 
-    // Note de compatibilité
-    var compatBlock = document.createElement("div");
-    compatBlock.style.cssText = "margin-top:4px;padding:12px;background:#E8F5E9;border-radius:14px;text-align:center";
-    var compat = p.yuka >= 75
-        ? (isEN ? "🟢 Excellent Yuka score: " + p.yuka + "/100" : "🟢 Excellente note Yuka : " + p.yuka + "/100")
-        : (isEN ? "🥕 Yuka score: " + p.yuka + "/100" : "🥕 Analyse INCI : " + p.yuka + "/100");
-    compatBlock.innerHTML = "<div style='font-size:13px;font-weight:700;color:#2E7D32'>" + compat + "</div>";
-    contentEl.appendChild(compatBlock);
+  // Compatibilité globale
+  var compat = getCompat(key, ST.skinType, ST.concerns[0]||"", ST.ageGroup, ST.allergies||[]);
+  var compatColor = compat >= 75 ? "#2E7D32" : compat >= 50 ? "#E65100" : "#C62828";
+  var compatBg = compat >= 75 ? "#E8F5E9" : compat >= 50 ? "#FFF3E0" : "#FFEBEE";
+  var compatLabel = compat >= 80 ? "Excellent pour toi" : compat >= 65 ? "Bien adapté" : compat >= 50 ? "Moyen" : "Peu recommandé";
+
+  var html = "";
+
+  // ── SCORE GLOBAL ──
+  html += "<div style=\"background:linear-gradient(135deg,#1F3864,#2E5496);border-radius:18px;padding:18px;margin-bottom:16px;display:flex;align-items:center;gap:16px\">";
+  html += "<div style=\"text-align:center;background:rgba(255,255,255,.15);border-radius:14px;padding:12px 16px;flex-shrink:0\">";
+  html += "<div style=\"font-size:32px;font-weight:900;color:#fff;font-family:Georgia,serif;line-height:1\">" + compat + "</div>";
+  html += "<div style=\"font-size:10px;color:rgba(255,255,255,.7);font-weight:700\">/100</div>";
+  html += "<div style=\"font-size:9px;color:rgba(255,255,255,.7);margin-top:2px\">" + compatLabel + "</div></div>";
+  html += "<div><p style=\"font-size:13px;color:#fff;line-height:1.6;margin:0\">Score de compatibilité calculé selon ton profil : peau " + skinLabel + (age ? ", " + age + " ans" : "") + (concerns.length > 0 ? ", problèmes : " + concerns.join(", ") : "") + ".</p></div></div>";
+
+  // Alerte allergie
+  if (allergenWarning) {
+    html += "<div style=\"background:#FFEBEE;border-radius:14px;padding:14px 16px;margin-bottom:14px;border-left:4px solid #C62828\">";
+    html += "<div style=\"font-size:13px;font-weight:700;color:#C62828;margin-bottom:4px\">🚨 Allergène détecté</div>";
+    html += "<div style=\"font-size:13px;color:#3D2B1F;line-height:1.6\">Ce produit contient <strong>" + allergenWarning + "</strong> que tu as déclaré comme allergène. Consulte un pharmacien avant utilisation.</div></div>";
+  }
+
+  // ── PARTIE 1 : TA PEAU ──
+  html += "<div style=\"background:#fff;border-radius:18px;padding:16px;margin-bottom:14px;box-shadow:0 2px 10px rgba(0,0,0,.07)\">";
+  html += "<p style=\"font-size:11px;font-weight:800;color:#C4726A;text-transform:uppercase;letter-spacing:2px;margin-bottom:14px\">👤 Partie 1 — Ton profil de peau</p>";
+
+  // Type de peau
+  html += "<div style=\"padding:10px 0;border-bottom:1px solid #F5F0ED\">";
+  html += "<div style=\"font-size:12px;color:#B0958F;font-weight:600;margin-bottom:4px\">TYPE DE PEAU</div>";
+  html += "<div style=\"font-size:14px;font-weight:700;color:#3D2B1F\">Peau " + skinLabel + (age ? " · " + age + " ans" : "") + "</div>";
+  // Explication peau
+  var skinExplain = {
+    grasse: "Ta peau produit un excès de sébum, ce qui peut provoquer brillances et points noirs. Elle nécessite des soins matifiants et non comédogènes.",
+    seche: "Ta peau manque de lipides et d'eau, elle peut tirailler et peler. Elle a besoin de soins riches en agents hydratants et nourrissants.",
+    mixte: "Ta peau est grasse sur la zone T (front, nez, menton) et normale à sèche sur les joues. Elle nécessite un soin équilibrant.",
+    sensible: "Ta peau réagit facilement aux agressions extérieures. Elle a besoin de formulations douces, sans parfum et hypoallergéniques.",
+    normale: "Ta peau est bien équilibrée, ni trop grasse ni trop sèche. Elle nécessite un entretien régulier pour conserver cet équilibre."
+  };
+  html += "<div style=\"font-size:12px;color:#5A4A42;margin-top:6px;line-height:1.6\">" + (skinExplain[ST.skinType] || "") + "</div></div>";
+
+  // Problèmes
+  if (concerns.length > 0) {
+    html += "<div style=\"padding:10px 0;border-bottom:1px solid #F5F0ED\">";
+    html += "<div style=\"font-size:12px;color:#B0958F;font-weight:600;margin-bottom:4px\">TES PROBLÈMES CIBLÉS</div>";
+    html += "<div style=\"display:flex;flex-wrap:wrap;gap:6px;margin-top:6px\">";
+    concerns.forEach(function(c) {
+      html += "<span style=\"background:#FDF0E6;color:#C4726A;border-radius:20px;padding:4px 12px;font-size:12px;font-weight:600\">" + c + "</span>";
+    });
+    html += "</div>";
+    html += "<div style=\"font-size:12px;color:#5A4A42;margin-top:8px;line-height:1.6\">Ce produit a été sélectionné parce qu'il cible directement " + (concerns.length === 1 ? "ce problème" : "ces problèmes") + " grâce à ses actifs spécifiques.</div></div>";
+  }
+
+  // Allergies
+  if (allergies.length > 0) {
+    html += "<div style=\"padding:10px 0;border-bottom:1px solid #F5F0ED\">";
+    html += "<div style=\"font-size:12px;color:#B0958F;font-weight:600;margin-bottom:4px\">TES ALLERGIES DÉCLARÉES</div>";
+    html += "<div style=\"display:flex;flex-wrap:wrap;gap:6px;margin-top:6px\">";
+    allergies.forEach(function(a) {
+      var detected = inciProd && AMAP[a] && inciProd[AMAP[a]];
+      html += "<span style=\"background:" + (detected ? "#FFEBEE" : "#E8F5E9") + ";color:" + (detected ? "#C62828" : "#2E7D32") + ";border-radius:20px;padding:4px 12px;font-size:12px;font-weight:600\">" + (detected ? "⚠️ " : "✅ ") + a + "</span>";
+    });
+    html += "</div></div>";
+  }
+
+  // Budget
+  if (budget) {
+    html += "<div style=\"padding:10px 0\">";
+    html += "<div style=\"font-size:12px;color:#B0958F;font-weight:600;margin-bottom:4px\">TON BUDGET</div>";
+    html += "<div style=\"font-size:13px;color:#3D2B1F\">" + (budgetLabels[budget]||budget) + " · Ce produit est à <strong>" + prix + "</strong></div></div>";
+  }
+
+  html += "</div>";
+
+  // ── PARTIE 2 : LE PRODUIT ──
+  html += "<div style=\"background:#fff;border-radius:18px;padding:16px;margin-bottom:14px;box-shadow:0 2px 10px rgba(0,0,0,.07)\">";
+  html += "<p style=\"font-size:11px;font-weight:800;color:#1F3864;text-transform:uppercase;letter-spacing:2px;margin-bottom:14px\">🧴 Partie 2 — Ce produit en détail</p>";
+
+  // Bénéfices
+  if (benefit) {
+    html += "<div style=\"padding:10px 0;border-bottom:1px solid #F5F0ED\">";
+    html += "<div style=\"font-size:12px;color:#B0958F;font-weight:600;margin-bottom:4px\">CE QUE CE PRODUIT FAIT</div>";
+    html += "<div style=\"font-size:13px;color:#3D2B1F;line-height:1.7\">" + benefit + "</div></div>";
+  }
+
+  // Actifs
+  if (aktifs) {
+    html += "<div style=\"padding:10px 0;border-bottom:1px solid #F5F0ED\">";
+    html += "<div style=\"font-size:12px;color:#B0958F;font-weight:600;margin-bottom:8px\">ACTIFS CLÉS</div>";
+    (p.ak||[]).forEach(function(actif) {
+      var explications = {
+        "Niacinamide":"Régule le sébum, réduit les pores et unifie le teint. Parfait pour peaux grasses et mixtes.",
+        "Acide hyaluronique":"Hydratation intense multi-couches. Attire et retient l'eau dans la peau.",
+        "Retinol":"Anti-âge scientifiquement prouvé. Stimule le renouvellement cellulaire. Utiliser le soir.",
+        "Rétinol":"Anti-âge scientifiquement prouvé. Stimule le renouvellement cellulaire. Utiliser le soir.",
+        "Vitamine C":"Antioxydant puissant qui illumine, unifie et protège contre les radicaux libres.",
+        "Acide salicylique":"BHA qui pénètre dans les pores pour les désobstruer. Idéal contre l'acné.",
+        "Ceramides":"Renforce la barrière cutanée et prévient la déshydratation. Essentiel pour peaux sèches.",
+        "Panthenol":"Apaise et hydrate. Accélère la cicatrisation et calme les irritations.",
+        "Zinc":"Régule la production de sébum et réduit les inflammations.",
+        "Aloe Vera":"Apaisant naturel, hydratant léger. Parfait pour peaux sensibles et irritées.",
+        "Peptides":"Stimulent la production de collagène. Réduisent les rides et améliorent la fermeté.",
+        "SPF":"Protection contre les UVA et UVB. Prévient le vieillissement prématuré et les taches.",
+        "Eau thermale":"Apaise, minéralise et renforce la barrière cutanée naturellement.",
+        "Madecassoside":"Actif cicatrisant dérivé du centella asiatica. Répare et apaise les peaux abîmées.",
+        "Bisabolol":"Anti-inflammatoire naturel dérivé de la camomille. Idéal pour peaux sensibles.",
+        "Squalane":"Hydratant léger qui mime les lipides naturels de la peau. Non comédogène.",
+      };
+      var expl = explications[actif] || "Actif bénéfique pour ta peau " + skinLabel + ".";
+      html += "<div style=\"display:flex;gap:10px;margin-bottom:10px\">";
+      html += "<div style=\"width:32px;height:32px;border-radius:8px;background:#E8F5E9;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:14px\">⚗️</div>";
+      html += "<div><div style=\"font-size:13px;font-weight:700;color:#2E7D32\">" + actif + "</div>";
+      html += "<div style=\"font-size:12px;color:#5A4A42;margin-top:2px;line-height:1.5\">" + expl + "</div></div></div>";
+    });
+    html += "</div>";
+  }
+
+  // Pour qui
+  if (pq) {
+    html += "<div style=\"padding:10px 0;border-bottom:1px solid #F5F0ED\">";
+    html += "<div style=\"font-size:12px;color:#B0958F;font-weight:600;margin-bottom:4px\">IDÉAL POUR</div>";
+    html += "<div style=\"font-size:13px;color:#3D2B1F;line-height:1.6\">" + pq + "</div></div>";
+  }
+
+  // Comment utiliser
+  if (app) {
+    html += "<div style=\"padding:10px 0;border-bottom:1px solid #F5F0ED\">";
+    html += "<div style=\"font-size:12px;color:#B0958F;font-weight:600;margin-bottom:4px\">COMMENT L'UTILISER</div>";
+    html += "<div style=\"font-size:13px;color:#3D2B1F;line-height:1.6\">" + app + "</div></div>";
+  }
+
+  // Moment
+  html += "<div style=\"padding:10px 0;border-bottom:1px solid #F5F0ED\">";
+  html += "<div style=\"font-size:12px;color:#B0958F;font-weight:600;margin-bottom:4px\">QUAND L'UTILISER</div>";
+  html += "<div style=\"font-size:13px;color:#3D2B1F;font-weight:600\">" + momentLabel + "</div></div>";
+
+  // INCI infos
+  if (inciProd) {
+    var allergensList = [];
+    var checks = {retinol:"Rétinol",parfum:"Parfum",paraben:"Parabènes",alcohol:"Alcool dénaturé",sulfate:"Sulfates",silicone:"Silicones",vitc:"Vitamine C",salicylic:"Acide salicylique",aha_bha:"AHA/BHA"};
+    Object.keys(checks).forEach(function(field) {
+      if (inciProd[field]) allergensList.push(checks[field]);
+    });
+    html += "<div style=\"padding:10px 0\">";
+    html += "<div style=\"font-size:12px;color:#B0958F;font-weight:600;margin-bottom:8px\">COMPOSITION — INGRÉDIENTS NOTABLES</div>";
+    if (allergensList.length > 0) {
+      html += "<div style=\"font-size:12px;color:#5A4A42;margin-bottom:6px\">Ce produit contient :</div>";
+      html += "<div style=\"display:flex;flex-wrap:wrap;gap:6px\">";
+      allergensList.forEach(function(a) {
+        var isUserAllergen = allergies.some(function(ua){ return ua.toLowerCase().includes(a.toLowerCase()) || a.toLowerCase().includes(ua.toLowerCase()); });
+        html += "<span style=\"background:" + (isUserAllergen ? "#FFEBEE" : "#F5F0ED") + ";color:" + (isUserAllergen ? "#C62828" : "#5A4A42") + ";border-radius:20px;padding:4px 10px;font-size:11px;font-weight:600\">" + (isUserAllergen ? "⚠️ " : "") + a + "</span>";
+      });
+      html += "</div>";
+    } else {
+      html += "<div style=\"font-size:12px;color:#2E7D32\">✅ Aucun ingrédient allergène majeur détecté dans notre base.</div>";
+    }
+    html += "</div>";
+  }
+
+  html += "</div>";
+
+  // Bouton acheter
+  if (p.link && p.link !== "#") {
+    html += "<button onclick=\"window.open(\'" + p.link.replace(/'/g,"\\'") + "\','_blank')\" style=\"width:100%;padding:14px;border-radius:50px;border:none;background:#1F3864;color:#fff;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit\">🛒 Acheter ce produit</button>";
+  }
+
+  document.getElementById("why-content").innerHTML = html;
 }
 
 
@@ -4824,12 +5190,8 @@ setTimeout(applyWelcomeLang, 50);
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', function() {
     navigator.serviceWorker.register('/sw.js')
-      .then(function(reg) {
-        // console.log('SkinMatch PWA : Service Worker enregistré', reg.scope);
-      })
-      .catch(function(err) {
-        console.log('SkinMatch PWA : Erreur Service Worker', err);
-      });
+      .then(function() {})
+      .catch(function() {});
   });
 }
 
