@@ -1692,88 +1692,46 @@ function build(){
     });
   };
 
-  const mk=(key,etape,moment,isAlt)=>({etape,moment,key,...DB[key],img:IMGS[key],isAlternative:!!isAlt,pourquoi:getWhy(key,sk,c[0],ST.ageGroup),compat:getCompat(key,sk,c[0],ST.ageGroup,ST.allergies)});
-
-  // tryStep : essaie chaque candidat dans l'ordre et utilise le premier safe + disponible.
-  // Si le 1er candidat (recommandation idéale) est exclu par allergie mais qu'une alternative
-  // est trouvée, le produit est marqué isAlternative:true → badge "Alternative" dans l'UI.
-  // Retourne false uniquement si aucun candidat ne passe (étape vraiment impossible).
-  const tryStep = (candidates, etape, moment) => {
-    const [primary, ...alts] = [...new Set(candidates)].filter(k=>k&&DB[k]);
-    // Essayer le produit idéal en premier
-    if(primary&&avail(primary)&&!usedKeys.has(primary)&&!hasAllergen(primary)){
-      usedKeys.add(primary);steps.push(mk(primary,etape,moment,false));return true;
+  const safeAvail = (key) => avail(key) && !hasAllergen(key);
+  const mk=(key,etape,moment)=>({etape,moment,key,...DB[key],img:IMGS[key],pourquoi:getWhy(key,sk,c[0],ST.ageGroup),compat:getCompat(key,sk,c[0],ST.ageGroup,ST.allergies)});
+  const addStep=(key,etape,moment)=>{
+    if(!key||!DB[key])return;
+    if(usedKeys.has(key)){
+      const alts={"cv-gel":"https://m.media-amazon.com/images/I/61S6p8gFMeL._AC_SL1500_.jpg","lrp-effgel":"https://www.laroche-posay.fr/dw/image/v2/AANG_PRD/on/demandware.static/-/Sites-lrp-master-catalog/default/dw1c8e6f9b/2023/LRP_Effaclar_Gel_Purifiant_400ml_3337875520731.jpg","cv-crem":"https://m.media-amazon.com/images/I/61FvCqKqkKL._AC_SL1500_.jpg","lrp-tol":"https://www.laroche-posay.fr/dw/image/v2/AANG_PRD/on/demandware.static/-/Sites-lrp-master-catalog/default/dw8c5b2a1f/2023/LRP_Toleriane_Dermallergo_40ml.jpg","lrp-effduo":"https://www.laroche-posay.fr/dw/image/v2/AANG_PRD/on/demandware.static/-/Sites-lrp-master-catalog/default/dwe5c2c8d2/2022/LRP_Effaclar_DuoPlus_M_40ml_3337875596704.jpg","cv-mou":"https://m.media-amazon.com/images/I/61hFpfpS0ZL._AC_SL1500_.jpg"};
+      key=alts[key]||key;
+      if(usedKeys.has(key))return;
     }
-    // Chercher une alternative parmi les candidats restants
-    for(const alt of alts){
-      if(!avail(alt)||usedKeys.has(alt)||hasAllergen(alt))continue;
-      usedKeys.add(alt);steps.push(mk(alt,etape,moment,true));return true;
-    }
-    return false; // aucune alternative trouvée pour cette étape
+    usedKeys.add(key);
+    steps.push(mk(key,etape,moment));
   };
-
-  // Listes de candidats ordonnées par priorité pour chaque type d'étape.
-  // Logique : budget demandé → mid → low → high → autres types de peau (filets de sécurité).
-  const netCandidates=[
-    ROUTE.net[sk]?.[b], ROUTE.net[sk]?.mid, ROUTE.net[sk]?.low, ROUTE.net[sk]?.high,
-    ROUTE.net.sensible?.low, ROUTE.net.sensible?.mid,
-    ROUTE.net.normale?.low, ROUTE.net.normale?.mid,
-  ];
-  const hydCandidates=[
-    ROUTE.hyd[sk]?.[b], ROUTE.hyd[sk]?.mid, ROUTE.hyd[sk]?.low, ROUTE.hyd[sk]?.high,
-    ROUTE.hyd.sensible?.low, ROUTE.hyd.sensible?.mid,
-    ROUTE.hyd.normale?.low, ROUTE.hyd.normale?.mid,
-  ];
-  const spfCandidates=[ROUTE.spf[b], ROUTE.spf.mid, ROUTE.spf.low, ROUTE.spf.high];
-  const serCandidates=(concern)=>[
-    ROUTE.ser[concern]?.[b], ROUTE.ser[concern]?.mid, ROUTE.ser[concern]?.low, ROUTE.ser[concern]?.high,
-    ROUTE.ser.deshydratation?.[b], ROUTE.ser.deshydratation?.mid, ROUTE.ser.deshydratation?.low,
-  ];
-
-  const missingSteps=[];
-
-  if(ST.routine==="simple"){
-    if(!tryStep(netCandidates,"Nettoyant","AM+PM")) missingSteps.push(LANG==='en'?'Cleanser':'Nettoyant');
-    if(!tryStep(hydCandidates,"Hydratant","AM+PM")) missingSteps.push(LANG==='en'?'Moisturiser':'Hydratant');
-    if(!tryStep(spfCandidates,"Protection solaire","AM")) missingSteps.push(LANG==='en'?'SPF':'Protection solaire');
-  }
+  const nk=ROUTE.net[sk]?.[b]||"cv-mou";
+  const hk=ROUTE.hyd[sk]?.[b]||"cv-crem";
+  const sk2=ROUTE.spf[b]||ROUTE.spf.mid;
+  if(ST.routine==="simple"){addStep(nk,"Nettoyant","AM+PM");addStep(hk,"Hydratant","AM+PM");addStep(sk2,"Protection solaire","AM");}
   if(ST.routine==="specifique"){
-    if(!tryStep(netCandidates,"Nettoyant","AM+PM")) missingSteps.push(LANG==='en'?'Cleanser':'Nettoyant');
-    const serMoment=(DB[ROUTE.ser[c[0]]?.[b]]||{}).moment||"AM+PM";
-    if(!tryStep(serCandidates(c[0]),"Soin ciblé",serMoment)) missingSteps.push(LANG==='en'?'Targeted treatment':'Soin ciblé');
-    if(!tryStep(hydCandidates,"Hydratant","AM+PM")) missingSteps.push(LANG==='en'?'Moisturiser':'Hydratant');
-    if(!tryStep(spfCandidates,"Protection solaire","AM")) missingSteps.push(LANG==='en'?'SPF':'Protection solaire');
+    const srk=ROUTE.ser[c[0]]?.[b]||"cv-vitc";
+    const prod=DB[srk];
+    addStep(srk,"Soin ciblé",prod?prod.moment:"AM+PM");
   }
   if(ST.routine==="complete"){
-    if(!tryStep(netCandidates,"Nettoyant","AM+PM")) missingSteps.push(LANG==='en'?'Cleanser':'Nettoyant');
-    c.slice(0,2).forEach((cc,i)=>{
-      if(!tryStep(serCandidates(cc),i===0?"Sérum principal":"Sérum soir",i===0?"AM+PM":"PM"))
-        missingSteps.push(i===0?(LANG==='en'?'Main serum':'Sérum principal'):(LANG==='en'?'Evening serum':'Sérum soir'));
-    });
-    if(!tryStep(hydCandidates,"Hydratant","AM+PM")) missingSteps.push(LANG==='en'?'Moisturiser':'Hydratant');
-    if(!tryStep(spfCandidates,"Protection solaire","AM")) missingSteps.push(LANG==='en'?'SPF':'Protection solaire');
+    addStep(nk,"Nettoyant","AM+PM");
+    c.slice(0,2).forEach((cc,i)=>{const srk=ROUTE.ser[cc]?.[b];addStep(srk,i===0?"Sérum principal":"Sérum soir",i===0?"AM+PM":"PM");});
+    addStep(hk,"Hydratant","AM+PM");addStep(sk2,"Protection solaire","AM");
   }
-
-  // Détecter les interactions actifs à risque dans la routine
-  const interactions=[];
-  const hasRetinol=steps.some(s=>(INCI_DB[s.key]||{}).retinol);
-  const hasAhaBha=steps.some(s=>(INCI_DB[s.key]||{}).aha_bha);
-  const hasVitC=steps.some(s=>(INCI_DB[s.key]||{}).vitc);
-  if(hasRetinol&&hasAhaBha) interactions.push(LANG==='en'?'⚠️ Retinol + AHA/BHA: risk of over-exfoliation. Use on alternating evenings.':'⚠️ Rétinol + AHA/BHA : risque de sur-exfoliation. Utilise en alternance le soir.');
-  if(hasRetinol&&hasVitC) interactions.push(LANG==='en'?'⚠️ Retinol + Vitamin C: do not use at the same time. Vitamin C in the morning, retinol in the evening.':'⚠️ Rétinol + Vitamine C : ne pas utiliser simultanément. Vitamine C le matin, rétinol le soir.');
-
-  // Trier par ordre logique d'application : nettoyant → sérums → hydratant → SPF
-  const ETAPE_ORDER={'Nettoyant':1,'Soin ciblé':2,'Sérum principal':2,'Sérum soir':3,'Hydratant':4,'Protection solaire':5};
-  steps.sort((a,b)=>(ETAPE_ORDER[a.etape]||3)-(ETAPE_ORDER[b.etape]||3));
-
+  // Trier TOUS les produits par note Yuka décroissante (SPF toujours en dernier)
+  const fixedZ=steps.filter(s=>s.etape==="Protection solaire");
+  const nonSpf=steps.filter(s=>s.etape!=="Protection solaire");
+  nonSpf.sort((a,b)=>(b.yuka||0)-(a.yuka||0));
+  steps.length=0;
+  nonSpf.forEach(s=>steps.push(s));
+  fixedZ.forEach(s=>steps.push(s));
   const l=T[LANG]||T.fr;
   const CONS=l.conseils||T.fr.conseils;
   const skinL=l.intro_skin||T.fr.intro_skin;
   const tpl=l.intro_tpl||T.fr.intro_tpl;
   const introStr=tpl.replace('{skin}',skinL[ST.skinType]||'').replace('{age}',ST.ageGroup?' ('+ST.ageGroup+')':'');
   const totalPrix=steps.reduce((a,s)=>{const n=parseFloat((s.prix||"0").replace("€","").replace("~",""));return isNaN(n)?a:a+n;},0);
-  const hasAlternatives=steps.some(s=>s.isAlternative);
-  return{intro:introStr,steps,conseil:CONS[c[0]]||"Une routine simple appliquée chaque jour surpasse une routine complexe abandonnée.",totalPrix,interactions,missingSteps,hasAlternatives};
+  return{intro:introStr,steps,conseil:CONS[c[0]]||"Une routine simple appliquée chaque jour surpasse une routine complexe abandonnée.",totalPrix};
 }
 
 function t(key){ return (T[LANG]&&T[LANG][key]!==undefined)?T[LANG][key]:(T.fr[key]||key); }
@@ -2322,7 +2280,11 @@ function capturePhoto() {
     document.getElementById("scan-img").src = dataUrl;
     document.getElementById("scan-camera-zone").style.display = "none";
     document.getElementById("scan-preview").style.display = "block";
-    document.getElementById("scan-btn").disabled = false;
+    document.getElementById("scan-result").style.display = "none";
+    var btn = document.getElementById("scan-btn");
+    btn.disabled = false;
+    btn.style.opacity = "1";
+    document.getElementById("scan-btn-text").textContent = LANG === "en" ? "Analyze my skin" : "Analyser ma peau";
     
     stopCamera();
     
@@ -2353,7 +2315,11 @@ function loadScanImage(file) {
         document.getElementById("scan-img").src = dataUrl;
         document.getElementById("scan-camera-zone").style.display = "none";
         document.getElementById("scan-preview").style.display = "block";
-        document.getElementById("scan-btn").disabled = false;
+        document.getElementById("scan-result").style.display = "none";
+        var btn = document.getElementById("scan-btn");
+        btn.disabled = false;
+        btn.style.opacity = "1";
+        document.getElementById("scan-btn-text").textContent = LANG === "en" ? "Analyze my skin" : "Analyser ma peau";
         stopCamera();
     };
     reader.readAsDataURL(file);
@@ -2365,8 +2331,13 @@ function resetScan() {
     document.getElementById("scan-camera-zone").style.display = "block";
     document.getElementById("scan-preview").style.display = "none";
     document.getElementById("scan-result").style.display = "none";
+    document.getElementById("scan-loading").style.display = "none";
+    document.getElementById("scan-analysis").style.display = "none";
     if (document.getElementById("scan-product-result")) document.getElementById("scan-product-result").style.display = "none";
-    document.getElementById("scan-btn").disabled = true;
+    var btn = document.getElementById("scan-btn");
+    btn.disabled = true;
+    btn.style.opacity = "0.4";
+    document.getElementById("scan-btn-text").textContent = LANG === "en" ? "Analyze my skin" : "Analyser ma peau";
     document.getElementById("scan-file-input").value = "";
     startCamera();
 }
@@ -2923,10 +2894,7 @@ function renderResult(){
           <div class="pe">${translateEtape(s.etape)}</div>
           <div class="pn">${s.nom}</div>
           <div class="pm">${s.marque}</div>
-          <div class="badges">
-            <span class="cb">✓ ${s.compat}% ${t('compatible')}</span>
-            ${s.isAlternative?`<span style="background:#FFF3E0;color:#E65100;border-radius:20px;padding:3px 8px;font-size:10px;font-weight:700;margin-left:4px;display:inline-flex;align-items:center;gap:3px"><svg width="10" height="10" viewBox="0 0 24 24" fill="#E65100"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>${LANG==='en'?'Alternative':'Alternative proposée'}</span>`:''}
-          </div>
+          <div class="badges"><span class="cb">✓ ${s.compat}% ${t('compatible')}</span></div>
         </div>
         <div style="position:absolute;top:12px;right:12px;background:#FDF0E6;border-radius:8px;padding:5px 11px;font-family:Georgia,serif;font-size:15px;font-weight:800;color:#C4726A">${s.prix}</div>
       </div>
@@ -2995,13 +2963,10 @@ function renderResult(){
       ${roHtml(amSteps,"ro-am")}
       <div id="ro-pm" style="display:none">${roHtml(pmSteps,"").innerHTML||""}</div>
     </div>
-    ${hasA?`<div class="aw" style="margin-bottom:12px"><svg width="16" height="16" viewBox="0 0 24 24" fill="#C4956A" style="flex-shrink:0;margin-top:1px"><path d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z"/></svg><div><div class="aw-t">${t('allergy_title')}</div><p class="aw-txt">${t('allergy_text')} ${activeAllergies.join(', ')}.</p></div></div>`:""}
-    ${(r.hasAlternatives)?`<div class="aw" style="margin-bottom:12px;background:#E8F5E9;border-color:#2E7D32"><svg width="16" height="16" viewBox="0 0 24 24" fill="#2E7D32" style="flex-shrink:0;margin-top:1px"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/></svg><div><div class="aw-t" style="color:#2E7D32">${LANG==='en'?'Alternatives found':'Alternatives trouvées'}</div><p class="aw-txt">${LANG==='en'?'Some products were replaced with compatible alternatives that respect your sensitivities. Look for the ⭐ Alternative badge on each card.':'Certains produits ont été remplacés par des alternatives compatibles avec tes sensibilités. Repère le badge ⭐ Alternative sur chaque fiche produit.'}</p></div></div>`:""}
-    ${(r.missingSteps&&r.missingSteps.length>0)?`<div class="aw" style="margin-bottom:12px;background:#FFF3E0;border-color:#FFB300"><svg width="16" height="16" viewBox="0 0 24 24" fill="#E65100" style="flex-shrink:0;margin-top:1px"><path d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z"/></svg><div><div class="aw-t" style="color:#E65100">${LANG==='en'?'Incomplete routine':'Routine incomplète'}</div><p class="aw-txt">${LANG==='en'?'No compatible alternative was found for: '+r.missingSteps.join(', ')+'. We recommend consulting a dermatologist for personalised guidance.':'Aucune alternative compatible n\'a pu être trouvée pour : '+r.missingSteps.join(', ')+'. Nous te conseillons de consulter un dermatologue pour un accompagnement personnalisé.'}</p></div></div>`:""}
-    ${(r.interactions&&r.interactions.length>0)?`<div class="aw" style="margin-bottom:12px;background:#E3F2FD;border-color:#1565C0"><svg width="16" height="16" viewBox="0 0 24 24" fill="#1565C0" style="flex-shrink:0;margin-top:1px"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg><div><div class="aw-t" style="color:#1565C0">${LANG==='en'?'Active ingredient interactions':'Interactions entre actifs'}</div>${r.interactions.map(i=>`<p class="aw-txt">${i}</p>`).join('')}</div></div>`:""}
     <div class="section-lbl">${t('products_title')}</div>
     ${stepsHtml}
     <div class="conseil"><div class="conseil-lbl">${t('conseil_label')}</div><div class="conseil-txt">${r.conseil}</div></div>
+    ${hasA?`<div class="aw"><svg width="16" height="16" viewBox="0 0 24 24" fill="#C4956A" style="flex-shrink:0;margin-top:1px"><path d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z"/></svg><div><div class="aw-t">${t('allergy_title')}</div><p class="aw-txt">${t('allergy_text')} ${ST.allergies.join(', ')}.</p></div></div>`:""}
     <div class="suivi">
       <div class="suivi-t">${t('suivi_title')}</div>
       <p class="suivi-txt">${t('suivi_text')}</p>
