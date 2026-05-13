@@ -2,12 +2,18 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
+  <script>
+    // Forcer le bon URL pour la PWA
+    if (window.location.pathname === '/skinnmatch' || window.location.pathname === '/skinnmatch/index.html') {
+      window.location.replace('/skinnmatch/');
+    }
+  </script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <meta name="color-scheme" content="light only">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%23C4726A'/><rect x='5' y='5' width='90' height='90' rx='18' fill='%23D4887F'/><text y='72' x='50' text-anchor='middle' font-size='52' font-weight='700' fill='white' font-family='Georgia,serif'>SM</text></svg>">
 <link rel="apple-touch-icon" href="data:image/png;base64,iVBORw0KGgo=">
 <meta name="supported-color-schemes" content="light">
-<link rel="manifest" href="manifest.json">
+<link rel="manifest" href="/skinnmatch/manifest.json">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="SkinMatch">
