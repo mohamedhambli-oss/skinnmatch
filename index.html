@@ -454,18 +454,70 @@ h2{font-family:var(--serif);font-size:20px;font-weight:700;margin-bottom:3px}
       <p class="sub" id="scan-sub">Prenez une photo de votre visage ou importez-en une. Notre IA analyse votre peau en quelques secondes.</p>
     </div>
 
-    <!-- Zone upload photo -->
-    <div id="scan-upload-zone" style="border:2px dashed var(--rose);border-radius:20px;padding:32px 20px;text-align:center;cursor:pointer;background:var(--blush);margin-bottom:16px;transition:all .2s" onclick="document.getElementById('scan-file-input').click()" ondragover="event.preventDefault();this.style.borderColor='#C4726A'" ondrop="handleScanDrop(event)">
-      <div style="font-size:40px;margin-bottom:12px">📸</div>
-      <div id="scan-upload-text" style="font-size:14px;font-weight:600;color:var(--acc2);margin-bottom:4px">Appuyez pour prendre ou importer une photo</div>
-      <div style="font-size:12px;color:var(--mut)">JPG, PNG · Visage bien éclairé, sans maquillage de préférence</div>
+    <!-- Zone cadrage visage + upload -->
+    <div id="scan-upload-zone" style="margin-bottom:16px" onclick="document.getElementById('scan-file-input').click()" ondragover="event.preventDefault()" ondrop="handleScanDrop(event)">
+      
+      <!-- Cadre ovale visage -->
+      <div style="position:relative;width:100%;height:300px;background:#1a1a1a;border-radius:20px;overflow:hidden;cursor:pointer;display:flex;align-items:center;justify-content:center">
+        
+        <!-- Fond sombre avec découpe ovale -->
+        <svg style="position:absolute;top:0;left:0;width:100%;height:100%" viewBox="0 0 360 300" preserveAspectRatio="xMidYMid slice">
+          <defs>
+            <mask id="face-mask">
+              <rect width="360" height="300" fill="white"/>
+              <ellipse cx="180" cy="148" rx="105" ry="130" fill="black"/>
+            </mask>
+          </defs>
+          <!-- Overlay sombre autour de l'ovale -->
+          <rect width="360" height="300" fill="rgba(0,0,0,0.65)" mask="url(#face-mask)"/>
+          <!-- Contour ovale animé -->
+          <ellipse cx="180" cy="148" rx="105" ry="130" fill="none" stroke="#C4726A" stroke-width="2.5" stroke-dasharray="8 4" opacity="0.9">
+            <animateTransform attributeName="transform" type="rotate" from="0 180 148" to="360 180 148" dur="12s" repeatCount="indefinite"/>
+          </ellipse>
+          <!-- Coins guides -->
+          <line x1="180" y1="8" x2="180" y2="22" stroke="#C4726A" stroke-width="2" opacity="0.7"/>
+          <line x1="180" y1="274" x2="180" y2="288" stroke="#C4726A" stroke-width="2" opacity="0.7"/>
+          <line x1="65" y1="148" x2="79" y2="148" stroke="#C4726A" stroke-width="2" opacity="0.7"/>
+          <line x1="281" y1="148" x2="295" y2="148" stroke="#C4726A" stroke-width="2" opacity="0.7"/>
+        </svg>
+
+        <!-- Icône centrale + texte -->
+        <div style="position:relative;z-index:2;text-align:center;pointer-events:none">
+          <div style="font-size:36px;margin-bottom:10px">📸</div>
+          <div id="scan-upload-text" style="font-size:14px;font-weight:700;color:#fff;margin-bottom:5px;text-shadow:0 1px 3px rgba(0,0,0,.5)">Centrez votre visage ici</div>
+          <div style="font-size:11px;color:rgba(255,255,255,.7);text-shadow:0 1px 2px rgba(0,0,0,.5)">Appuyez pour prendre ou importer une photo</div>
+        </div>
+
+        <!-- Badge conseils -->
+        <div style="position:absolute;bottom:14px;left:0;right:0;display:flex;justify-content:center;gap:8px;z-index:2">
+          <span style="background:rgba(0,0,0,.55);color:#fff;border-radius:20px;padding:4px 10px;font-size:10px;font-weight:600;backdrop-filter:blur(4px)">💡 Bonne lumière</span>
+          <span style="background:rgba(0,0,0,.55);color:#fff;border-radius:20px;padding:4px 10px;font-size:10px;font-weight:600;backdrop-filter:blur(4px)">😐 Face caméra</span>
+          <span style="background:rgba(0,0,0,.55);color:#fff;border-radius:20px;padding:4px 10px;font-size:10px;font-weight:600;backdrop-filter:blur(4px)">🕶️ Sans lunettes</span>
+        </div>
+      </div>
       <input type="file" id="scan-file-input" accept="image/*" capture="user" style="display:none" onchange="handleScanFile(this)">
     </div>
 
-    <!-- Aperçu photo -->
+    <!-- Aperçu photo avec cadre ovale -->
     <div id="scan-preview" style="display:none;margin-bottom:16px;position:relative">
-      <img id="scan-img" style="width:100%;border-radius:16px;max-height:280px;object-fit:cover" alt="Photo peau">
-      <button onclick="resetScan()" style="position:absolute;top:10px;right:10px;background:rgba(0,0,0,.5);border:none;border-radius:50%;width:30px;height:30px;color:#fff;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center">×</button>
+      <div style="position:relative;width:100%;height:300px;background:#1a1a1a;border-radius:20px;overflow:hidden">
+        <img id="scan-img" style="width:100%;height:100%;object-fit:cover;display:block" alt="Photo peau">
+        <!-- Overlay ovale sur la preview -->
+        <svg style="position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none" viewBox="0 0 360 300" preserveAspectRatio="xMidYMid slice">
+          <defs>
+            <mask id="face-mask-prev">
+              <rect width="360" height="300" fill="white"/>
+              <ellipse cx="180" cy="148" rx="105" ry="130" fill="black"/>
+            </mask>
+          </defs>
+          <rect width="360" height="300" fill="rgba(0,0,0,0.4)" mask="url(#face-mask-prev)"/>
+          <ellipse cx="180" cy="148" rx="105" ry="130" fill="none" stroke="#C4726A" stroke-width="2.5" opacity="0.9"/>
+        </svg>
+        <button onclick="resetScan()" style="position:absolute;top:10px;right:10px;background:rgba(0,0,0,.6);border:none;border-radius:50%;width:32px;height:32px;color:#fff;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:10">×</button>
+        <div style="position:absolute;bottom:12px;left:0;right:0;text-align:center;z-index:10">
+          <span style="background:rgba(196,114,106,.85);color:#fff;border-radius:20px;padding:5px 14px;font-size:11px;font-weight:700">Prêt pour l'analyse ✓</span>
+        </div>
+      </div>
     </div>
 
     <!-- Bouton analyser -->
@@ -887,6 +939,22 @@ h2{font-family:var(--serif);font-size:20px;font-weight:700;margin-bottom:3px}
       <p class="sub" id="dash-sub">Votre tableau de bord skincare personnalisé</p>
     </div>
     <div id="dashboard-content"></div>
+  </div>
+</div>
+
+<!-- ══ PROFIL FIREBASE ══ -->
+<div id="sc-profile" class="hidden">
+  <div class="topbar">
+    <button class="btn-back" onclick="go('welcome')">← Retour</button>
+    <div class="logo"><div class="logo-icon">SM</div>Skin<span>Match</span></div>
+  </div>
+  <div class="content">
+    <div style="margin:8px 0 20px">
+      <div class="step-lbl">Mon compte</div>
+      <h2 id="profile-name" style="margin-bottom:4px">Mon profil</h2>
+      <p class="sub" id="profile-email"></p>
+    </div>
+    <div id="profile-content"></div>
   </div>
 </div>
 
@@ -2679,6 +2747,19 @@ function doGenerate(){
     renderResult();
     go("result");
     if (btn) { btn.disabled = false; }
+    // Sauvegarde Firestore si connecté
+    if (window._currentUser) {
+      saveRoutineToFirestore({
+        skinType: ST.skinType,
+        ageGroup: ST.ageGroup,
+        concerns: ST.concerns,
+        allergies: ST.allergies,
+        budget: ST.budget,
+        routine: ST.routine,
+        products: (ST.result.steps || []).map(function(s){ return { key: s.key, nom: s.nom, marque: s.marque, prix: s.prix }; }),
+        savedAt: new Date().toISOString()
+      });
+    }
   }, 400);
 }
 
@@ -5248,13 +5329,100 @@ window.onFirebaseUserReady = function(user) {
   var btnLog = document.getElementById('btn-log');
   var btnReg = document.getElementById('btn-reg');
   if (user) {
-    if (btnLog) { btnLog.textContent = '👤 ' + (user.displayName || user.email.split('@')[0]); btnLog.onclick = doLogout; }
+    var shortName = user.displayName ? user.displayName.split(' ')[0] : user.email.split('@')[0];
+    if (btnLog) { btnLog.textContent = '👤 ' + shortName; btnLog.onclick = function(){ renderProfile(); go('profile'); }; }
     if (btnReg) btnReg.style.display = 'none';
+    // Charger routine sauvegardée
+    loadSavedRoutine(user);
   } else {
     if (btnLog) { btnLog.textContent = 'Se connecter'; btnLog.onclick = function(){ go('login'); }; }
     if (btnReg) { btnReg.style.display = ''; btnReg.textContent = 'Créer un compte'; }
   }
 };
+
+async function loadSavedRoutine(user) {
+  if (!window._firebaseReady || !user) return;
+  try {
+    var snap = await window._getDoc(window._doc(window._db, 'users', user.uid));
+    if (snap.exists() && snap.data().lastRoutine) {
+      window._savedRoutine = snap.data().lastRoutine;
+    }
+  } catch(e) { console.log('loadSavedRoutine error:', e); }
+}
+
+function renderProfile() {
+  var user = window._currentUser;
+  if (!user) { go('login'); return; }
+  
+  var nameEl = document.getElementById('profile-name');
+  var emailEl = document.getElementById('profile-email');
+  var contentEl = document.getElementById('profile-content');
+  
+  if (nameEl) nameEl.textContent = user.displayName || 'Mon profil';
+  if (emailEl) emailEl.textContent = user.email;
+  
+  if (!contentEl) return;
+  
+  var savedRoutine = window._savedRoutine;
+  var html = '';
+  
+  // Infos compte
+  html += '<div style="background:#fff;border-radius:16px;border:1px solid var(--bdr);padding:16px;margin-bottom:14px">';
+  html += '<div style="font-size:10px;font-weight:700;color:var(--mut);text-transform:uppercase;letter-spacing:.5px;margin-bottom:12px">Informations</div>';
+  html += '<div style="display:flex;align-items:center;gap:12px;margin-bottom:12px">';
+  html += '<div style="width:52px;height:52px;border-radius:50%;background:linear-gradient(135deg,#C4726A,#A85A52);display:flex;align-items:center;justify-content:center;font-family:Georgia,serif;font-size:20px;font-weight:700;color:#fff;flex-shrink:0">' + (user.displayName ? user.displayName[0].toUpperCase() : '?') + '</div>';
+  html += '<div><div style="font-size:15px;font-weight:700;color:var(--pri)">' + (user.displayName || 'Utilisateur') + '</div>';
+  html += '<div style="font-size:12px;color:var(--mut)">' + user.email + '</div></div></div>';
+  html += '</div>';
+  
+  // Dernière routine sauvegardée
+  if (savedRoutine && savedRoutine.products && savedRoutine.products.length > 0) {
+    var date = savedRoutine.savedAt ? new Date(savedRoutine.savedAt).toLocaleDateString('fr-FR') : '';
+    html += '<div style="background:var(--blush);border-radius:16px;border:1px solid var(--rose);padding:16px;margin-bottom:14px">';
+    html += '<div style="font-size:10px;font-weight:700;color:var(--acc2);text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px">🌸 Dernière routine' + (date ? ' · ' + date : '') + '</div>';
+    html += '<div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px">';
+    if (savedRoutine.skinType) html += '<span style="background:var(--tag);border-radius:20px;padding:3px 10px;font-size:11px;font-weight:600;color:var(--acc2)">Peau ' + savedRoutine.skinType + '</span>';
+    if (savedRoutine.budget) html += '<span style="background:var(--tag);border-radius:20px;padding:3px 10px;font-size:11px;font-weight:600;color:var(--acc2)">Budget ' + savedRoutine.budget + '</span>';
+    html += '</div>';
+    savedRoutine.products.forEach(function(p) {
+      html += '<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--rose)">';
+      html += '<div><div style="font-size:12px;font-weight:600;color:var(--pri)">' + p.nom + '</div>';
+      html += '<div style="font-size:10px;color:var(--mut)">' + p.marque + '</div></div>';
+      html += '<div style="font-family:Georgia,serif;font-size:13px;font-weight:700;color:#C4726A">' + p.prix + '</div>';
+      html += '</div>';
+    });
+    html += '<button onclick="reloadSavedRoutine()" style="width:100%;margin-top:12px;padding:11px;border-radius:50px;border:none;background:#C4726A;color:#fff;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">Revoir ma routine →</button>';
+    html += '</div>';
+  } else {
+    html += '<div style="background:var(--blush);border-radius:16px;border:1px solid var(--rose);padding:20px;margin-bottom:14px;text-align:center">';
+    html += '<div style="font-size:32px;margin-bottom:10px">🌸</div>';
+    html += '<div style="font-size:13px;font-weight:600;color:var(--pri);margin-bottom:6px">Pas encore de routine sauvegardée</div>';
+    html += '<div style="font-size:12px;color:var(--mut);margin-bottom:14px">Fais ton diagnostic pour générer ta première routine.</div>';
+    html += '<button onclick="go("q1")" style="padding:11px 24px;border-radius:50px;border:none;background:#C4726A;color:#fff;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">Commencer le diagnostic</button>';
+    html += '</div>';
+  }
+  
+  // Bouton déconnexion
+  html += '<button onclick="doLogout()" style="width:100%;padding:13px;border-radius:50px;border:1.5px solid var(--acc);background:transparent;color:var(--acc2);font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;margin-top:4px">Se déconnecter</button>';
+  
+  contentEl.innerHTML = html;
+}
+
+function reloadSavedRoutine() {
+  var saved = window._savedRoutine;
+  if (!saved) return;
+  // Restaurer ST depuis la routine sauvegardée
+  ST.skinType = saved.skinType || null;
+  ST.ageGroup = saved.ageGroup || null;
+  ST.concerns = saved.concerns || [];
+  ST.allergies = saved.allergies || [];
+  ST.budget = saved.budget || null;
+  ST.routine = saved.routine || null;
+  // Régénérer la routine
+  ST.result = build();
+  renderResult();
+  go('result');
+}
 
 // Init
 go('lang');
