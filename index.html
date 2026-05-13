@@ -469,42 +469,38 @@ h2{font-family:var(--serif);font-size:20px;font-weight:700;margin-bottom:3px}
           <defs>
             <mask id="oval-mask">
               <rect width="360" height="340" fill="white"/>
-              <ellipse cx="180" cy="165" rx="115" ry="145" fill="black"/>
+              <ellipse cx="180" cy="170" rx="160" ry="162" fill="black"/>
             </mask>
           </defs>
-          <!-- Zone sombre autour de l'ovale -->
-          <rect width="360" height="340" fill="rgba(0,0,0,0.55)" mask="url(#oval-mask)"/>
-          <!-- Contour ovale -->
-          <ellipse id="oval-border" cx="180" cy="165" rx="115" ry="145" fill="none" stroke="#C4726A" stroke-width="3" opacity="0.95"/>
-          <!-- 4 coins décoratifs -->
-          <path d="M180,15 L180,30" stroke="#C4726A" stroke-width="2.5" opacity="0.8"/>
-          <path d="M180,300 L180,315" stroke="#C4726A" stroke-width="2.5" opacity="0.8"/>
-          <path d="M58,165 L73,165" stroke="#C4726A" stroke-width="2.5" opacity="0.8"/>
-          <path d="M287,165 L302,165" stroke="#C4726A" stroke-width="2.5" opacity="0.8"/>
+          <rect width="360" height="340" fill="rgba(0,0,0,0.45)" mask="url(#oval-mask)"/>
+          <ellipse id="oval-border" cx="180" cy="170" rx="160" ry="162" fill="none" stroke="#C4726A" stroke-width="3" opacity="0.95"/>
+          <path d="M180,4 L180,16" stroke="#C4726A" stroke-width="2.5" opacity="0.8"/>
+          <path d="M180,324 L180,336" stroke="#C4726A" stroke-width="2.5" opacity="0.8"/>
+          <path d="M14,170 L26,170" stroke="#C4726A" stroke-width="2.5" opacity="0.8"/>
+          <path d="M334,170 L346,170" stroke="#C4726A" stroke-width="2.5" opacity="0.8"/>
         </svg>
 
         <!-- Message de guidage en haut -->
-        <div id="scan-guide-text" style="position:absolute;top:14px;left:0;right:0;text-align:center;z-index:10;pointer-events:none">
-          <span style="background:rgba(0,0,0,.6);color:#fff;border-radius:20px;padding:6px 16px;font-size:12px;font-weight:600;backdrop-filter:blur(4px)">📍 Centrez votre visage dans l'ovale</span>
+        <div style="position:absolute;top:12px;left:0;right:0;text-align:center;z-index:10;pointer-events:none">
+          <span style="background:rgba(0,0,0,.65);color:#fff;border-radius:20px;padding:6px 16px;font-size:12px;font-weight:600;backdrop-filter:blur(4px)">📍 Centrez votre visage dans l'ovale</span>
         </div>
 
-        <!-- Badges conseils en bas -->
-        <div style="position:absolute;bottom:70px;left:0;right:0;display:flex;justify-content:center;gap:6px;z-index:10;pointer-events:none">
-          <span style="background:rgba(0,0,0,.55);color:#fff;border-radius:20px;padding:3px 9px;font-size:10px;font-weight:600">💡 Lumière naturelle</span>
-          <span style="background:rgba(0,0,0,.55);color:#fff;border-radius:20px;padding:3px 9px;font-size:10px;font-weight:600">😐 Face caméra</span>
-          <span style="background:rgba(0,0,0,.55);color:#fff;border-radius:20px;padding:3px 9px;font-size:10px;font-weight:600">🕶️ Sans lunettes</span>
-        </div>
-
-        <!-- Bouton capture (shutter) -->
-        <div style="position:absolute;bottom:14px;left:0;right:0;display:flex;justify-content:center;align-items:center;gap:20px;z-index:10">
-          <!-- Bouton retourner caméra -->
-          <button onclick="flipCamera()" style="width:42px;height:42px;border-radius:50%;background:rgba(255,255,255,.2);border:none;color:#fff;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(4px)">🔄</button>
-          <!-- Bouton capture principal -->
-          <button onclick="capturePhoto()" id="shutter-btn" style="width:68px;height:68px;border-radius:50%;background:#fff;border:4px solid #C4726A;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 20px rgba(0,0,0,.4)">
-            <div style="width:52px;height:52px;border-radius:50%;background:#C4726A"></div>
-          </button>
-          <!-- Bouton importer depuis galerie -->
-          <button onclick="document.getElementById('scan-file-input').click()" style="width:42px;height:42px;border-radius:50%;background:rgba(255,255,255,.2);border:none;color:#fff;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(4px)">🖼️</button>
+        <!-- Boutons contrôle + shutter tout en bas -->
+        <div style="position:absolute;bottom:12px;left:0;right:0;z-index:10">
+          <!-- Badges conseils au-dessus des boutons -->
+          <div style="display:flex;justify-content:center;gap:6px;margin-bottom:10px;pointer-events:none">
+            <span style="background:rgba(0,0,0,.65);color:#fff;border-radius:20px;padding:3px 9px;font-size:10px;font-weight:600;backdrop-filter:blur(4px)">💡 Lumière</span>
+            <span style="background:rgba(0,0,0,.65);color:#fff;border-radius:20px;padding:3px 9px;font-size:10px;font-weight:600;backdrop-filter:blur(4px)">😐 Face caméra</span>
+            <span style="background:rgba(0,0,0,.65);color:#fff;border-radius:20px;padding:3px 9px;font-size:10px;font-weight:600;backdrop-filter:blur(4px)">🕶️ Sans lunettes</span>
+          </div>
+          <!-- Boutons -->
+          <div style="display:flex;justify-content:center;align-items:center;gap:24px">
+            <button onclick="flipCamera()" style="width:44px;height:44px;border-radius:50%;background:rgba(255,255,255,.2);border:2px solid rgba(255,255,255,.3);color:#fff;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(4px)">🔄</button>
+            <button onclick="capturePhoto()" style="width:70px;height:70px;border-radius:50%;background:#fff;border:4px solid #C4726A;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 20px rgba(0,0,0,.5)">
+              <div style="width:54px;height:54px;border-radius:50%;background:#C4726A"></div>
+            </button>
+            <button onclick="document.getElementById('scan-file-input').click()" style="width:44px;height:44px;border-radius:50%;background:rgba(255,255,255,.2);border:2px solid rgba(255,255,255,.3);color:#fff;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(4px)">🖼️</button>
+          </div>
         </div>
 
         <!-- Message caméra non disponible -->
@@ -526,11 +522,11 @@ h2{font-family:var(--serif);font-size:20px;font-weight:700;margin-bottom:3px}
           <defs>
             <mask id="oval-prev">
               <rect width="360" height="340" fill="white"/>
-              <ellipse cx="180" cy="165" rx="115" ry="145" fill="black"/>
+              <ellipse cx="180" cy="170" rx="160" ry="162" fill="black"/>
             </mask>
           </defs>
-          <rect width="360" height="340" fill="rgba(0,0,0,0.35)" mask="url(#oval-prev)"/>
-          <ellipse cx="180" cy="165" rx="115" ry="145" fill="none" stroke="#C4726A" stroke-width="2.5"/>
+          <rect width="360" height="340" fill="rgba(0,0,0,0.3)" mask="url(#oval-prev)"/>
+          <ellipse cx="180" cy="170" rx="160" ry="162" fill="none" stroke="#C4726A" stroke-width="2.5"/>
         </svg>
         <button onclick="resetScan()" style="position:absolute;top:12px;right:12px;background:rgba(0,0,0,.6);border:none;border-radius:50%;width:34px;height:34px;color:#fff;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:10">×</button>
         <div style="position:absolute;bottom:14px;left:0;right:0;text-align:center;z-index:10">
@@ -1209,7 +1205,7 @@ const IMGS = {
   "skc-phy":   "https://www.easypara.fr/img/p/1/0/7/5/5/7/107557-home_default.jpg",
   "skc-met":   "https://www.easypara.fr/img/p/1/0/7/5/5/8/107558-home_default.jpg",
   "skc-spf":   "https://www.easypara.fr/img/p/1/3/8/1/4/8/138148-home_default.jpg",
-  "lrp-effgel": "https://www.laroche-posay.fr/dw/image/v2/AAUW_PRD/on/demandware.static/-/Sites-lrp-master-catalog/default/images/large/effaclar-gel-moussant-purifiant-3337875520823.jpg",
+  "lrp-effgel": "https://ccdn.myshoptet.com/usr/www.najlacnejsikozmetika.sk/user/documents/upload/La%20Roche-Posay/Effaclar/effaclar-gel-400ml_1.jpg",
   "lrp-effduo": "https://www.pharmacie-du-centre.fr/media/catalog/product/cache/1/image/700x700/9df78eab33525d08d6e5fb8d27136e95/3/3/3337875596704.jpg",
   "lrp-cica": "https://www.pharmacie-du-centre.fr/media/catalog/product/cache/1/image/700x700/9df78eab33525d08d6e5fb8d27136e95/3/3/3337875520670.jpg",
   "lrp-tol": "https://www.pharmacie-du-centre.fr/media/catalog/product/cache/1/image/700x700/9df78eab33525d08d6e5fb8d27136e95/3/3/3337875520977.jpg",
@@ -1228,26 +1224,7 @@ const IMGS = {
   "cv-eye": "https://www.pharmacie-du-centre.fr/media/catalog/product/cache/1/image/700x700/9df78eab33525d08d6e5fb8d27136e95/3/3/3337875521622.jpg",
   "cv-mou": "https://www.pharmacie-du-centre.fr/media/catalog/product/cache/1/image/700x700/9df78eab33525d08d6e5fb8d27136e95/3/3/3337875772756.jpg",
   "ng-spf": "https://www.pharmacie-du-centre.fr/media/catalog/product/cache/1/image/700x700/9df78eab33525d08d6e5fb8d27136e95/3/5/3574661685921.jpg",
-  "ng-bha": "https://www.pharmacie-du-centre.fr/media/catalog/product/cache/1/image/700x700/9df78eab33525d08d6e5fb8d27136e95/0/0/0086800108597.jpg",
-  "vic-normaderm": "https://www.vichy.fr/dw/image/v2/AAUW_PRD/on/demandware.static/-/Sites-vchy-master/default/images/large/normaderm-phytosolution-soin-double-correction-3337875594434.jpg",
-  "vic-minral89": "https://www.vichy.fr/dw/image/v2/AAUW_PRD/on/demandware.static/-/Sites-vchy-master/default/images/large/mineral-89-serum-boosteur-quotidien-3337875557082.jpg",
-  "vic-liftactiv": "https://www.vichy.fr/dw/image/v2/AAUW_PRD/on/demandware.static/-/Sites-vchy-master/default/images/large/liftactiv-collagen-specialist-3337875565025.jpg",
-  "euc-urearepair": "https://www.eucerin.fr/sites/g/files/rdmwob461/files/styles/product_detail_image/public/urearepair-plus-creme-visage-corps-5-uree.jpg",
-  "svr-sebiaclear": "https://www.svr.com/sites/default/files/styles/product/public/products/sebiaclear-gel-moussant.jpg",
-  "svr-hydra": "https://www.svr.com/sites/default/files/styles/product/public/products/hydraliane-legere.jpg",
-  "uri-eau-thermale": "https://www.uriage.com/sites/default/files/styles/product_main/public/products/eau-thermale-uriage-spray.jpg",
-  "uri-roseliane": "https://www.uriage.com/sites/default/files/styles/product_main/public/products/roseliane-creme-anti-rougeurs.jpg",
-  "ader-epitheliale": "https://www.a-derma.fr/sites/default/files/styles/product_full/public/products/epitheliale-ah-creme-reparatrice.jpg",
-  "ader-dermalibour": "https://www.a-derma.fr/sites/default/files/styles/product_full/public/products/dermalibour-creme-reparatrice.jpg",
-  "lie-hydragenist": "https://www.lierac.com/cdn/shop/products/Lierac-Hydragenist-Gel-Creme-50ml.jpg",
-  "lie-sebologie": "https://www.lierac.com/cdn/shop/products/Lierac-Sebologie-Solution-Keratolitique.jpg",
-  "nux-creme-fraiche": "https://www.nuxe.com/cdn/shop/products/creme-fraiche-de-beaute-creme-hydratante-48h-50ml.jpg",
-  "cau-vinoperfect": "https://www.caudalie.com/cdn/shop/products/vinoperfect-serum-eclat-anti-taches-30ml.jpg",
-  "pay-serum-eclat": "https://www.payot.com/cdn/shop/products/my-payot-serum-eclat.jpg",
-  "gar-potion-magique": "https://www.garancia.com/cdn/shop/products/potion-magique-soin-pores.jpg",
-  "tal-eye-therapy": "https://www.talika.com/cdn/shop/products/eye-therapy-patch.jpg",
-  "cla-spf": "https://www.clarins.fr/dw/image/v2/AAUW_PRD/on/demandware.static/-/Sites-clarins-master-catalog/default/images/large/uv-plus-anti-pollution-spf50-80038879.jpg",
-  "lan-renergie": "https://www.lancome.fr/dw/image/v2/AAUW_PRD/on/demandware.static/-/Sites-lancome-master-catalog/default/images/large/renergie-hcf-triple-serum-3614272974531.jpg"
+  "ng-bha": "https://www.pharmacie-du-centre.fr/media/catalog/product/cache/1/image/700x700/9df78eab33525d08d6e5fb8d27136e95/0/0/0086800108597.jpg"
 };
 
 // ─── PRODUITS ─────────────────────────────────────────────────────────────────
@@ -2414,7 +2391,19 @@ function analyzeSkin() {
         document.getElementById("scan-loading").style.display = "none";
         document.getElementById("scan-btn").disabled = false;
         document.getElementById("scan-btn-text").textContent = isEN ? "Retry" : "Reessayer";
-        alert(isEN ? "Analysis failed. Please try again with a clearer photo." : "Analyse echouee. Reessayez avec une photo plus nette.");
+        // Afficher un message d'erreur contextuel au lieu d'une alert
+        var errDiv = document.getElementById("scan-error-msg");
+        if (!errDiv) {
+            errDiv = document.createElement("div");
+            errDiv.id = "scan-error-msg";
+            errDiv.style.cssText = "background:#FFF0F0;border:1px solid #F5C0C0;border-radius:14px;padding:14px 16px;margin-bottom:12px;font-size:12px;line-height:1.6;color:#C62828";
+            var scanBtn = document.getElementById("scan-btn");
+            scanBtn.parentNode.insertBefore(errDiv, scanBtn);
+        }
+        errDiv.innerHTML = isEN 
+            ? "⚠️ <strong>Analysis failed.</strong> For best results:<br>• Good natural light (near a window)<br>• Hold phone 20–30 cm from face<br>• Full face visible, no glasses<br>• Neutral background"
+            : "⚠️ <strong>Analyse impossible.</strong> Pour de meilleurs résultats :<br>• Bonne lumière naturelle (près d'une fenêtre)<br>• Tenir le téléphone à 20–30 cm du visage<br>• Visage entier visible, sans lunettes<br>• Fond neutre de préférence";
+        errDiv.style.display = "block";
     });
 }
 
@@ -2857,7 +2846,7 @@ function imgHtml(key,marque,size){
   var init = words.length >= 2 && words[1] ? (words[0][0]+words[1][0]).toUpperCase() : (marque||"SK").substring(0,2).toUpperCase();
   var style = getBrandStyle(marque);
   return '<div style="width:'+size+'px;height:'+size+'px;border-radius:14px;background:'+style.bg+';display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;flex-shrink:0;overflow:hidden;position:relative">' +
-    (src ? '<img src="'+src+'" alt="'+marque+'" onerror="this.style.display=\'none\'" style="position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;border-radius:14px" />' : '') +
+    (src ? '<img src="'+src+'" alt="'+marque+'" style="position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;border-radius:14px" />' : '') +
     '<span style="font-size:'+(size>60?22:16)+'px;font-weight:900;color:'+style.tx+';letter-spacing:.5px;position:relative;z-index:1">'+init+'</span>' +
     '<span style="font-size:9px;font-weight:600;color:'+style.tx+';opacity:.8;text-align:center;padding:0 4px;max-width:'+(size-8)+'px;overflow:hidden;white-space:nowrap;position:relative;z-index:1">'+marque+'</span>' +
   '</div>';
