@@ -454,68 +454,87 @@ h2{font-family:var(--serif);font-size:20px;font-weight:700;margin-bottom:3px}
       <p class="sub" id="scan-sub">Prenez une photo de votre visage ou importez-en une. Notre IA analyse votre peau en quelques secondes.</p>
     </div>
 
-    <!-- Zone cadrage visage + upload -->
-    <div id="scan-upload-zone" style="margin-bottom:16px" onclick="document.getElementById('scan-file-input').click()" ondragover="event.preventDefault()" ondrop="handleScanDrop(event)">
-      
-      <!-- Cadre ovale visage -->
-      <div style="position:relative;width:100%;height:300px;background:#1a1a1a;border-radius:20px;overflow:hidden;cursor:pointer;display:flex;align-items:center;justify-content:center">
+    <!-- Caméra live intégrée avec ovale -->
+    <div id="scan-camera-zone" style="margin-bottom:16px">
+      <div style="position:relative;width:100%;height:340px;background:#111;border-radius:20px;overflow:hidden">
         
-        <!-- Fond sombre avec découpe ovale -->
-        <svg style="position:absolute;top:0;left:0;width:100%;height:100%" viewBox="0 0 360 300" preserveAspectRatio="xMidYMid slice">
+        <!-- Flux vidéo live -->
+        <video id="scan-video" autoplay playsinline muted style="width:100%;height:100%;object-fit:cover;display:block;transform:scaleX(-1)"></video>
+        
+        <!-- Canvas caché pour capturer -->
+        <canvas id="scan-canvas" style="display:none"></canvas>
+        
+        <!-- Overlay SVG avec ovale et masque -->
+        <svg id="scan-overlay" style="position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none" viewBox="0 0 360 340" preserveAspectRatio="xMidYMid slice">
           <defs>
-            <mask id="face-mask">
-              <rect width="360" height="300" fill="white"/>
-              <ellipse cx="180" cy="148" rx="105" ry="130" fill="black"/>
+            <mask id="oval-mask">
+              <rect width="360" height="340" fill="white"/>
+              <ellipse cx="180" cy="165" rx="115" ry="145" fill="black"/>
             </mask>
           </defs>
-          <!-- Overlay sombre autour de l'ovale -->
-          <rect width="360" height="300" fill="rgba(0,0,0,0.65)" mask="url(#face-mask)"/>
-          <!-- Contour ovale animé -->
-          <ellipse cx="180" cy="148" rx="105" ry="130" fill="none" stroke="#C4726A" stroke-width="2.5" stroke-dasharray="8 4" opacity="0.9">
-            <animateTransform attributeName="transform" type="rotate" from="0 180 148" to="360 180 148" dur="12s" repeatCount="indefinite"/>
-          </ellipse>
-          <!-- Coins guides -->
-          <line x1="180" y1="8" x2="180" y2="22" stroke="#C4726A" stroke-width="2" opacity="0.7"/>
-          <line x1="180" y1="274" x2="180" y2="288" stroke="#C4726A" stroke-width="2" opacity="0.7"/>
-          <line x1="65" y1="148" x2="79" y2="148" stroke="#C4726A" stroke-width="2" opacity="0.7"/>
-          <line x1="281" y1="148" x2="295" y2="148" stroke="#C4726A" stroke-width="2" opacity="0.7"/>
+          <!-- Zone sombre autour de l'ovale -->
+          <rect width="360" height="340" fill="rgba(0,0,0,0.55)" mask="url(#oval-mask)"/>
+          <!-- Contour ovale -->
+          <ellipse id="oval-border" cx="180" cy="165" rx="115" ry="145" fill="none" stroke="#C4726A" stroke-width="3" opacity="0.95"/>
+          <!-- 4 coins décoratifs -->
+          <path d="M180,15 L180,30" stroke="#C4726A" stroke-width="2.5" opacity="0.8"/>
+          <path d="M180,300 L180,315" stroke="#C4726A" stroke-width="2.5" opacity="0.8"/>
+          <path d="M58,165 L73,165" stroke="#C4726A" stroke-width="2.5" opacity="0.8"/>
+          <path d="M287,165 L302,165" stroke="#C4726A" stroke-width="2.5" opacity="0.8"/>
         </svg>
 
-        <!-- Icône centrale + texte -->
-        <div style="position:relative;z-index:2;text-align:center;pointer-events:none">
-          <div style="font-size:36px;margin-bottom:10px">📸</div>
-          <div id="scan-upload-text" style="font-size:14px;font-weight:700;color:#fff;margin-bottom:5px;text-shadow:0 1px 3px rgba(0,0,0,.5)">Centrez votre visage ici</div>
-          <div style="font-size:11px;color:rgba(255,255,255,.7);text-shadow:0 1px 2px rgba(0,0,0,.5)">Appuyez pour prendre ou importer une photo</div>
+        <!-- Message de guidage en haut -->
+        <div id="scan-guide-text" style="position:absolute;top:14px;left:0;right:0;text-align:center;z-index:10;pointer-events:none">
+          <span style="background:rgba(0,0,0,.6);color:#fff;border-radius:20px;padding:6px 16px;font-size:12px;font-weight:600;backdrop-filter:blur(4px)">📍 Centrez votre visage dans l'ovale</span>
         </div>
 
-        <!-- Badge conseils -->
-        <div style="position:absolute;bottom:14px;left:0;right:0;display:flex;justify-content:center;gap:8px;z-index:2">
-          <span style="background:rgba(0,0,0,.55);color:#fff;border-radius:20px;padding:4px 10px;font-size:10px;font-weight:600;backdrop-filter:blur(4px)">💡 Bonne lumière</span>
-          <span style="background:rgba(0,0,0,.55);color:#fff;border-radius:20px;padding:4px 10px;font-size:10px;font-weight:600;backdrop-filter:blur(4px)">😐 Face caméra</span>
-          <span style="background:rgba(0,0,0,.55);color:#fff;border-radius:20px;padding:4px 10px;font-size:10px;font-weight:600;backdrop-filter:blur(4px)">🕶️ Sans lunettes</span>
+        <!-- Badges conseils en bas -->
+        <div style="position:absolute;bottom:70px;left:0;right:0;display:flex;justify-content:center;gap:6px;z-index:10;pointer-events:none">
+          <span style="background:rgba(0,0,0,.55);color:#fff;border-radius:20px;padding:3px 9px;font-size:10px;font-weight:600">💡 Lumière naturelle</span>
+          <span style="background:rgba(0,0,0,.55);color:#fff;border-radius:20px;padding:3px 9px;font-size:10px;font-weight:600">😐 Face caméra</span>
+          <span style="background:rgba(0,0,0,.55);color:#fff;border-radius:20px;padding:3px 9px;font-size:10px;font-weight:600">🕶️ Sans lunettes</span>
+        </div>
+
+        <!-- Bouton capture (shutter) -->
+        <div style="position:absolute;bottom:14px;left:0;right:0;display:flex;justify-content:center;align-items:center;gap:20px;z-index:10">
+          <!-- Bouton retourner caméra -->
+          <button onclick="flipCamera()" style="width:42px;height:42px;border-radius:50%;background:rgba(255,255,255,.2);border:none;color:#fff;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(4px)">🔄</button>
+          <!-- Bouton capture principal -->
+          <button onclick="capturePhoto()" id="shutter-btn" style="width:68px;height:68px;border-radius:50%;background:#fff;border:4px solid #C4726A;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 20px rgba(0,0,0,.4)">
+            <div style="width:52px;height:52px;border-radius:50%;background:#C4726A"></div>
+          </button>
+          <!-- Bouton importer depuis galerie -->
+          <button onclick="document.getElementById('scan-file-input').click()" style="width:42px;height:42px;border-radius:50%;background:rgba(255,255,255,.2);border:none;color:#fff;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(4px)">🖼️</button>
+        </div>
+
+        <!-- Message caméra non disponible -->
+        <div id="scan-no-camera" style="display:none;position:absolute;inset:0;background:#111;border-radius:20px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;padding:24px">
+          <div style="font-size:40px">📷</div>
+          <div style="font-size:14px;font-weight:600;color:#fff;text-align:center">Caméra non disponible</div>
+          <div style="font-size:12px;color:rgba(255,255,255,.6);text-align:center">Importez une photo depuis votre galerie</div>
+          <button onclick="document.getElementById('scan-file-input').click()" style="padding:12px 24px;border-radius:50px;border:none;background:#C4726A;color:#fff;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">Choisir une photo 🖼️</button>
         </div>
       </div>
-      <input type="file" id="scan-file-input" accept="image/*" capture="user" style="display:none" onchange="handleScanFile(this)">
+      <input type="file" id="scan-file-input" accept="image/*" style="display:none" onchange="handleScanFile(this)">
     </div>
 
-    <!-- Aperçu photo avec cadre ovale -->
-    <div id="scan-preview" style="display:none;margin-bottom:16px;position:relative">
-      <div style="position:relative;width:100%;height:300px;background:#1a1a1a;border-radius:20px;overflow:hidden">
+    <!-- Aperçu photo capturée -->
+    <div id="scan-preview" style="display:none;margin-bottom:16px">
+      <div style="position:relative;width:100%;height:340px;background:#111;border-radius:20px;overflow:hidden">
         <img id="scan-img" style="width:100%;height:100%;object-fit:cover;display:block" alt="Photo peau">
-        <!-- Overlay ovale sur la preview -->
-        <svg style="position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none" viewBox="0 0 360 300" preserveAspectRatio="xMidYMid slice">
+        <svg style="position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none" viewBox="0 0 360 340" preserveAspectRatio="xMidYMid slice">
           <defs>
-            <mask id="face-mask-prev">
-              <rect width="360" height="300" fill="white"/>
-              <ellipse cx="180" cy="148" rx="105" ry="130" fill="black"/>
+            <mask id="oval-prev">
+              <rect width="360" height="340" fill="white"/>
+              <ellipse cx="180" cy="165" rx="115" ry="145" fill="black"/>
             </mask>
           </defs>
-          <rect width="360" height="300" fill="rgba(0,0,0,0.4)" mask="url(#face-mask-prev)"/>
-          <ellipse cx="180" cy="148" rx="105" ry="130" fill="none" stroke="#C4726A" stroke-width="2.5" opacity="0.9"/>
+          <rect width="360" height="340" fill="rgba(0,0,0,0.35)" mask="url(#oval-prev)"/>
+          <ellipse cx="180" cy="165" rx="115" ry="145" fill="none" stroke="#C4726A" stroke-width="2.5"/>
         </svg>
-        <button onclick="resetScan()" style="position:absolute;top:10px;right:10px;background:rgba(0,0,0,.6);border:none;border-radius:50%;width:32px;height:32px;color:#fff;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:10">×</button>
-        <div style="position:absolute;bottom:12px;left:0;right:0;text-align:center;z-index:10">
-          <span style="background:rgba(196,114,106,.85);color:#fff;border-radius:20px;padding:5px 14px;font-size:11px;font-weight:700">Prêt pour l'analyse ✓</span>
+        <button onclick="resetScan()" style="position:absolute;top:12px;right:12px;background:rgba(0,0,0,.6);border:none;border-radius:50%;width:34px;height:34px;color:#fff;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:10">×</button>
+        <div style="position:absolute;bottom:14px;left:0;right:0;text-align:center;z-index:10">
+          <span style="background:rgba(196,114,106,.9);color:#fff;border-radius:20px;padding:6px 16px;font-size:12px;font-weight:700">✓ Photo prête — lancez l'analyse</span>
         </div>
       </div>
     </div>
@@ -661,7 +680,7 @@ h2{font-family:var(--serif);font-size:20px;font-weight:700;margin-bottom:3px}
     <div class="step-lbl" id="step-lbl-3">Étape 3 / 5</div>
     <h2 id="q3-title">Vos problèmes de peau</h2><p class="sub" id="q3-sub">Sélectionnez tout ce qui vous concerne.</p>
     <div id="q3-concerns" class="chips"></div>
-    <div class="step-lbl" style="margin-bottom:10px">Sensibilités / Ingrédients à éviter</div>
+    <div class="step-lbl" style="margin-bottom:10px">Allergies / Ingrédients à éviter</div>
     <div id="q3-allergies" class="chips"></div>
     <button class="btn-p" id="q3-next" disabled onclick="go('q4')">Continuer</button>
   </div>
@@ -974,7 +993,7 @@ const T = {
     q1_title:"Type de peau",q1_sub:"Choisissez celui qui vous correspond.",
     q2_title:"Votre tranche d'âge",q2_sub:"Les besoins de votre peau évoluent avec l'âge.",
     q3_title:"Vos problèmes de peau",q3_sub:"Sélectionnez tout ce qui vous concerne.",
-    q3_allergies:"Sensibilités / Ingrédients à éviter",
+    q3_allergies:"Allergies / Ingrédients à éviter",
     q4_title:"Votre budget",q4_sub:"Par produit, en moyenne.",
     q5_title:"Type de routine",q5_sub:"Selon le temps que vous souhaitez y consacrer.",
     btn_continue:"Continuer",btn_generate:"Générer ma routine",btn_restart:"Recommencer",
@@ -982,7 +1001,7 @@ const T = {
     share_btn:"Partager ma routine",order_title:"Ordre d'application",
     tab_am:"☀️ Matin",tab_pm:"🌙 Soir",
     products_title:"Les produits sélectionnés",conseil_label:"💡 Conseil expert",
-    allergy_title:"Sensibilités enregistrées",allergy_text:"Vérifiez la composition. Ingrédients à éviter :",
+    allergy_title:"Allergies enregistrées",allergy_text:"Vérifiez la composition. Allergènes :",
     suivi_title:"Suivi à 4 semaines",
     suivi_text:"Votre peau évolue. Revenez dans 4 semaines pour ajuster votre routine.",
     suivi_btn:"Refaire le diagnostic",
@@ -1075,7 +1094,7 @@ const T = {
     q1_title:"Skin type",q1_sub:"Choose the one that best describes your skin.",
     q2_title:"Your age group",q2_sub:"Your skin needs change as you age.",
     q3_title:"Your skin concerns",q3_sub:"Select everything that applies to you.",
-    q3_allergies:"Sensitivities / Ingredients to avoid",
+    q3_allergies:"Allergies / Ingredients to avoid",
     q4_title:"Your budget",q4_sub:"Per product, on average.",
     q5_title:"Routine type",q5_sub:"Based on the time you want to dedicate.",
     btn_continue:"Continue",btn_generate:"Generate my routine",btn_restart:"Restart",
@@ -1083,7 +1102,7 @@ const T = {
     share_btn:"Share my routine",order_title:"Application order",
     tab_am:"☀️ Morning",tab_pm:"🌙 Evening",
     products_title:"Selected products",conseil_label:"💡 Expert tip",
-    allergy_title:"Declared sensitivities",allergy_text:"Check the full INCI list. Ingredients to avoid:",
+    allergy_title:"Registered allergies",allergy_text:"Check the ingredients. Declared allergens:",
     suivi_title:"4-week follow-up",
     suivi_text:"Your skin evolves. Come back in 4 weeks to adjust your routine.",
     suivi_btn:"Redo the diagnosis",
@@ -1480,19 +1499,17 @@ function getCompat(key,skin,concern,age,allergies){
   var p = DB[key];
   if (!p) return 70;
 
-  // Mapping allergie → champ INCI_DB
-  // "Alcool" → alcohol_denat (alcool dénaturé irritant uniquement, pas les alcools gras)
-  // "Huiles essentielles" → huile_essentielle (champ dédié, distinct du parfum synthétique)
+  // Vérifier allergies via INCI_DB
   var AMAP = {
     'Parfums / Fragrances':'parfum','Fragrances / Perfumes':'parfum',
     'Parabènes':'paraben','Parabens':'paraben',
-    'Alcool':'alcohol_denat','Alcohol':'alcohol_denat',
+    'Alcool':'alcohol','Alcohol':'alcohol',
     'Sulfates (SLS/SLES)':'sulfate','Silicones':'silicone',
     'Rétinol':'retinol','Retinol':'retinol',
     'Vitamine C':'vitc','Vitamin C':'vitc',
     'Acide salicylique':'salicylic','Salicylic acid':'salicylic',
     'Acides (AHA/BHA)':'aha_bha','Acids (AHA/BHA)':'aha_bha',
-    'Huiles essentielles':'huile_essentielle','Essential oils':'huile_essentielle',
+    'Huiles essentielles':'parfum','Essential oils':'parfum',
   };
   var inciProd = INCI_DB[key];
   var hasAllergenInProduct = (allergies||[]).some(function(allergy) {
@@ -1501,37 +1518,22 @@ function getCompat(key,skin,concern,age,allergies){
       var field = AMAP[allergy];
       return field && inciProd[field] === true;
     }
-    // Fallback sur comp[] (alcool = seulement alcohol denat dans le fallback)
+    // Fallback
     var allText = ((p.comp||[]).join(' ')+(p.ak||[]).join(' ')).toLowerCase();
-    var FALLBACK = {
-      'Rétinol':['retinol','retinyl'],'Retinol':['retinol','retinyl'],
-      'Vitamine C':['ascorbic acid'],'Vitamin C':['ascorbic acid'],
-      'Acide salicylique':['salicylic acid'],'Salicylic acid':['salicylic acid'],
-      'Parfums / Fragrances':['parfum','fragrance'],'Fragrances / Perfumes':['parfum','fragrance'],
-      'Alcool':['alcohol denat'],'Alcohol':['alcohol denat'],
-      'Huiles essentielles':['essential oil','huile essentielle','lavandula','citrus','mentha'],'Essential oils':['essential oil','huile essentielle','lavandula','citrus','mentha'],
-    };
+    var FALLBACK = {'Rétinol':['retinol','retinyl'],'Vitamine C':['ascorbic acid'],'Acide salicylique':['salicylic acid'],'Parfums / Fragrances':['parfum','fragrance']};
     return (FALLBACK[allergy]||[]).some(function(ing){return allText.includes(ing);});
   });
   if (hasAllergenInProduct) return 15;
 
-  // Score de base 65 (plus réaliste) + bonus selon correspondance peau/actif + malus si inadapté
-  var s = 65;
+  var s = 72;
   if (p.clean) s += 8;
-  if (p.yuka >= 85) s += 5; else if (p.yuka < 60) s -= 5;
-  // Bonus type de peau
-  if (skin === 'sensible' && p.yuka >= 75 && !((INCI_DB[key]||{}).parfum)) s += 8;
-  if (skin === 'sensible' && (INCI_DB[key]||{}).parfum) s -= 6;
+  if (skin === 'sensible' && p.yuka >= 75) s += 8;
   if (skin === 'grasse' && (p.ak||[]).some(function(a){return a.toLowerCase().includes('niacinamide');})) s += 7;
-  if (skin === 'grasse' && (p.ak||[]).some(function(a){return a.toLowerCase().includes('hydrat')||a.toLowerCase().includes('beurre');})) s -= 4;
-  if (skin === 'seche' && (p.ak||[]).some(function(a){return a.toLowerCase().includes('hyaluronique')||a.toLowerCase().includes('ceramide')||a.toLowerCase().includes('beurre');})) s += 7;
-  if (skin === 'seche' && (INCI_DB[key]||{}).alcohol_denat) s -= 5;
-  // Bonus préoccupation
-  if (age === '46+' && (p.ak||[]).some(function(a){return a.toLowerCase().includes('ride')||a.toLowerCase().includes('proxylane')||a.toLowerCase().includes('retinol');})) s += 7;
+  if (skin === 'seche' && (p.ak||[]).some(function(a){return a.toLowerCase().includes('hyaluronique') || a.toLowerCase().includes('ceramide');})) s += 7;
+  if (age === '46+' && (p.ak||[]).some(function(a){return a.includes('ride')||a.includes('Proxylane')||a.includes('retinol');})) s += 7;
   if (concern === 'acne' && (p.ak||[]).some(function(a){return a.toLowerCase().includes('salicylique')||a.toLowerCase().includes('niacinamide');})) s += 8;
   if (concern === 'taches' && (p.ak||[]).some(function(a){return a.toLowerCase().includes('vitamine c')||a.toLowerCase().includes('niacinamide');})) s += 8;
-  if (concern === 'rougeurs' && (INCI_DB[key]||{}).parfum) s -= 5;
-  return Math.min(99, Math.max(30, s));
+  return Math.min(99, Math.max(72, s));
 }
 
 function getRegionProducts() {
@@ -1648,118 +1650,88 @@ function build(){
   const avail = (key) => regionKeys.has(key) && DB[key];
 
   // Mapping allergie → champ INCI_DB
-  // Alcool → alcohol_denat (alcool dénaturé uniquement, pas les alcools gras bénéfiques)
-  // Huiles essentielles → huile_essentielle (champ dédié)
   const ALLERGY_INCI_MAP_BUILD = {
     'Parfums / Fragrances':'parfum','Fragrances / Perfumes':'parfum',
     'Parabènes':'paraben','Parabens':'paraben',
-    'Alcool':'alcohol_denat','Alcohol':'alcohol_denat',
+    'Alcool':'alcohol','Alcohol':'alcohol',
     'Sulfates (SLS/SLES)':'sulfate',
     'Silicones':'silicone',
     'Rétinol':'retinol','Retinol':'retinol',
     'Vitamine C':'vitc','Vitamin C':'vitc',
     'Acide salicylique':'salicylic','Salicylic acid':'salicylic',
     'Acides (AHA/BHA)':'aha_bha','Acids (AHA/BHA)':'aha_bha',
-    'Huiles essentielles':'huile_essentielle','Essential oils':'huile_essentielle',
+    'Huiles essentielles':'parfum','Essential oils':'parfum',
   };
 
   // Filtre allergies : exclure les produits qui contiennent un allergène déclaré
   const hasAllergen = (key) => {
     if (!DB[key]) return false;
-    const userAllergies = (ST.allergies || []).filter(a=>a!=='Aucune allergie connue'&&a!=='No known allergies');
+    const userAllergies = ST.allergies || [];
     if (userAllergies.length === 0) return false;
+    // Vérifier via INCI_DB en priorité
     const inciProd = INCI_DB[key];
     if (inciProd) {
       return userAllergies.some(function(allergy) {
+        if (allergy === 'Aucune allergie connue' || allergy === 'No known allergies') return false;
         const field = ALLERGY_INCI_MAP_BUILD[allergy];
         return field && inciProd[field] === true;
       });
     }
-    // Fallback sur comp[] — alcool = seulement alcohol denat, HE par noms botaniques
+    // Fallback sur comp[]
     const p = DB[key];
     const allText = ((p.comp||[]).join(' ') + ' ' + (p.ak||[]).join(' ')).toLowerCase();
     const ALLERGY_MAP_FALLBACK = {
-      'Parfums / Fragrances':['parfum','fragrance'],'Fragrances / Perfumes':['parfum','fragrance'],
-      'Parabènes':['paraben'],'Parabens':['paraben'],
-      'Alcool':['alcohol denat'],'Alcohol':['alcohol denat'],
-      'Rétinol':['retinol','retinyl'],'Retinol':['retinol','retinyl'],
-      'Vitamine C':['ascorbic acid'],'Vitamin C':['ascorbic acid'],
-      'Acide salicylique':['salicylic acid'],'Salicylic acid':['salicylic acid'],
-      'Acides (AHA/BHA)':['glycolic acid','lactic acid','salicylic acid'],'Acids (AHA/BHA)':['glycolic acid','lactic acid','salicylic acid'],
-      'Huiles essentielles':['essential oil','lavandula','citrus','mentha','tea tree'],'Essential oils':['essential oil','lavandula','citrus','mentha','tea tree'],
+      'Parfums / Fragrances':['parfum','fragrance'],
+      'Parabènes':['paraben'],'Alcool':['alcohol denat'],
+      'Rétinol':['retinol','retinyl'],'Vitamine C':['ascorbic acid'],
+      'Acide salicylique':['salicylic acid'],'Acides (AHA/BHA)':['glycolic acid','lactic acid','salicylic acid'],
     };
     return userAllergies.some(function(allergy) {
+      if (allergy === 'Aucune allergie connue') return false;
       return (ALLERGY_MAP_FALLBACK[allergy]||[]).some(ing => allText.includes(ing));
     });
   };
 
   const safeAvail = (key) => avail(key) && !hasAllergen(key);
   const mk=(key,etape,moment)=>({etape,moment,key,...DB[key],img:IMGS[key],pourquoi:getWhy(key,sk,c[0],ST.ageGroup),compat:getCompat(key,sk,c[0],ST.ageGroup,ST.allergies)});
-
-  // Vraies clés de remplacement si un produit est déjà utilisé dans la routine
-  const STEP_ALTS = {
-    "cv-gel":"lrp-effgel","lrp-effgel":"cv-gel","cv-crem":"lrp-tol","lrp-tol":"cv-crem",
-    "cv-mou":"bd-sens","bd-sens":"cv-mou","lrp-effduo":"svr-hydra","svr-hydra":"lrp-effduo",
-  };
-
   const addStep=(key,etape,moment)=>{
     if(!key||!DB[key])return;
     if(usedKeys.has(key)){
-      const altKey=STEP_ALTS[key];
-      if(!altKey||usedKeys.has(altKey)||!DB[altKey])return;
-      key=altKey;
-    }
-    if(hasAllergen(key)){
-      // Signaler le produit exclu pour l'avertissement
-      ST._excludedByAllergy=(ST._excludedByAllergy||0)+1;
-      return;
+      const alts={"cv-gel":"https://m.media-amazon.com/images/I/61S6p8gFMeL._AC_SL1500_.jpg","lrp-effgel":"https://www.laroche-posay.fr/dw/image/v2/AANG_PRD/on/demandware.static/-/Sites-lrp-master-catalog/default/dw1c8e6f9b/2023/LRP_Effaclar_Gel_Purifiant_400ml_3337875520731.jpg","cv-crem":"https://m.media-amazon.com/images/I/61FvCqKqkKL._AC_SL1500_.jpg","lrp-tol":"https://www.laroche-posay.fr/dw/image/v2/AANG_PRD/on/demandware.static/-/Sites-lrp-master-catalog/default/dw8c5b2a1f/2023/LRP_Toleriane_Dermallergo_40ml.jpg","lrp-effduo":"https://www.laroche-posay.fr/dw/image/v2/AANG_PRD/on/demandware.static/-/Sites-lrp-master-catalog/default/dwe5c2c8d2/2022/LRP_Effaclar_DuoPlus_M_40ml_3337875596704.jpg","cv-mou":"https://m.media-amazon.com/images/I/61hFpfpS0ZL._AC_SL1500_.jpg"};
+      key=alts[key]||key;
+      if(usedKeys.has(key))return;
     }
     usedKeys.add(key);
     steps.push(mk(key,etape,moment));
   };
-
   const nk=ROUTE.net[sk]?.[b]||"cv-mou";
   const hk=ROUTE.hyd[sk]?.[b]||"cv-crem";
   const sk2=ROUTE.spf[b]||ROUTE.spf.mid;
-  ST._excludedByAllergy=0;
-
-  if(ST.routine==="simple"){
-    addStep(nk,"Nettoyant","AM+PM");addStep(hk,"Hydratant","AM+PM");addStep(sk2,"Protection solaire","AM");
-  }
+  if(ST.routine==="simple"){addStep(nk,"Nettoyant","AM+PM");addStep(hk,"Hydratant","AM+PM");addStep(sk2,"Protection solaire","AM");}
   if(ST.routine==="specifique"){
-    // Routine ciblée = nettoyant + soin ciblé + hydratant + SPF (routine complète centrée sur le soin ciblé)
     const srk=ROUTE.ser[c[0]]?.[b]||"cv-vitc";
     const prod=DB[srk];
-    addStep(nk,"Nettoyant","AM+PM");
     addStep(srk,"Soin ciblé",prod?prod.moment:"AM+PM");
-    addStep(hk,"Hydratant","AM+PM");
-    addStep(sk2,"Protection solaire","AM");
   }
   if(ST.routine==="complete"){
     addStep(nk,"Nettoyant","AM+PM");
     c.slice(0,2).forEach((cc,i)=>{const srk=ROUTE.ser[cc]?.[b];addStep(srk,i===0?"Sérum principal":"Sérum soir",i===0?"AM+PM":"PM");});
     addStep(hk,"Hydratant","AM+PM");addStep(sk2,"Protection solaire","AM");
   }
-
-  // Détecter les interactions actifs à risque dans la routine
-  const interactions=[];
-  const hasRetinol=steps.some(s=>(INCI_DB[s.key]||{}).retinol);
-  const hasAhaBha=steps.some(s=>(INCI_DB[s.key]||{}).aha_bha);
-  const hasVitC=steps.some(s=>(INCI_DB[s.key]||{}).vitc);
-  if(hasRetinol&&hasAhaBha) interactions.push(LANG==='en'?'⚠️ Retinol + AHA/BHA: risk of over-exfoliation. Use on alternating evenings.':'⚠️ Rétinol + AHA/BHA : risque de sur-exfoliation. Utilise en alternance le soir.');
-  if(hasRetinol&&hasVitC) interactions.push(LANG==='en'?'⚠️ Retinol + Vitamin C: do not use at the same time. Vitamin C in the morning, retinol in the evening.':'⚠️ Rétinol + Vitamine C : ne pas utiliser simultanément. Vitamine C le matin, rétinol le soir.');
-
-  // Trier les produits par ordre logique d'application (pas par Yuka) : nettoyant → sérums → hydratant → SPF
-  const ETAPE_ORDER={'Nettoyant':1,'Soin ciblé':2,'Sérum principal':2,'Sérum soir':3,'Hydratant':4,'Protection solaire':5};
-  steps.sort((a,b)=>(ETAPE_ORDER[a.etape]||3)-(ETAPE_ORDER[b.etape]||3));
-
+  // Trier TOUS les produits par note Yuka décroissante (SPF toujours en dernier)
+  const fixedZ=steps.filter(s=>s.etape==="Protection solaire");
+  const nonSpf=steps.filter(s=>s.etape!=="Protection solaire");
+  nonSpf.sort((a,b)=>(b.yuka||0)-(a.yuka||0));
+  steps.length=0;
+  nonSpf.forEach(s=>steps.push(s));
+  fixedZ.forEach(s=>steps.push(s));
   const l=T[LANG]||T.fr;
   const CONS=l.conseils||T.fr.conseils;
   const skinL=l.intro_skin||T.fr.intro_skin;
   const tpl=l.intro_tpl||T.fr.intro_tpl;
   const introStr=tpl.replace('{skin}',skinL[ST.skinType]||'').replace('{age}',ST.ageGroup?' ('+ST.ageGroup+')':'');
   const totalPrix=steps.reduce((a,s)=>{const n=parseFloat((s.prix||"0").replace("€","").replace("~",""));return isNaN(n)?a:a+n;},0);
-  return{intro:introStr,steps,conseil:CONS[c[0]]||"Une routine simple appliquée chaque jour surpasse une routine complexe abandonnée.",totalPrix,interactions,excludedByAllergy:ST._excludedByAllergy||0};
+  return{intro:introStr,steps,conseil:CONS[c[0]]||"Une routine simple appliquée chaque jour surpasse une routine complexe abandonnée.",totalPrix};
 }
 
 function t(key){ return (T[LANG]&&T[LANG][key]!==undefined)?T[LANG][key]:(T.fr[key]||key); }
@@ -1860,7 +1832,7 @@ function getRegionProducts() {
   return available;
 }
 
-const SCREENS=["lang","welcome","register","login","scan","q1","diag","q2","q3","q4","q5","result","compare","suivi","dashboard","scan-product"];
+const SCREENS=["lang","welcome","register","login","scan","q1","diag","q2","q3","q4","q5","result","compare","suivi","dashboard","scan-product","profile"];
 
 const ST={
   screen:'lang',user:null,
@@ -1871,10 +1843,14 @@ const ST={
 };
 
 function go(screen){
+  // Stopper la caméra si on quitte l'écran scan
+  if (ST.screen === 'scan' && screen !== 'scan') stopCamera();
   SCREENS.forEach(s=>{const el=document.getElementById("sc-"+s);if(el)el.classList.toggle("hidden",s!==screen);});
   ST.screen=screen;
   window.scrollTo(0,0);
   if(screen==='welcome') setTimeout(applyWelcomeLang,10);
+  // Démarrer la caméra quand on arrive sur scan
+  if(screen==='scan') setTimeout(function(){ startCamera(); }, 100);
 }
 
 function setLang(l){
@@ -2238,6 +2214,83 @@ function initQuestions(){
 var scanBase64 = null;
 var scanResult = null;
 
+// ══ CAMÉRA LIVE ══
+var cameraStream = null;
+var facingMode = "user"; // caméra frontale par défaut
+
+function startCamera() {
+    var video = document.getElementById("scan-video");
+    var noCam = document.getElementById("scan-no-camera");
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+        if (noCam) noCam.style.display = "flex";
+        return;
+    }
+    navigator.mediaDevices.getUserMedia({ 
+        video: { facingMode: facingMode, width: { ideal: 720 }, height: { ideal: 960 } }, 
+        audio: false 
+    })
+    .then(function(stream) {
+        cameraStream = stream;
+        video.srcObject = stream;
+        video.style.display = "block";
+        video.style.transform = facingMode === "user" ? "scaleX(-1)" : "scaleX(1)";
+        if (noCam) noCam.style.display = "none";
+    })
+    .catch(function(err) {
+        console.log("Camera error:", err);
+        if (noCam) noCam.style.display = "flex";
+        if (video) video.style.display = "none";
+    });
+}
+
+function stopCamera() {
+    if (cameraStream) {
+        cameraStream.getTracks().forEach(function(t) { t.stop(); });
+        cameraStream = null;
+    }
+    var video = document.getElementById("scan-video");
+    if (video) video.srcObject = null;
+}
+
+function flipCamera() {
+    facingMode = facingMode === "user" ? "environment" : "user";
+    stopCamera();
+    startCamera();
+}
+
+function capturePhoto() {
+    var video = document.getElementById("scan-video");
+    var canvas = document.getElementById("scan-canvas");
+    if (!video || !canvas || !video.videoWidth) return;
+    
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+    var ctx = canvas.getContext("2d");
+    
+    // Miroir si caméra frontale
+    if (facingMode === "user") {
+        ctx.translate(canvas.width, 0);
+        ctx.scale(-1, 1);
+    }
+    ctx.drawImage(video, 0, 0);
+    
+    var dataUrl = canvas.toDataURL("image/jpeg", 0.9);
+    scanBase64 = dataUrl.split(",")[1];
+    
+    document.getElementById("scan-img").src = dataUrl;
+    document.getElementById("scan-camera-zone").style.display = "none";
+    document.getElementById("scan-preview").style.display = "block";
+    document.getElementById("scan-btn").disabled = false;
+    
+    stopCamera();
+    
+    // Flash effect
+    var flash = document.createElement("div");
+    flash.style.cssText = "position:fixed;inset:0;background:#fff;z-index:9999;opacity:0.8;pointer-events:none;transition:opacity 0.3s";
+    document.body.appendChild(flash);
+    setTimeout(function() { flash.style.opacity = "0"; setTimeout(function() { flash.remove(); }, 300); }, 50);
+}
+
 function handleScanFile(input) {
     var file = input.files[0];
     if (!file) return;
@@ -2256,9 +2309,10 @@ function loadScanImage(file) {
         var dataUrl = e.target.result;
         scanBase64 = dataUrl.split(",")[1];
         document.getElementById("scan-img").src = dataUrl;
-        document.getElementById("scan-upload-zone").style.display = "none";
+        document.getElementById("scan-camera-zone").style.display = "none";
         document.getElementById("scan-preview").style.display = "block";
         document.getElementById("scan-btn").disabled = false;
+        stopCamera();
     };
     reader.readAsDataURL(file);
 }
@@ -2266,11 +2320,13 @@ function loadScanImage(file) {
 function resetScan() {
     scanBase64 = null;
     scanResult = null;
-    document.getElementById("scan-upload-zone").style.display = "block";
+    document.getElementById("scan-camera-zone").style.display = "block";
     document.getElementById("scan-preview").style.display = "none";
-    document.getElementById("scan-product-result").style.display = "none";
+    document.getElementById("scan-result").style.display = "none";
+    if (document.getElementById("scan-product-result")) document.getElementById("scan-product-result").style.display = "none";
     document.getElementById("scan-btn").disabled = true;
     document.getElementById("scan-file-input").value = "";
+    startCamera();
 }
 
 function analyzeSkin() {
@@ -2732,31 +2788,7 @@ async function validerAutreConcern() {
 }
 
 function togConcern(id,el){const i=ST.concerns.indexOf(id);if(i>-1){ST.concerns.splice(i,1);el.classList.remove("on");}else{ST.concerns.push(id);el.classList.add("on");}document.getElementById("q3-next").disabled=ST.concerns.length===0;}
-function togAllergy(el){
-  const a=el.textContent.trim();
-  const noA=['Aucune allergie connue','No known allergies'];
-  const isNoA=noA.includes(a);
-  if(isNoA){
-    const i=ST.allergies.findIndex(x=>noA.includes(x));
-    if(i>-1){ST.allergies.splice(i,1);el.classList.remove("on");}
-    else{
-      ST.allergies=ST.allergies.filter(x=>noA.includes(x));
-      ST.allergies.push(a);
-      document.querySelectorAll("#q3-allergies .chip").forEach(c=>{c.classList.remove("on");});
-      el.classList.add("on");
-    }
-    return;
-  }
-  // Remove "Aucune allergie connue" if a real allergen is selected
-  const noIdx=ST.allergies.findIndex(x=>noA.includes(x));
-  if(noIdx>-1){
-    ST.allergies.splice(noIdx,1);
-    document.querySelectorAll("#q3-allergies .chip").forEach(c=>{if(noA.includes(c.textContent.trim()))c.classList.remove("on");});
-  }
-  const i=ST.allergies.indexOf(a);
-  if(i>-1){ST.allergies.splice(i,1);el.classList.remove("on");}
-  else{ST.allergies.push(a);el.classList.add("on");}
-}
+function togAllergy(el){const a=el.textContent;const i=ST.allergies.indexOf(a);if(i>-1){ST.allergies.splice(i,1);el.classList.remove("on");}else{ST.allergies.push(a);el.classList.add("on");}}
 function pickBudget(id,el){
   ST.budget=id;
   document.querySelectorAll("#q4-opts .sr").forEach(b=>{
@@ -2836,9 +2868,7 @@ function doGenerate(){
 
 function renderResult(){
   const r=ST.result;
-  const noALabels=['Aucune allergie connue','No known allergies'];
-  const activeAllergies=(ST.allergies||[]).filter(a=>!noALabels.includes(a));
-  const hasA=activeAllergies.length>0;
+  const hasA=ST.allergies.length>0&&!ST.allergies.includes("Aucune allergie connue");
   const amSteps=r.steps.filter(s=>s.moment==="AM"||s.moment==="AM+PM");
   const pmSteps=r.steps.filter(s=>s.moment==="PM"||s.moment==="AM+PM");
 
@@ -2920,12 +2950,10 @@ function renderResult(){
       ${roHtml(amSteps,"ro-am")}
       <div id="ro-pm" style="display:none">${roHtml(pmSteps,"").innerHTML||""}</div>
     </div>
-    ${hasA?`<div class="aw" style="margin-bottom:12px"><svg width="16" height="16" viewBox="0 0 24 24" fill="#C4956A" style="flex-shrink:0;margin-top:1px"><path d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z"/></svg><div><div class="aw-t">${t('allergy_title')}</div><p class="aw-txt">${t('allergy_text')} ${activeAllergies.join(', ')}.</p></div></div>`:""}
-    ${(r.excludedByAllergy&&r.excludedByAllergy>0)?`<div class="aw" style="margin-bottom:12px;background:#FFF3E0;border-color:#FFB300"><svg width="16" height="16" viewBox="0 0 24 24" fill="#E65100" style="flex-shrink:0;margin-top:1px"><path d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z"/></svg><div><div class="aw-t" style="color:#E65100">${LANG==='en'?'Incomplete routine':'Routine incomplète'}</div><p class="aw-txt">${LANG==='en'?r.excludedByAllergy+' product(s) were excluded due to your declared sensitivities. Your routine may be shorter than usual. Consider consulting a dermatologist for personalised alternatives.':r.excludedByAllergy+' produit(s) exclu(s) en raison de tes sensibilités déclarées. Ta routine peut être plus courte qu\'habituellement. Consulte un dermatologue pour des alternatives personnalisées.'}</p></div></div>`:""}
-    ${(r.interactions&&r.interactions.length>0)?`<div class="aw" style="margin-bottom:12px;background:#E3F2FD;border-color:#1565C0"><svg width="16" height="16" viewBox="0 0 24 24" fill="#1565C0" style="flex-shrink:0;margin-top:1px"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg><div><div class="aw-t" style="color:#1565C0">${LANG==='en'?'Active ingredient interactions':'Interactions entre actifs'}</div>${r.interactions.map(i=>`<p class="aw-txt">${i}</p>`).join('')}</div></div>`:""}
     <div class="section-lbl">${t('products_title')}</div>
     ${stepsHtml}
     <div class="conseil"><div class="conseil-lbl">${t('conseil_label')}</div><div class="conseil-txt">${r.conseil}</div></div>
+    ${hasA?`<div class="aw"><svg width="16" height="16" viewBox="0 0 24 24" fill="#C4956A" style="flex-shrink:0;margin-top:1px"><path d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z"/></svg><div><div class="aw-t">${t('allergy_title')}</div><p class="aw-txt">${t('allergy_text')} ${ST.allergies.join(', ')}.</p></div></div>`:""}
     <div class="suivi">
       <div class="suivi-t">${t('suivi_title')}</div>
       <p class="suivi-txt">${t('suivi_text')}</p>
@@ -4141,164 +4169,135 @@ function confirmTerms() {
 
 
 var INCI_DB = {
-  // Légende champs ajoutés :
-  // alcohol_denat : alcool dénaturé irritant (≠ alcools gras cetyl/stearyl qui sont sûrs)
-  // huile_essentielle : contient des huiles essentielles (lavande, agrumes, tea tree, etc.)
-  "cv-gel": {retinol:false,parfum:false,paraben:false,alcohol:false,alcohol_denat:false,sulfate:false,silicone:false,vitc:false,salicylic:true,aha_bha:true,huile_essentielle:false},
-  // cv-crem : reformulé 2021, plus de parabènes. Contient cetyl alcohol (alcool gras, non irritant)
-  "cv-crem": {retinol:false,parfum:false,paraben:false,alcohol:true,alcohol_denat:false,sulfate:false,silicone:false,vitc:false,salicylic:false,aha_bha:false,huile_essentielle:false},
-  // cv-ret : contient cetearyl alcohol (alcool gras), pas d'alcohol denat
-  "cv-ret": {retinol:true,parfum:false,paraben:false,alcohol:true,alcohol_denat:false,sulfate:false,silicone:false,vitc:false,salicylic:false,aha_bha:false,huile_essentielle:false},
-  // cv-mou : contient cetyl alcohol (alcool gras)
-  "cv-mou": {retinol:false,parfum:false,paraben:false,alcohol:true,alcohol_denat:false,sulfate:false,silicone:true,vitc:false,salicylic:false,aha_bha:false,huile_essentielle:false},
-  // cv-vitc : contient alcohol denat comme véhicule du sérum
-  "cv-vitc": {retinol:false,parfum:false,paraben:false,alcohol:true,alcohol_denat:true,sulfate:false,silicone:false,vitc:true,salicylic:false,aha_bha:false,huile_essentielle:false},
-  // cv-eye : contient cetyl alcohol (alcool gras)
-  "cv-eye": {retinol:false,parfum:false,paraben:false,alcohol:true,alcohol_denat:false,sulfate:false,silicone:false,vitc:false,salicylic:false,aha_bha:false,huile_essentielle:false},
-  "lrp-effgel": {retinol:false,parfum:false,paraben:false,alcohol:false,alcohol_denat:false,sulfate:true,silicone:false,vitc:false,salicylic:false,aha_bha:false,huile_essentielle:false},
-  // lrp-effduo : contient alcohol denat et parfum modifié
-  "lrp-effduo": {retinol:false,parfum:true,paraben:false,alcohol:true,alcohol_denat:true,sulfate:false,silicone:true,vitc:false,salicylic:false,aha_bha:false,huile_essentielle:false},
-  "lrp-cica": {retinol:false,parfum:false,paraben:false,alcohol:false,alcohol_denat:false,sulfate:false,silicone:true,vitc:false,salicylic:false,aha_bha:false,huile_essentielle:false},
-  "lrp-tol": {retinol:false,parfum:false,paraben:false,alcohol:false,alcohol_denat:false,sulfate:false,silicone:false,vitc:false,salicylic:false,aha_bha:false,huile_essentielle:false},
-  "lrp-anth": {retinol:false,parfum:false,paraben:false,alcohol:true,alcohol_denat:false,sulfate:false,silicone:true,vitc:false,salicylic:false,aha_bha:false,huile_essentielle:false},
-  // lrp-hyalu : contient alcohol denat
-  "lrp-hyalu": {retinol:false,parfum:true,paraben:false,alcohol:true,alcohol_denat:true,sulfate:false,silicone:false,vitc:false,salicylic:false,aha_bha:true,huile_essentielle:false},
-  "bd-sens": {retinol:false,parfum:false,paraben:false,alcohol:false,alcohol_denat:false,sulfate:false,silicone:false,vitc:false,salicylic:false,aha_bha:false,huile_essentielle:false},
-  "bd-sebgel": {retinol:false,parfum:false,paraben:false,alcohol:false,alcohol_denat:false,sulfate:false,silicone:false,vitc:false,salicylic:true,aha_bha:true,huile_essentielle:false},
-  "bd-hydra": {retinol:false,parfum:false,paraben:false,alcohol:false,alcohol_denat:false,sulfate:false,silicone:false,vitc:false,salicylic:false,aha_bha:false,huile_essentielle:false},
-  // bd-sebser : contient alcohol denat
-  "bd-sebser": {retinol:false,parfum:false,paraben:false,alcohol:true,alcohol_denat:true,sulfate:false,silicone:false,vitc:false,salicylic:true,aha_bha:true,huile_essentielle:false},
-  // av-tol : contient alcohol denat
-  "av-tol": {retinol:false,parfum:false,paraben:false,alcohol:true,alcohol_denat:true,sulfate:false,silicone:false,vitc:false,salicylic:false,aha_bha:false,huile_essentielle:false},
-  "av-lait": {retinol:false,parfum:false,paraben:false,alcohol:false,alcohol_denat:false,sulfate:false,silicone:false,vitc:false,salicylic:false,aha_bha:false,huile_essentielle:false},
-  // vic-minral89 : contient alcohol denat
-  "vic-minral89": {retinol:false,parfum:false,paraben:false,alcohol:true,alcohol_denat:true,sulfate:false,silicone:false,vitc:false,salicylic:false,aha_bha:false,huile_essentielle:false},
-  // vic-normaderm : contient alcohol denat + parfum
-  "vic-normaderm": {retinol:false,parfum:true,paraben:false,alcohol:true,alcohol_denat:true,sulfate:false,silicone:true,vitc:false,salicylic:true,aha_bha:true,huile_essentielle:false},
-  // vic-liftactiv : contient alcohol denat + parfum
-  "vic-liftactiv": {retinol:false,parfum:true,paraben:false,alcohol:true,alcohol_denat:true,sulfate:false,silicone:false,vitc:false,salicylic:false,aha_bha:false,huile_essentielle:false},
-  "vic-capital": {retinol:false,parfum:true,paraben:false,alcohol:true,alcohol_denat:true,sulfate:false,silicone:true,vitc:false,salicylic:false,aha_bha:false,huile_essentielle:false},
-  "vic-slow-age": {retinol:false,parfum:true,paraben:false,alcohol:true,alcohol_denat:true,sulfate:false,silicone:false,vitc:false,salicylic:false,aha_bha:false,huile_essentielle:false},
-  // nux-huile-prodigieuse : contient de nombreuses HE (rose, camomille, néroli, iris…)
-  "nux-huile-prodigieuse": {retinol:false,parfum:true,paraben:false,alcohol:false,alcohol_denat:false,sulfate:false,silicone:false,vitc:false,salicylic:false,aha_bha:false,huile_essentielle:true},
-  "nux-creme-fraiche": {retinol:false,parfum:true,paraben:false,alcohol:true,alcohol_denat:false,sulfate:false,silicone:false,vitc:false,salicylic:false,aha_bha:false,huile_essentielle:false},
-  // nux-reve-de-miel : contient des HE (miel, cire d'abeille, extraits botaniques parfumés)
-  "nux-reve-de-miel": {retinol:false,parfum:true,paraben:false,alcohol:false,alcohol_denat:false,sulfate:false,silicone:false,vitc:false,salicylic:false,aha_bha:false,huile_essentielle:true},
-  "nux-merveillance": {retinol:false,parfum:true,paraben:false,alcohol:true,alcohol_denat:false,sulfate:false,silicone:false,vitc:false,salicylic:false,aha_bha:false,huile_essentielle:false},
-  "cau-vinoperfect": {retinol:false,parfum:true,paraben:false,alcohol:true,alcohol_denat:true,sulfate:false,silicone:false,vitc:false,salicylic:false,aha_bha:false,huile_essentielle:false},
-  "cau-vinosource": {retinol:false,parfum:true,paraben:false,alcohol:true,alcohol_denat:true,sulfate:false,silicone:false,vitc:false,salicylic:false,aha_bha:false,huile_essentielle:false},
-  "cau-resveratrol": {retinol:false,parfum:true,paraben:false,alcohol:true,alcohol_denat:true,sulfate:false,silicone:false,vitc:false,salicylic:false,aha_bha:false,huile_essentielle:false},
-  "cau-spf": {retinol:false,parfum:true,paraben:false,alcohol:true,alcohol_denat:true,sulfate:false,silicone:true,vitc:false,salicylic:false,aha_bha:false,huile_essentielle:false},
-  "cla-double-serum": {retinol:false,parfum:true,paraben:false,alcohol:true,alcohol_denat:true,sulfate:false,silicone:false,vitc:false,salicylic:false,aha_bha:false,huile_essentielle:false},
-  "cla-hydra-essentiel": {retinol:false,parfum:true,paraben:false,alcohol:true,alcohol_denat:true,sulfate:false,silicone:false,vitc:false,salicylic:false,aha_bha:false,huile_essentielle:false},
-  "cla-multi-active": {retinol:false,parfum:true,paraben:false,alcohol:false,alcohol_denat:false,sulfate:false,silicone:false,vitc:false,salicylic:false,aha_bha:false,huile_essentielle:false},
-  "cla-spf": {retinol:false,parfum:true,paraben:false,alcohol:true,alcohol_denat:true,sulfate:false,silicone:true,vitc:false,salicylic:false,aha_bha:false,huile_essentielle:false},
-  // skc-* : SkinCeuticals, alcools dans sérum = alcohol denat typiquement
-  "skc-cef": {retinol:false,parfum:false,paraben:false,alcohol:true,alcohol_denat:true,sulfate:false,silicone:false,vitc:true,salicylic:false,aha_bha:false,huile_essentielle:false},
-  "skc-ph": {retinol:false,parfum:false,paraben:false,alcohol:true,alcohol_denat:true,sulfate:false,silicone:false,vitc:true,salicylic:false,aha_bha:false,huile_essentielle:false},
-  "skc-sil": {retinol:false,parfum:false,paraben:false,alcohol:true,alcohol_denat:true,sulfate:false,silicone:false,vitc:false,salicylic:true,aha_bha:true,huile_essentielle:false},
-  "skc-ha": {retinol:false,parfum:false,paraben:false,alcohol:false,alcohol_denat:false,sulfate:false,silicone:false,vitc:false,salicylic:false,aha_bha:false,huile_essentielle:false},
-  "skc-dis": {retinol:false,parfum:false,paraben:false,alcohol:true,alcohol_denat:true,sulfate:false,silicone:false,vitc:false,salicylic:false,aha_bha:false,huile_essentielle:false},
-  "skc-age": {retinol:false,parfum:true,paraben:false,alcohol:true,alcohol_denat:true,sulfate:false,silicone:false,vitc:false,salicylic:false,aha_bha:true,huile_essentielle:false},
-  "skc-bl": {retinol:false,parfum:false,paraben:false,alcohol:true,alcohol_denat:true,sulfate:false,silicone:false,vitc:false,salicylic:true,aha_bha:true,huile_essentielle:false},
-  "skc-phy": {retinol:false,parfum:false,paraben:false,alcohol:false,alcohol_denat:false,sulfate:false,silicone:false,vitc:false,salicylic:false,aha_bha:false,huile_essentielle:false},
-  "skc-met": {retinol:false,parfum:false,paraben:false,alcohol:false,alcohol_denat:false,sulfate:false,silicone:false,vitc:false,salicylic:false,aha_bha:false,huile_essentielle:false},
-  "skc-spf": {retinol:false,parfum:false,paraben:false,alcohol:false,alcohol_denat:false,sulfate:false,silicone:true,vitc:false,salicylic:false,aha_bha:false,huile_essentielle:false},
-  "cs-power": {retinol:true,parfum:false,paraben:false,alcohol:false,alcohol_denat:false,sulfate:false,silicone:false,vitc:false,salicylic:false,aha_bha:false,huile_essentielle:false},
-  "cs-bleu": {retinol:false,parfum:false,paraben:false,alcohol:false,alcohol_denat:false,sulfate:false,silicone:false,vitc:false,salicylic:false,aha_bha:false,huile_essentielle:false},
-  "cs-skin2": {retinol:false,parfum:false,paraben:false,alcohol:false,alcohol_denat:false,sulfate:false,silicone:false,vitc:false,salicylic:false,aha_bha:false,huile_essentielle:false},
-  "cs-u": {retinol:false,parfum:false,paraben:false,alcohol:false,alcohol_denat:false,sulfate:false,silicone:false,vitc:false,salicylic:false,aha_bha:false,huile_essentielle:false},
-  "cs-eye": {retinol:false,parfum:false,paraben:false,alcohol:false,alcohol_denat:false,sulfate:false,silicone:false,vitc:false,salicylic:false,aha_bha:false,huile_essentielle:false},
-  "cs-culte": {retinol:false,parfum:false,paraben:false,alcohol:false,alcohol_denat:false,sulfate:false,silicone:false,vitc:false,salicylic:false,aha_bha:false,huile_essentielle:false},
-  "cs-mousse": {retinol:false,parfum:false,paraben:false,alcohol:false,alcohol_denat:false,sulfate:false,silicone:false,vitc:false,salicylic:false,aha_bha:false,huile_essentielle:false},
-  "cs-crev": {retinol:false,parfum:false,paraben:false,alcohol:false,alcohol_denat:false,sulfate:false,silicone:false,vitc:false,salicylic:false,aha_bha:false,huile_essentielle:false},
-  "int-ord-ha": {retinol:false,parfum:false,paraben:false,alcohol:false,alcohol_denat:false,sulfate:false,silicone:false,vitc:false,salicylic:false,aha_bha:false,huile_essentielle:false},
-  "int-ord-niac": {retinol:false,parfum:false,paraben:false,alcohol:false,alcohol_denat:false,sulfate:false,silicone:false,vitc:false,salicylic:false,aha_bha:true,huile_essentielle:false},
-  "int-ord-ret": {retinol:true,parfum:false,paraben:false,alcohol:false,alcohol_denat:false,sulfate:false,silicone:false,vitc:false,salicylic:false,aha_bha:false,huile_essentielle:false},
-  "euc-hyaluron": {retinol:false,parfum:false,paraben:false,alcohol:true,alcohol_denat:false,sulfate:false,silicone:false,vitc:false,salicylic:false,aha_bha:false,huile_essentielle:false},
-  "euc-aquaphor": {retinol:false,parfum:false,paraben:false,alcohol:false,alcohol_denat:false,sulfate:false,silicone:false,vitc:false,salicylic:false,aha_bha:false,huile_essentielle:false},
-  "euc-dermopure": {retinol:false,parfum:false,paraben:false,alcohol:false,alcohol_denat:false,sulfate:false,silicone:false,vitc:false,salicylic:true,aha_bha:true,huile_essentielle:false},
-  // euc-urearepair : contient de l'urée (kératolytique) mais PAS d'AHA ni BHA au sens strict
-  "euc-urearepair": {retinol:false,parfum:false,paraben:false,alcohol:false,alcohol_denat:false,sulfate:false,silicone:false,vitc:false,salicylic:false,aha_bha:false,huile_essentielle:false},
-  "euc-sun": {retinol:false,parfum:false,paraben:false,alcohol:true,alcohol_denat:true,sulfate:false,silicone:true,vitc:false,salicylic:false,aha_bha:false,huile_essentielle:false},
-  "int-paula-bha": {retinol:false,parfum:false,paraben:false,alcohol:false,alcohol_denat:false,sulfate:false,silicone:false,vitc:false,salicylic:true,aha_bha:true,huile_essentielle:false},
-  // svr-hydra : contient parfum
-  "svr-hydra": {retinol:false,parfum:true,paraben:false,alcohol:false,alcohol_denat:false,sulfate:false,silicone:false,vitc:false,salicylic:false,aha_bha:false,huile_essentielle:false},
-  "svr-sebiaclear": {retinol:false,parfum:false,paraben:false,alcohol:false,alcohol_denat:false,sulfate:false,silicone:false,vitc:false,salicylic:true,aha_bha:true,huile_essentielle:false},
-  "svr-xerial": {retinol:false,parfum:false,paraben:false,alcohol:false,alcohol_denat:false,sulfate:false,silicone:false,vitc:false,salicylic:false,aha_bha:true,huile_essentielle:false},
-  "svr-cicavit": {retinol:false,parfum:false,paraben:false,alcohol:false,alcohol_denat:false,sulfate:false,silicone:false,vitc:false,salicylic:false,aha_bha:false,huile_essentielle:false},
-  "svr-sun-secure": {retinol:false,parfum:false,paraben:false,alcohol:true,alcohol_denat:true,sulfate:false,silicone:true,vitc:false,salicylic:false,aha_bha:false,huile_essentielle:false},
-  "uri-eau-thermale": {retinol:false,parfum:false,paraben:false,alcohol:false,alcohol_denat:false,sulfate:false,silicone:false,vitc:false,salicylic:false,aha_bha:false,huile_essentielle:false},
-  "uri-bariesun": {retinol:false,parfum:false,paraben:false,alcohol:false,alcohol_denat:false,sulfate:false,silicone:true,vitc:false,salicylic:false,aha_bha:false,huile_essentielle:false},
-  "uri-roseliane": {retinol:false,parfum:false,paraben:false,alcohol:false,alcohol_denat:false,sulfate:false,silicone:false,vitc:false,salicylic:false,aha_bha:false,huile_essentielle:false},
-  "uri-isdin": {retinol:false,parfum:false,paraben:false,alcohol:false,alcohol_denat:false,sulfate:false,silicone:false,vitc:false,salicylic:true,aha_bha:true,huile_essentielle:false},
-  "uri-prederma": {retinol:false,parfum:false,paraben:false,alcohol:false,alcohol_denat:false,sulfate:false,silicone:false,vitc:false,salicylic:false,aha_bha:false,huile_essentielle:false},
-  "duc-melascreen": {retinol:false,parfum:true,paraben:false,alcohol:true,alcohol_denat:true,sulfate:false,silicone:false,vitc:false,salicylic:false,aha_bha:false,huile_essentielle:false},
-  "duc-ictyane": {retinol:false,parfum:false,paraben:false,alcohol:false,alcohol_denat:false,sulfate:false,silicone:false,vitc:false,salicylic:false,aha_bha:false,huile_essentielle:false},
-  "duc-anaphase": {retinol:false,parfum:false,paraben:false,alcohol:false,alcohol_denat:false,sulfate:false,silicone:false,vitc:false,salicylic:false,aha_bha:false,huile_essentielle:false},
-  "ader-epitheliale": {retinol:false,parfum:false,paraben:false,alcohol:false,alcohol_denat:false,sulfate:false,silicone:false,vitc:false,salicylic:false,aha_bha:false,huile_essentielle:false},
-  "ader-protect": {retinol:false,parfum:false,paraben:false,alcohol:true,alcohol_denat:false,sulfate:false,silicone:true,vitc:false,salicylic:false,aha_bha:false,huile_essentielle:false},
-  "ader-exomega": {retinol:false,parfum:false,paraben:false,alcohol:false,alcohol_denat:false,sulfate:false,silicone:false,vitc:false,salicylic:false,aha_bha:false,huile_essentielle:false},
-  "ader-dermalibour": {retinol:false,parfum:false,paraben:false,alcohol:false,alcohol_denat:false,sulfate:false,silicone:false,vitc:false,salicylic:false,aha_bha:false,huile_essentielle:false},
-  // lie-premium : contient alcohol denat + parfum + retinol
-  "lie-premium": {retinol:true,parfum:true,paraben:false,alcohol:true,alcohol_denat:true,sulfate:false,silicone:false,vitc:false,salicylic:false,aha_bha:false,huile_essentielle:false},
-  "lie-hydragenist": {retinol:false,parfum:false,paraben:false,alcohol:false,alcohol_denat:false,sulfate:false,silicone:false,vitc:false,salicylic:false,aha_bha:false,huile_essentielle:false},
-  "lie-sebologie": {retinol:false,parfum:false,paraben:false,alcohol:false,alcohol_denat:false,sulfate:false,silicone:false,vitc:false,salicylic:true,aha_bha:true,huile_essentielle:false},
-  // pay-pate-grise : contient alcohol denat + parfum + salicylic
-  "pay-pate-grise": {retinol:false,parfum:true,paraben:false,alcohol:true,alcohol_denat:true,sulfate:false,silicone:false,vitc:false,salicylic:true,aha_bha:true,huile_essentielle:false},
-  "pay-hydra24": {retinol:false,parfum:true,paraben:false,alcohol:false,alcohol_denat:false,sulfate:false,silicone:false,vitc:false,salicylic:false,aha_bha:false,huile_essentielle:false},
-  "pay-serum-eclat": {retinol:false,parfum:true,paraben:false,alcohol:true,alcohol_denat:true,sulfate:false,silicone:false,vitc:false,salicylic:false,aha_bha:false,huile_essentielle:false},
-  // ng-spf : Neutrogena SPF, contient alcohol denat
-  "ng-spf": {retinol:false,parfum:false,paraben:false,alcohol:true,alcohol_denat:true,sulfate:false,silicone:true,vitc:false,salicylic:false,aha_bha:false,huile_essentielle:false},
-  // ng-bha : Neutrogena BHA, contient alcohol denat
-  "ng-bha": {retinol:false,parfum:false,paraben:false,alcohol:true,alcohol_denat:true,sulfate:false,silicone:false,vitc:false,salicylic:true,aha_bha:true,huile_essentielle:false},
-  "bio-aquasource": {retinol:false,parfum:false,paraben:false,alcohol:true,alcohol_denat:false,sulfate:false,silicone:false,vitc:false,salicylic:false,aha_bha:false,huile_essentielle:false},
-  "bio-blue-therapy": {retinol:true,parfum:true,paraben:false,alcohol:true,alcohol_denat:true,sulfate:false,silicone:false,vitc:false,salicylic:false,aha_bha:false,huile_essentielle:false},
-  "bio-life-plankton": {retinol:false,parfum:true,paraben:false,alcohol:true,alcohol_denat:true,sulfate:false,silicone:false,vitc:false,salicylic:false,aha_bha:false,huile_essentielle:false},
-  "lan-advanced-genifique": {retinol:false,parfum:true,paraben:false,alcohol:true,alcohol_denat:true,sulfate:false,silicone:false,vitc:false,salicylic:false,aha_bha:false,huile_essentielle:false},
-  "lan-renergie": {retinol:true,parfum:true,paraben:false,alcohol:true,alcohol_denat:true,sulfate:false,silicone:false,vitc:false,salicylic:false,aha_bha:false,huile_essentielle:false},
-  "lan-absolue": {retinol:true,parfum:true,paraben:false,alcohol:false,alcohol_denat:false,sulfate:false,silicone:true,vitc:false,salicylic:false,aha_bha:false,huile_essentielle:false},
-  "es-isdin-spf": {retinol:false,parfum:false,paraben:false,alcohol:true,alcohol_denat:true,sulfate:false,silicone:true,vitc:false,salicylic:false,aha_bha:false,huile_essentielle:false},
-  "de-nivea-creme": {retinol:false,parfum:true,paraben:false,alcohol:true,alcohol_denat:false,sulfate:false,silicone:false,vitc:false,salicylic:false,aha_bha:false,huile_essentielle:false},
-  // de-weleda-huile : contient parfum + HE (cire d'abeille, HE de lavande, rose)
-  "de-weleda-huile": {retinol:false,parfum:true,paraben:false,alcohol:false,alcohol_denat:false,sulfate:false,silicone:false,vitc:false,salicylic:false,aha_bha:false,huile_essentielle:true},
-  "tal-eye-therapy": {retinol:false,parfum:false,paraben:false,alcohol:true,alcohol_denat:false,sulfate:false,silicone:false,vitc:false,salicylic:false,aha_bha:false,huile_essentielle:false},
-  "tal-lash": {retinol:false,parfum:false,paraben:false,alcohol:true,alcohol_denat:false,sulfate:false,silicone:false,vitc:false,salicylic:false,aha_bha:false,huile_essentielle:false},
-  "acm-sebionex": {retinol:false,parfum:false,paraben:false,alcohol:false,alcohol_denat:false,sulfate:false,silicone:false,vitc:false,salicylic:true,aha_bha:true,huile_essentielle:false},
-  "acm-depiwhite": {retinol:false,parfum:true,paraben:false,alcohol:false,alcohol_denat:false,sulfate:false,silicone:false,vitc:false,salicylic:false,aha_bha:false,huile_essentielle:false},
-  "acm-sterilak": {retinol:false,parfum:false,paraben:false,alcohol:false,alcohol_denat:false,sulfate:false,silicone:false,vitc:false,salicylic:false,aha_bha:false,huile_essentielle:false},
-  "aha-dead-sea": {retinol:false,parfum:false,paraben:false,alcohol:false,alcohol_denat:false,sulfate:false,silicone:false,vitc:false,salicylic:false,aha_bha:true,huile_essentielle:false},
-  // aha-mineral, aha-mud : produits Mer Morte, contiennent parfum
-  "aha-mineral": {retinol:false,parfum:true,paraben:false,alcohol:false,alcohol_denat:false,sulfate:false,silicone:false,vitc:false,salicylic:false,aha_bha:false,huile_essentielle:false},
-  "aha-mud": {retinol:false,parfum:true,paraben:false,alcohol:false,alcohol_denat:false,sulfate:false,silicone:false,vitc:false,salicylic:false,aha_bha:false,huile_essentielle:false},
-  "gar-potion-magique": {retinol:false,parfum:false,paraben:false,alcohol:false,alcohol_denat:false,sulfate:false,silicone:false,vitc:false,salicylic:false,aha_bha:false,huile_essentielle:false},
-  "gar-boum-boum": {retinol:false,parfum:true,paraben:false,alcohol:false,alcohol_denat:false,sulfate:false,silicone:false,vitc:false,salicylic:false,aha_bha:false,huile_essentielle:false},
-  "jon-rehydrate": {retinol:false,parfum:false,paraben:false,alcohol:false,alcohol_denat:false,sulfate:false,silicone:false,vitc:false,salicylic:false,aha_bha:false,huile_essentielle:false},
-  "jon-pure": {retinol:false,parfum:false,paraben:false,alcohol:false,alcohol_denat:false,sulfate:false,silicone:false,vitc:false,salicylic:true,aha_bha:true,huile_essentielle:false},
-  "jon-nutritive": {retinol:false,parfum:false,paraben:false,alcohol:false,alcohol_denat:false,sulfate:false,silicone:false,vitc:false,salicylic:false,aha_bha:false,huile_essentielle:false},
-  "pat-absolis": {retinol:false,parfum:true,paraben:false,alcohol:false,alcohol_denat:false,sulfate:false,silicone:false,vitc:false,salicylic:false,aha_bha:false,huile_essentielle:false},
-  "pat-ageless": {retinol:false,parfum:false,paraben:false,alcohol:false,alcohol_denat:false,sulfate:false,silicone:false,vitc:false,salicylic:false,aha_bha:false,huile_essentielle:false},
-  "sos-hydra": {retinol:false,parfum:false,paraben:false,alcohol:false,alcohol_denat:false,sulfate:false,silicone:false,vitc:false,salicylic:false,aha_bha:false,huile_essentielle:false},
-  "sos-protect": {retinol:false,parfum:false,paraben:false,alcohol:true,alcohol_denat:true,sulfate:false,silicone:true,vitc:false,salicylic:false,aha_bha:false,huile_essentielle:false},
-  "isis-uveblock": {retinol:false,parfum:false,paraben:false,alcohol:true,alcohol_denat:true,sulfate:false,silicone:true,vitc:false,salicylic:false,aha_bha:false,huile_essentielle:false},
-  "isis-yday": {retinol:false,parfum:false,paraben:false,alcohol:false,alcohol_denat:false,sulfate:false,silicone:false,vitc:false,salicylic:false,aha_bha:false,huile_essentielle:false},
-  "isis-teinte": {retinol:false,parfum:false,paraben:false,alcohol:false,alcohol_denat:false,sulfate:false,silicone:true,vitc:false,salicylic:false,aha_bha:false,huile_essentielle:false},
-  "ona-soin-quotidien": {retinol:false,parfum:false,paraben:false,alcohol:false,alcohol_denat:false,sulfate:false,silicone:false,vitc:false,salicylic:false,aha_bha:false,huile_essentielle:false},
-  "ona-huile": {retinol:false,parfum:false,paraben:false,alcohol:false,alcohol_denat:false,sulfate:false,silicone:false,vitc:false,salicylic:false,aha_bha:false,huile_essentielle:false},
-  "top-base": {retinol:false,parfum:false,paraben:false,alcohol:false,alcohol_denat:false,sulfate:false,silicone:false,vitc:false,salicylic:false,aha_bha:false,huile_essentielle:false},
-  "top-soin-mains": {retinol:false,parfum:false,paraben:false,alcohol:false,alcohol_denat:false,sulfate:false,silicone:false,vitc:false,salicylic:false,aha_bha:false,huile_essentielle:false},
-  "dz-biophar-creme": {retinol:false,parfum:false,paraben:false,alcohol:false,alcohol_denat:false,sulfate:false,silicone:false,vitc:false,salicylic:false,aha_bha:false,huile_essentielle:false},
-  "dz-biophar-gel": {retinol:false,parfum:false,paraben:false,alcohol:false,alcohol_denat:false,sulfate:false,silicone:false,vitc:false,salicylic:false,aha_bha:false,huile_essentielle:false},
-  "dz-saidal-huile": {retinol:false,parfum:false,paraben:false,alcohol:false,alcohol_denat:false,sulfate:false,silicone:false,vitc:false,salicylic:false,aha_bha:false,huile_essentielle:false},
-  "dz-atlas-rose": {retinol:false,parfum:false,paraben:false,alcohol:false,alcohol_denat:false,sulfate:false,silicone:false,vitc:false,salicylic:false,aha_bha:false,huile_essentielle:false},
-  // dz-atlas-nigelle : huile de nigelle, peut contenir des HE naturelles
-  "dz-atlas-nigelle": {retinol:false,parfum:false,paraben:false,alcohol:false,alcohol_denat:false,sulfate:false,silicone:false,vitc:false,salicylic:false,aha_bha:false,huile_essentielle:true},
-  // ma-nectarome-argan : produit Maroc avec parfum et possibles HE
-  "ma-nectarome-argan": {retinol:false,parfum:true,paraben:false,alcohol:false,alcohol_denat:false,sulfate:false,silicone:false,vitc:false,salicylic:false,aha_bha:false,huile_essentielle:true},
-  "ma-zineglob-rose": {retinol:false,parfum:false,paraben:false,alcohol:false,alcohol_denat:false,sulfate:false,silicone:false,vitc:false,salicylic:false,aha_bha:false,huile_essentielle:false},
-  // ma-beldi-savon : savon beldi, contient parfum traditionnel + HE
-  "ma-beldi-savon": {retinol:false,parfum:true,paraben:false,alcohol:false,alcohol_denat:false,sulfate:false,silicone:false,vitc:false,salicylic:false,aha_bha:false,huile_essentielle:true},
-  "ma-argan-id": {retinol:false,parfum:false,paraben:false,alcohol:false,alcohol_denat:false,sulfate:false,silicone:false,vitc:false,salicylic:false,aha_bha:false,huile_essentielle:false},
+  "cv-gel": {retinol:false,parfum:false,paraben:false,alcohol:false,sulfate:false,silicone:false,vitc:false,salicylic:true,aha_bha:true},
+  "cv-crem": {retinol:false,parfum:false,paraben:true,alcohol:true,sulfate:false,silicone:false,vitc:false,salicylic:false,aha_bha:false},
+  "cv-ret": {retinol:true,parfum:false,paraben:false,alcohol:true,sulfate:false,silicone:false,vitc:false,salicylic:false,aha_bha:false},
+  "cv-mou": {retinol:false,parfum:false,paraben:false,alcohol:true,sulfate:false,silicone:true,vitc:false,salicylic:false,aha_bha:false},
+  "cv-vitc": {retinol:false,parfum:false,paraben:false,alcohol:true,sulfate:false,silicone:false,vitc:true,salicylic:false,aha_bha:false},
+  "cv-eye": {retinol:false,parfum:false,paraben:false,alcohol:true,sulfate:false,silicone:false,vitc:false,salicylic:false,aha_bha:false},
+  "lrp-effgel": {retinol:false,parfum:false,paraben:false,alcohol:false,sulfate:true,silicone:false,vitc:false,salicylic:false,aha_bha:false},
+  "lrp-effduo": {retinol:false,parfum:true,paraben:false,alcohol:true,sulfate:false,silicone:true,vitc:false,salicylic:false,aha_bha:false},
+  "lrp-cica": {retinol:false,parfum:false,paraben:false,alcohol:false,sulfate:false,silicone:true,vitc:false,salicylic:false,aha_bha:false},
+  "lrp-tol": {retinol:false,parfum:false,paraben:false,alcohol:false,sulfate:false,silicone:false,vitc:false,salicylic:false,aha_bha:false},
+  "lrp-anth": {retinol:false,parfum:false,paraben:false,alcohol:true,sulfate:false,silicone:true,vitc:false,salicylic:false,aha_bha:false},
+  "lrp-hyalu": {retinol:false,parfum:true,paraben:false,alcohol:true,sulfate:false,silicone:false,vitc:false,salicylic:false,aha_bha:true},
+  "bd-sens": {retinol:false,parfum:false,paraben:false,alcohol:false,sulfate:false,silicone:false,vitc:false,salicylic:false,aha_bha:false},
+  "bd-sebgel": {retinol:false,parfum:false,paraben:false,alcohol:false,sulfate:false,silicone:false,vitc:false,salicylic:true,aha_bha:true},
+  "bd-hydra": {retinol:false,parfum:false,paraben:false,alcohol:false,sulfate:false,silicone:false,vitc:false,salicylic:false,aha_bha:false},
+  "bd-sebser": {retinol:false,parfum:false,paraben:false,alcohol:true,sulfate:false,silicone:false,vitc:false,salicylic:true,aha_bha:true},
+  "av-tol": {retinol:false,parfum:false,paraben:false,alcohol:true,sulfate:false,silicone:false,vitc:false,salicylic:false,aha_bha:false},
+  "av-lait": {retinol:false,parfum:false,paraben:false,alcohol:false,sulfate:false,silicone:false,vitc:false,salicylic:false,aha_bha:false},
+  "vic-minral89": {retinol:false,parfum:false,paraben:false,alcohol:true,sulfate:false,silicone:false,vitc:false,salicylic:false,aha_bha:false},
+  "vic-normaderm": {retinol:false,parfum:true,paraben:false,alcohol:true,sulfate:false,silicone:true,vitc:false,salicylic:true,aha_bha:true},
+  "vic-liftactiv": {retinol:false,parfum:true,paraben:false,alcohol:true,sulfate:false,silicone:false,vitc:false,salicylic:false,aha_bha:false},
+  "vic-capital": {retinol:false,parfum:true,paraben:false,alcohol:true,sulfate:false,silicone:true,vitc:false,salicylic:false,aha_bha:false},
+  "vic-slow-age": {retinol:false,parfum:true,paraben:false,alcohol:true,sulfate:false,silicone:false,vitc:false,salicylic:false,aha_bha:false},
+  "nux-huile-prodigieuse": {retinol:false,parfum:true,paraben:false,alcohol:false,sulfate:false,silicone:false,vitc:false,salicylic:false,aha_bha:false},
+  "nux-creme-fraiche": {retinol:false,parfum:true,paraben:false,alcohol:true,sulfate:false,silicone:false,vitc:false,salicylic:false,aha_bha:false},
+  "nux-reve-de-miel": {retinol:false,parfum:true,paraben:false,alcohol:false,sulfate:false,silicone:false,vitc:false,salicylic:false,aha_bha:false},
+  "nux-merveillance": {retinol:false,parfum:true,paraben:false,alcohol:true,sulfate:false,silicone:false,vitc:false,salicylic:false,aha_bha:false},
+  "cau-vinoperfect": {retinol:false,parfum:true,paraben:false,alcohol:true,sulfate:false,silicone:false,vitc:false,salicylic:false,aha_bha:false},
+  "cau-vinosource": {retinol:false,parfum:true,paraben:false,alcohol:true,sulfate:false,silicone:false,vitc:false,salicylic:false,aha_bha:false},
+  "cau-resveratrol": {retinol:false,parfum:true,paraben:false,alcohol:true,sulfate:false,silicone:false,vitc:false,salicylic:false,aha_bha:false},
+  "cau-spf": {retinol:false,parfum:true,paraben:false,alcohol:true,sulfate:false,silicone:true,vitc:false,salicylic:false,aha_bha:false},
+  "cla-double-serum": {retinol:false,parfum:true,paraben:false,alcohol:true,sulfate:false,silicone:false,vitc:false,salicylic:false,aha_bha:false},
+  "cla-hydra-essentiel": {retinol:false,parfum:true,paraben:false,alcohol:true,sulfate:false,silicone:false,vitc:false,salicylic:false,aha_bha:false},
+  "cla-multi-active": {retinol:false,parfum:true,paraben:false,alcohol:false,sulfate:false,silicone:false,vitc:false,salicylic:false,aha_bha:false},
+  "cla-spf": {retinol:false,parfum:true,paraben:false,alcohol:true,sulfate:false,silicone:true,vitc:false,salicylic:false,aha_bha:false},
+  "skc-cef": {retinol:false,parfum:false,paraben:false,alcohol:true,sulfate:false,silicone:false,vitc:true,salicylic:false,aha_bha:false},
+  "skc-ph": {retinol:false,parfum:false,paraben:false,alcohol:true,sulfate:false,silicone:false,vitc:true,salicylic:false,aha_bha:false},
+  "skc-sil": {retinol:false,parfum:false,paraben:false,alcohol:true,sulfate:false,silicone:false,vitc:false,salicylic:true,aha_bha:true},
+  "skc-ha": {retinol:false,parfum:false,paraben:false,alcohol:false,sulfate:false,silicone:false,vitc:false,salicylic:false,aha_bha:false},
+  "skc-dis": {retinol:false,parfum:false,paraben:false,alcohol:true,sulfate:false,silicone:false,vitc:false,salicylic:false,aha_bha:false},
+  "skc-age": {retinol:false,parfum:true,paraben:false,alcohol:true,sulfate:false,silicone:false,vitc:false,salicylic:false,aha_bha:true},
+  "skc-bl": {retinol:false,parfum:false,paraben:false,alcohol:true,sulfate:false,silicone:false,vitc:false,salicylic:true,aha_bha:true},
+  "skc-phy": {retinol:false,parfum:false,paraben:false,alcohol:false,sulfate:false,silicone:false,vitc:false,salicylic:false,aha_bha:false},
+  "skc-met": {retinol:false,parfum:false,paraben:false,alcohol:false,sulfate:false,silicone:false,vitc:false,salicylic:false,aha_bha:false},
+  "skc-spf": {retinol:false,parfum:false,paraben:false,alcohol:false,sulfate:false,silicone:true,vitc:false,salicylic:false,aha_bha:false},
+  "cs-power": {retinol:true,parfum:false,paraben:false,alcohol:false,sulfate:false,silicone:false,vitc:false,salicylic:false,aha_bha:false},
+  "cs-bleu": {retinol:false,parfum:false,paraben:false,alcohol:false,sulfate:false,silicone:false,vitc:false,salicylic:false,aha_bha:false},
+  "cs-skin2": {retinol:false,parfum:false,paraben:false,alcohol:false,sulfate:false,silicone:false,vitc:false,salicylic:false,aha_bha:false},
+  "cs-u": {retinol:false,parfum:false,paraben:false,alcohol:false,sulfate:false,silicone:false,vitc:false,salicylic:false,aha_bha:false},
+  "cs-eye": {retinol:false,parfum:false,paraben:false,alcohol:false,sulfate:false,silicone:false,vitc:false,salicylic:false,aha_bha:false},
+  "cs-culte": {retinol:false,parfum:false,paraben:false,alcohol:false,sulfate:false,silicone:false,vitc:false,salicylic:false,aha_bha:false},
+  "cs-mousse": {retinol:false,parfum:false,paraben:false,alcohol:false,sulfate:false,silicone:false,vitc:false,salicylic:false,aha_bha:false},
+  "cs-crev": {retinol:false,parfum:false,paraben:false,alcohol:false,sulfate:false,silicone:false,vitc:false,salicylic:false,aha_bha:false},
+  "int-ord-ha": {retinol:false,parfum:false,paraben:false,alcohol:false,sulfate:false,silicone:false,vitc:false,salicylic:false,aha_bha:false},
+  "int-ord-niac": {retinol:false,parfum:false,paraben:false,alcohol:false,sulfate:false,silicone:false,vitc:false,salicylic:false,aha_bha:true},
+  "int-ord-ret": {retinol:true,parfum:false,paraben:false,alcohol:false,sulfate:false,silicone:false,vitc:false,salicylic:false,aha_bha:false},
+  "euc-hyaluron": {retinol:false,parfum:false,paraben:false,alcohol:true,sulfate:false,silicone:false,vitc:false,salicylic:false,aha_bha:false},
+  "euc-aquaphor": {retinol:false,parfum:false,paraben:false,alcohol:false,sulfate:false,silicone:false,vitc:false,salicylic:false,aha_bha:false},
+  "euc-dermopure": {retinol:false,parfum:false,paraben:false,alcohol:false,sulfate:false,silicone:false,vitc:false,salicylic:true,aha_bha:true},
+  "euc-urearepair": {retinol:false,parfum:false,paraben:false,alcohol:false,sulfate:false,silicone:false,vitc:false,salicylic:false,aha_bha:true},
+  "euc-sun": {retinol:false,parfum:false,paraben:false,alcohol:true,sulfate:false,silicone:true,vitc:false,salicylic:false,aha_bha:false},
+  "int-paula-bha": {retinol:false,parfum:false,paraben:false,alcohol:false,sulfate:false,silicone:false,vitc:false,salicylic:true,aha_bha:true},
+  "svr-hydra": {retinol:false,parfum:true,paraben:false,alcohol:false,sulfate:false,silicone:false,vitc:false,salicylic:false,aha_bha:false},
+  "svr-sebiaclear": {retinol:false,parfum:false,paraben:false,alcohol:false,sulfate:false,silicone:false,vitc:false,salicylic:true,aha_bha:true},
+  "svr-xerial": {retinol:false,parfum:false,paraben:false,alcohol:false,sulfate:false,silicone:false,vitc:false,salicylic:false,aha_bha:true},
+  "svr-cicavit": {retinol:false,parfum:false,paraben:false,alcohol:false,sulfate:false,silicone:false,vitc:false,salicylic:false,aha_bha:false},
+  "svr-sun-secure": {retinol:false,parfum:false,paraben:false,alcohol:true,sulfate:false,silicone:true,vitc:false,salicylic:false,aha_bha:false},
+  "uri-eau-thermale": {retinol:false,parfum:false,paraben:false,alcohol:false,sulfate:false,silicone:false,vitc:false,salicylic:false,aha_bha:false},
+  "uri-bariesun": {retinol:false,parfum:false,paraben:false,alcohol:false,sulfate:false,silicone:true,vitc:false,salicylic:false,aha_bha:false},
+  "uri-roseliane": {retinol:false,parfum:false,paraben:false,alcohol:false,sulfate:false,silicone:false,vitc:false,salicylic:false,aha_bha:false},
+  "uri-isdin": {retinol:false,parfum:false,paraben:false,alcohol:false,sulfate:false,silicone:false,vitc:false,salicylic:true,aha_bha:true},
+  "uri-prederma": {retinol:false,parfum:false,paraben:false,alcohol:false,sulfate:false,silicone:false,vitc:false,salicylic:false,aha_bha:false},
+  "duc-melascreen": {retinol:false,parfum:true,paraben:false,alcohol:true,sulfate:false,silicone:false,vitc:false,salicylic:false,aha_bha:false},
+  "duc-ictyane": {retinol:false,parfum:false,paraben:false,alcohol:false,sulfate:false,silicone:false,vitc:false,salicylic:false,aha_bha:false},
+  "duc-anaphase": {retinol:false,parfum:false,paraben:false,alcohol:false,sulfate:false,silicone:false,vitc:false,salicylic:false,aha_bha:false},
+  "ader-epitheliale": {retinol:false,parfum:false,paraben:false,alcohol:false,sulfate:false,silicone:false,vitc:false,salicylic:false,aha_bha:false},
+  "ader-protect": {retinol:false,parfum:false,paraben:false,alcohol:true,sulfate:false,silicone:true,vitc:false,salicylic:false,aha_bha:false},
+  "ader-exomega": {retinol:false,parfum:false,paraben:false,alcohol:false,sulfate:false,silicone:false,vitc:false,salicylic:false,aha_bha:false},
+  "ader-dermalibour": {retinol:false,parfum:false,paraben:false,alcohol:false,sulfate:false,silicone:false,vitc:false,salicylic:false,aha_bha:false},
+  "lie-premium": {retinol:true,parfum:true,paraben:false,alcohol:true,sulfate:false,silicone:false,vitc:false,salicylic:false,aha_bha:false},
+  "lie-hydragenist": {retinol:false,parfum:false,paraben:false,alcohol:false,sulfate:false,silicone:false,vitc:false,salicylic:false,aha_bha:false},
+  "lie-sebologie": {retinol:false,parfum:false,paraben:false,alcohol:false,sulfate:false,silicone:false,vitc:false,salicylic:true,aha_bha:true},
+  "pay-pate-grise": {retinol:false,parfum:true,paraben:false,alcohol:true,sulfate:false,silicone:false,vitc:false,salicylic:true,aha_bha:true},
+  "pay-hydra24": {retinol:false,parfum:true,paraben:false,alcohol:false,sulfate:false,silicone:false,vitc:false,salicylic:false,aha_bha:false},
+  "pay-serum-eclat": {retinol:false,parfum:true,paraben:false,alcohol:true,sulfate:false,silicone:false,vitc:false,salicylic:false,aha_bha:false},
+  "ng-spf": {retinol:false,parfum:false,paraben:false,alcohol:true,sulfate:false,silicone:true,vitc:false,salicylic:false,aha_bha:false},
+  "ng-bha": {retinol:false,parfum:false,paraben:false,alcohol:true,sulfate:false,silicone:false,vitc:false,salicylic:true,aha_bha:true},
+  "bio-aquasource": {retinol:false,parfum:false,paraben:false,alcohol:true,sulfate:false,silicone:false,vitc:false,salicylic:false,aha_bha:false},
+  "bio-blue-therapy": {retinol:true,parfum:true,paraben:false,alcohol:true,sulfate:false,silicone:false,vitc:false,salicylic:false,aha_bha:false},
+  "bio-life-plankton": {retinol:false,parfum:true,paraben:false,alcohol:true,sulfate:false,silicone:false,vitc:false,salicylic:false,aha_bha:false},
+  "lan-advanced-genifique": {retinol:false,parfum:true,paraben:false,alcohol:true,sulfate:false,silicone:false,vitc:false,salicylic:false,aha_bha:false},
+  "lan-renergie": {retinol:true,parfum:true,paraben:false,alcohol:true,sulfate:false,silicone:false,vitc:false,salicylic:false,aha_bha:false},
+  "lan-absolue": {retinol:true,parfum:true,paraben:false,alcohol:false,sulfate:false,silicone:true,vitc:false,salicylic:false,aha_bha:false},
+  "es-isdin-spf": {retinol:false,parfum:false,paraben:false,alcohol:true,sulfate:false,silicone:true,vitc:false,salicylic:false,aha_bha:false},
+  "de-nivea-creme": {retinol:false,parfum:true,paraben:false,alcohol:true,sulfate:false,silicone:false,vitc:false,salicylic:false,aha_bha:false},
+  "de-weleda-huile": {retinol:false,parfum:true,paraben:false,alcohol:false,sulfate:false,silicone:false,vitc:false,salicylic:false,aha_bha:false},
+  "tal-eye-therapy": {retinol:false,parfum:false,paraben:false,alcohol:true,sulfate:false,silicone:false,vitc:false,salicylic:false,aha_bha:false},
+  "tal-lash": {retinol:false,parfum:false,paraben:false,alcohol:true,sulfate:false,silicone:false,vitc:false,salicylic:false,aha_bha:false},
+  "acm-sebionex": {retinol:false,parfum:false,paraben:false,alcohol:false,sulfate:false,silicone:false,vitc:false,salicylic:true,aha_bha:true},
+  "acm-depiwhite": {retinol:false,parfum:true,paraben:false,alcohol:false,sulfate:false,silicone:false,vitc:false,salicylic:false,aha_bha:false},
+  "acm-sterilak": {retinol:false,parfum:false,paraben:false,alcohol:false,sulfate:false,silicone:false,vitc:false,salicylic:false,aha_bha:false},
+  "aha-dead-sea": {retinol:false,parfum:false,paraben:false,alcohol:false,sulfate:false,silicone:false,vitc:false,salicylic:false,aha_bha:true},
+  "aha-mineral": {retinol:false,parfum:true,paraben:false,alcohol:false,sulfate:false,silicone:false,vitc:false,salicylic:false,aha_bha:false},
+  "aha-mud": {retinol:false,parfum:true,paraben:false,alcohol:false,sulfate:false,silicone:false,vitc:false,salicylic:false,aha_bha:false},
+  "gar-potion-magique": {retinol:false,parfum:false,paraben:false,alcohol:false,sulfate:false,silicone:false,vitc:false,salicylic:false,aha_bha:false},
+  "gar-boum-boum": {retinol:false,parfum:true,paraben:false,alcohol:false,sulfate:false,silicone:false,vitc:false,salicylic:false,aha_bha:false},
+  "jon-rehydrate": {retinol:false,parfum:false,paraben:false,alcohol:false,sulfate:false,silicone:false,vitc:false,salicylic:false,aha_bha:false},
+  "jon-pure": {retinol:false,parfum:false,paraben:false,alcohol:false,sulfate:false,silicone:false,vitc:false,salicylic:true,aha_bha:true},
+  "jon-nutritive": {retinol:false,parfum:false,paraben:false,alcohol:false,sulfate:false,silicone:false,vitc:false,salicylic:false,aha_bha:false},
+  "pat-absolis": {retinol:false,parfum:true,paraben:false,alcohol:false,sulfate:false,silicone:false,vitc:false,salicylic:false,aha_bha:false},
+  "pat-ageless": {retinol:false,parfum:false,paraben:false,alcohol:false,sulfate:false,silicone:false,vitc:false,salicylic:false,aha_bha:false},
+  "sos-hydra": {retinol:false,parfum:false,paraben:false,alcohol:false,sulfate:false,silicone:false,vitc:false,salicylic:false,aha_bha:false},
+  "sos-protect": {retinol:false,parfum:false,paraben:false,alcohol:true,sulfate:false,silicone:true,vitc:false,salicylic:false,aha_bha:false},
+  "isis-uveblock": {retinol:false,parfum:false,paraben:false,alcohol:true,sulfate:false,silicone:true,vitc:false,salicylic:false,aha_bha:false},
+  "isis-yday": {retinol:false,parfum:false,paraben:false,alcohol:false,sulfate:false,silicone:false,vitc:false,salicylic:false,aha_bha:false},
+  "isis-teinte": {retinol:false,parfum:false,paraben:false,alcohol:false,sulfate:false,silicone:true,vitc:false,salicylic:false,aha_bha:false},
+  "ona-soin-quotidien": {retinol:false,parfum:false,paraben:false,alcohol:false,sulfate:false,silicone:false,vitc:false,salicylic:false,aha_bha:false},
+  "ona-huile": {retinol:false,parfum:false,paraben:false,alcohol:false,sulfate:false,silicone:false,vitc:false,salicylic:false,aha_bha:false},
+  "top-base": {retinol:false,parfum:false,paraben:false,alcohol:false,sulfate:false,silicone:false,vitc:false,salicylic:false,aha_bha:false},
+  "top-soin-mains": {retinol:false,parfum:false,paraben:false,alcohol:false,sulfate:false,silicone:false,vitc:false,salicylic:false,aha_bha:false},
+  "dz-biophar-creme": {retinol:false,parfum:false,paraben:false,alcohol:false,sulfate:false,silicone:false,vitc:false,salicylic:false,aha_bha:false},
+  "dz-biophar-gel": {retinol:false,parfum:false,paraben:false,alcohol:false,sulfate:false,silicone:false,vitc:false,salicylic:false,aha_bha:false},
+  "dz-saidal-huile": {retinol:false,parfum:false,paraben:false,alcohol:false,sulfate:false,silicone:false,vitc:false,salicylic:false,aha_bha:false},
+  "dz-atlas-rose": {retinol:false,parfum:false,paraben:false,alcohol:false,sulfate:false,silicone:false,vitc:false,salicylic:false,aha_bha:false},
+  "dz-atlas-nigelle": {retinol:false,parfum:false,paraben:false,alcohol:false,sulfate:false,silicone:false,vitc:false,salicylic:false,aha_bha:false},
+  "ma-nectarome-argan": {retinol:false,parfum:true,paraben:false,alcohol:false,sulfate:false,silicone:false,vitc:false,salicylic:false,aha_bha:false},
+  "ma-zineglob-rose": {retinol:false,parfum:false,paraben:false,alcohol:false,sulfate:false,silicone:false,vitc:false,salicylic:false,aha_bha:false},
+  "ma-beldi-savon": {retinol:false,parfum:true,paraben:false,alcohol:false,sulfate:false,silicone:false,vitc:false,salicylic:false,aha_bha:false},
+  "ma-argan-id": {retinol:false,parfum:false,paraben:false,alcohol:false,sulfate:false,silicone:false,vitc:false,salicylic:false,aha_bha:false},
 };
 
 var BRAND_COLORS = {
