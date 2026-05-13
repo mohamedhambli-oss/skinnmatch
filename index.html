@@ -2368,7 +2368,9 @@ function analyzeSkin() {
     })
     .then(function(res) { return res.json(); })
     .then(function(data) {
+        console.log("Gemini response:", JSON.stringify(data).substring(0, 500));
         var rawText = data.candidates && data.candidates[0] && data.candidates[0].content && data.candidates[0].content.parts && data.candidates[0].content.parts[0] ? data.candidates[0].content.parts[0].text : "";
+        if (!rawText && data.error) { throw new Error("Gemini error: " + data.error.message); }
         var analysis;
         try {
             var clean = rawText.replace(/```json/g, "").replace(/```/g, "").trim();
@@ -2386,6 +2388,7 @@ function analyzeSkin() {
     })
     .catch(function(err) {
         console.error("Scan error:", err);
+        console.error("Scan error detail:", JSON.stringify(err));
         document.getElementById("scan-loading").style.display = "none";
         document.getElementById("scan-btn").disabled = false;
         document.getElementById("scan-btn-text").textContent = isEN ? "Retry" : "Reessayer";
