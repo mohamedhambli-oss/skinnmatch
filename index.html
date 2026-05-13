@@ -2370,7 +2370,8 @@ function analyzeSkin() {
     .then(function(data) {
         console.log("Gemini response:", JSON.stringify(data).substring(0, 500));
         var rawText = data.candidates && data.candidates[0] && data.candidates[0].content && data.candidates[0].content.parts && data.candidates[0].content.parts[0] ? data.candidates[0].content.parts[0].text : "";
-        if (!rawText && data.error) { throw new Error("Gemini error: " + data.error.message); }
+        if (!rawText && data.error) { throw new Error("Gemini: " + data.error.message + " (code:" + data.error.code + ")"); }
+        if (!rawText) { throw new Error("Réponse vide. Data: " + JSON.stringify(data).substring(0,200)); }
         var analysis;
         try {
             var clean = rawText.replace(/```json/g, "").replace(/```/g, "").trim();
@@ -2401,9 +2402,7 @@ function analyzeSkin() {
             var scanBtn = document.getElementById("scan-btn");
             scanBtn.parentNode.insertBefore(errDiv, scanBtn);
         }
-        errDiv.innerHTML = isEN 
-            ? "⚠️ <strong>Analysis failed.</strong> For best results:<br>• Good natural light (near a window)<br>• Hold phone 20–30 cm from face<br>• Full face visible, no glasses<br>• Neutral background"
-            : "⚠️ <strong>Analyse impossible.</strong> Pour de meilleurs résultats :<br>• Bonne lumière naturelle (près d'une fenêtre)<br>• Tenir le téléphone à 20–30 cm du visage<br>• Visage entier visible, sans lunettes<br>• Fond neutre de préférence";
+        errDiv.innerHTML = "⚠️ <strong>Erreur :</strong> " + err.message;
         errDiv.style.display = "block";
     });
 }
