@@ -1559,18 +1559,19 @@ async function normalizeAutreWithAI(autreTexte, type) {
     : "Tu es un expert cosmétique. L'utilisateur décrit une allergie en texte libre. Retourne UNIQUEMENT une liste JSON des catégories correspondantes parmi : Parfums / Fragrances, Parabènes, Alcool, Sulfates (SLS/SLES), Silicones, Huiles essentielles, Acide salicylique, Rétinol, Vitamine C, Acides (AHA/BHA). Exemple: [\"Parfums / Fragrances\"]. Si aucune correspondance, retourne [].";
 
   try {
-    var response = await fetch("https://api.anthropic.com/v1/messages", {
+    var GEMINI_KEY = "AIzaSyCdFV7fJJM6PJc7M9JC69u2QZIO3TrBirk";
+    var response = await fetch("https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=" + GEMINI_KEY, {
       method: "POST",
       headers: {"Content-Type": "application/json"},
       body: JSON.stringify({
-        model: "claude-sonnet-4-20250514",
-        max_tokens: 200,
-        system: systemPrompt,
-        messages: [{role: "user", content: autreTexte}]
+        contents: [{ parts: [{ text: systemPrompt + "
+
+Texte utilisateur: " + autreTexte }] }],
+        generationConfig: { maxOutputTokens: 200, temperature: 0.1 }
       })
     });
     var data = await response.json();
-    var text = data.content && data.content[0] ? data.content[0].text : "[]";
+    var text = data.candidates && data.candidates[0] && data.candidates[0].content && data.candidates[0].content.parts && data.candidates[0].content.parts[0] ? data.candidates[0].content.parts[0].text : "[]";
     text = text.replace(/```json|```/g, "").trim();
     return JSON.parse(text);
   } catch(e) {
@@ -2353,24 +2354,23 @@ function analyzeSkin() {
 
     var prompt = isEN ? promptEN : promptFR;
 
-    fetch("https://api.anthropic.com/v1/messages", {
+    var GEMINI_KEY = "AIzaSyCdFV7fJJM6PJc7M9JC69u2QZIO3TrBirk";
+    fetch("https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=" + GEMINI_KEY, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-            model: "claude-sonnet-4-5-20251001",
-            max_tokens: 1000,
-            messages: [{
-                role: "user",
-                content: [
-                    { type: "image", source: { type: "base64", media_type: "image/jpeg", data: scanBase64 } },
-                    { type: "text", text: prompt }
+            contents: [{
+                parts: [
+                    { inline_data: { mime_type: "image/jpeg", data: scanBase64 } },
+                    { text: prompt }
                 ]
-            }]
+            }],
+            generationConfig: { maxOutputTokens: 1000, temperature: 0.1 }
         })
     })
     .then(function(res) { return res.json(); })
     .then(function(data) {
-        var rawText = data.content && data.content[0] ? data.content[0].text : "";
+        var rawText = data.candidates && data.candidates[0] && data.candidates[0].content && data.candidates[0].content.parts && data.candidates[0].content.parts[0] ? data.candidates[0].content.parts[0].text : "";
         var analysis;
         try {
             var clean = rawText.replace(/```json/g, "").replace(/```/g, "").trim();
