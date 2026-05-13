@@ -1560,7 +1560,7 @@ async function normalizeAutreWithAI(autreTexte, type) {
 
   try {
     var GEMINI_KEY = "AIzaSyCdFV7fJJM6PJc7M9JC69u2QZIO3TrBirk";
-    var response = await fetch("https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=" + GEMINI_KEY, {
+    var response = await fetch("https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=" + GEMINI_KEY, {
       method: "POST",
       headers: {"Content-Type": "application/json"},
       body: JSON.stringify({
@@ -2353,7 +2353,7 @@ function analyzeSkin() {
     var prompt = isEN ? promptEN : promptFR;
 
     var GEMINI_KEY = "AIzaSyCdFV7fJJM6PJc7M9JC69u2QZIO3TrBirk";
-    fetch("https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=" + GEMINI_KEY, {
+    fetch("https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=" + GEMINI_KEY, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
