@@ -1564,9 +1564,7 @@ async function normalizeAutreWithAI(autreTexte, type) {
       method: "POST",
       headers: {"Content-Type": "application/json"},
       body: JSON.stringify({
-        contents: [{ parts: [{ text: systemPrompt + "
-
-Texte utilisateur: " + autreTexte }] }],
+        contents: [{ parts: [{ text: systemPrompt + "\n\nTexte utilisateur: " + autreTexte }] }],
         generationConfig: { maxOutputTokens: 200, temperature: 0.1 }
       })
     });
