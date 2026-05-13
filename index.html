@@ -29,6 +29,64 @@
 <meta property="og:type" content="website">
 <title>SkinMatch — Your Skin, Your Routine</title>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+<!-- Firebase SDK -->
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+  import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut, updateProfile } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+  import { getFirestore, doc, setDoc, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyBMWoVUUrj2R5FywcCl34z9ooFTI9ZMAE4",
+    authDomain: "skin-match-c7189.firebaseapp.com",
+    projectId: "skin-match-c7189",
+    storageBucket: "skin-match-c7189.firebasestorage.app",
+    messagingSenderId: "1033609385398",
+    appId: "1:1033609385398:web:4b08eef7db24e6470ddd17",
+    measurementId: "G-DBH333L5FB"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const db = getFirestore(app);
+  const googleProvider = new GoogleAuthProvider();
+
+  // Exposer globalement pour les fonctions existantes
+  window._auth = auth;
+  window._db = db;
+  window._googleProvider = googleProvider;
+  window._createUserWithEmailAndPassword = createUserWithEmailAndPassword;
+  window._signInWithEmailAndPassword = signInWithEmailAndPassword;
+  window._signInWithPopup = signInWithPopup;
+  window._signOut = signOut;
+  window._updateProfile = updateProfile;
+  window._doc = doc;
+  window._setDoc = setDoc;
+  window._getDoc = getDoc;
+  window._updateDoc = updateDoc;
+  window._firebaseReady = true;
+
+  // Observer état connexion
+  onAuthStateChanged(auth, (user) => {
+    window._currentUser = user;
+    if (user) {
+      // Charger profil Firestore
+      getDoc(doc(db, 'users', user.uid)).then(snap => {
+        if (snap.exists()) {
+          window._userProfile = snap.data();
+        }
+      });
+      // Mettre à jour l'UI si la fonction existe
+      if (typeof window.onFirebaseUserReady === 'function') {
+        window.onFirebaseUserReady(user);
+      }
+    } else {
+      window._userProfile = null;
+      if (typeof window.onFirebaseUserReady === 'function') {
+        window.onFirebaseUserReady(null);
+      }
+    }
+  });
+</script>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
@@ -474,7 +532,11 @@ h2{font-family:var(--serif);font-size:20px;font-weight:700;margin-bottom:3px}
     <div id="err-r" class="err-msg hidden"></div>
     <button class="btn-p" onclick="doRegister()">Continuer</button>
     <div class="divider"><hr><span>ou</span><hr></div>
-    <button class="btn-o" onclick="go('login')">J'ai déjà un compte</button>
+    <button class="btn-o" onclick="doGoogleLogin()" style="margin-bottom:8px">
+      <svg width="18" height="18" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.5 0 6.6 1.2 9 3.2l6.7-6.7C35.8 2.5 30.3 0 24 0 14.7 0 6.8 5.5 3 13.5l7.8 6C12.7 13.5 17.9 9.5 24 9.5z"/><path fill="#4285F4" d="M46.5 24.5c0-1.6-.1-3.1-.4-4.5H24v8.5h12.7c-.6 3-2.3 5.5-4.8 7.2l7.5 5.8C43.7 37 46.5 31.3 46.5 24.5z"/><path fill="#FBBC05" d="M10.8 28.5c-.5-1.5-.8-3-.8-4.5s.3-3 .8-4.5L3 13.5C1.1 17.1 0 21.1 0 25.3c0 4.2 1.1 8.2 3 11.7l7.8-8.5z"/><path fill="#34A853" d="M24 48c6.5 0 11.9-2.1 15.9-5.8l-7.5-5.8c-2.1 1.4-4.8 2.2-8.4 2.2-6.1 0-11.3-4.1-13.2-9.6l-7.8 6C6.8 42.5 14.7 48 24 48z"/></svg>
+      Continuer avec Google
+    </button>
+    <button class="btn-ghost" onclick="go('login')">J'ai déjà un compte</button>
   </div>
 </div>
 
@@ -488,7 +550,11 @@ h2{font-family:var(--serif);font-size:20px;font-weight:700;margin-bottom:3px}
     <div id="err-l" class="err-msg hidden"></div>
     <button class="btn-p" onclick="doLogin()">Se connecter</button>
     <div class="divider"><hr><span>ou</span><hr></div>
-    <button class="btn-o" onclick="go('register')">Créer un compte</button>
+    <button class="btn-o" onclick="doGoogleLogin()" style="margin-bottom:8px">
+      <svg width="18" height="18" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.5 0 6.6 1.2 9 3.2l6.7-6.7C35.8 2.5 30.3 0 24 0 14.7 0 6.8 5.5 3 13.5l7.8 6C12.7 13.5 17.9 9.5 24 9.5z"/><path fill="#4285F4" d="M46.5 24.5c0-1.6-.1-3.1-.4-4.5H24v8.5h12.7c-.6 3-2.3 5.5-4.8 7.2l7.5 5.8C43.7 37 46.5 31.3 46.5 24.5z"/><path fill="#FBBC05" d="M10.8 28.5c-.5-1.5-.8-3-.8-4.5s.3-3 .8-4.5L3 13.5C1.1 17.1 0 21.1 0 25.3c0 4.2 1.1 8.2 3 11.7l7.8-8.5z"/><path fill="#34A853" d="M24 48c6.5 0 11.9-2.1 15.9-5.8l-7.5-5.8c-2.1 1.4-4.8 2.2-8.4 2.2-6.1 0-11.3-4.1-13.2-9.6l-7.8 6C6.8 42.5 14.7 48 24 48z"/></svg>
+      Continuer avec Google
+    </button>
+    <button class="btn-ghost" onclick="go('register')">Créer un compte</button>
   </div>
 </div>
 
@@ -5099,6 +5165,96 @@ function doReset(){
   ST.skinType=null;ST.ageGroup=null;ST.concerns=[];ST.allergies=[];ST.budget=null;ST.routine=null;ST.result=null;ST.showShare=false;
   initQuestions();go("q1");
 }
+
+// ══ FIREBASE AUTH FUNCTIONS ══
+
+async function doRegister() {
+  if (!window._firebaseReady) { alert("Firebase pas encore chargé, réessaie dans 1s."); return; }
+  var name = document.getElementById('inp-name').value.trim();
+  var email = document.getElementById('inp-email-r').value.trim();
+  var pw = document.getElementById('inp-pw-r').value;
+  var errEl = document.getElementById('err-r');
+  errEl.classList.add('hidden');
+  if (!name) { errEl.textContent = "Veuillez entrer votre prénom."; errEl.classList.remove('hidden'); return; }
+  if (!email) { errEl.textContent = "Veuillez entrer votre email."; errEl.classList.remove('hidden'); return; }
+  if (pw.length < 6) { errEl.textContent = "Le mot de passe doit faire au moins 6 caractères."; errEl.classList.remove('hidden'); return; }
+  try {
+    var cred = await window._createUserWithEmailAndPassword(window._auth, email, pw);
+    await window._updateProfile(cred.user, { displayName: name });
+    await window._setDoc(window._doc(window._db, 'users', cred.user.uid), {
+      name: name, email: email, createdAt: new Date().toISOString(), skinProfile: null, lastRoutine: null
+    });
+    window._currentUser = cred.user;
+    go('welcome');
+  } catch(e) {
+    var msg = e.code === 'auth/email-already-in-use' ? 'Cet email est déjà utilisé.' :
+              e.code === 'auth/invalid-email' ? 'Email invalide.' :
+              e.code === 'auth/weak-password' ? 'Mot de passe trop faible.' : 'Erreur : ' + e.message;
+    errEl.textContent = msg; errEl.classList.remove('hidden');
+  }
+}
+
+async function doLogin() {
+  if (!window._firebaseReady) { alert("Firebase pas encore chargé, réessaie dans 1s."); return; }
+  var email = document.getElementById('inp-email-l').value.trim();
+  var pw = document.getElementById('inp-pw-l').value;
+  var errEl = document.getElementById('err-l');
+  errEl.classList.add('hidden');
+  try {
+    var cred = await window._signInWithEmailAndPassword(window._auth, email, pw);
+    window._currentUser = cred.user;
+    var snap = await window._getDoc(window._doc(window._db, 'users', cred.user.uid));
+    if (snap.exists() && snap.data().lastRoutine) window._savedRoutine = snap.data().lastRoutine;
+    go('welcome');
+  } catch(e) {
+    var msg = (e.code === 'auth/user-not-found' || e.code === 'auth/wrong-password' || e.code === 'auth/invalid-credential')
+      ? 'Email ou mot de passe incorrect.' : 'Erreur : ' + e.message;
+    errEl.textContent = msg; errEl.classList.remove('hidden');
+  }
+}
+
+async function doGoogleLogin() {
+  if (!window._firebaseReady) { alert("Firebase pas encore chargé, réessaie dans 1s."); return; }
+  try {
+    var result = await window._signInWithPopup(window._auth, window._googleProvider);
+    var user = result.user;
+    var snap = await window._getDoc(window._doc(window._db, 'users', user.uid));
+    if (!snap.exists()) {
+      await window._setDoc(window._doc(window._db, 'users', user.uid), {
+        name: user.displayName || '', email: user.email, createdAt: new Date().toISOString(), skinProfile: null, lastRoutine: null
+      });
+    }
+    window._currentUser = user;
+    go('welcome');
+  } catch(e) { console.error('Google login error:', e); }
+}
+
+async function doLogout() {
+  await window._signOut(window._auth);
+  window._currentUser = null; window._userProfile = null;
+  go('welcome');
+}
+
+async function saveRoutineToFirestore(routineData) {
+  if (!window._currentUser || !window._firebaseReady) return;
+  try {
+    await window._updateDoc(window._doc(window._db, 'users', window._currentUser.uid), {
+      lastRoutine: routineData, skinProfile: ST, updatedAt: new Date().toISOString()
+    });
+  } catch(e) { console.log('Firestore save error:', e); }
+}
+
+window.onFirebaseUserReady = function(user) {
+  var btnLog = document.getElementById('btn-log');
+  var btnReg = document.getElementById('btn-reg');
+  if (user) {
+    if (btnLog) { btnLog.textContent = '👤 ' + (user.displayName || user.email.split('@')[0]); btnLog.onclick = doLogout; }
+    if (btnReg) btnReg.style.display = 'none';
+  } else {
+    if (btnLog) { btnLog.textContent = 'Se connecter'; btnLog.onclick = function(){ go('login'); }; }
+    if (btnReg) { btnReg.style.display = ''; btnReg.textContent = 'Créer un compte'; }
+  }
+};
 
 // Init
 go('lang');
