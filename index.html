@@ -353,11 +353,11 @@ h2{font-family:var(--serif);font-size:20px;font-weight:700;margin-bottom:3px}
       <div style="display:flex;gap:16px;margin-bottom:28px;justify-content:center">
         <div style="display:flex;align-items:center;gap:6px;background:#fff;border-radius:50px;padding:8px 14px;box-shadow:0 2px 8px rgba(0,0,0,.06)">
           <span style="font-size:14px">🎯</span>
-          <span style="font-size:12px;font-weight:700;color:#3D2B1F">Pour ta peau, pas la marque</span>
+          <span style="font-size:12px;font-weight:700;color:#3D2B1F" id="badge1">Pour ta peau, pas la marque</span>
         </div>
         <div style="display:flex;align-items:center;gap:6px;background:#fff;border-radius:50px;padding:8px 14px;box-shadow:0 2px 8px rgba(0,0,0,.06)">
           <span style="font-size:14px">🆓</span>
-          <span style="font-size:12px;font-weight:700;color:#3D2B1F">100% Gratuit</span>
+          <span style="font-size:12px;font-weight:700;color:#3D2B1F" id="badge2">100% Gratuit</span>
         </div>
         <div style="display:flex;align-items:center;gap:6px;background:#fff;border-radius:50px;padding:8px 14px;box-shadow:0 2px 8px rgba(0,0,0,.06)">
           <span style="font-size:14px">🇫🇷</span>
@@ -367,15 +367,15 @@ h2{font-family:var(--serif);font-size:20px;font-weight:700;margin-bottom:3px}
 
       <!-- Mini tutoriel 3 étapes -->
       <div style="width:100%;max-width:340px;margin-bottom:28px">
-        <p style="font-size:11px;font-weight:700;color:#C4726A;text-transform:uppercase;letter-spacing:2px;margin-bottom:16px">Comment ça marche</p>
+        <p style="font-size:11px;font-weight:700;color:#C4726A;text-transform:uppercase;letter-spacing:2px;margin-bottom:16px" id="how-it-works-title">Comment ça marche</p>
         <div style="display:flex;flex-direction:column;gap:12px;text-align:left">
           <div style="display:flex;align-items:center;gap:14px;background:#fff;border-radius:16px;padding:14px 16px;box-shadow:0 2px 10px rgba(0,0,0,.06)">
             <div style="width:40px;height:40px;border-radius:12px;background:linear-gradient(135deg,#C4726A,#A85A52);display:flex;align-items:center;justify-content:center;flex-shrink:0">
               <span style="font-size:18px">📋</span>
             </div>
             <div>
-              <div style="font-size:13px;font-weight:700;color:#3D2B1F">Réponds à 5 questions</div>
-              <div style="font-size:12px;color:#8B6F5E;margin-top:2px">Type de peau, âge, problèmes, allergies, budget</div>
+              <div style="font-size:13px;font-weight:700;color:#3D2B1F" id="step1-title">Réponds à 5 questions</div>
+              <div style="font-size:12px;color:#8B6F5E;margin-top:2px" id="step1-sub">Type de peau, âge, problèmes, allergies, budget</div>
             </div>
           </div>
           <div style="display:flex;align-items:center;gap:14px;background:#fff;border-radius:16px;padding:14px 16px;box-shadow:0 2px 10px rgba(0,0,0,.06)">
@@ -383,8 +383,8 @@ h2{font-family:var(--serif);font-size:20px;font-weight:700;margin-bottom:3px}
               <span style="font-size:18px">✨</span>
             </div>
             <div>
-              <div style="font-size:13px;font-weight:700;color:#3D2B1F">L'IA analyse ton profil</div>
-              <div style="font-size:12px;color:#8B6F5E;margin-top:2px">Parmi 160+ produits de 30+ marques</div>
+              <div style="font-size:13px;font-weight:700;color:#3D2B1F" id="step2-title">SkinMatch analyse ton profil</div>
+              <div style="font-size:12px;color:#8B6F5E;margin-top:2px" id="step2-sub">Parmi 160+ produits de 30+ marques</div>
             </div>
           </div>
           <div style="display:flex;align-items:center;gap:14px;background:#fff;border-radius:16px;padding:14px 16px;box-shadow:0 2px 10px rgba(0,0,0,.06)">
@@ -392,8 +392,8 @@ h2{font-family:var(--serif);font-size:20px;font-weight:700;margin-bottom:3px}
               <span style="font-size:18px">✨</span>
             </div>
             <div>
-              <div style="font-size:13px;font-weight:700;color:#3D2B1F">Ta routine personnalisée</div>
-              <div style="font-size:12px;color:#8B6F5E;margin-top:2px">Produits adaptés à toi, liens d'achat directs</div>
+              <div style="font-size:13px;font-weight:700;color:#3D2B1F" id="step3-title">Ta routine personnalisée</div>
+              <div style="font-size:12px;color:#8B6F5E;margin-top:2px" id="step3-sub">Produits adaptés à toi, liens d'achat directs</div>
             </div>
           </div>
         </div>
@@ -409,7 +409,7 @@ h2{font-family:var(--serif);font-size:20px;font-weight:700;margin-bottom:3px}
       <button onclick="go('scan')" style="width:100%;max-width:320px;padding:14px 20px;border-radius:50px;border:2px solid #C4726A;background:transparent;color:#C4726A;font-size:14px;font-weight:600;cursor:pointer;font-family:'Outfit',sans-serif;display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:28px" id="btn-scan">
         <span style="font-size:16px">📸</span>
         <span id="btn-scan-text">Scanner ma peau avec l'IA</span>
-        <span style="font-size:9px;background:#C4726A;color:#fff;border-radius:20px;padding:2px 7px;font-weight:700">NEW</span>
+        <span id="scan-badge-new" style="font-size:9px;background:#C4726A;color:#fff;border-radius:20px;padding:2px 7px;font-weight:700">NEW</span>
       </button>
 
       <!-- Stats sociales -->
@@ -545,7 +545,7 @@ h2{font-family:var(--serif);font-size:20px;font-weight:700;margin-bottom:3px}
       <!-- Loading -->
       <div id="scan-loading" style="text-align:center;padding:24px;display:none">
         <div style="width:44px;height:44px;border:3px solid var(--rose);border-top-color:#C4726A;border-radius:50%;animation:spin 1s linear infinite;margin:0 auto 14px"></div>
-        <div style="font-size:13px;color:var(--mut)" id="scan-loading-text">Analyse en cours...</div>
+        <div style="font-size:13px;color:var(--mut)" id="scan-loading-text"><span id="scan-analyzing-text">Analyse en cours...</span></div>
       </div>
       <!-- Résultats -->
       <div id="scan-analysis" style="display:none">
@@ -593,7 +593,7 @@ h2{font-family:var(--serif);font-size:20px;font-weight:700;margin-bottom:3px}
       <h2>Créer votre compte</h2>
       <p class="sub">Enregistrez votre profil pour accéder à vos recommandations.</p>
     </div>
-    <div class="inp-wrap"><svg width="15" height="15" viewBox="0 0 24 24" fill="#9A8B7C"><path d="M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12zm0 2.4c-3.2 0-9.6 1.6-9.6 4.8v2.4h19.2v-2.4c0-3.2-6.4-4.8-9.6-4.8z"/></svg><input id="inp-name" type="text" placeholder="Prénom"></div>
+    <div class="inp-wrap"><svg width="15" height="15" viewBox="0 0 24 24" fill="#9A8B7C"><path d="M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12zm0 2.4c-3.2 0-9.6 1.6-9.6 4.8v2.4h19.2v-2.4c0-3.2-6.4-4.8-9.6-4.8z"/></svg><input id="inp-name" type="text" placeholder="Prénom" id="inp-name-placeholder"></div>
     <div class="inp-wrap"><svg width="15" height="15" viewBox="0 0 24 24" fill="#9A8B7C"><path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg><input id="inp-email-r" type="email" placeholder="Adresse email"></div>
     <div class="inp-wrap"><svg width="15" height="15" viewBox="0 0 24 24" fill="#9A8B7C"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/></svg><input id="inp-pw-r" type="password" placeholder="Mot de passe (6 min.)"></div>
     <div id="err-r" class="err-msg hidden"></div>
@@ -1613,7 +1613,7 @@ async function normalizeAutreWithAI(autreTexte, type) {
     : "Tu es un expert cosmétique. L'utilisateur décrit une allergie en texte libre. Retourne UNIQUEMENT une liste JSON des catégories correspondantes parmi : Parfums / Fragrances, Parabènes, Alcool, Sulfates (SLS/SLES), Silicones, Huiles essentielles, Acide salicylique, Rétinol, Vitamine C, Acides (AHA/BHA). Exemple: [\"Parfums / Fragrances\"]. Si aucune correspondance, retourne [].";
 
   try {
-    var GEMINI_KEY = "AIzaSyAcnK0dToixkPc6jgteaDK5w3XD4XKuU_Y";
+    var GEMINI_KEY = "AIzaSyAcnK0dToixkPc6jgteaDK5w3XD4XKuU_Y"; // Restreindre sur console.cloud.google.com
     var response = await fetch("https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=" + GEMINI_KEY, {
       method: "POST",
       headers: {"Content-Type": "application/json"},
@@ -1875,7 +1875,7 @@ function buildRegionList() {
       btn.style.cssText = 'width:100%;padding:12px 16px;border-radius:12px;border:2px solid #EDD9D4;background:' + (isActive ? '#fff' : '#F5F2F0') + ';cursor:' + (isActive ? 'pointer' : 'not-allowed') + ';display:flex;align-items:center;gap:10px;font-family:inherit;text-align:left;opacity:' + (isActive ? '1' : '0.45') + ';position:relative';
       btn.innerHTML = '<span style="font-size:22px">' + item.flag + '</span>' +
         '<span style="font-size:14px;font-weight:600;color:' + (isActive ? '#3D2B1F' : '#B0958F') + '">' + item.name + '</span>' +
-        (!isActive ? '<span style="margin-left:auto;font-size:10px;font-weight:700;color:#B0958F;background:#EDD9D4;padding:2px 8px;border-radius:20px;flex-shrink:0">Bientôt</span>' : '');
+        (!isActive ? '<span style="margin-left:auto;font-size:10px;font-weight:700;color:#B0958F;background:#EDD9D4;padding:2px 8px;border-radius:20px;flex-shrink:0" class="soon-label">Bientôt</span>' : '');
       if (isActive) {
         btn.onclick = (function(v) {
           return function() { setRegion(v); };
@@ -2017,7 +2017,7 @@ function applyWelcomeLang(){
   }
   // Q2
   const q2title2 = document.getElementById('q2-title');
-  if(q2title2) q2title2.textContent = l.q2_title||"Votre tranche d'âge";
+  if(q2title2) q2title2.textContent = l.q2_title||"Votre tranche d'\u00e2ge";
   const q2sub2 = document.getElementById('q2-sub');
   if(q2sub2) q2sub2.textContent = l.q2_sub||'';
   // Q3
@@ -2067,6 +2067,25 @@ function applyWelcomeLang(){
   if(scanRetry) scanRetry.textContent = LANG==='en' ? 'Retake a photo' : 'Reprendre une photo';
   const scanBtnTxt = document.getElementById('scan-btn-text');
   if(scanBtnTxt && !scanBtnTxt.textContent.includes("...")) scanBtnTxt.textContent = LANG==="en" ? "Analyze my skin" : "Analyser ma peau";
+  // Badges preuves sociales
+  var b1 = document.getElementById('badge1');
+  if(b1) b1.textContent = LANG==='en' ? 'For your skin, not the brand' : 'Pour ta peau, pas la marque';
+  var b2 = document.getElementById('badge2');
+  if(b2) b2.textContent = LANG==='en' ? '100% Free' : '100% Gratuit';
+  var hiw = document.getElementById('how-it-works-title');
+  if(hiw) hiw.textContent = LANG==='en' ? 'How it works' : 'Comment ça marche';
+  var s1t = document.getElementById('step1-title');
+  if(s1t) s1t.textContent = LANG==='en' ? 'Answer 5 questions' : 'Réponds à 5 questions';
+  var s1s = document.getElementById('step1-sub');
+  if(s1s) s1s.textContent = LANG==='en' ? 'Skin type, age, concerns, allergies, budget' : 'Type de peau, âge, problèmes, allergies, budget';
+  var s2t = document.getElementById('step2-title');
+  if(s2t) s2t.textContent = LANG==='en' ? 'SkinMatch analyzes your profile' : 'SkinMatch analyse ton profil';
+  var s2s = document.getElementById('step2-sub');
+  if(s2s) s2s.textContent = LANG==='en' ? 'Among 160+ products from 30+ brands' : 'Parmi 160+ produits de 30+ marques';
+  var s3t = document.getElementById('step3-title');
+  if(s3t) s3t.textContent = LANG==='en' ? 'Your personalized routine' : 'Ta routine personnalisée';
+  var s3s = document.getElementById('step3-sub');
+  if(s3s) s3s.textContent = LANG==='en' ? 'Products tailored to you, direct purchase links' : "Produits adaptés à toi, liens d'achat directs";
   // Bouton diagnostic
   const diagBtn = document.querySelector('#q1-opts .sr');
   if(diagBtn){
@@ -2075,6 +2094,35 @@ function applyWelcomeLang(){
     if(rl) rl.textContent = LANG==='en' ? 'Determine my skin type' : 'Déterminer mon type de peau';
     if(rs) rs.textContent = LANG==='en' ? 'Answer 5 questions to find out' : 'Répondez à 5 questions pour le découvrir';
   }
+  // Scan privacy note
+  var spn = document.getElementById('scan-privacy-note');
+  if(spn) spn.innerHTML = LANG==='en' 
+    ? '🔒 <strong>Your photo is not stored.</strong> It is analyzed locally and deleted immediately after analysis.'
+    : "🔒 <strong>Votre photo n'est pas stockée.</strong> Elle est analysée localement et supprimée immédiatement après l'analyse.";
+  // Bouton analyser
+  var sabt = document.getElementById('scan-btn-text');
+  if(sabt && !sabt.textContent.includes('...')) sabt.textContent = LANG==='en' ? 'Analyze my skin' : 'Analyser ma peau';
+  // Texte analyse en cours
+  var sat = document.getElementById('scan-analyzing-text');
+  if(sat) sat.textContent = LANG==='en' ? 'Analyzing...' : 'Analyse en cours...';
+  // Badge NEW/BÊTA
+  var snb = document.getElementById('scan-badge-new');
+  if(snb) snb.textContent = 'NEW';
+  // Labels Bientôt dans région
+  document.querySelectorAll('.soon-label').forEach(function(el){ el.textContent = LANG==='en' ? 'Soon' : 'Bientôt'; });
+  // Placeholder prénom
+  var inp = document.getElementById('inp-name');
+  if(inp) inp.placeholder = LANG==='en' ? 'First name' : 'Prénom';
+  // Placeholders allergies/problèmes
+  var autreProb = document.getElementById('autre-prob-input');
+  if(autreProb) autreProb.placeholder = LANG==='en' ? 'Ex: Rosacea, Keratosis pilaris...' : 'Ex: Rosacée, Kératose pilaire...';
+  var autreAllerg = document.getElementById('autre-allerg-input');
+  if(autreAllerg) autreAllerg.placeholder = LANG==='en' ? 'Ex: Lanolin, Phenoxyethanol...' : 'Ex: Lanoline, Phénoxyéthanol...';
+  // Écran région
+  var rt = document.getElementById('region-title');
+  if(rt) rt.textContent = LANG==='en' ? 'Where are you?' : 'Où êtes-vous ?';
+  var rs = document.getElementById('region-sub');
+  if(rs) rs.textContent = LANG==='en' ? 'Products are tailored to your country.' : 'Les produits sont adaptés à votre pays.';
   // Boutons retour (← Retour / ← Back)
   document.querySelectorAll('.btn-back').forEach(b=>{
     b.textContent = (LANG==='en' ? '← Back' : '← Retour');
@@ -2441,7 +2489,7 @@ function analyzeSkin() {
 
     var prompt = isEN ? promptEN : promptFR;
 
-    var GEMINI_KEY = "AIzaSyAcnK0dToixkPc6jgteaDK5w3XD4XKuU_Y";
+    var GEMINI_KEY = "AIzaSyAcnK0dToixkPc6jgteaDK5w3XD4XKuU_Y"; // Restreindre sur console.cloud.google.com
     fetch("https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=" + GEMINI_KEY, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -2481,7 +2529,7 @@ function analyzeSkin() {
         console.error("Scan error detail:", JSON.stringify(err));
         document.getElementById("scan-loading").style.display = "none";
         document.getElementById("scan-btn").disabled = false;
-        document.getElementById("scan-btn-text").textContent = isEN ? "Retry" : "Reessayer";
+        document.getElementById("scan-btn-text").textContent = isEN ? "Retry" : "Réessayer";
         // Afficher un message d'erreur contextuel au lieu d'une alert
         var errDiv = document.getElementById("scan-error-msg");
         if (!errDiv) {
@@ -2813,7 +2861,7 @@ async function validerAutreAllergy() {
     confirmed.style.display = "block";
     confirmed.style.background = "#FDF0E6";
     confirmed.style.color = "#C4726A";
-    confirmed.textContent = "⏳ Analyse en cours...";
+    confirmed.textContent = "Analyse en cours...";
   }
   input.blur();
 
@@ -2871,7 +2919,7 @@ async function validerAutreConcern() {
     confirmed.style.display = "block";
     confirmed.style.background = "#FDF0E6";
     confirmed.style.color = "#C4726A";
-    confirmed.textContent = "⏳ Analyse en cours...";
+    confirmed.textContent = "Analyse en cours...";
   }
   input.blur();
 
@@ -4724,7 +4772,7 @@ function buildRegionList() {
       btn.style.cssText = 'width:100%;padding:12px 16px;border-radius:12px;border:2px solid #EDD9D4;background:' + (isActive ? '#fff' : '#F5F2F0') + ';cursor:' + (isActive ? 'pointer' : 'not-allowed') + ';display:flex;align-items:center;gap:10px;font-family:inherit;text-align:left;opacity:' + (isActive ? '1' : '0.45') + ';position:relative';
       btn.innerHTML = '<span style="font-size:22px">' + item.flag + '</span>' +
         '<span style="font-size:14px;font-weight:600;color:' + (isActive ? '#3D2B1F' : '#B0958F') + '">' + item.name + '</span>' +
-        (!isActive ? '<span style="margin-left:auto;font-size:10px;font-weight:700;color:#B0958F;background:#EDD9D4;padding:2px 8px;border-radius:20px;flex-shrink:0">Bientôt</span>' : '');
+        (!isActive ? '<span style="margin-left:auto;font-size:10px;font-weight:700;color:#B0958F;background:#EDD9D4;padding:2px 8px;border-radius:20px;flex-shrink:0" class="soon-label">Bientôt</span>' : '');
       if (isActive) {
         btn.onclick = (function(v) {
           return function() { setRegion(v); };
@@ -5675,9 +5723,10 @@ async function doRegister() {
     window._currentUser = cred.user;
     go('welcome');
   } catch(e) {
-    var msg = e.code === 'auth/email-already-in-use' ? 'Cet email est déjà utilisé.' :
-              e.code === 'auth/invalid-email' ? 'Email invalide.' :
-              e.code === 'auth/weak-password' ? 'Mot de passe trop faible.' : 'Erreur : ' + e.message;
+    var isEN = LANG === 'en';
+    var msg = e.code === 'auth/email-already-in-use' ? (isEN ? 'This email is already in use.' : 'Cet email est déjà utilisé.') :
+              e.code === 'auth/invalid-email' ? (isEN ? 'Invalid email.' : 'Email invalide.') :
+              e.code === 'auth/weak-password' ? (isEN ? 'Password too weak.' : 'Mot de passe trop faible.') : (isEN ? 'Error: ' : 'Erreur : ') + e.message;
     errEl.textContent = msg; errEl.classList.remove('hidden');
   }
 }
@@ -5695,8 +5744,9 @@ async function doLogin() {
     if (snap.exists() && snap.data().lastRoutine) window._savedRoutine = snap.data().lastRoutine;
     go('welcome');
   } catch(e) {
+    var isENl = LANG === 'en';
     var msg = (e.code === 'auth/user-not-found' || e.code === 'auth/wrong-password' || e.code === 'auth/invalid-credential')
-      ? 'Email ou mot de passe incorrect.' : 'Erreur : ' + e.message;
+      ? (isENl ? 'Incorrect email or password.' : 'Email ou mot de passe incorrect.') : (isENl ? 'Error: ' : 'Erreur : ') + e.message;
     errEl.textContent = msg; errEl.classList.remove('hidden');
   }
 }
@@ -5857,7 +5907,7 @@ setTimeout(applyWelcomeLang, 50);
     </div>
     <div id="why-loading" style="text-align:center;padding:32px;display:none">
       <div style="width:40px;height:40px;border:3px solid #F2C4BC;border-top-color:#C4726A;border-radius:50%;animation:spin 1s linear infinite;margin:0 auto 14px"></div>
-      <div style="font-size:13px;color:#B0958F">Analyse en cours...</div>
+      <div style="font-size:13px;color:#B0958F"><span id="scan-analyzing-text">Analyse en cours...</span></div>
     </div>
     <div id="why-content" style="font-size:14px;line-height:1.75;color:#3D2B1F"></div>
     <button onclick="closeWhyModal()" style="width:100%;margin-top:20px;padding:13px;border-radius:50px;border:none;background:#C4726A;color:#fff;font-size:14px;font-weight:700;cursor:pointer;font-family:'Outfit',sans-serif">Fermer</button>
@@ -5869,8 +5919,8 @@ setTimeout(applyWelcomeLang, 50);
   <div style="background:#FDF8F5;border-radius:24px 24px 0 0;padding:28px 24px 40px;width:100%;max-width:460px;max-height:85vh;overflow-y:auto">
     <div style="text-align:center;margin-bottom:20px">
       <div style="font-size:10px;font-weight:700;color:#C4726A;text-transform:uppercase;letter-spacing:3px;margin-bottom:8px">🌍 Région</div>
-      <h2 style="font-family:Georgia,serif;font-size:22px;font-weight:700;color:#3D2B1F;margin-bottom:4px">Où êtes-vous ?</h2>
-      <p style="font-size:13px;color:#8B6F5E">Les produits sont adaptés à votre pays.</p>
+      <h2 id="region-title" style="font-family:Georgia,serif;font-size:22px;font-weight:700;color:#3D2B1F;margin-bottom:4px">Où êtes-vous ?</h2>
+      <p id="region-sub" style="font-size:13px;color:#8B6F5E">Les produits sont adaptés à votre pays.</p>
     </div>
     <!-- Liste custom mobile-friendly -->
     <div id="region-list" style="display:flex;flex-direction:column;gap:8px;margin-bottom:16px"></div>
