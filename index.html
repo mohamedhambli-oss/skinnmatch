@@ -218,6 +218,9 @@ h2{font-family:var(--serif);font-size:20px;font-weight:700;margin-bottom:3px}
 .sc-item-brand{font-size:10px;color:rgba(255,255,255,.5)}
 .sc-item-etape{font-size:9px;color:var(--acc);text-transform:uppercase;letter-spacing:.5px;margin-bottom:2px}
 .sc-item-prix{font-family:var(--serif);font-size:13px;font-weight:700;color:var(--acc)}
+.promo-pct{background:#FFF3CD;color:#856404;border-radius:6px;padding:2px 7px;font-size:9px;font-weight:800;letter-spacing:.4px;display:inline-block}
+.prix-barre{text-decoration:line-through;opacity:.5;font-size:10px;font-weight:600;color:#9A8B7C;line-height:1}
+.prix-promo{font-family:var(--serif);font-size:15px;font-weight:800;color:#2E7D32;line-height:1}
 .sc-footer{font-size:10px;color:rgba(255,255,255,.4);text-align:center;margin-top:12px}
 
 /* ALLERGY WARNING */
@@ -1281,6 +1284,15 @@ const IMGS = {
   "ng-bha": "https://www.pharmacie-du-centre.fr/media/catalog/product/cache/1/image/700x700/9df78eab33525d08d6e5fb8d27136e95/0/0/0086800108597.jpg"
 };
 
+// ─── PROMOTIONS ───────────────────────────────────────────────────────────────
+// Format: "product-key": { prix: "Xe", pct: Y, site: "Marchand", expires: "YYYY-MM-DD" }
+// Alimenté automatiquement via flux produits Awin (Doctipharma, Notino, 1001pharmacies)
+const PROMOS = {
+  "cv-gel":    { prix: "7€",  pct: 22, site: "Notino",         expires: "2026-05-31" },
+  "lrp-anth":  { prix: "16€", pct: 20, site: "Doctipharma",    expires: "2026-05-31" },
+  "bd-sens":   { prix: "8€",  pct: 27, site: "1001pharmacies", expires: "2026-05-31" },
+};
+
 // ─── PRODUITS ─────────────────────────────────────────────────────────────────
 const DB = {
   "cs-power": {nom:"Sérum Le Power",marque:"Cible Skin",prix:"190€",link:"https://www.cibleskin.com/collections/all",yuka:100,yl:"Excellent",usage:"Anti-rides, liftant & antioxydant",texture:"Sérum fluide",ak:["Complexe IDANS®","Actifs liftants","Antioxydants"],comp:["Aqua","Glycerin","Complexe IDANS®","Sodium Hyaluronate"],clean:true,vegan:true,pq:"Tous types de peau, peaux matures.",ben:"Réduit rides et ridules, effet liftant immédiat.",app:"5-6 gouttes sur visage et cou, matin et/ou soir.",video:"https://www.youtube.com/results?search_query=Cible+Skin+serum+power+skincare",moment:"AM+PM",video:"https://www.youtube.com/results?search_query=Cible+Skin+skincare"},
@@ -1810,7 +1822,7 @@ function build(){
   const skinL=l.intro_skin||T.fr.intro_skin;
   const tpl=l.intro_tpl||T.fr.intro_tpl;
   const introStr=tpl.replace('{skin}',skinL[ST.skinType]||'').replace('{age}',ST.ageGroup?' ('+ST.ageGroup+')':'');
-  const totalPrix=steps.reduce((a,s)=>{const n=parseFloat((s.prix||"0").replace("€","").replace("~",""));return isNaN(n)?a:a+n;},0);
+  const totalPrix=steps.reduce((a,s)=>{const promo=PROMOS[s.key];const prixStr=(promo&&promo.prix?promo.prix:s.prix)||"0";const n=parseFloat(prixStr.replace("€","").replace("~",""));return isNaN(n)?a:a+n;},0);
   return{intro:introStr,steps,conseil:CONS[c[0]]||"Une routine simple appliquée chaque jour surpasse une routine complexe abandonnée.",totalPrix};
 }
 
@@ -2995,6 +3007,21 @@ function yukaBadge(yuka,yl){
   return `<span class="yb ${cls}">🥕 ${yuka}/100 · ${yl}</span>`;
 }
 
+function prixHtml(key, prixNormal) {
+  var promo = PROMOS[key];
+  if (promo && promo.prix && promo.pct) {
+    var siteLabel = promo.site ? ' · ' + promo.site : '';
+    return '<div style="position:absolute;top:10px;right:12px;display:flex;flex-direction:column;align-items:flex-end;gap:3px">' +
+      '<span class="promo-pct">-' + promo.pct + '%' + siteLabel + '</span>' +
+      '<div style="background:#F0FFF0;border-radius:8px;padding:4px 10px;text-align:right">' +
+        '<div class="prix-barre">' + prixNormal + '</div>' +
+        '<div class="prix-promo">' + promo.prix + '</div>' +
+      '</div>' +
+    '</div>';
+  }
+  return '<div style="position:absolute;top:12px;right:12px;background:#FDF0E6;border-radius:8px;padding:5px 11px;font-family:Georgia,serif;font-size:15px;font-weight:800;color:#C4726A">' + prixNormal + '</div>';
+}
+
 // ─── GENERATE RESULT ──────────────────────────────────────────────────────────
 function doGenerate(){
   var btn = document.getElementById('q5-next');
@@ -3041,7 +3068,7 @@ function renderResult(){
           <div class="pm">${s.marque}</div>
           <div class="badges"><span class="cb">✓ ${s.compat}% ${t('compatible')}</span></div>
         </div>
-        <div style="position:absolute;top:12px;right:12px;background:#FDF0E6;border-radius:8px;padding:5px 11px;font-family:Georgia,serif;font-size:15px;font-weight:800;color:#C4726A">${s.prix}</div>
+        ${prixHtml(s.key,s.prix)}
       </div>
       <div class="pb">
         <div class="pu">${s.pourquoi}</div>
@@ -3083,7 +3110,7 @@ function renderResult(){
 
   const shareHtml=`<div class="share-card">
     <div class="sc-head"><div><div class="sc-ey">SkinMatch</div><div class="sc-title">Ma routine ${({seche:"sèche",grasse:"grasse",mixte:"mixte",normale:"normale",sensible:"sensible"})[ST.skinType]||""}</div>${ST.ageGroup?`<div style="font-size:11px;color:rgba(255,255,255,.6);margin-top:2px">${ST.ageGroup} ans</div>`:""}</div><div class="sc-budget"><div class="sc-budget-lbl">Budget total</div><div class="sc-budget-val">~${Math.round(r.totalPrix)}€</div></div></div>
-    ${r.steps.map(s=>`<div class="sc-item"><div><div class="sc-item-etape">${translateEtape(s.etape)}</div><div class="sc-item-name">${s.nom}</div><div class="sc-item-brand">${s.marque}</div></div><div class="sc-item-prix">${s.prix}</div></div>`).join("")}
+    ${r.steps.map(s=>{const pr=PROMOS[s.key];return`<div class="sc-item"><div><div class="sc-item-etape">${translateEtape(s.etape)}</div><div class="sc-item-name">${s.nom}</div><div class="sc-item-brand">${s.marque}</div></div><div class="sc-item-prix">${pr&&pr.prix?'<span style="text-decoration:line-through;opacity:.5;font-size:10px">'+s.prix+'</span> <span style="color:#2E7D32">'+pr.prix+'</span>':s.prix}</div></div>`;}).join("")}
     <div class="sc-footer">${t("share_footer")}</div>
   </div>`;
 
