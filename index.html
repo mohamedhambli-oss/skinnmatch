@@ -3794,12 +3794,12 @@ function showBarcodeNotFound(code) {
   var resultDiv = document.getElementById("scan-product-result");
   if (resultDiv) {
     resultDiv.style.display = "block";
-    resultDiv.innerHTML = '<div style="background:#FFF8F0;border:1px solid #F5C0A0;border-radius:16px;padding:20px;text-align:center">' +
-      '<div style="font-size:32px;margin-bottom:10px">🔍</div>' +
-      '<div style="font-size:14px;font-weight:700;color:#3D2B1F;margin-bottom:6px">Produit non trouvé</div>' +
-      '<div style="font-size:12px;color:#8B6F5E;margin-bottom:14px">Code : ' + code + '<br>Ce produit n'est pas encore dans notre base.</div>' +
-      '<button onclick="resetBarcodeScanner()" style="padding:11px 24px;border-radius:50px;border:none;background:#C4726A;color:#fff;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">Rescanner</button>' +
-      '</div>';
+    resultDiv.innerHTML = "<div style=\"background:#FFF8F0;border:1px solid #F5C0A0;border-radius:16px;padding:20px;text-align:center\">" +
+      "<div style=\"font-size:32px;margin-bottom:10px\">🔍</div>" +
+      "<div style=\"font-size:14px;font-weight:700;color:#3D2B1F;margin-bottom:6px\">Produit non trouv&eacute;</div>" +
+      "<div style=\"font-size:12px;color:#8B6F5E;margin-bottom:14px\">Code : " + code + "<br>Ce produit nest pas encore dans notre base.</div>" +
+      "<button onclick=\"resetBarcodeScanner()\" style=\"padding:11px 24px;border-radius:50px;border:none;background:#C4726A;color:#fff;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit\">Rescanner</button>" +
+      "</div>";
   }
 }
 
