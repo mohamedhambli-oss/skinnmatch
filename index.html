@@ -6464,7 +6464,7 @@ function renderProfile() {
     html += '<div style="font-size:32px;margin-bottom:10px">🌸</div>';
     html += '<div style="font-size:13px;font-weight:600;color:var(--pri);margin-bottom:6px">Pas encore de routine sauvegardée</div>';
     html += '<div style="font-size:12px;color:var(--mut);margin-bottom:14px">Fais ton diagnostic pour générer ta première routine.</div>';
-    html += '<button onclick="go("q1")" style="padding:11px 24px;border-radius:50px;border:none;background:#C4726A;color:#fff;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">Commencer le diagnostic</button>';
+    html += '<button onclick="startDiagFromProfile()" style="padding:11px 24px;border-radius:50px;border:none;background:#C4726A;color:#fff;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">Commencer le diagnostic</button>';
     html += '</div>';
   }
   
@@ -6472,6 +6472,14 @@ function renderProfile() {
   html += '<button onclick="doLogout()" style="width:100%;padding:13px;border-radius:50px;border:1.5px solid var(--acc);background:transparent;color:var(--acc2);font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;margin-top:4px">Se déconnecter</button>';
   
   contentEl.innerHTML = html;
+}
+
+function startDiagFromProfile() {
+  // Fermer le profil et lancer le diagnostic
+  go('welcome');
+  setTimeout(function() {
+    showTermsModal();
+  }, 100);
 }
 
 // ══ NAVIGATION BAS ══
