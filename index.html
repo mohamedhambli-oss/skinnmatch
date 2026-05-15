@@ -1081,6 +1081,21 @@ h2{font-family:var(--serif);font-size:20px;font-weight:700;margin-bottom:3px}
   </div>
 </div>
 
+<!-- ══ ÉCRAN RÉGLAGES ══ -->
+<div id="sc-settings" class="hidden">
+  <div class="topbar">
+    <button class="btn-back" onclick="go('dashboard')">← Retour</button>
+    <div class="logo"><div class="logo-icon">SM</div>Skin<span>Match</span></div>
+  </div>
+  <div class="content" style="padding-bottom:90px">
+    <div style="margin:8px 0 20px">
+      <div class="step-lbl" id="settings-lbl">Paramètres</div>
+      <h2 id="settings-title">Réglages</h2>
+    </div>
+    <div id="settings-content"></div>
+  </div>
+</div>
+
 <!-- ══ BARRE DE NAVIGATION BAS ══ -->
 <div id="bottom-nav" style="display:none;position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px solid #F0E8E5;padding:8px 0 max(8px, env(safe-area-inset-bottom));z-index:1000;max-width:430px;margin:0 auto">
   <div style="display:flex;justify-content:space-around;align-items:center">
@@ -1096,10 +1111,7 @@ h2{font-family:var(--serif);font-size:20px;font-weight:700;margin-bottom:3px}
       <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="5" height="5"/><rect x="16" y="3" width="5" height="5"/><rect x="3" y="16" width="5" height="5"/><path d="M21 16h-3a2 2 0 0 0-2 2v3"/><path d="M21 21v.01"/><path d="M12 7v3a2 2 0 0 1-2 2H7"/><path d="M3 12h.01"/><path d="M12 3h.01"/><path d="M12 16v.01"/><path d="M16 12h1"/><path d="M21 12v.01"/><path d="M12 21v-1"/></svg>
       <span style="font-size:10px;font-weight:600" id="nav-scan-lbl">Scanner</span>
     </button>
-    <button onclick="navTo('articles')" id="nav-articles" class="nav-btn" style="flex:1;background:none;border:none;cursor:pointer;padding:6px 4px;display:flex;flex-direction:column;align-items:center;gap:3px;font-family:'Outfit',sans-serif">
-      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
-      <span style="font-size:10px;font-weight:600" id="nav-articles-lbl">Articles</span>
-    </button>
+
     <button onclick="navTo('dashboard')" id="nav-space" class="nav-btn" style="flex:1;background:none;border:none;cursor:pointer;padding:6px 4px;display:flex;flex-direction:column;align-items:center;gap:3px;font-family:'Outfit',sans-serif">
       <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
       <span style="font-size:10px;font-weight:600" id="nav-space-lbl">Mon espace</span>
@@ -1999,7 +2011,7 @@ function getRegionProducts() {
   return available;
 }
 
-const SCREENS=["lang","welcome","register","login","scan","q1","diag","q2","q3","q4","q5","result","compare","suivi","dashboard","scan-product","profile","articles"];
+const SCREENS=["lang","welcome","register","login","scan","q1","diag","q2","q3","q4","q5","result","compare","suivi","dashboard","scan-product","profile","articles","settings"];
 
 const ST={
   screen:'lang',user:null,
@@ -3718,7 +3730,7 @@ function getChatbotResponse(msg) {
   // Bonjour / salut
   if (m.includes('bonjour') || m.includes('salut') || m.includes('hello') || m.includes('bonsoir') || m.includes('hi')) {
     var skin = ST.skinType ? ' Je vois que tu as une peau ' + ST.skinType + '.' : '';
-    return '👋 Bonjour !' + skin + ' Je suis l\'assistant SkinMatch, expert en soins de peau. Tu peux me poser toutes tes questions sur ta routine, les actifs, les produits ou les problèmes de peau. Je suis là pour t\'aider !';
+    var isEN = LANG==='en'; return isEN ? '👋 Hello! I am the SkinMatch assistant. Ask me anything about skincare!' : '👋 Bonjour !' + skin + ' Je suis l\'assistant SkinMatch, expert en soins de peau. Tu peux me poser toutes tes questions sur ta routine, les actifs, les produits ou les problèmes de peau. Je suis là pour t\'aider !';
   }
   // Merci
   if (m.includes('merci') || m.includes('thanks') || m.includes('super') || m.includes('parfait')) {
@@ -5108,6 +5120,8 @@ function getInitials(nom, marque) {
   return (nom || 'SK').substring(0, 2).toUpperCase();
 }
 function showRegionModal() {
+  // Si région déjà mémorisée, ne pas redemander
+  if (localStorage.getItem('skinmatch_region')) return;
   selectedRegionValue = '';
   buildRegionList();
   var m = document.getElementById('region-modal');
@@ -5637,9 +5651,11 @@ function renderDashboard() {
     var hour = new Date().getHours();
     var greeting = hour < 12 ? (isEN ? "Good morning" : "Bonjour") : hour < 18 ? (isEN ? "Good afternoon" : "Bonsoir") : (isEN ? "Good evening" : "Bonsoir");
     var headerEl = document.createElement("div");
-    headerEl.style.cssText = "margin-bottom:16px";
-    headerEl.innerHTML = "<div style='font-size:22px;font-family:Georgia,serif;font-weight:700;color:var(--pri)'>" + greeting + (userName ? " " + userName.split(" ")[0] : "") + " 👋</div>" +
-      "<div style='font-size:13px;color:var(--mut);margin-top:2px'>" + (isEN ? "Your personalized skincare space" : "Ton espace skincare personnalisé") + "</div>";
+    headerEl.style.cssText = "margin-bottom:16px;display:flex;align-items:flex-start;justify-content:space-between";
+    headerEl.innerHTML = "<div>" +
+      "<div style='font-size:22px;font-family:Georgia,serif;font-weight:700;color:var(--pri)'>" + greeting + (userName ? " " + userName.split(" ")[0] : "") + " 👋</div>" +
+      "<div style='font-size:13px;color:var(--mut);margin-top:2px'>" + (isEN ? "Your personalized skincare space" : "Ton espace skincare personnalisé") + "</div></div>" +
+      "<button onclick='openSettings()' style='background:var(--surf);border:1px solid var(--bdr);border-radius:50%;width:38px;height:38px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:18px;flex-shrink:0'>⚙️</button>";
     wrap.appendChild(headerEl);
 
     // ── 2. AFFIRMATION DU JOUR ──
@@ -5847,6 +5863,34 @@ function renderDashboard() {
     });
     badgeEl.appendChild(badgeGrid);
     wrap.appendChild(badgeEl);
+
+    // ── 11. ARTICLES DANS MON ESPACE ──
+    var allArticlesEl = document.createElement("div");
+    allArticlesEl.style.cssText = "margin-bottom:14px";
+    allArticlesEl.innerHTML = "<div style='display:flex;align-items:center;justify-content:space-between;margin-bottom:10px'>" +
+      "<div style='font-size:11px;font-weight:700;color:var(--mut);text-transform:uppercase;letter-spacing:.5px'>📚 " + (isEN ? "ARTICLES" : "ARTICLES") + "</div>" +
+      "<div style='font-size:11px;font-weight:700;color:var(--mut);text-transform:uppercase;letter-spacing:.5px'>\uD83D\uDCDA " + (isEN ? "ARTICLES" : "ARTICLES") + "</div>" +
+      "</div>";
+    var artPreviewGrid = document.createElement("div");
+    artPreviewGrid.style.cssText = "display:flex;flex-direction:column;gap:8px";
+    var previewArticles = isEN ? ARTICLES_EN : ARTICLES_FR;
+    var todayArtIdx = new Date().getDate() % previewArticles.length;
+    // Afficher 3 articles (article du jour + 2 suivants)
+    [0, 1, 2].forEach(function(offset) {
+      var idx = (todayArtIdx + offset) % previewArticles.length;
+      var a = previewArticles[idx];
+      var card = document.createElement("div");
+      card.style.cssText = "background:var(--surf);border-radius:14px;border:1px solid var(--bdr);padding:12px 14px;cursor:pointer;display:flex;align-items:center;gap:12px";
+      card.onclick = (function(i) { return function() { showArticle(i, isEN); }; })(idx);
+      card.innerHTML = "<div style='font-size:26px;flex-shrink:0'>" + a.emoji + "</div>" +
+        "<div style='flex:1;min-width:0'>" +
+        "<div style='font-size:10px;color:var(--acc2);font-weight:600;margin-bottom:2px'>" + a.tag + " · " + a.read + "</div>" +
+        "<div style='font-size:13px;font-weight:700;color:var(--pri);line-height:1.3;overflow:hidden;text-overflow:ellipsis;white-space:nowrap'>" + a.title + "</div></div>" +
+        "<div style='font-size:16px;color:var(--mut);flex-shrink:0'>›</div>";
+      artPreviewGrid.appendChild(card);
+    });
+    allArticlesEl.appendChild(artPreviewGrid);
+    wrap.appendChild(allArticlesEl);
 }
 
 // ── FONCTIONS JOURNAL ──
@@ -6462,14 +6506,16 @@ function renderProfile() {
   } else {
     html += '<div style="background:var(--blush);border-radius:16px;border:1px solid var(--rose);padding:20px;margin-bottom:14px;text-align:center">';
     html += '<div style="font-size:32px;margin-bottom:10px">🌸</div>';
-    html += '<div style="font-size:13px;font-weight:600;color:var(--pri);margin-bottom:6px">Pas encore de routine sauvegardée</div>';
-    html += '<div style="font-size:12px;color:var(--mut);margin-bottom:14px">Fais ton diagnostic pour générer ta première routine.</div>';
-    html += '<button onclick="startDiagFromProfile()" style="padding:11px 24px;border-radius:50px;border:none;background:#C4726A;color:#fff;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">Commencer le diagnostic</button>';
+    html += '<div style="font-size:13px;font-weight:600;color:var(--pri);margin-bottom:6px">' + (LANG==="en" ? "No routine saved yet" : "Pas encore de routine sauvegardée") + '</div>';
+    html += '<div style="font-size:12px;color:var(--mut);margin-bottom:14px">' + (LANG==="en" ? "Take your diagnosis to generate your first routine." : "Fais ton diagnostic pour générer ta première routine.") + '</div>';
+    html += '<button onclick="startDiagFromProfile()" style="padding:11px 24px;border-radius:50px;border:none;background:#C4726A;color:#fff;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">' + (LANG==="en" ? "Start diagnosis" : "Commencer le diagnostic") + '</button>';
     html += '</div>';
   }
   
+  // Bouton réglages
+  html += '<button onclick="openSettings()" style="width:100%;padding:13px;border-radius:50px;border:1.5px solid var(--bdr);background:var(--surf);color:var(--pri);font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;margin-top:4px;display:flex;align-items:center;justify-content:center;gap:8px">⚙️ ' + (LANG==="en" ? "Settings" : "Réglages") + '</button>';
   // Bouton déconnexion
-  html += '<button onclick="doLogout()" style="width:100%;padding:13px;border-radius:50px;border:1.5px solid var(--acc);background:transparent;color:var(--acc2);font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;margin-top:4px">Se déconnecter</button>';
+  html += '<button onclick="doLogout()" style="width:100%;padding:13px;border-radius:50px;border:1.5px solid var(--acc);background:transparent;color:var(--acc2);font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;margin-top:8px">' + (LANG==="en" ? "Log out" : "Se déconnecter") + '</button>';
   
   contentEl.innerHTML = html;
 }
@@ -6520,7 +6566,6 @@ function updateNav(screen) {
     'nav-home-lbl': isEN ? 'Home' : 'Accueil',
     'nav-routine-lbl': isEN ? 'Routine' : 'Routine',
     'nav-scan-lbl': isEN ? 'Scan' : 'Scanner',
-    'nav-articles-lbl': isEN ? 'Articles' : 'Articles',
     'nav-space-lbl': isEN ? 'My space' : 'Mon espace',
     'nav-chat-lbl': isEN ? 'Advice' : 'Conseil',
   };
@@ -6530,7 +6575,7 @@ function updateNav(screen) {
   });
   
   // Activer le bon bouton
-  var map = { 'welcome':'nav-home', 'result':'nav-routine', 'scan-product':'nav-scan', 'articles':'nav-articles', 'dashboard':'nav-space' };
+  var map = { 'welcome':'nav-home', 'result':'nav-routine', 'scan-product':'nav-scan', 'dashboard':'nav-space' };
   document.querySelectorAll('.nav-btn').forEach(function(b) { b.classList.remove('active'); });
   if (map[screen]) {
     var activeBtn = document.getElementById(map[screen]);
@@ -6592,6 +6637,98 @@ function renderArticlesScreen() {
   };
   
   renderList(window._artFilter || null);
+}
+
+function openSettings() {
+  renderSettings();
+  go('settings');
+}
+
+function renderSettings() {
+  var isEN = LANG === 'en';
+  var el = document.getElementById('settings-lbl');
+  var t = document.getElementById('settings-title');
+  if (el) el.textContent = isEN ? 'Preferences' : 'Paramètres';
+  if (t) t.textContent = isEN ? 'Settings' : 'Réglages';
+  
+  var content = document.getElementById('settings-content');
+  if (!content) return;
+
+  var notifGranted = 'Notification' in window && Notification.permission === 'granted';
+  var currentLang = LANG === 'en' ? '🇬🇧 English' : '🇫🇷 Français';
+  var regionFlags = {fr:'🇫🇷 France',dz:'🇩🇿 Algérie',ma:'🇲🇦 Maroc',gb:'🇬🇧 United Kingdom',es:'🇪🇸 España',de:'🇩🇪 Deutschland',be:'🇧🇪 Belgique',ch:'🇨🇭 Suisse',other:'🌍 Autre'};
+  var currentRegion = regionFlags[REGION] || '🌍';
+
+  var sections = [
+    {
+      title: isEN ? '🌍 Language & Region' : '🌍 Langue & Région',
+      items: [
+        { label: isEN ? 'Language' : 'Langue', value: currentLang, action: 'changeLangRegion()' },
+        { label: isEN ? 'Region' : 'Région', value: currentRegion, action: 'changeRegionOnly()' },
+      ]
+    },
+    {
+      title: isEN ? '🔔 Notifications' : '🔔 Notifications',
+      items: [
+        { label: isEN ? 'Morning reminder (8:00)' : 'Rappel matin (8h00)', value: notifGranted ? (isEN ? 'Active' : 'Actif') : (isEN ? 'Inactive' : 'Inactif'), action: 'requestNotifPermission()', toggle: notifGranted },
+        { label: isEN ? 'Evening reminder (21:00)' : 'Rappel soir (21h00)', value: notifGranted ? (isEN ? 'Active' : 'Actif') : (isEN ? 'Inactive' : 'Inactif'), toggle: notifGranted },
+      ]
+    },
+    {
+      title: isEN ? '👤 Account' : '👤 Compte',
+      items: [
+        { label: isEN ? 'Email' : 'Email', value: window._currentUser ? window._currentUser.email : '-' },
+        { label: isEN ? 'Logout' : 'Se déconnecter', value: '', action: 'doLogout()', danger: true },
+      ]
+    },
+    {
+      title: isEN ? '📱 App' : '📱 Application',
+      items: [
+        { label: isEN ? 'Reset skin data' : 'Réinitialiser mes données peau', value: '', action: 'resetAllData()', danger: true },
+        { label: isEN ? 'Version' : 'Version', value: 'SkinMatch v1.0' },
+        { label: isEN ? 'CGU' : 'CGU', value: '', action: "go('cgu')" },
+      ]
+    },
+  ];
+
+  var html = '';
+  sections.forEach(function(section) {
+    html += '<div style="margin-bottom:20px">';
+    html += '<div style="font-size:11px;font-weight:700;color:var(--mut);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">' + section.title + '</div>';
+    html += '<div style="background:#fff;border-radius:16px;border:1px solid var(--bdr);overflow:hidden">';
+    section.items.forEach(function(item, i) {
+      var isLast = i === section.items.length - 1;
+      html += '<div style="padding:14px 16px;' + (!isLast ? 'border-bottom:1px solid var(--bdr);' : '') + 'display:flex;align-items:center;justify-content:space-between;' + (item.action ? 'cursor:pointer;' : '') + '"' + (item.action ? ' onclick="' + item.action + '"' : '') + '>';
+      html += '<span style="font-size:14px;font-weight:500;color:' + (item.danger ? '#C62828' : 'var(--pri)') + '">' + item.label + '</span>';
+      if (item.hasOwnProperty('toggle')) {
+        html += '<div style="width:44px;height:24px;border-radius:12px;background:' + (item.toggle ? '#C4726A' : '#E0E0E0') + ';position:relative;cursor:pointer"><div style="position:absolute;top:2px;' + (item.toggle ? 'right:2px' : 'left:2px') + ';width:20px;height:20px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.3)"></div></div>';
+      } else if (item.value) {
+        html += '<span style="font-size:13px;color:var(--mut);display:flex;align-items:center;gap:4px">' + item.value + (item.action ? ' <span style="color:var(--mut)">›</span>' : '') + '</span>';
+      } else if (item.action) {
+        html += '<span style="color:var(--mut)">›</span>';
+      }
+      html += '</div>';
+    });
+    html += '</div></div>';
+  });
+
+  content.innerHTML = html;
+}
+
+function changeRegionOnly() {
+  localStorage.removeItem('skinmatch_region');
+  showRegionModal();
+}
+
+function resetAllData() {
+  var isEN = LANG === 'en';
+  if (confirm(isEN ? 'Reset all your skin data? This cannot be undone.' : 'Réinitialiser toutes tes données peau ? Cette action est irréversible.')) {
+    localStorage.removeItem('skinmatch_dashboard');
+    localStorage.removeItem('skinmatch_suivi');
+    localStorage.removeItem('skinmatch_journal');
+    ST.result = null; ST.skinType = null; ST.ageGroup = null; ST.concerns = []; ST.allergies = []; ST.budget = null;
+    go('welcome');
+  }
 }
 
 function changeLangRegion() {
