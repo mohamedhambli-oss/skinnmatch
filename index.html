@@ -114,7 +114,7 @@ body{background:var(--bg);font-family:var(--sans);color:var(--pri);min-height:10
 .btn-back{background:linear-gradient(135deg,#C4726A,#A85A52);border:none;border-radius:50px;padding:10px 20px;cursor:pointer;display:flex;align-items:center;gap:6px;color:#fff;font-size:13px;font-family:var(--sans);font-weight:700;box-shadow:0 3px 12px rgba(196,114,106,.35)}
 
 /* CONTENT */
-.content{padding:18px 18px 48px;flex:1}
+.content{padding:18px 18px 100px;flex:1}
 .step-lbl{font-size:10px;font-weight:600;color:var(--acc);text-transform:uppercase;letter-spacing:.6px;margin-bottom:5px}
 h2{font-family:var(--serif);font-size:20px;font-weight:700;margin-bottom:3px}
 .sub{font-size:13px;color:var(--mut);margin-bottom:18px;line-height:1.5}
@@ -2031,7 +2031,7 @@ function go(screen){
   if(screen==='scan') setTimeout(function(){ startCamera(); }, 100);
   if(screen==='scan-product') setTimeout(function(){ startBarcodeCamera(); }, 100);
   // Afficher/cacher la nav
-  var navScreens = ['welcome','result','scan-product','articles','dashboard','profile'];
+  var navScreens = ['welcome','result','scan-product','articles','dashboard','profile','login','register','settings'];
   var nav = document.getElementById('bottom-nav');
   if (nav) nav.style.display = navScreens.indexOf(screen) !== -1 ? 'block' : 'none';
   // Activer le bon onglet
@@ -2188,6 +2188,8 @@ function applyWelcomeLang(){
   if(s3t) s3t.textContent = LANG==='en' ? 'Your personalized routine' : 'Ta routine personnalisée';
   var s3s = document.getElementById('step3-sub');
   if(s3s) s3s.textContent = LANG==='en' ? 'Products tailored to you, direct purchase links' : "Produits adaptés à toi, liens d'achat directs";
+  // Afficher la nav sur welcome
+  updateNav('welcome');
   // Bouton diagnostic
   const diagBtn = document.querySelector('#q1-opts .sr');
   if(diagBtn){
@@ -6933,6 +6935,8 @@ if (_savedLang && _savedRegion) {
   LANG = _savedLang;
   REGION = _savedRegion;
   go('welcome');
+  // Afficher la nav dès le départ
+  setTimeout(function() { updateNav('welcome'); }, 100);
 } else {
   go('lang');
 }
