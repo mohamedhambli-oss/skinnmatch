@@ -5460,6 +5460,82 @@ var CHALLENGES = [
     { id: "noclean7", icon: "🧹", label: "Double nettoyage 7j", labelEN: "Double cleanse 7d", desc: "Double nettoyage chaque soir pendant 7 jours", descEN: "Double cleanse every evening for 7 days", days: 7 },
 ];
 
+// ══ ARTICLES ══
+var ARTICLES_FR = [
+  { id:"a1", emoji:"☀️", tag:"Protection", title:"Le SPF, indispensable même en hiver", intro:"Les UV ne s'arrêtent pas en décembre. En hiver, les UVA pénètrent toujours autant dans la peau — et sont responsables du vieillissement prématuré.", content:"Les UVB (coups de soleil) diminuent en hiver, mais les UVA restent présents toute l'année, même par temps nuageux. Ils pénètrent jusqu'au derme et accélèrent le vieillissement, les taches et le relâchement cutané. Un SPF 30 ou 50 le matin prend 10 secondes et protège ta peau pour la journée entière. C'est l'anti-âge le moins cher du marché.", read:"3 min" },
+  { id:"a2", emoji:"🌙", tag:"Routine du soir", title:"5 erreurs qui abîment ta peau la nuit", intro:"La nuit, ta peau se répare. Mais certaines habitudes sabotent ce processus sans que tu le saches.", content:"1. Dormir avec du maquillage — les résidus obstruent les pores et génèrent des imperfections. 2. Utiliser une taie d'oreiller en coton — il absorbe le sébum et les produits. Essaie la soie ou le satin. 3. Toucher ton visage avec tes mains — chaque contact transfère des bactéries. 4. Sauter l'hydratant parce que ta peau est grasse — la peau grasse peut aussi être déshydratée. 5. Ne pas nettoyer ton téléphone — c'est l'objet le plus bactérien que tu approches de ton visage.", read:"4 min" },
+  { id:"a3", emoji:"💧", tag:"Hydratation", title:"Peau grasse et hydratation : un duo mal compris", intro:"Beaucoup de peaux grasses évitent les hydratants par peur d'aggraver les brillances. C'est souvent l'erreur inverse.", content:"Une peau grasse peut être déshydratée. Quand la peau manque d'eau, elle compense en produisant plus de sébum — créant un cercle vicieux. La solution : un gel hydratant sans huile, à base d'acide hyaluronique. Il apporte de l'eau sans alourdir. Ta peau sera plus équilibrée, moins brillante et moins sujette aux imperfections.", read:"3 min" },
+  { id:"a4", emoji:"🧬", tag:"Actifs", title:"Niacinamide : l'actif qui convient (presque) à tout le monde", intro:"Pores dilatés, taches, rougeurs, imperfections — le niacinamide s'attaque à tout ça. Et il est rarement irritant.", content:"Le niacinamide (vitamine B3) est l'un des actifs les plus polyvalents en skincare. Il régule la production de sébum, réduit l'apparence des pores, uniformise le teint, atténue les rougeurs et renforce la barrière cutanée. Compatible avec presque tous les types de peau et la plupart des autres actifs. La concentration idéale : entre 5% et 10%.", read:"3 min" },
+  { id:"a5", emoji:"🌿", tag:"Naturel", title:"Les huiles végétales : lesquelles pour quel type de peau ?", intro:"Pas toutes les huiles se valent. Certaines conviennent aux peaux grasses, d'autres aux peaux sèches.", content:"Peau sèche : huile d'argan, rosehip, avocat — riches et nourrissantes. Peau mixte : huile de jojoba — proche du sébum naturel, équilibrante. Peau grasse : huile de nigelle, pépins de raisin — légères et régulatrices. Peau sensible : huile de calendula, camomille — apaisantes. Évite l'huile de coco sur le visage si tu as tendance acnéique — elle est comédogène.", read:"4 min" },
+  { id:"a6", emoji:"🔬", tag:"Science", title:"Rétinol : tout ce qu'il faut savoir avant de commencer", intro:"Le rétinol est l'actif anti-âge le plus étudié. Mais mal utilisé, il peut irriter. Voici comment l'intégrer en douceur.", content:"Le rétinol accélère le renouvellement cellulaire et stimule la production de collagène. Résultat : moins de rides, pores affinés, teint uniformisé. Pour commencer : 0,1% à 0,3%, 2 fois par semaine le soir. Augmenter progressivement. Ne jamais utiliser avec du benzoyle de peroxyde. Toujours suivre d'un SPF le matin. Les premières semaines peuvent inclure légère irritation — c'est normal.", read:"5 min" },
+  { id:"a7", emoji:"🧘", tag:"Bien-être", title:"Le lien entre stress et imperfections", intro:"Quand tu stresses, ta peau le ressent. Ce n'est pas dans ta tête — c'est de la biochimie.", content:"Le stress provoque une libération de cortisol. Cette hormone stimule les glandes sébacées et augmente la production de sébum. Plus de sébum = plus d'obstruction = plus d'imperfections. Le stress affecte aussi la barrière cutanée, la rendant plus perméable aux irritants. Gérer son stress (sommeil, exercice, respiration) fait partie intégrante d'une bonne routine skincare.", read:"3 min" },
+  { id:"a8", emoji:"🍎", tag:"Nutrition", title:"Les aliments qui font du bien à ta peau", intro:"Ce que tu manges se lit sur ton visage. Certains aliments sont de véritables boosts pour la peau.", content:"Top aliments peau : avocat (vitamine E et graisses saines), poissons gras (oméga-3 anti-inflammatoires), tomates (lycopène protecteur), noix du Brésil (sélénium), fruits rouges (antioxydants). À limiter : sucre raffiné (accélère le vieillissement par glycation), produits laitiers (lien avec l'acné chez certaines personnes), alcool (déshydratation).", read:"4 min" },
+  { id:"a9", emoji:"💤", tag:"Sommeil", title:"Pourquoi le sommeil est le meilleur soin de nuit", intro:"Aucune crème ne remplace 8 heures de sommeil réparateur. Pendant que tu dors, ta peau travaille.", content:"Entre 22h et 2h du matin, la production de mélatonine et d'hormone de croissance est maximale. Ces hormones stimulent la régénération cellulaire, la synthèse de collagène et la réparation des dommages UV. Le manque de sommeil se lit directement sur le visage : teint terne, cernes, pores dilatés. Dormir sur le dos préserve aussi la peau du visage des frottements.", read:"3 min" },
+  { id:"a10", emoji:"🧪", tag:"Ingrédients", title:"Les ingrédients à ne jamais mélanger", intro:"Certains actifs se neutralisent ou s'irritent mutuellement. Voici les combos à éviter.", content:"À éviter ensemble : Rétinol + AHA/BHA (sur-exfoliation). Vitamine C + Niacinamide à forte dose (peut réduire l'efficacité). Rétinol + Benzoyle de peroxyde (irritation sévère). Acide hyaluronique + alcools dénaturés (contre-productif). Les bons combos : Niacinamide + Zinc (sébum). SPF + Antioxydants (protection maximale). Rétinol + Peptides (anti-âge complet).", read:"4 min" },
+  { id:"a11", emoji:"🌊", tag:"Hydratation", title:"Combien d'eau faut-il vraiment boire pour la peau ?", intro:"L'hydratation interne compte autant que les soins topiques.", content:"1,5 à 2 litres d'eau par jour restent la référence. Mais l'hydratation de la peau dépend aussi de ta barrière cutanée — si elle est altérée, l'eau s'évapore plus vite. Utiliser un hydratant contenant des occlutants (comme la vaseline ou les céramides) aide à retenir l'eau dans les couches superficielles. Thé vert, eau de coco et bouillons de légumes comptent aussi dans ton apport hydrique.", read:"3 min" },
+  { id:"a12", emoji:"✨", tag:"Routine", title:"Comment construire une routine skincare en 3 étapes", intro:"Pas besoin de 15 produits. Une routine efficace peut tenir en 3 étapes.", content:"Matin : 1. Nettoyant doux → 2. Hydratant léger → 3. SPF. C'est tout. Le soir : 1. Double nettoyage (huile puis mousse) → 2. Sérum ciblé (rétinol, niacinamide...) → 3. Crème plus riche. Le secret : la régularité. Une routine simple faite chaque jour dépasse toujours une routine complexe faite de temps en temps.", read:"3 min" },
+];
+
+var ARTICLES_EN = [
+  { id:"a1", emoji:"☀️", tag:"Protection", title:"SPF: Essential Even in Winter", intro:"UV rays don't stop in December. UVA rays still penetrate skin all year round — causing premature aging.", content:"UVB rays (sunburn) decrease in winter, but UVA rays remain present year-round, even on cloudy days. They penetrate into the dermis and accelerate aging, spots and sagging. SPF 30 or 50 in the morning takes 10 seconds and protects your skin all day. It's the cheapest anti-aging product on the market.", read:"3 min" },
+  { id:"a2", emoji:"🌙", tag:"Evening Routine", title:"5 Habits That Damage Your Skin at Night", intro:"At night, your skin repairs itself. But some habits sabotage this process without you knowing.", content:"1. Sleeping with makeup — residues clog pores and cause blemishes. 2. Cotton pillowcase — absorbs sebum and products. Try silk or satin. 3. Touching your face — every contact transfers bacteria. 4. Skipping moisturizer because your skin is oily — oily skin can also be dehydrated. 5. Not cleaning your phone — it's the most bacteria-laden object near your face.", read:"4 min" },
+  { id:"a3", emoji:"💧", tag:"Hydration", title:"Oily Skin and Hydration: A Misunderstood Duo", intro:"Many oily skin types avoid moisturizers fearing they'll worsen shine. This is often the opposite mistake.", content:"Oily skin can be dehydrated. When skin lacks water, it compensates by producing more sebum — creating a vicious cycle. The solution: an oil-free hydrating gel, based on hyaluronic acid. It provides water without weighing skin down. Your skin will be more balanced, less shiny and less prone to blemishes.", read:"3 min" },
+  { id:"a4", emoji:"🧬", tag:"Actives", title:"Niacinamide: The Active That Suits (Almost) Everyone", intro:"Enlarged pores, spots, redness, blemishes — niacinamide tackles all of this. And it's rarely irritating.", content:"Niacinamide (vitamin B3) is one of the most versatile skincare actives. It regulates sebum production, reduces the appearance of pores, evens skin tone, reduces redness and strengthens the skin barrier. Compatible with almost all skin types and most other actives. Ideal concentration: between 5% and 10%.", read:"3 min" },
+];
+
+// ══ AFFIRMATIONS ══
+var AFFIRMATIONS_FR = [
+  "Ta peau est unique. Prends soin d'elle à ton rythme.",
+  "Chaque geste de soin est un acte d'amour envers toi-même.",
+  "La constance, pas la perfection, transforme ta peau.",
+  "Tu mérites de te sentir bien dans ta peau chaque jour.",
+  "Prendre soin de soi n'est pas un luxe, c'est une nécessité.",
+  "Ta peau reflète ta santé intérieure. Nourris-la bien.",
+  "Un jour à la fois. Une routine à la fois.",
+  "La patience est le secret de toute belle peau.",
+  "Ton teint s'améliore chaque jour, même si tu ne le vois pas encore.",
+  "Sois douce avec toi-même — ta peau aussi a besoin de douceur.",
+  "Les petits gestes quotidiens font les grandes transformations.",
+  "Tu es plus belle que tu ne le crois.",
+  "Ta routine skincare est ton moment rien qu'à toi.",
+  "La régularité bat toujours l'intensité.",
+  "Prendre soin de ta peau, c'est prendre soin de toi.",
+];
+
+var AFFIRMATIONS_EN = [
+  "Your skin is unique. Take care of it at your own pace.",
+  "Every skincare gesture is an act of self-love.",
+  "Consistency, not perfection, transforms your skin.",
+  "You deserve to feel good in your skin every day.",
+  "Self-care is not a luxury, it's a necessity.",
+  "Your skin reflects your inner health. Nourish it well.",
+  "One day at a time. One routine at a time.",
+  "Patience is the secret to beautiful skin.",
+  "Your complexion improves every day, even if you can't see it yet.",
+  "Be gentle with yourself — your skin needs gentleness too.",
+  "Small daily gestures create great transformations.",
+  "You are more beautiful than you think.",
+  "Your skincare routine is your time just for you.",
+  "Consistency always beats intensity.",
+  "Taking care of your skin is taking care of yourself.",
+];
+
+// ══ JOURNAL DE PEAU ══
+function getSkinJournal() {
+  try { return JSON.parse(localStorage.getItem("skinmatch_journal") || "[]"); } catch(e) { return []; }
+}
+function saveSkinJournal(entries) {
+  localStorage.setItem("skinmatch_journal", JSON.stringify(entries));
+}
+function addJournalEntry(mood, factors, note) {
+  var entries = getSkinJournal();
+  var today = new Date().toISOString().split("T")[0];
+  entries = entries.filter(function(e) { return e.date !== today; }); // un seul par jour
+  entries.push({ date: today, mood: mood, factors: factors, note: note });
+  if (entries.length > 30) entries = entries.slice(-30); // garder 30 jours
+  saveSkinJournal(entries);
+}
+
 function renderDashboard() {
     var data = getDashData();
     var wrap = document.getElementById("dashboard-content");
@@ -5468,8 +5544,8 @@ function renderDashboard() {
 
     // Streak check
     var today = new Date().toDateString();
+    var todayISO = new Date().toISOString().split("T")[0];
     if (data.lastCheck !== today) {
-        // Auto-unlock first_routine badge
         if (!data.badges) data.badges = [];
         if (data.badges.indexOf("first_routine") === -1) data.badges.push("first_routine");
         saveDashData(data);
@@ -5489,56 +5565,152 @@ function renderDashboard() {
             var diff = last - prev;
             if (diff > 0) scoreLabel = isEN ? "+" + Math.round(diff*20) + "% vs last week 📈" : "+" + Math.round(diff*20) + "% vs semaine dernière 📈";
             else if (diff < 0) scoreLabel = isEN ? Math.round(diff*20) + "% vs last week 📉" : Math.round(diff*20) + "% vs semaine dernière 📉";
-            else scoreLabel = isEN ? "Stable 📊" : "Stable 📊";
+            else scoreLabel = "Stable 📊";
         }
         scoreColor = skinScore >= 70 ? "#2E7D32" : skinScore >= 50 ? "#E65100" : "#C62828";
     }
 
-    // --- SCORE PEAU ---
+    // ── 1. HEADER PERSONNALISÉ ──
+    var userName = window._currentUser ? (window._currentUser.displayName || window._currentUser.email.split("@")[0]) : "";
+    var hour = new Date().getHours();
+    var greeting = hour < 12 ? (isEN ? "Good morning" : "Bonjour") : hour < 18 ? (isEN ? "Good afternoon" : "Bonsoir") : (isEN ? "Good evening" : "Bonsoir");
+    var headerEl = document.createElement("div");
+    headerEl.style.cssText = "margin-bottom:16px";
+    headerEl.innerHTML = "<div style='font-size:22px;font-family:Georgia,serif;font-weight:700;color:var(--pri)'>" + greeting + (userName ? " " + userName.split(" ")[0] : "") + " 👋</div>" +
+      "<div style='font-size:13px;color:var(--mut);margin-top:2px'>" + (isEN ? "Your personalized skincare space" : "Ton espace skincare personnalisé") + "</div>";
+    wrap.appendChild(headerEl);
+
+    // ── 2. AFFIRMATION DU JOUR ──
+    var affirmations = isEN ? AFFIRMATIONS_EN : AFFIRMATIONS_FR;
+    var affIdx = new Date().getDate() % affirmations.length;
+    var affEl = document.createElement("div");
+    affEl.style.cssText = "background:linear-gradient(135deg,#C4726A,#A85A52);border-radius:20px;padding:18px 20px;margin-bottom:14px;position:relative;overflow:hidden";
+    affEl.innerHTML = "<div style='position:absolute;top:-20px;right:-20px;width:80px;height:80px;border-radius:50%;background:rgba(255,255,255,.08)'></div>" +
+      "<div style='font-size:10px;font-weight:700;color:rgba(255,255,255,.75);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px'>✨ " + (isEN ? "AFFIRMATION OF THE DAY" : "AFFIRMATION DU JOUR") + "</div>" +
+      "<div style='font-size:15px;font-style:italic;color:#fff;line-height:1.6;font-family:Georgia,serif'>" + affirmations[affIdx] + "</div>";
+    wrap.appendChild(affEl);
+
+    // ── 3. SCORE DE PEAU ──
     var scoreEl = document.createElement("div");
-    scoreEl.style.cssText = "background:linear-gradient(135deg,#C4726A,#A85A52);border-radius:20px;padding:20px;margin-bottom:14px;color:#fff";
-    scoreEl.innerHTML = "<div style='font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;opacity:.8;margin-bottom:8px'>" + (isEN ? "SKIN SCORE" : "SCORE DE PEAU") + "</div>" +
-        "<div style='display:flex;align-items:center;justify-content:space-between'>" +
-        "<div><div style='font-family:Georgia,serif;font-size:48px;font-weight:700'>" + (skinScore || "--") + "</div><div style='font-size:11px;opacity:.8'>" + scoreLabel + "</div></div>" +
-        "<div style='width:80px;height:80px;border-radius:50%;background:rgba(255,255,255,.15);display:flex;flex-direction:column;align-items:center;justify-content:center'>" +
-        "<div style='font-size:28px'>" + (skinScore >= 70 ? "🌸" : skinScore >= 50 ? "" : skinScore > 0 ? "🌱" : "") + "</div>" +
-        "</div></div>";
+    scoreEl.style.cssText = "background:var(--surf);border-radius:18px;border:1px solid var(--bdr);padding:16px;margin-bottom:14px";
+    scoreEl.innerHTML = "<div style='font-size:10px;font-weight:700;color:var(--mut);text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px'>" + (isEN ? "SKIN SCORE" : "SCORE DE PEAU") + "</div>" +
+      "<div style='display:flex;align-items:center;gap:14px'>" +
+      "<div style='width:64px;height:64px;border-radius:50%;background:" + (skinScore > 0 ? "linear-gradient(135deg," + scoreColor + ",#fff3)" : "var(--blush)") + ";border:3px solid " + (skinScore > 0 ? scoreColor : "var(--rose)") + ";display:flex;align-items:center;justify-content:center;flex-shrink:0'>" +
+      "<div style='font-family:Georgia,serif;font-size:20px;font-weight:700;color:" + (skinScore > 0 ? scoreColor : "var(--acc2)") + "'>" + (skinScore || "--") + "</div></div>" +
+      "<div><div style='font-size:14px;font-weight:700;color:var(--pri)'>" + (skinScore > 0 ? (skinScore >= 70 ? (isEN ? "Great skin 🌸" : "Belle peau 🌸") : skinScore >= 50 ? (isEN ? "Good progress" : "Bons progrès") : (isEN ? "Getting better 🌱" : "En progression 🌱")) : (isEN ? "Start your 4-week tracking" : "Commence ton suivi 4 semaines")) + "</div>" +
+      "<div style='font-size:11px;color:var(--mut);margin-top:2px'>" + scoreLabel + "</div>" +
+      (skinScore === 0 ? '<button onclick="go(\'suivi\')" style="margin-top:8px;padding:7px 14px;border-radius:20px;border:none;background:#C4726A;color:#fff;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit">' + (isEN ? "Start tracking \u2192" : "Commencer le suivi \u2192") + '</button>' : "") +
+      "</div></div>";
     wrap.appendChild(scoreEl);
 
-    // --- CONSEIL DU JOUR ---
+    // ── 4. JOURNAL DE PEAU (aujourd'hui) ──
+    var journal = getSkinJournal();
+    var todayEntry = journal.find(function(e) { return e.date === todayISO; });
+    var journalEl = document.createElement("div");
+    journalEl.style.cssText = "background:var(--surf);border-radius:18px;border:1px solid var(--bdr);padding:16px;margin-bottom:14px";
+    var jHeader = "<div style='font-size:10px;font-weight:700;color:var(--mut);text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px'>📓 " + (isEN ? "TODAY'S SKIN JOURNAL" : "JOURNAL DE PEAU DU JOUR") + "</div>";
+    if (todayEntry) {
+      var moodEmojis = ["😣","😕","😐","🙂","😊"];
+      journalEl.innerHTML = jHeader +
+        "<div style='display:flex;align-items:center;gap:10px'>" +
+        "<div style='font-size:36px'>" + moodEmojis[todayEntry.mood-1] + "</div>" +
+        "<div><div style='font-size:13px;font-weight:700;color:var(--pri)'>" + (isEN ? "Logged today" : "Noté aujourd'hui") + "</div>" +
+        (todayEntry.note ? "<div style=\"font-size:12px;color:var(--mut);margin-top:2px;font-style:italic\">&quot;" + todayEntry.note + "&quot;</div>" : "") +
+        "<div style='font-size:11px;color:var(--acc2);margin-top:4px'>" + (todayEntry.factors && todayEntry.factors.length > 0 ? todayEntry.factors.join(" · ") : "") + "</div></div></div>";
+    } else {
+      var moods = [
+        { v:1, e:"😣", l: isEN?"Bad":"Mauvaise" },
+        { v:2, e:"😕", l: isEN?"Meh":"Bof" },
+        { v:3, e:"😐", l: isEN?"OK":"OK" },
+        { v:4, e:"🙂", l: isEN?"Good":"Bien" },
+        { v:5, e:"😊", l: isEN?"Great":"Super" }
+      ];
+      var factorList = isEN
+        ? ["Stressed","Bad sleep","Exercise","Healthy eating","Hormones","Alcohol","Sun"]
+        : ["Stress","Mauvais sommeil","Sport","Bonne alimentation","Hormones","Alcool","Soleil"];
+      journalEl.innerHTML = jHeader +
+        "<div style='font-size:12px;color:var(--mut);margin-bottom:10px'>" + (isEN ? "How is your skin today?" : "Comment est ta peau aujourd'hui ?") + "</div>" +
+        "<div style='display:flex;gap:6px;margin-bottom:12px'>" +
+        moods.map(function(m) {
+          return "<button onclick='selectJournalMood(" + m.v + ")' id='jmood-" + m.v + "' style='flex:1;padding:8px 4px;border-radius:12px;border:1.5px solid var(--bdr);background:#fff;cursor:pointer;font-size:18px;text-align:center'>" + m.e + "<div style='font-size:9px;color:var(--mut);margin-top:2px'>" + m.l + "</div></button>";
+        }).join("") + "</div>" +
+        "<div style='display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px'>" +
+        factorList.map(function(f) {
+          return "<button onclick='toggleJournalFactor(this)' data-factor='" + f + "' style='padding:5px 10px;border-radius:20px;border:1.5px solid var(--bdr);background:#fff;font-size:11px;cursor:pointer;font-family:inherit;color:var(--mut)'>" + f + "</button>";
+        }).join("") + "</div>" +
+        "<input id='journal-note' type='text' placeholder='" + (isEN ? "A note about your skin... (optional)" : "Une note sur ta peau... (optionnel)") + "' style='width:100%;box-sizing:border-box;padding:10px 14px;border-radius:12px;border:1.5px solid var(--bdr);font-size:13px;font-family:inherit;outline:none;color:var(--pri)'>" +
+        "<button onclick='saveJournalEntry()' style='width:100%;margin-top:10px;padding:12px;border-radius:50px;border:none;background:#C4726A;color:#fff;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;opacity:.4' id='save-journal-btn'>" + (isEN ? "Save" : "Enregistrer") + "</button>";
+    }
+    wrap.appendChild(journalEl);
+
+    // ── 5. ARTICLE DU JOUR ──
+    var articles = isEN ? ARTICLES_EN : ARTICLES_FR;
+    var artIdx = new Date().getDate() % articles.length;
+    var art = articles[artIdx];
+    var artEl = document.createElement("div");
+    artEl.style.cssText = "background:var(--surf);border-radius:18px;border:1px solid var(--bdr);overflow:hidden;margin-bottom:14px;cursor:pointer";
+    artEl.onclick = function() { showArticle(artIdx, isEN); };
+    artEl.innerHTML = "<div style='background:var(--blush);padding:14px 16px;border-bottom:1px solid var(--rose)'>" +
+      "<div style='font-size:10px;font-weight:700;color:var(--acc2);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px'>📰 " + (isEN ? "ARTICLE OF THE DAY" : "ARTICLE DU JOUR") + " · " + art.read + "</div>" +
+      "<div style='font-size:15px;font-weight:700;color:var(--pri);line-height:1.4'>" + art.emoji + " " + art.title + "</div></div>" +
+      "<div style='padding:14px 16px'>" +
+      "<div style='font-size:12px;color:var(--mut);line-height:1.6;margin-bottom:10px'>" + art.intro + "</div>" +
+      "<div style='color:#C4726A;font-size:12px;font-weight:700'>" + (isEN ? "Read the full article →" : "Lire l'article complet →") + "</div></div>";
+    wrap.appendChild(artEl);
+
+    // ── 6. CONSEIL DU JOUR ──
     var tips = isEN ? DAILY_TIPS_EN : DAILY_TIPS_FR;
     var dayIdx = new Date().getDate() % tips.length;
     var tipEl = document.createElement("div");
     tipEl.style.cssText = "background:var(--blush);border-radius:16px;padding:16px;margin-bottom:14px;border:1px solid var(--rose)";
     tipEl.innerHTML = "<div style='font-size:10px;font-weight:700;color:var(--acc2);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px'>💡 " + (isEN ? "TIP OF THE DAY" : "CONSEIL DU JOUR") + "</div>" +
-        "<div style='font-size:13px;line-height:1.6;color:var(--pri)'>" + tips[dayIdx] + "</div>";
+      "<div style='font-size:13px;line-height:1.6;color:var(--pri)'>" + tips[dayIdx] + "</div>";
     wrap.appendChild(tipEl);
 
-    // --- DÉFIS ---
+    // ── 7. ROUTINE DU MOMENT ──
+    if (ST.result && ST.result.steps && ST.result.steps.length > 0) {
+      var isAM = new Date().getHours() < 14;
+      var routineSteps = ST.result.steps.filter(function(s) {
+        return isAM ? (s.moment === "AM" || s.moment === "AM+PM") : (s.moment === "PM" || s.moment === "AM+PM");
+      });
+      if (routineSteps.length > 0) {
+        var routineEl = document.createElement("div");
+        routineEl.style.cssText = "background:var(--surf);border-radius:18px;border:1px solid var(--bdr);overflow:hidden;margin-bottom:14px";
+        routineEl.innerHTML = "<div style='padding:12px 16px;border-bottom:1px solid var(--bdr);display:flex;align-items:center;gap:8px'>" +
+          "<span style='font-size:16px'>" + (isAM ? "🌅" : "🌙") + "</span>" +
+          "<div style='font-size:11px;font-weight:700;color:var(--mut);text-transform:uppercase;letter-spacing:.5px'>" + (isAM ? (isEN ? "MORNING ROUTINE" : "ROUTINE DU MATIN") : (isEN ? "EVENING ROUTINE" : "ROUTINE DU SOIR")) + "</div></div>" +
+          routineSteps.map(function(s, i) {
+            return "<div style='padding:12px 16px;border-bottom:1px solid var(--bdr);display:flex;align-items:center;gap:10px'>" +
+              "<div style='width:24px;height:24px;border-radius:50%;background:" + (s.checked ? "#E8F5E9" : "var(--blush)") + ";border:1.5px solid " + (s.checked ? "#4CAF50" : "var(--rose)") + ";display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0'>" + (s.checked ? "✓" : (i+1)) + "</div>" +
+              "<div><div style='font-size:12px;font-weight:700;color:var(--pri)'>" + s.nom + "</div>" +
+              "<div style='font-size:10px;color:var(--mut)'>" + s.etape + " · " + s.marque + "</div></div></div>";
+          }).join("") +
+          "<div style=\"padding:12px 16px\"><button onclick=\"go('result')\" style=\"width:100%;padding:11px;border-radius:50px;border:none;background:#C4726A;color:#fff;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit\">" + (isEN ? "View full routine \u2192" : "Voir ma routine compl\u00e8te \u2192") + "</button></div>";
+        wrap.appendChild(routineEl);
+      }
+    }
+
+    // ── 8. DÉFIS ──
     var challengeEl = document.createElement("div");
-    challengeEl.style.cssText = "background:var(--surf);border-radius:16px;border:1px solid var(--bdr);overflow:hidden;margin-bottom:14px";
+    challengeEl.style.cssText = "background:var(--surf);border-radius:18px;border:1px solid var(--bdr);overflow:hidden;margin-bottom:14px";
     var challHeader = document.createElement("div");
     challHeader.style.cssText = "padding:14px 16px;font-size:11px;font-weight:700;color:var(--mut);text-transform:uppercase;letter-spacing:.5px;border-bottom:1px solid var(--bdr)";
     challHeader.textContent = isEN ? "🎯 30-DAY CHALLENGES" : "🎯 DÉFIS 30 JOURS";
     challengeEl.appendChild(challHeader);
-
     CHALLENGES.forEach(function(ch) {
         var chData = (data.challenges && data.challenges[ch.id]) || { started: false, days: 0, lastCheck: null };
         var row = document.createElement("div");
         row.style.cssText = "padding:14px 16px;border-bottom:1px solid var(--bdr);display:flex;align-items:center;gap:12px";
-
         var icon = document.createElement("div");
         icon.style.cssText = "font-size:24px;flex-shrink:0";
         icon.textContent = ch.icon;
         row.appendChild(icon);
-
         var info = document.createElement("div");
         info.style.cssText = "flex:1;min-width:0";
         var chLabel = isEN ? ch.labelEN : ch.label;
         var chDesc = isEN ? ch.descEN : ch.desc;
         info.innerHTML = "<div style='font-size:13px;font-weight:700;color:var(--pri)'>" + chLabel + "</div>" +
             "<div style='font-size:11px;color:var(--mut);margin-top:2px'>" + chDesc + "</div>";
-
         if (chData.started) {
             var pct = Math.min(100, Math.round((chData.days / ch.days) * 100));
             var barWrap = document.createElement("div");
@@ -5553,25 +5725,20 @@ function renderDashboard() {
             info.appendChild(daysLbl);
         }
         row.appendChild(info);
-
         var btn = document.createElement("button");
         btn.style.cssText = "flex-shrink:0;padding:7px 12px;border-radius:20px;font-size:11px;font-weight:700;cursor:pointer;font-family:var(--sans);border:none";
         if (!chData.started) {
-            btn.style.background = "#C4726A";
-            btn.style.color = "#fff";
+            btn.style.background = "#C4726A"; btn.style.color = "#fff";
             btn.textContent = isEN ? "Start" : "Démarrer";
             btn.onclick = (function(chId) { return function() { startChallenge(chId); }; })(ch.id);
         } else if (chData.lastCheck === today) {
-            btn.style.background = "#E8F5E9";
-            btn.style.color = "#2E7D32";
+            btn.style.background = "#E8F5E9"; btn.style.color = "#2E7D32";
             btn.textContent = "✓";
         } else if (chData.days >= ch.days) {
-            btn.style.background = "#E8F5E9";
-            btn.style.color = "#2E7D32";
+            btn.style.background = "#E8F5E9"; btn.style.color = "#2E7D32";
             btn.textContent = "🏆";
         } else {
-            btn.style.background = "var(--blush)";
-            btn.style.color = "#C4726A";
+            btn.style.background = "var(--blush)"; btn.style.color = "#C4726A";
             btn.textContent = isEN ? "Done ✓" : "Fait ✓";
             btn.onclick = (function(chId) { return function() { checkChallenge(chId); }; })(ch.id);
         }
@@ -5580,68 +5747,106 @@ function renderDashboard() {
     });
     wrap.appendChild(challengeEl);
 
-    // --- BADGES ---
-    var badgeEl = document.createElement("div");
-    badgeEl.style.cssText = "background:var(--surf);border-radius:16px;border:1px solid var(--bdr);padding:16px;margin-bottom:14px";
-    var badgeHeader = document.createElement("div");
-    badgeHeader.style.cssText = "font-size:11px;font-weight:700;color:var(--mut);text-transform:uppercase;letter-spacing:.5px;margin-bottom:12px";
-    badgeHeader.textContent = isEN ? "🏆 MY BADGES" : "🏆 MES BADGES";
-    badgeEl.appendChild(badgeHeader);
+    // ── 9. AUTRES ARTICLES ──
+    var otherArticles = isEN ? ARTICLES_EN : ARTICLES_FR;
+    var otherEl = document.createElement("div");
+    otherEl.style.cssText = "margin-bottom:14px";
+    otherEl.innerHTML = "<div style='font-size:11px;font-weight:700;color:var(--mut);text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px'>📚 " + (isEN ? "MORE ARTICLES" : "PLUS D'ARTICLES") + "</div>";
+    var artGrid = document.createElement("div");
+    artGrid.style.cssText = "display:flex;flex-direction:column;gap:8px";
+    otherArticles.forEach(function(a, i) {
+      if (i === artIdx) return; // déjà affiché
+      var card = document.createElement("div");
+      card.style.cssText = "background:var(--surf);border-radius:14px;border:1px solid var(--bdr);padding:12px 14px;cursor:pointer;display:flex;align-items:center;gap:12px";
+      card.onclick = (function(idx) { return function() { showArticle(idx, isEN); }; })(i);
+      card.innerHTML = "<div style='font-size:28px;flex-shrink:0'>" + a.emoji + "</div>" +
+        "<div style='flex:1;min-width:0'>" +
+        "<div style='font-size:10px;color:var(--acc2);font-weight:600;margin-bottom:2px'>" + a.tag + " · " + a.read + "</div>" +
+        "<div style='font-size:13px;font-weight:700;color:var(--pri);line-height:1.3'>" + a.title + "</div></div>" +
+        "<div style='font-size:16px;color:var(--mut);flex-shrink:0'>›</div>";
+      artGrid.appendChild(card);
+    });
+    otherEl.appendChild(artGrid);
+    wrap.appendChild(otherEl);
 
+    // ── 10. BADGES ──
+    var badgeEl = document.createElement("div");
+    badgeEl.style.cssText = "background:var(--surf);border-radius:18px;border:1px solid var(--bdr);padding:16px;margin-bottom:14px";
+    badgeEl.innerHTML = "<div style='font-size:11px;font-weight:700;color:var(--mut);text-transform:uppercase;letter-spacing:.5px;margin-bottom:12px'>🏆 " + (isEN ? "MY BADGES" : "MES BADGES") + "</div>";
     var badgeGrid = document.createElement("div");
     badgeGrid.style.cssText = "display:grid;grid-template-columns:repeat(3,1fr);gap:10px";
-
     BADGES_DEF.forEach(function(b) {
         var unlocked = data.badges && data.badges.indexOf(b.id) !== -1;
         var card = document.createElement("div");
         card.style.cssText = "text-align:center;padding:12px 6px;border-radius:12px;background:" + (unlocked ? "var(--blush)" : "var(--bg)") + ";border:1px solid " + (unlocked ? "var(--rose)" : "var(--bdr)") + ";opacity:" + (unlocked ? "1" : ".4");
         card.innerHTML = "<div style='font-size:28px;margin-bottom:4px'>" + b.icon + "</div>" +
             "<div style='font-size:10px;font-weight:700;color:var(--pri);line-height:1.3'>" + b.label + "</div>";
-        if (unlocked) {
-            card.title = b.desc;
-        }
         badgeGrid.appendChild(card);
     });
     badgeEl.appendChild(badgeGrid);
     wrap.appendChild(badgeEl);
-
-    // --- RAPPORT MENSUEL ---
-    if (suivi.entries && suivi.entries.length > 0) {
-        var reportEl = document.createElement("div");
-        reportEl.style.cssText = "background:var(--surf);border-radius:16px;border:1px solid var(--bdr);padding:16px;margin-bottom:16px";
-        var repHeader = document.createElement("div");
-        repHeader.style.cssText = "font-size:11px;font-weight:700;color:var(--mut);text-transform:uppercase;letter-spacing:.5px;margin-bottom:12px";
-        repHeader.textContent = isEN ? "📊 MONTHLY REPORT" : "📊 RAPPORT MENSUEL";
-        reportEl.appendChild(repHeader);
-
-        var bestEntry = suivi.entries.reduce(function(a,b){ return a.rating > b.rating ? a : b; });
-        var avgRating = (suivi.entries.reduce(function(a,e){ return a+e.rating;},0)/suivi.entries.length).toFixed(1);
-
-        var stats = [
-            { label: isEN ? "Weeks tracked" : "Semaines notées", val: suivi.entries.length + "/4" },
-            { label: isEN ? "Average score" : "Note moyenne", val: avgRating + "/5 " },
-            { label: isEN ? "Best week" : "Meilleure semaine", val: "S" + bestEntry.week + " (" + bestEntry.rating + "/5)" },
-        ];
-
-        stats.forEach(function(s) {
-            var row = document.createElement("div");
-            row.style.cssText = "display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--bdr)";
-            row.innerHTML = "<span style='font-size:12px;color:var(--mut)'>" + s.label + "</span>" +
-                "<span style='font-size:13px;font-weight:700;color:var(--pri)'>" + s.val + "</span>";
-            reportEl.appendChild(row);
-        });
-
-        var advice = document.createElement("div");
-        advice.style.cssText = "margin-top:12px;padding:10px;background:var(--blush);border-radius:10px;font-size:12px;color:var(--pri);line-height:1.5";
-        advice.textContent = parseFloat(avgRating) >= 4
-            ? (isEN ? "🌸 Excellent progress! Your routine is working perfectly." : "🌸 Excellent progrès ! Votre routine fonctionne parfaitement.")
-            : parseFloat(avgRating) >= 3
-            ? (isEN ? "Good progress. Stay consistent for better results." : "Bons progrès. Continuez pour de meilleurs résultats.")
-            : (isEN ? "🌱 Your skin needs more time. Stay patient and consistent!" : "🌱 Votre peau a besoin de plus de temps. Restez patient et régulier !");
-        reportEl.appendChild(advice);
-        wrap.appendChild(reportEl);
-    }
 }
+
+// ── FONCTIONS JOURNAL ──
+var _journalMood = 0;
+var _journalFactors = [];
+
+function selectJournalMood(val) {
+  _journalMood = val;
+  for (var i = 1; i <= 5; i++) {
+    var btn = document.getElementById("jmood-" + i);
+    if (btn) btn.style.background = i === val ? "var(--blush)" : "#fff";
+    if (btn) btn.style.borderColor = i === val ? "#C4726A" : "var(--bdr)";
+  }
+  var saveBtn = document.getElementById("save-journal-btn");
+  if (saveBtn) saveBtn.style.opacity = "1";
+}
+
+function toggleJournalFactor(btn) {
+  var f = btn.getAttribute("data-factor");
+  var idx = _journalFactors.indexOf(f);
+  if (idx === -1) {
+    _journalFactors.push(f);
+    btn.style.background = "var(--blush)";
+    btn.style.borderColor = "#C4726A";
+    btn.style.color = "var(--acc2)";
+  } else {
+    _journalFactors.splice(idx, 1);
+    btn.style.background = "#fff";
+    btn.style.borderColor = "var(--bdr)";
+    btn.style.color = "var(--mut)";
+  }
+}
+
+function saveJournalEntry() {
+  if (!_journalMood) return;
+  var note = document.getElementById("journal-note");
+  addJournalEntry(_journalMood, _journalFactors.slice(), note ? note.value.trim() : "");
+  _journalMood = 0;
+  _journalFactors = [];
+  renderDashboard();
+}
+
+// ── ARTICLE MODAL ──
+function showArticle(idx, isEN) {
+  var articles = isEN ? ARTICLES_EN : ARTICLES_FR;
+  var a = articles[idx];
+  if (!a) return;
+  var modal = document.createElement("div");
+  modal.id = "article-modal";
+  modal.style.cssText = "position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:9999;display:flex;flex-direction:column;justify-content:flex-end";
+  modal.innerHTML = "<div style='background:#fff;border-radius:24px 24px 0 0;max-height:85vh;overflow-y:auto;padding:24px 20px 40px'>" +
+    "<div style='display:flex;justify-content:space-between;align-items:center;margin-bottom:16px'>" +
+    "<div style='font-size:10px;font-weight:700;color:var(--acc2);text-transform:uppercase;letter-spacing:.5px'>" + a.tag + " · " + a.read + "</div>" +
+    "<button onclick=\"document.getElementById('article-modal').remove()\" style=\"background:var(--bg);border:none;border-radius:50%;width:32px;height:32px;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--mut)\">&#x2715;</button></div>" +
+    "<div style='font-size:22px;font-family:Georgia,serif;font-weight:700;color:var(--pri);line-height:1.3;margin-bottom:12px'>" + a.emoji + " " + a.title + "</div>" +
+    "<div style='font-size:13px;color:var(--acc2);font-style:italic;line-height:1.6;margin-bottom:16px;padding:12px;background:var(--blush);border-radius:12px'>" + a.intro + "</div>" +
+    "<div style='font-size:14px;color:var(--pri);line-height:1.8'>" + a.content.replace(/\. /g, ".<br><br>").replace(/\d\./g, function(m) { return "<strong>" + m + "</strong>"; }) + "</div>" +
+    "</div>";
+  document.body.appendChild(modal);
+  modal.onclick = function(e) { if (e.target === modal) modal.remove(); };
+}
+
 
 function startChallenge(id) {
     var data = getDashData();
