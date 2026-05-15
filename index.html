@@ -3109,7 +3109,9 @@ function doGenerate(){
     ST.showShare=false;
     renderResult();
     go("result");
+    window.scrollTo(0, 0);
     if (btn) { btn.disabled = false; }
+    updateNav("result");
     // Sauvegarde Firestore si connecté
     if (window._currentUser) {
       saveRoutineToFirestore({
@@ -3223,7 +3225,11 @@ function renderResult(){
       <p class="suivi-txt">${t('suivi_text')}</p>
       <button style="padding:8px 14px;border-radius:8px;border:1.5px solid #2C2C2C;background:transparent;color:#2C2C2C;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit" onclick="doReset()">${t('suivi_btn')}</button>
     </div>
-    <button onclick="openDashboard()" style="width:100%;padding:16px;border-radius:16px;border:none;background:linear-gradient(135deg,#C4726A,#A85A52);color:#fff;font-size:14px;font-weight:700;cursor:pointer;font-family:var(--sans);display:flex;align-items:center;justify-content:center;gap:10px;box-shadow:0 4px 20px rgba(196,114,106,.35);margin-top:8px;margin-bottom:10px">
+    <button onclick="saveAndConfirm()" id="btn-save-routine" style="width:100%;padding:16px;border-radius:16px;border:none;background:linear-gradient(135deg,#2E7D32,#388E3C);color:#fff;font-size:14px;font-weight:700;cursor:pointer;font-family:var(--sans);display:flex;align-items:center;justify-content:center;gap:10px;box-shadow:0 4px 20px rgba(46,125,50,.3);margin-top:8px;margin-bottom:6px">
+      <span style="font-size:20px">💾</span>
+      <span>${LANG==="en"?"Save my routine":"Enregistrer ma routine"}</span>
+    </button>
+    <button onclick="openDashboard()" style="width:100%;padding:16px;border-radius:16px;border:none;background:linear-gradient(135deg,#C4726A,#A85A52);color:#fff;font-size:14px;font-weight:700;cursor:pointer;font-family:var(--sans);display:flex;align-items:center;justify-content:center;gap:10px;box-shadow:0 4px 20px rgba(196,114,106,.35);margin-top:0;margin-bottom:10px">
       <span style="font-size:20px">🏠</span>
       <span>${LANG==="en"?"My SkinMatch Space":"Mon espace SkinMatch"}</span>
     </button>
@@ -3287,7 +3293,7 @@ function renderResult(){
     lowHtml += '<p style="font-size:11px;color:#E65100;font-weight:600;margin-bottom:10px;padding:8px;background:#FFF0E0;border-radius:8px">⚠️ ' + (LANG==='en' ? 'These products have a Yuka score under 50/100. They may not suit all skin profiles.' : 'Ces produits ont une note Yuka inférieure à 50/100. Ils peuvent ne pas convenir à tous les profils.') + '</p>';
     ST.lowYukaProducts.forEach(function(s) {
       lowHtml += '<div style="background:#fff;border-radius:12px;padding:12px;margin-bottom:8px;border:1px solid #F5E0D0;display:flex;align-items:center;gap:10px">';
-      lowHtml += '<div style="font-size:28px">' + (s.img || '🧴') + '</div>';
+      var imgContent = (s.img && s.img.startsWith('http')) ? '<img src="' + s.img + '" style="width:40px;height:40px;object-fit:contain" onerror="this.style.display=\'none\'"/>' : (s.img || '🧴'); lowHtml += '<div style="width:40px;height:40px;display:flex;align-items:center;justify-content:center;font-size:28px">' + imgContent + '</div>';
       lowHtml += '<div style="flex:1"><div style="font-size:13px;font-weight:700;color:#3D2B1F">' + s.nom + '</div>';
       lowHtml += '<div style="font-size:11px;color:#8B6F5E">' + s.marque + ' · ' + s.prix + '</div>';
       lowHtml += '<div style="margin-top:4px;display:flex;align-items:center;gap:6px"><div style="height:4px;width:60px;background:#F5E0D0;border-radius:4px;overflow:hidden"><div style="height:100%;width:' + (s.yuka||0) + '%;background:#E65100"></div></div>';
@@ -6426,6 +6432,42 @@ async function doLogout() {
   go('welcome');
 }
 
+async function saveAndConfirm() {
+  var btn = document.getElementById('btn-save-routine');
+  if (btn) {
+    btn.disabled = true;
+    btn.innerHTML = '<span style="font-size:20px">⏳</span><span>' + (LANG==="en" ? "Saving..." : "Enregistrement...") + '</span>';
+  }
+  
+  if (!ST.result) return;
+  
+  var routineData = {
+    skinType: ST.skinType,
+    ageGroup: ST.ageGroup,
+    concerns: ST.concerns,
+    allergies: ST.allergies,
+    budget: ST.budget,
+    routine: ST.routine,
+    products: (ST.result.steps || []).map(function(s) {
+      return { key: s.key, nom: s.nom, marque: s.marque, prix: s.prix };
+    }),
+    savedAt: new Date().toISOString()
+  };
+  
+  await saveRoutineToFirestore(routineData);
+  
+  // Toast confirmation
+  if (btn) {
+    btn.innerHTML = '<span style="font-size:20px">✅</span><span>' + (LANG==="en" ? "Routine saved!" : "Routine enregistrée !") + '</span>';
+    btn.style.background = 'linear-gradient(135deg,#1B5E20,#2E7D32)';
+    setTimeout(function() {
+      btn.disabled = false;
+      btn.innerHTML = '<span style="font-size:20px">💾</span><span>' + (LANG==="en" ? "Save my routine" : "Enregistrer ma routine") + '</span>';
+      btn.style.background = 'linear-gradient(135deg,#2E7D32,#388E3C)';
+    }, 3000);
+  }
+}
+
 async function saveRoutineToFirestore(routineData) {
   if (!window._currentUser || !window._firebaseReady) return;
   try {
@@ -6536,11 +6578,18 @@ function navTo(screen) {
   if (typeof stopCamera === 'function') stopCamera();
   if (typeof stopBarcodeCamera === 'function') stopBarcodeCamera();
   
-  if (screen === 'result' && (!ST.result)) {
-    // Pas encore de routine → lancer le diagnostic
-    go('q1');
-    updateNav(null);
-    return;
+  if (screen === 'result') {
+    if (!ST.result && window._savedRoutine) {
+      // Routine sauvegardée en mémoire — la recharger
+      reloadSavedRoutine();
+      updateNav('result');
+      return;
+    } else if (!ST.result) {
+      // Pas de routine → diagnostic
+      go('q1');
+      updateNav(null);
+      return;
+    }
   }
   if (screen === 'articles') {
     renderArticlesScreen();
