@@ -218,9 +218,6 @@ h2{font-family:var(--serif);font-size:20px;font-weight:700;margin-bottom:3px}
 .sc-item-brand{font-size:10px;color:rgba(255,255,255,.5)}
 .sc-item-etape{font-size:9px;color:var(--acc);text-transform:uppercase;letter-spacing:.5px;margin-bottom:2px}
 .sc-item-prix{font-family:var(--serif);font-size:13px;font-weight:700;color:var(--acc)}
-.promo-pct{background:#FFF3CD;color:#856404;border-radius:6px;padding:2px 7px;font-size:9px;font-weight:800;letter-spacing:.4px;display:inline-block}
-.prix-barre{text-decoration:line-through;opacity:.5;font-size:10px;font-weight:600;color:#9A8B7C;line-height:1}
-.prix-promo{font-family:var(--serif);font-size:15px;font-weight:800;color:#2E7D32;line-height:1}
 .sc-footer{font-size:10px;color:rgba(255,255,255,.4);text-align:center;margin-top:12px}
 
 /* ALLERGY WARNING */
@@ -400,6 +397,41 @@ h2{font-family:var(--serif);font-size:20px;font-weight:700;margin-bottom:3px}
             </div>
           </div>
         </div>
+      </div>
+
+      <!-- Aperçu routine exemple -->
+      <div id="routine-preview" style="width:100%;max-width:340px;margin-bottom:20px;background:#fff;border-radius:20px;padding:16px;box-shadow:0 4px 20px rgba(196,114,106,.12);border:1px solid #F5E8E5">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+          <div style="font-size:10px;font-weight:700;color:#C4726A;text-transform:uppercase;letter-spacing:1px" id="preview-title">Exemple de routine</div>
+          <div style="font-size:10px;color:#B0958F" id="preview-subtitle">Peau mixte · Budget moyen</div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <div style="display:flex;align-items:center;gap:10px;padding:8px;background:#FDF8F5;border-radius:12px">
+            <span style="font-size:20px">🧴</span>
+            <div style="flex:1">
+              <div style="font-size:12px;font-weight:700;color:#3D2B1F">CeraVe Gel Moussant</div>
+              <div style="font-size:10px;color:#8B6F5E">Nettoyant · Matin & Soir</div>
+            </div>
+            <div style="font-size:11px;font-weight:700;color:#C4726A">9,90€</div>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px;padding:8px;background:#FDF8F5;border-radius:12px">
+            <span style="font-size:20px">💧</span>
+            <div style="flex:1">
+              <div style="font-size:12px;font-weight:700;color:#3D2B1F">La Roche-Posay Effaclar</div>
+              <div style="font-size:10px;color:#8B6F5E">Hydratant · Matin</div>
+            </div>
+            <div style="font-size:11px;font-weight:700;color:#C4726A">16,90€</div>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px;padding:8px;background:#FDF8F5;border-radius:12px">
+            <span style="font-size:20px">☀️</span>
+            <div style="flex:1">
+              <div style="font-size:12px;font-weight:700;color:#3D2B1F">Avène SPF50+</div>
+              <div style="font-size:10px;color:#8B6F5E">Protection · Matin</div>
+            </div>
+            <div style="font-size:11px;font-weight:700;color:#C4726A">14,50€</div>
+          </div>
+        </div>
+        <div style="margin-top:10px;text-align:center;font-size:10px;color:#B0958F" id="preview-cta">👆 Ta routine sera personnalisée selon ton profil</div>
       </div>
 
       <!-- Bouton principal CTA -->
@@ -1284,15 +1316,6 @@ const IMGS = {
   "ng-bha": "https://www.pharmacie-du-centre.fr/media/catalog/product/cache/1/image/700x700/9df78eab33525d08d6e5fb8d27136e95/0/0/0086800108597.jpg"
 };
 
-// ─── PROMOTIONS ───────────────────────────────────────────────────────────────
-// Format: "product-key": { prix: "Xe", pct: Y, site: "Marchand", expires: "YYYY-MM-DD" }
-// Alimenté automatiquement via flux produits Awin (Doctipharma, Notino, 1001pharmacies)
-const PROMOS = {
-  "cv-gel":    { prix: "7€",  pct: 22, site: "Notino",         expires: "2026-05-31" },
-  "lrp-anth":  { prix: "16€", pct: 20, site: "Doctipharma",    expires: "2026-05-31" },
-  "bd-sens":   { prix: "8€",  pct: 27, site: "1001pharmacies", expires: "2026-05-31" },
-};
-
 // ─── PRODUITS ─────────────────────────────────────────────────────────────────
 const DB = {
   "cs-power": {nom:"Sérum Le Power",marque:"Cible Skin",prix:"190€",link:"https://www.cibleskin.com/collections/all",yuka:100,yl:"Excellent",usage:"Anti-rides, liftant & antioxydant",texture:"Sérum fluide",ak:["Complexe IDANS®","Actifs liftants","Antioxydants"],comp:["Aqua","Glycerin","Complexe IDANS®","Sodium Hyaluronate"],clean:true,vegan:true,pq:"Tous types de peau, peaux matures.",ben:"Réduit rides et ridules, effet liftant immédiat.",app:"5-6 gouttes sur visage et cou, matin et/ou soir.",video:"https://www.youtube.com/results?search_query=Cible+Skin+serum+power+skincare",moment:"AM+PM",video:"https://www.youtube.com/results?search_query=Cible+Skin+skincare"},
@@ -1822,7 +1845,7 @@ function build(){
   const skinL=l.intro_skin||T.fr.intro_skin;
   const tpl=l.intro_tpl||T.fr.intro_tpl;
   const introStr=tpl.replace('{skin}',skinL[ST.skinType]||'').replace('{age}',ST.ageGroup?' ('+ST.ageGroup+')':'');
-  const totalPrix=steps.reduce((a,s)=>{const promo=PROMOS[s.key];const prixStr=(promo&&promo.prix?promo.prix:s.prix)||"0";const n=parseFloat(prixStr.replace("€","").replace("~",""));return isNaN(n)?a:a+n;},0);
+  const totalPrix=steps.reduce((a,s)=>{const n=parseFloat((s.prix||"0").replace("€","").replace("~",""));return isNaN(n)?a:a+n;},0);
   return{intro:introStr,steps,conseil:CONS[c[0]]||"Une routine simple appliquée chaque jour surpasse une routine complexe abandonnée.",totalPrix};
 }
 
@@ -3007,21 +3030,6 @@ function yukaBadge(yuka,yl){
   return `<span class="yb ${cls}">🥕 ${yuka}/100 · ${yl}</span>`;
 }
 
-function prixHtml(key, prixNormal) {
-  var promo = PROMOS[key];
-  if (promo && promo.prix && promo.pct) {
-    var siteLabel = promo.site ? ' · ' + promo.site : '';
-    return '<div style="position:absolute;top:10px;right:12px;display:flex;flex-direction:column;align-items:flex-end;gap:3px">' +
-      '<span class="promo-pct">-' + promo.pct + '%' + siteLabel + '</span>' +
-      '<div style="background:#F0FFF0;border-radius:8px;padding:4px 10px;text-align:right">' +
-        '<div class="prix-barre">' + prixNormal + '</div>' +
-        '<div class="prix-promo">' + promo.prix + '</div>' +
-      '</div>' +
-    '</div>';
-  }
-  return '<div style="position:absolute;top:12px;right:12px;background:#FDF0E6;border-radius:8px;padding:5px 11px;font-family:Georgia,serif;font-size:15px;font-weight:800;color:#C4726A">' + prixNormal + '</div>';
-}
-
 // ─── GENERATE RESULT ──────────────────────────────────────────────────────────
 function doGenerate(){
   var btn = document.getElementById('q5-next');
@@ -3068,7 +3076,7 @@ function renderResult(){
           <div class="pm">${s.marque}</div>
           <div class="badges"><span class="cb">✓ ${s.compat}% ${t('compatible')}</span></div>
         </div>
-        ${prixHtml(s.key,s.prix)}
+        <div style="position:absolute;top:12px;right:12px;background:#FDF0E6;border-radius:8px;padding:5px 11px;font-family:Georgia,serif;font-size:15px;font-weight:800;color:#C4726A">${s.prix}</div>
       </div>
       <div class="pb">
         <div class="pu">${s.pourquoi}</div>
@@ -3077,9 +3085,13 @@ function renderResult(){
 
         </div>
         
-        <button onclick="showWhyAI('${s.key}','${s.nom}','${s.marque}')" style="width:100%;margin-top:10px;padding:12px 16px;border-radius:50px;border:none;background:#C4726A;color:#fff;font-size:13px;font-weight:700;cursor:pointer;font-family:var(--sans);display:flex;align-items:center;justify-content:center;gap:8px">
-          <span>${LANG==="en"?"Why this product?":"Mon Skin Match"}</span>
-        </button>
+        <div style="display:flex;gap:6px;margin-top:10px;align-items:center">
+          <button onclick="showWhyAI('${s.key}','${s.nom}','${s.marque}')" style="flex:1;padding:12px 16px;border-radius:50px;border:none;background:#C4726A;color:#fff;font-size:13px;font-weight:700;cursor:pointer;font-family:var(--sans);display:flex;align-items:center;justify-content:center;gap:8px">
+            <span>${LANG==="en"?"Why this product?":"Mon Skin Match"}</span>
+          </button>
+          <button onclick="submitFeedback('${s.key}','like',this)" style="width:42px;height:42px;border-radius:50%;border:1.5px solid #E8E0DC;background:#fff;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0">👍</button>
+          <button onclick="submitFeedback('${s.key}','dislike',this)" style="width:42px;height:42px;border-radius:50%;border:1.5px solid #E8E0DC;background:#fff;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0">👎</button>
+        </div>
         <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:4px">
           ${s.yuka>=75
             ? `<span style="background:#E8F5E9;color:#2E7D32;border-radius:20px;padding:5px 10px;font-size:11px;font-weight:700;display:inline-flex;align-items:center;gap:4px">🥕 ${s.yuka}/100 · ${s.yl}</span>`
@@ -3110,7 +3122,7 @@ function renderResult(){
 
   const shareHtml=`<div class="share-card">
     <div class="sc-head"><div><div class="sc-ey">SkinMatch</div><div class="sc-title">Ma routine ${({seche:"sèche",grasse:"grasse",mixte:"mixte",normale:"normale",sensible:"sensible"})[ST.skinType]||""}</div>${ST.ageGroup?`<div style="font-size:11px;color:rgba(255,255,255,.6);margin-top:2px">${ST.ageGroup} ans</div>`:""}</div><div class="sc-budget"><div class="sc-budget-lbl">Budget total</div><div class="sc-budget-val">~${Math.round(r.totalPrix)}€</div></div></div>
-    ${r.steps.map(s=>{const pr=PROMOS[s.key];return`<div class="sc-item"><div><div class="sc-item-etape">${translateEtape(s.etape)}</div><div class="sc-item-name">${s.nom}</div><div class="sc-item-brand">${s.marque}</div></div><div class="sc-item-prix">${pr&&pr.prix?'<span style="text-decoration:line-through;opacity:.5;font-size:10px">'+s.prix+'</span> <span style="color:#2E7D32">'+pr.prix+'</span>':s.prix}</div></div>`;}).join("")}
+    ${r.steps.map(s=>`<div class="sc-item"><div><div class="sc-item-etape">${translateEtape(s.etape)}</div><div class="sc-item-name">${s.nom}</div><div class="sc-item-brand">${s.marque}</div></div><div class="sc-item-prix">${s.prix}</div></div>`).join("")}
     <div class="sc-footer">${t("share_footer")}</div>
   </div>`;
 
@@ -3169,6 +3181,28 @@ function renderResult(){
       <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M17.65 6.35C16.2 4.9 14.21 4 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/></svg>
       ${t('btn_restart')}
     </button>`;
+
+  // ══ Bouton notifications ══
+  var existingNotifBtn = document.getElementById('notif-btn-wrap');
+  if (existingNotifBtn) existingNotifBtn.remove();
+  if ('Notification' in window && 'serviceWorker' in navigator) {
+    var notifWrap = document.createElement('div');
+    notifWrap.id = 'notif-btn-wrap';
+    notifWrap.style.cssText = 'margin-top:12px';
+    var notifHtml = '';
+    if (Notification.permission === 'granted') {
+      notifHtml = '<div style="background:#E8F5E9;border-radius:14px;padding:12px 16px;display:flex;align-items:center;gap:10px">';
+      notifHtml += '<span style="font-size:20px">🔔</span>';
+      notifHtml += '<div style="flex:1"><div style="font-size:12px;font-weight:700;color:#2E7D32">' + (LANG==="en" ? "Reminders activated" : "Rappels activés") + '</div>';
+      notifHtml += '<div style="font-size:11px;color:#4CAF50">' + (LANG==="en" ? "You will be reminded morning & evening" : "Tu seras rappelé matin & soir") + '</div></div></div>';
+    } else {
+      notifHtml = '<button onclick="requestNotifPermission()" style="width:100%;padding:13px;border-radius:50px;border:1.5px solid #C4726A;background:transparent;color:#C4726A;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:8px">';
+      notifHtml += '<span>🔔</span><span>' + (LANG==="en" ? "Get morning & evening reminders" : "Recevoir des rappels matin & soir") + '</span></button>';
+    }
+    notifWrap.innerHTML = notifHtml;
+    var resultContent = document.querySelector("#sc-result .content");
+    if (resultContent) resultContent.appendChild(notifWrap);
+  }
 
   // ══ Section produits Yuka < 50 ══
   var existingLow = document.getElementById('low-yuka-section');
@@ -3857,52 +3891,331 @@ function scanBarcodeLoop() {
   }
 }
 
-function onBarcodeDetected(code) {
+async function onBarcodeDetected(code) {
   barcodeScanning = false;
   stopBarcodeCamera();
-  
+
   // Feedback visuel
   var guide = document.getElementById("barcode-guide");
   if (guide) guide.textContent = "✅ Code détecté : " + code;
-  
-  // Chercher dans la DB par code EAN ou fallback recherche
+
+  // 1. Chercher dans notre DB locale
   var found = searchByBarcode(code);
   if (found) {
     simulateScanWithKey(found);
-  } else {
-    // Afficher le code et permettre recherche manuelle
-    var input = document.getElementById("product-search-input");
-    if (input) { input.value = code; }
-    document.getElementById("barcode-camera-zone").style.display = "none";
+    return;
+  }
+
+  // 2. Chercher dans Firestore (produits ajoutés par les utilisateurs)
+  var firestoreKey = await searchBarcodeInFirestore(code);
+  if (firestoreKey) {
+    simulateScanWithKey(firestoreKey);
+    return;
+  }
+
+  // 3. Fallback Open Beauty Facts API
+  showBarcodeLoading(code);
+  try {
+    var resp = await fetch("https://world.openbeautyfacts.org/api/v2/product/" + code + ".json?fields=product_name,brands,categories_tags");
+    var data = await resp.json();
+    if (data.status === 1 && data.product && data.product.product_name) {
+      var productName = data.product.product_name;
+      var brand = data.product.brands || "";
+      showBarcodeExternalResult(code, productName, brand);
+    } else {
+      showBarcodeNotFound(code);
+    }
+  } catch(e) {
     showBarcodeNotFound(code);
   }
 }
 
+async function searchBarcodeInFirestore(code) {
+  if (!window._firebaseReady) return null;
+  try {
+    var snap = await window._getDoc(window._doc(window._db, "community_eans", code));
+    if (snap.exists() && snap.data().productKey) {
+      return snap.data().productKey;
+    }
+    return null;
+  } catch(e) { return null; }
+}
+
+function showBarcodeLoading(code) {
+  var resultDiv = document.getElementById("scan-product-result");
+  if (!resultDiv) return;
+  resultDiv.style.display = "block";
+  resultDiv.innerHTML = '<div style="background:#fff;border:1px solid var(--bdr);border-radius:16px;padding:24px;text-align:center">' +
+    '<div style="width:36px;height:36px;border:3px solid var(--rose);border-top-color:#C4726A;border-radius:50%;animation:spin 1s linear infinite;margin:0 auto 14px"></div>' +
+    '<div style="font-size:13px;color:var(--mut)">' + (LANG === "en" ? "Searching in our database..." : "Recherche dans notre base...") + '</div>' +
+    '</div>';
+}
+
 function searchByBarcode(code) {
-  // Table EAN → clé DB (à enrichir)
+  // 0. Vérifier le cache local community_eans
+  try {
+    var localEans = JSON.parse(localStorage.getItem("skinmatch_community_eans") || "{}");
+    if (localEans[code] && localEans[code].nom) {
+      // Produit communautaire local — chercher par nom dans la DB
+      var nomLower = localEans[code].nom.toLowerCase();
+      for (var k in DB) {
+        if (DB[k].nom && DB[k].nom.toLowerCase().includes(nomLower.substring(0, 10))) {
+          return k;
+        }
+      }
+    }
+  } catch(e) {}
+
+  // Table EAN → clé DB
   var EAN_MAP = {
-    "3337875545082": "lrp-effduo",
+    "0070501007002": "ng-bha",
+    "0070501101009": "ng-spf",
+    "0635494263015": "skc-cef",
+    "0635494263039": "skc-met",
+    "0635494263084": "skc-bl",
+    "0635494263152": "skc-spf",
+    "0635494314205": "skc-phy",
+    "0635494400892": "skc-dis",
+    "0635494401561": "skc-ha",
+    "0635494412796": "skc-sil",
+    "0635494412819": "skc-age",
+    "3264680009785": "nux-creme-fraiche",
+    "3264680009792": "nux-huile-prodigieuse",
+    "3264680009808": "nux-reve-de-miel",
+    "3264680009815": "nux-merveillance",
+    "3282770037159": "ader-exomega",
+    "3282770037203": "ader-epitheliale",
+    "3282770037210": "av-lait",
+    "3282770147308": "ader-protect",
+    "3282770204735": "ader-dermalibour",
+    "3282770204841": "av-tol",
+    "3282779001427": "duc-melascreen",
+    "3282779001434": "duc-kertyol",
+    "3282779002509": "duc-ictyane",
+    "3282779003025": "duc-anaphase",
+    "3337871320046": "vic-normaderm",
+    "3337871320978": "vic-minral89",
+    "3337871322804": "vic-slow-age",
+    "3337871324266": "vic-capital",
+    "3337871400464": "vic-liftactiv",
+    "3337872411083": "lrp-effgel",
+    "3337872413088": "lrp-cica",
     "3337872413446": "lrp-tol",
-    "3606000396548": "av-cicalfate",
-    "3337872413088": "lrp-cicaplast",
-    "0070501101009": "cv-gel",
-    "0070501007002": "cv-mou",
-    "3606000741249": "av-xera",
-    "5900697064551": "bio-micel",
-    "3614273337519": "skc-cef",
+    "3337875545082": "lrp-effduo",
+    "3337875545099": "lrp-anth",
+    "3337875722827": "lrp-hyalu",
+    "3380810048025": "cla-multi-active",
+    "3380810048032": "cla-double-serum",
+    "3380810048278": "cla-hydra-essentiel",
+    "3380810048285": "cla-spf",
+    "3390150093524": "pay-pate-grise",
+    "3390150093531": "pay-hydra24",
+    "3390150093548": "pay-serum-eclat",
+    "3401381003045": "svr-cicavit",
+    "3401381012818": "svr-hydra",
+    "3401381110019": "svr-xerial",
+    "3401381120018": "svr-sun-secure",
+    "3401381332785": "svr-sebiaclear",
+    "3401399004781": "bd-hydra",
+    "3401399005009": "bd-sebser",
+    "3401597800108": "bd-sebgel",
+    "3508240009001": "lie-premium",
+    "3508240009018": "lie-hydragenist",
+    "3508240009025": "lie-sebologie",
+    "3517360001198": "jon-pure",
+    "3517360001204": "jon-rehydrate",
+    "3517360001211": "jon-nutritive",
+    "3522930002604": "cau-vinoperfect",
+    "3522930003014": "cau-resveratrol",
+    "3522930004172": "cau-vinosource",
+    "3522930004356": "cau-spf",
+    "3606000396548": "cv-gel",
+    "3606000512351": "cv-vitc",
+    "3606000537613": "cv-eye",
+    "3606000537668": "cv-crem",
+    "3606000537699": "cv-mou",
+    "3614271284587": "bio-blue-therapy",
+    "3614271284594": "bio-aquasource",
+    "3614271284600": "bio-life-plankton",
+    "3614272046122": "lan-renergie",
+    "3614272046139": "lan-absolue",
+    "3614272897502": "lan-advanced-genifique",
+    "3661434001001": "uri-prederma",
+    "3661434002985": "uri-bariesun",
+    "3661434003005": "uri-eau-thermale",
+    "3661434009007": "uri-roseliane",
+    "3700225004008": "isis-uveblock",
+    "3700225004015": "isis-yday",
+    "3700225004022": "isis-teinte",
+    "3760032670046": "gar-potion-magique",
+    "3760032670053": "gar-boum-boum",
+    "3760139621007": "acm-sebionex",
+    "3760139621014": "acm-depiwhite",
+    "3760139621021": "acm-sterilak",
+    "4005808194506": "de-nivea-creme",
+    "4005900020833": "euc-aquaphor",
+    "4005900198754": "euc-hyaluron",
+    "4005900199096": "euc-sun",
+    "4005900583314": "euc-urearepair",
+    "4005900653734": "euc-dermopure",
+    "5900697064551": "bd-sens",
+    "761261148450": "int-paula-choice-bha",
+    "769915190433": "int-the-ordinary-retinol",
+    "769915190570": "int-the-ordinary-niac",
+    "769915190587": "int-the-ordinary-ha",
+    "8429420054424": "es-isdin-spf",
+    "0070501101016": "ng-spf",
+    "0635494328004": "skc-ph",
+    "3264680009839": "nux-huile-prodigieuse",
+    "3264680009846": "nux-huile-prodigieuse",
+    "3282770147506": "av-tol",
+    "3337871322422": "vic-normaderm",
+    "3337871322736": "vic-minral89",
+    "3337871322743": "vic-minral89",
+    "3337871325164": "vic-capital",
+    "3337871325720": "vic-minral89",
+    "3337872413095": "lrp-cica",
+    "3337872414084": "lrp-effduo",
+    "3337875597210": "cv-eye",
+    "3337875685894": "lrp-effgel",
+    "3337875685900": "cv-mou",
+    "3337875784054": "lrp-effgel",
+    "3337875784061": "cv-gel",
+    "3337875814652": "cv-crem",
+    "3337875814669": "cv-ret",
+    "3337875890069": "lrp-effgel",
+    "3337875890137": "lrp-anth",
+    "3380810048049": "cla-double-serum",
+    "3380810048056": "cla-double-serum",
+    "3401381332617": "svr-sebiaclear",
+    "3401397901829": "bd-sens",
+    "3401399003944": "bd-sens",
+    "3401399003951": "bd-sens",
+    "3401399004002": "bd-sens",
+    "3401399004798": "bd-hydra",
+    "3401399005016": "bd-sebser",
+    "3401399505202": "bd-sebgel",
+    "3433422405295": "lrp-tol",
+    "3433422405301": "lrp-tol",
+    "3522930002598": "cau-vinoperfect",
+    "3606000492431": "lrp-anth",
+    "3606000512276": "cv-ret",
+    "3606000514911": "cv-ret",
+    "3606000534797": "cv-vitc",
+    "3606000537316": "cv-ret",
+    "3606000537422": "cv-crem",
+    "3606000537439": "cv-crem",
+    "3606000741249": "cv-mou",
+    "3606000741256": "cv-mou",
+    "3661434007058": "uri-isdin",
+    "3661434007065": "uri-isdin",
+    "3661434007072": "uri-isdin",
+    "3760139621038": "acm-novophane",
+    "4005900020888": "euc-aquaphor",
+    "4005900653727": "euc-dermopure",
   };
   return EAN_MAP[code] || null;
 }
 
 function showBarcodeNotFound(code) {
   var resultDiv = document.getElementById("scan-product-result");
+  if (!resultDiv) return;
+  var isEN = LANG === "en";
+  resultDiv.style.display = "block";
+  resultDiv.innerHTML = 
+    "<div style=\"background:#fff;border:1px solid var(--bdr);border-radius:16px;padding:20px\">" +
+      "<div style=\"text-align:center;margin-bottom:16px\">" +
+        "<div style=\"font-size:36px;margin-bottom:8px\">🔍</div>" +
+        "<div style=\"font-size:14px;font-weight:700;color:#3D2B1F;margin-bottom:4px\">" + (isEN ? "Product not found" : "Produit non trouv&eacute;") + "</div>" +
+        "<div style=\"font-size:11px;color:#8B6F5E;font-family:monospace;background:#F5F0ED;padding:4px 10px;border-radius:8px;display:inline-block;margin-bottom:12px\">" + code + "</div>" +
+      "</div>" +
+      "<div style=\"background:#FDF8F5;border-radius:14px;padding:14px;margin-bottom:14px\">" +
+        "<div style=\"font-size:12px;font-weight:700;color:#C4726A;margin-bottom:8px\">✨ " + (isEN ? "Add this product to help others!" : "Ajoute ce produit pour aider la communauté !") + "</div>" +
+        "<input id=\"contrib-name\" type=\"text\" placeholder=\"" + (isEN ? "Product name (ex: CeraVe Foaming Gel)" : "Nom du produit (ex: CeraVe Gel Moussant)") + "\" style=\"width:100%;box-sizing:border-box;padding:11px 14px;border-radius:12px;border:1.5px solid var(--bdr);font-size:14px;font-family:inherit;outline:none;margin-bottom:8px\">" +
+        "<input id=\"contrib-brand\" type=\"text\" placeholder=\"" + (isEN ? "Brand (ex: CeraVe)" : "Marque (ex: CeraVe)") + "\" style=\"width:100%;box-sizing:border-box;padding:11px 14px;border-radius:12px;border:1.5px solid var(--bdr);font-size:14px;font-family:inherit;outline:none;margin-bottom:12px\">" +
+        "<button onclick=\"submitBarcodeContrib('" + code + "')\" style=\"width:100%;padding:13px;border-radius:50px;border:none;background:#C4726A;color:#fff;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit\">" +
+          (isEN ? "Submit this product 🙌" : "Soumettre ce produit 🙌") +
+        "</button>" +
+      "</div>" +
+      "<button onclick=\"resetBarcodeScanner()\" style=\"width:100%;padding:12px;border-radius:50px;border:1.5px solid var(--acc);background:transparent;color:var(--acc2);font-size:13px;font-weight:600;cursor:pointer;font-family:inherit\">" +
+        (isEN ? "Scan again" : "Rescanner") +
+      "</button>" +
+    "</div>";
+}
+
+function showBarcodeExternalResult(code, name, brand) {
+  var resultDiv = document.getElementById("scan-product-result");
+  if (!resultDiv) return;
+  var isEN = LANG === "en";
+  resultDiv.style.display = "block";
+  resultDiv.innerHTML =
+    "<div style=\"background:#fff;border:1px solid var(--bdr);border-radius:16px;padding:20px\">" +
+      "<div style=\"display:flex;align-items:center;gap:10px;margin-bottom:14px\">" +
+        "<div style=\"font-size:36px\">🧴</div>" +
+        "<div>" +
+          "<div style=\"font-size:14px;font-weight:700;color:#3D2B1F\">" + name + "</div>" +
+          (brand ? "<div style=\"font-size:12px;color:#8B6F5E\">" + brand + "</div>" : "") +
+        "</div>" +
+      "</div>" +
+      "<div style=\"background:#FDF0E6;border-radius:12px;padding:12px;margin-bottom:14px\">" +
+        "<div style=\"font-size:12px;color:#C4726A;font-weight:600\">" + 
+          (isEN ? "ℹ️ This product was found in the Open Beauty Facts database, but is not yet in our personalized routine system." : 
+                  "ℹ️ Ce produit a été trouvé dans la base Open Beauty Facts, mais il n'est pas encore dans notre système de routine personnalisée.") + 
+        "</div>" +
+      "</div>" +
+      "<button onclick=\"submitBarcodeContrib('" + code + "', '" + name.replace(/'/g, "") + "', '" + brand.replace(/'/g, "") + "')\" style=\"width:100%;padding:13px;border-radius:50px;border:none;background:#C4726A;color:#fff;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;margin-bottom:10px\">" +
+        (isEN ? "Add to SkinMatch database 🙌" : "Ajouter à la base SkinMatch 🙌") +
+      "</button>" +
+      "<button onclick=\"resetBarcodeScanner()\" style=\"width:100%;padding:12px;border-radius:50px;border:1.5px solid var(--acc);background:transparent;color:var(--acc2);font-size:13px;font-weight:600;cursor:pointer;font-family:inherit\">" +
+        (isEN ? "Scan again" : "Rescanner") +
+      "</button>" +
+    "</div>";
+}
+
+async function submitBarcodeContrib(code, prefillName, prefillBrand) {
+  var nameEl = document.getElementById("contrib-name");
+  var brandEl = document.getElementById("contrib-brand");
+  var name = prefillName || (nameEl ? nameEl.value.trim() : "");
+  var brand = prefillBrand || (brandEl ? brandEl.value.trim() : "");
+  
+  if (!name) {
+    if (nameEl) nameEl.style.borderColor = "#C62828";
+    return;
+  }
+
+  // Sauvegarder dans Firestore collection community_eans
+  if (window._firebaseReady) {
+    try {
+      await window._setDoc(window._doc(window._db, "community_eans", code), {
+        ean: code,
+        nom: name,
+        marque: brand,
+        addedBy: window._currentUser ? window._currentUser.uid : "anonymous",
+        addedAt: new Date().toISOString(),
+        validated: false
+      });
+    } catch(e) { console.log("Firestore contrib error:", e); }
+  }
+
+  // Sauvegarder aussi en localStorage comme cache local
+  var localEans = JSON.parse(localStorage.getItem("skinmatch_community_eans") || "{}");
+  localEans[code] = { nom: name, marque: brand, date: new Date().toISOString() };
+  localStorage.setItem("skinmatch_community_eans", JSON.stringify(localEans));
+
+  // Toast confirmation
+  var resultDiv = document.getElementById("scan-product-result");
   if (resultDiv) {
-    resultDiv.style.display = "block";
-    resultDiv.innerHTML = "<div style=\"background:#FFF8F0;border:1px solid #F5C0A0;border-radius:16px;padding:20px;text-align:center\">" +
-      "<div style=\"font-size:32px;margin-bottom:10px\">🔍</div>" +
-      "<div style=\"font-size:14px;font-weight:700;color:#3D2B1F;margin-bottom:6px\">Produit non trouv&eacute;</div>" +
-      "<div style=\"font-size:12px;color:#8B6F5E;margin-bottom:14px\">Code : " + code + "<br>Ce produit nest pas encore dans notre base.</div>" +
-      "<button onclick=\"resetBarcodeScanner()\" style=\"padding:11px 24px;border-radius:50px;border:none;background:#C4726A;color:#fff;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit\">Rescanner</button>" +
+    resultDiv.innerHTML = 
+      "<div style=\"background:#E8F5E9;border:1px solid #A5D6A7;border-radius:16px;padding:24px;text-align:center\">" +
+        "<div style=\"font-size:40px;margin-bottom:10px\">🙌</div>" +
+        "<div style=\"font-size:14px;font-weight:700;color:#2E7D32;margin-bottom:6px\">" + (LANG === "en" ? "Thank you!" : "Merci !") + "</div>" +
+        "<div style=\"font-size:12px;color:#388E3C;margin-bottom:16px\">" + 
+          (LANG === "en" ? name + " has been added. The next user who scans this product will find it directly!" : 
+                           name + " a été ajouté. Le prochain utilisateur qui scannera ce produit le trouvera directement !") + 
+        "</div>" +
+        "<button onclick=\"resetBarcodeScanner()\" style=\"padding:12px 24px;border-radius:50px;border:none;background:#2E7D32;color:#fff;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit\">" +
+          (LANG === "en" ? "Scan another product" : "Scanner un autre produit") +
+        "</button>" +
       "</div>";
   }
 }
@@ -5915,6 +6228,105 @@ function reloadSavedRoutine() {
   ST.result = build();
   renderResult();
   go('result');
+}
+
+// ══ NOTIFICATIONS ══
+function requestNotifPermission() {
+  if (!('Notification' in window)) return;
+  Notification.requestPermission().then(function(perm) {
+    if (perm === 'granted') {
+      scheduleRoutineReminders();
+      var wrap = document.getElementById('notif-btn-wrap');
+      if (wrap) wrap.innerHTML = '<div style="background:#E8F5E9;border-radius:14px;padding:12px 16px;display:flex;align-items:center;gap:10px"><span style="font-size:20px">🔔</span><div style="flex:1"><div style="font-size:12px;font-weight:700;color:#2E7D32">' + (LANG==="en" ? "Reminders activated!" : "Rappels activés !") + '</div><div style="font-size:11px;color:#4CAF50">' + (LANG==="en" ? "Check your settings to manage times" : "Gère tes horaires dans les paramètres") + '</div></div></div>';
+    }
+  });
+}
+
+function scheduleRoutineReminders() {
+  // Notification matin 8h
+  var now = new Date();
+  var morning = new Date(now);
+  morning.setHours(8, 0, 0, 0);
+  if (morning <= now) morning.setDate(morning.getDate() + 1);
+  var msUntilMorning = morning - now;
+  setTimeout(function() {
+    if (Notification.permission === 'granted') {
+      new Notification('SkinMatch 🌅', {
+        body: LANG === 'en' ? 'Time for your morning skincare routine!' : 'Il est temps pour ta routine soin du matin !',
+        icon: '/skinnmatch/icon-192.png',
+        badge: '/skinnmatch/icon-192.png'
+      });
+    }
+    setInterval(function() {
+      if (Notification.permission === 'granted') {
+        new Notification('SkinMatch 🌅', {
+          body: LANG === 'en' ? 'Time for your morning skincare routine!' : 'Il est temps pour ta routine soin du matin !',
+          icon: '/skinnmatch/icon-192.png'
+        });
+      }
+    }, 24 * 60 * 60 * 1000);
+  }, msUntilMorning);
+  
+  // Notification soir 21h
+  var evening = new Date(now);
+  evening.setHours(21, 0, 0, 0);
+  if (evening <= now) evening.setDate(evening.getDate() + 1);
+  var msUntilEvening = evening - now;
+  setTimeout(function() {
+    if (Notification.permission === 'granted') {
+      new Notification('SkinMatch 🌙', {
+        body: LANG === "en" ? "Don't forget your evening skincare routine!" : "N'oublie pas ta routine soin du soir !",
+        icon: '/skinnmatch/icon-192.png'
+      });
+    }
+    setInterval(function() {
+      if (Notification.permission === 'granted') {
+        new Notification('SkinMatch 🌙', {
+          body: LANG === "en" ? "Don't forget your evening skincare routine!" : "N'oublie pas ta routine soin du soir !",
+          icon: '/skinnmatch/icon-192.png'
+        });
+      }
+    }, 24 * 60 * 60 * 1000);
+  }, msUntilEvening);
+}
+
+// ══ FEEDBACK PRODUIT ══
+var productFeedback = JSON.parse(localStorage.getItem('skinmatch_feedback') || '{}');
+
+function submitFeedback(key, type, btn) {
+  if (!productFeedback[key]) productFeedback[key] = {};
+  productFeedback[key].feedback = type;
+  productFeedback[key].date = new Date().toISOString();
+  localStorage.setItem('skinmatch_feedback', JSON.stringify(productFeedback));
+  
+  // Sauvegarder dans Firestore si connecté
+  if (window._currentUser && window._firebaseReady) {
+    window._updateDoc(window._doc(window._db, 'users', window._currentUser.uid), {
+      ['feedback.' + key]: { type: type, date: new Date().toISOString() }
+    }).catch(function(e) { console.log('Feedback save error:', e); });
+  }
+  
+  // Feedback visuel sur le bouton
+  if (btn) {
+    var parent = btn.parentNode;
+    var thumbs = parent.querySelectorAll('button[onclick*="submitFeedback"]');
+    thumbs.forEach(function(b) {
+      b.style.background = '#F5F0ED';
+      b.style.opacity = '0.5';
+    });
+    btn.style.background = type === 'like' ? '#E8F5E9' : '#FFEBEE';
+    btn.style.opacity = '1';
+    btn.style.borderColor = type === 'like' ? '#4CAF50' : '#EF5350';
+  }
+  
+  // Toast confirmation
+  var toast = document.createElement('div');
+  toast.style.cssText = 'position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:#3D2B1F;color:#fff;padding:10px 20px;border-radius:20px;font-size:12px;font-weight:600;z-index:9999;opacity:0;transition:opacity .3s';
+  toast.textContent = type === "like" ? (LANG === "en" ? "Noted! We will show more like this." : "Noté ! On t'en proposera de similaires.") : (LANG === "en" ? "Noted! We will refine your recommendations." : "Noté ! On affinera tes recommandations.");
+  toast.textContent = type === 'like' 
+  document.body.appendChild(toast);
+  setTimeout(function() { toast.style.opacity = '1'; }, 10);
+  setTimeout(function() { toast.style.opacity = '0'; setTimeout(function() { toast.remove(); }, 300); }, 2500);
 }
 
 // Init
