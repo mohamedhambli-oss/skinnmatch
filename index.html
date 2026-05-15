@@ -104,6 +104,10 @@ body{background:var(--bg);font-family:var(--sans);color:var(--pri);min-height:10
 
 /* NAV */
 .topbar{display:flex;align-items:center;justify-content:space-between;padding:20px 18px 0}
+.nav-btn{color:#B0958F;transition:color .2s}
+.nav-btn.active{color:#C4726A}
+.nav-btn svg{display:block}
+.has-nav .content{padding-bottom:90px !important}
 .logo{font-family:var(--serif);font-size:24px;font-weight:700;letter-spacing:.5px;color:#3D2B1F;display:flex;align-items:center;gap:10px}
 .logo-icon{width:34px;height:34px;border-radius:9px;background:#C4726A;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#fff;font-family:var(--serif);flex-shrink:0;box-shadow:0 2px 8px rgba(196,114,106,.35)}
 .logo span{color:#C4726A}
@@ -1046,6 +1050,21 @@ h2{font-family:var(--serif);font-size:20px;font-weight:700;margin-bottom:3px}
   </div>
 </div>
 
+<!-- ══ ÉCRAN ARTICLES ══ -->
+<div id="sc-articles" class="hidden">
+  <div class="topbar">
+    <div class="logo"><div class="logo-icon">SM</div>Skin<span>Match</span></div>
+  </div>
+  <div class="content" style="padding-bottom:80px">
+    <div style="margin:8px 0 20px">
+      <div class="step-lbl" id="articles-eyebrow">Bibliothèque</div>
+      <h2 style="margin-bottom:4px" id="articles-title">Tous les articles</h2>
+      <p class="sub" id="articles-sub">Conseils, actifs, routines — tout ce qu'il faut savoir</p>
+    </div>
+    <div id="articles-list"></div>
+  </div>
+</div>
+
 <!-- ══ PROFIL FIREBASE ══ -->
 <div id="sc-profile" class="hidden">
   <div class="topbar">
@@ -1059,6 +1078,32 @@ h2{font-family:var(--serif);font-size:20px;font-weight:700;margin-bottom:3px}
       <p class="sub" id="profile-email"></p>
     </div>
     <div id="profile-content"></div>
+  </div>
+</div>
+
+<!-- ══ BARRE DE NAVIGATION BAS ══ -->
+<div id="bottom-nav" style="display:none;position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px solid #F0E8E5;padding:8px 0 max(8px, env(safe-area-inset-bottom));z-index:1000;max-width:430px;margin:0 auto">
+  <div style="display:flex;justify-content:space-around;align-items:center">
+    <button onclick="navTo('welcome')" id="nav-home" class="nav-btn" style="flex:1;background:none;border:none;cursor:pointer;padding:6px 4px;display:flex;flex-direction:column;align-items:center;gap:3px;font-family:'Outfit',sans-serif">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+      <span style="font-size:10px;font-weight:600" id="nav-home-lbl">Accueil</span>
+    </button>
+    <button onclick="navTo('result')" id="nav-routine" class="nav-btn" style="flex:1;background:none;border:none;cursor:pointer;padding:6px 4px;display:flex;flex-direction:column;align-items:center;gap:3px;font-family:'Outfit',sans-serif">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a10 10 0 1 0 0 20A10 10 0 0 0 12 2z"/><path d="M12 6v6l4 2"/></svg>
+      <span style="font-size:10px;font-weight:600" id="nav-routine-lbl">Routine</span>
+    </button>
+    <button onclick="navTo('scan-product')" id="nav-scan" class="nav-btn" style="flex:1;background:none;border:none;cursor:pointer;padding:6px 4px;display:flex;flex-direction:column;align-items:center;gap:3px;font-family:'Outfit',sans-serif">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="5" height="5"/><rect x="16" y="3" width="5" height="5"/><rect x="3" y="16" width="5" height="5"/><path d="M21 16h-3a2 2 0 0 0-2 2v3"/><path d="M21 21v.01"/><path d="M12 7v3a2 2 0 0 1-2 2H7"/><path d="M3 12h.01"/><path d="M12 3h.01"/><path d="M12 16v.01"/><path d="M16 12h1"/><path d="M21 12v.01"/><path d="M12 21v-1"/></svg>
+      <span style="font-size:10px;font-weight:600" id="nav-scan-lbl">Scanner</span>
+    </button>
+    <button onclick="navTo('articles')" id="nav-articles" class="nav-btn" style="flex:1;background:none;border:none;cursor:pointer;padding:6px 4px;display:flex;flex-direction:column;align-items:center;gap:3px;font-family:'Outfit',sans-serif">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+      <span style="font-size:10px;font-weight:600" id="nav-articles-lbl">Articles</span>
+    </button>
+    <button onclick="navTo('dashboard')" id="nav-space" class="nav-btn" style="flex:1;background:none;border:none;cursor:pointer;padding:6px 4px;display:flex;flex-direction:column;align-items:center;gap:3px;font-family:'Outfit',sans-serif">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      <span style="font-size:10px;font-weight:600" id="nav-space-lbl">Mon espace</span>
+    </button>
   </div>
 </div>
 
@@ -1947,7 +1992,7 @@ function getRegionProducts() {
   return available;
 }
 
-const SCREENS=["lang","welcome","register","login","scan","q1","diag","q2","q3","q4","q5","result","compare","suivi","dashboard","scan-product","profile"];
+const SCREENS=["lang","welcome","register","login","scan","q1","diag","q2","q3","q4","q5","result","compare","suivi","dashboard","scan-product","profile","articles"];
 
 const ST={
   screen:'lang',user:null,
@@ -1958,18 +2003,20 @@ const ST={
 };
 
 function go(screen){
-  // Stopper la caméra si on quitte l'écran scan
   if (ST.screen === 'scan' && screen !== 'scan') stopCamera();
+  if (ST.screen === 'scan-product' && screen !== 'scan-product') stopBarcodeCamera();
   SCREENS.forEach(s=>{const el=document.getElementById("sc-"+s);if(el)el.classList.toggle("hidden",s!==screen);});
   ST.screen=screen;
   window.scrollTo(0,0);
   if(screen==='welcome') setTimeout(applyWelcomeLang,10);
-  // Démarrer la caméra quand on arrive sur scan
   if(screen==='scan') setTimeout(function(){ startCamera(); }, 100);
-  // Démarrer la caméra code-barres
   if(screen==='scan-product') setTimeout(function(){ startBarcodeCamera(); }, 100);
-  // Stopper la caméra code-barres si on quitte
-  if(ST.screen==='scan-product' && screen!=='scan-product') stopBarcodeCamera();
+  // Afficher/cacher la nav
+  var navScreens = ['welcome','result','scan-product','articles','dashboard','profile'];
+  var nav = document.getElementById('bottom-nav');
+  if (nav) nav.style.display = navScreens.indexOf(screen) !== -1 ? 'block' : 'none';
+  // Activer le bon onglet
+  if (typeof updateNav === 'function') updateNav(screen);
 }
 
 function setLang(l){
@@ -4799,6 +4846,12 @@ function showTab(tab) {
 }
 
 function showTermsModal() {
+  // Si déjà accepté, aller directement au questionnaire
+  if (localStorage.getItem('skinmatch_terms_accepted') === '1') {
+    ST.user = {name:'', email:''};
+    go('q1');
+    return;
+  }
   var modal = document.getElementById('terms-modal');
   if (modal) modal.style.display = 'flex';
 }
@@ -4823,6 +4876,7 @@ function confirmTerms() {
   if (!cb || !cb.checked) return;
   var modal = document.getElementById('terms-modal');
   if (modal) modal.style.display = 'none';
+  localStorage.setItem('skinmatch_terms_accepted', '1');
   ST.user = {name:'', email:''};
   go('q1');
 }
@@ -6287,6 +6341,7 @@ async function doLogin() {
     window._currentUser = cred.user;
     var snap = await window._getDoc(window._doc(window._db, 'users', cred.user.uid));
     if (snap.exists() && snap.data().lastRoutine) window._savedRoutine = snap.data().lastRoutine;
+    showWelcomeToast(cred.user.displayName || cred.user.email.split('@')[0]);
     go('welcome');
   } catch(e) {
     var isENl = LANG === 'en';
@@ -6308,6 +6363,7 @@ async function doGoogleLogin() {
       });
     }
     window._currentUser = user;
+    showWelcomeToast(user.displayName || user.email.split('@')[0]);
     go('welcome');
   } catch(e) { console.error('Google login error:', e); }
 }
@@ -6408,6 +6464,132 @@ function renderProfile() {
   html += '<button onclick="doLogout()" style="width:100%;padding:13px;border-radius:50px;border:1.5px solid var(--acc);background:transparent;color:var(--acc2);font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;margin-top:4px">Se déconnecter</button>';
   
   contentEl.innerHTML = html;
+}
+
+// ══ NAVIGATION BAS ══
+var NAV_SCREENS = ['welcome','result','scan-product','articles','dashboard'];
+
+function navTo(screen) {
+  // Arrêter caméras si on quitte
+  if (typeof stopCamera === 'function') stopCamera();
+  if (typeof stopBarcodeCamera === 'function') stopBarcodeCamera();
+  
+  if (screen === 'result' && (!ST.result)) {
+    // Pas encore de routine → lancer le diagnostic
+    go('q1');
+    updateNav(null);
+    return;
+  }
+  if (screen === 'articles') {
+    renderArticlesScreen();
+  }
+  if (screen === 'dashboard') {
+    renderDashboard();
+  }
+  if (screen === 'scan-product') {
+    setTimeout(function() { startBarcodeCamera(); }, 100);
+  }
+  go(screen);
+  updateNav(screen);
+}
+
+function updateNav(screen) {
+  var isEN = LANG === 'en';
+  var navVisible = NAV_SCREENS.indexOf(screen) !== -1 || screen === 'welcome';
+  var nav = document.getElementById('bottom-nav');
+  if (nav) nav.style.display = navVisible ? 'block' : 'none';
+  
+  // Mettre à jour les labels
+  var labels = {
+    'nav-home-lbl': isEN ? 'Home' : 'Accueil',
+    'nav-routine-lbl': isEN ? 'Routine' : 'Routine',
+    'nav-scan-lbl': isEN ? 'Scan' : 'Scanner',
+    'nav-articles-lbl': isEN ? 'Articles' : 'Articles',
+    'nav-space-lbl': isEN ? 'My space' : 'Mon espace',
+  };
+  Object.keys(labels).forEach(function(id) {
+    var el = document.getElementById(id);
+    if (el) el.textContent = labels[id];
+  });
+  
+  // Activer le bon bouton
+  var map = { 'welcome':'nav-home', 'result':'nav-routine', 'scan-product':'nav-scan', 'articles':'nav-articles', 'dashboard':'nav-space' };
+  document.querySelectorAll('.nav-btn').forEach(function(b) { b.classList.remove('active'); });
+  if (map[screen]) {
+    var activeBtn = document.getElementById(map[screen]);
+    if (activeBtn) activeBtn.classList.add('active');
+  }
+  
+  // Ajouter padding bas aux écrans avec nav
+  document.querySelectorAll('.content').forEach(function(el) {
+    el.style.paddingBottom = navVisible ? '90px' : '';
+  });
+}
+
+function renderArticlesScreen() {
+  var isEN = LANG === 'en';
+  var articles = isEN ? ARTICLES_EN : ARTICLES_FR;
+  var list = document.getElementById('articles-list');
+  if (!list) return;
+  
+  // Mettre à jour les textes
+  var eyebrow = document.getElementById('articles-eyebrow');
+  var title = document.getElementById('articles-title');
+  var sub = document.getElementById('articles-sub');
+  if (eyebrow) eyebrow.textContent = isEN ? 'Library' : 'Bibliothèque';
+  if (title) title.textContent = isEN ? 'All articles' : 'Tous les articles';
+  if (sub) sub.textContent = isEN ? "Tips, actives, routines — everything you need to know" : "Conseils, actifs, routines — tout ce qu'il faut savoir";
+  
+  // Tags uniques
+  var tags = [...new Set(articles.map(function(a) { return a.tag; }))];
+  var activeTag = null;
+  
+  function renderList(filterTag) {
+    var filtered = filterTag ? articles.filter(function(a) { return a.tag === filterTag; }) : articles;
+    list.innerHTML = 
+      '<div style="display:flex;gap:8px;overflow-x:auto;padding-bottom:8px;margin-bottom:16px;-webkit-overflow-scrolling:touch;scrollbar-width:none">' +
+      ['<button onclick="renderArticlesFilter(null)" id="tag-all" style="flex-shrink:0;padding:6px 14px;border-radius:20px;border:1.5px solid ' + (!filterTag ? '#C4726A' : 'var(--bdr)') + ';background:' + (!filterTag ? '#C4726A' : '#fff') + ';color:' + (!filterTag ? '#fff' : 'var(--mut)') + ';font-size:12px;font-weight:600;cursor:pointer;font-family:inherit">' + (isEN ? 'All' : 'Tous') + '</button>',
+      ...tags.map(function(tag) {
+        var isActive = filterTag === tag;
+        return "<button onclick=\"window._artFilter='' + tag.replace(/'/g,'') + '';renderArticlesScreen()\" style=\"flex-shrink:0;padding:6px 14px;border-radius:20px;border:1.5px solid " + (isActive ? "#C4726A" : "var(--bdr)") + ";background:" + (isActive ? "#C4726A" : "#fff") + ";color:" + (isActive ? "#fff" : "var(--mut)") + ";font-size:12px;font-weight:600;cursor:pointer;font-family:inherit\">" + tag + "</button>";
+
+      })].join('') + '</div>' +
+      '<div style="display:flex;flex-direction:column;gap:10px">' +
+      filtered.map(function(a, i) {
+        var realIdx = articles.indexOf(a);
+        return '<div onclick="showArticle(' + realIdx + ',' + isEN + ')" style="background:#fff;border-radius:16px;border:1px solid var(--bdr);padding:14px;cursor:pointer;display:flex;gap:12px;align-items:flex-start">' +
+          '<div style="font-size:32px;flex-shrink:0;line-height:1">' + a.emoji + '</div>' +
+          '<div style="flex:1;min-width:0">' +
+          '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">' +
+          '<span style="font-size:10px;font-weight:700;color:var(--acc2);text-transform:uppercase;letter-spacing:.5px">' + a.tag + '</span>' +
+          '<span style="font-size:10px;color:var(--mut)">' + a.read + '</span></div>' +
+          '<div style="font-size:14px;font-weight:700;color:var(--pri);line-height:1.3;margin-bottom:4px">' + a.title + '</div>' +
+          '<div style="font-size:12px;color:var(--mut);line-height:1.5;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden">' + a.intro + '</div>' +
+          '</div></div>';
+      }).join('') + '</div>';
+  }
+  
+  window.renderArticlesFilter = function(tag) {
+    window._artFilter = tag;
+    renderList(tag);
+  };
+  
+  renderList(window._artFilter || null);
+}
+
+function showWelcomeToast(name) {
+  var firstName = name ? name.split(' ')[0] : '';
+  var hour = new Date().getHours();
+  var greeting = LANG === 'en'
+    ? (hour < 12 ? 'Good morning' : hour < 18 ? 'Good afternoon' : 'Good evening')
+    : (hour < 12 ? 'Bonjour' : hour < 18 ? 'Bon après-midi' : 'Bonsoir');
+  var msg = greeting + (firstName ? ' ' + firstName : '') + ' 👋';
+  var toast = document.createElement('div');
+  toast.style.cssText = 'position:fixed;top:60px;left:50%;transform:translateX(-50%);background:#3D2B1F;color:#fff;padding:14px 24px;border-radius:50px;font-size:14px;font-weight:600;z-index:9999;opacity:0;transition:opacity .3s;white-space:nowrap;box-shadow:0 4px 20px rgba(0,0,0,.3)';
+  toast.textContent = msg;
+  document.body.appendChild(toast);
+  setTimeout(function() { toast.style.opacity = '1'; }, 50);
+  setTimeout(function() { toast.style.opacity = '0'; setTimeout(function() { toast.remove(); }, 400); }, 3000);
 }
 
 function toggleLowYuka() {
