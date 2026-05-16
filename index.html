@@ -627,7 +627,7 @@ h2{font-family:var(--serif);font-size:20px;font-weight:700;margin-bottom:3px}
 <!-- ══ REGISTER ══ -->
 <div id="sc-register" class="hidden">
   <div class="topbar"><button class="btn-back" onclick="go('welcome')">← Retour</button><div class="logo"><div class="logo-icon">SM</div>Skin<span>Match</span></div><button onclick="changeLangRegion()" style="background:rgba(196,114,106,.12);border:1px solid rgba(196,114,106,.25);border-radius:20px;padding:4px 10px;font-size:11px;font-weight:600;color:#C4726A;cursor:pointer;font-family:'Outfit',sans-serif">🌐 Lang</button></div>
-  <div class="content" style="padding-bottom:120px">
+  <div class="content" style="padding-bottom:130px">
     <div style="margin:22px 0">
       <h2>Créer votre compte</h2>
       <p class="sub">Enregistrez votre profil pour accéder à vos recommandations.</p>
@@ -649,7 +649,7 @@ h2{font-family:var(--serif);font-size:20px;font-weight:700;margin-bottom:3px}
 <!-- ══ LOGIN ══ -->
 <div id="sc-login" class="hidden">
   <div class="topbar"><button class="btn-back" onclick="go('welcome')">← Retour</button><div class="logo"><div class="logo-icon">SM</div>Skin<span>Match</span></div><button onclick="changeLangRegion()" style="background:rgba(196,114,106,.12);border:1px solid rgba(196,114,106,.25);border-radius:20px;padding:4px 10px;font-size:11px;font-weight:600;color:#C4726A;cursor:pointer;font-family:'Outfit',sans-serif">🌐 Lang</button></div>
-  <div class="content" style="padding-bottom:120px">
+  <div class="content" style="padding-bottom:130px">
     <div style="margin:22px 0"><h2>Bon retour</h2><p class="sub">Connectez-vous pour accéder à votre profil.</p></div>
     <div class="inp-wrap"><svg width="15" height="15" viewBox="0 0 24 24" fill="#9A8B7C"><path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg><input id="inp-email-l" type="email" placeholder="Adresse email"></div>
     <div class="inp-wrap"><svg width="15" height="15" viewBox="0 0 24 24" fill="#9A8B7C"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/></svg><input id="inp-pw-l" type="password" placeholder="Mot de passe"></div>
@@ -3110,6 +3110,7 @@ function doGenerate(){
     ST.result=build();
     ST.showShare=false;
     renderResult();
+    window._lastResult = ST.result; // mémoriser pour la nav
     go("result");
     window.scrollTo(0, 0);
     if (btn) { btn.disabled = false; }
@@ -3332,8 +3333,23 @@ function switchTab(tab){
 }
 
 function toggleShare(){
-  ST.showShare=!ST.showShare;
-  document.getElementById("share-card-wrap").style.display=ST.showShare?"block":"none";
+  // Utiliser le Web Share API directement
+  var r = ST.result;
+  if (!r) return;
+  var skinLabels = {dry: LANG==="en"?"dry":"sèche", oily: LANG==="en"?"oily":"grasse", combo: LANG==="en"?"combination":"mixte", sensitive: LANG==="en"?"sensitive":"sensible", normal: LANG==="en"?"normal":"normale"};
+  var skinLabel = skinLabels[ST.skinType] || ST.skinType;
+  var productNames = r.steps.slice(0, 4).map(function(s) { return "✨ " + s.nom + " — " + s.marque; }).join("\n");
+  var appUrl = "https://mohamedhambli-oss.github.io/skinnmatch";
+  var shareText = LANG === "en"
+    ? "🌸 My SkinMatch routine for " + skinLabel + " skin:\n\n" + productNames + "\n\n🔗 Get your free personalized routine: " + appUrl
+    : "🌸 Ma routine SkinMatch pour peau " + skinLabel + " :\n\n" + productNames + "\n\n🔗 Obtiens ta routine personnalisée gratuite : " + appUrl;
+
+  if (navigator.share) {
+    navigator.share({ title: "Ma routine SkinMatch 🌸", text: shareText, url: appUrl })
+      .catch(function() { copyShareText(shareText); });
+  } else {
+    copyShareText(shareText);
+  }
 }
 
 // ─── MODAL ────────────────────────────────────────────────────────────────────
@@ -5657,7 +5673,7 @@ function renderDashboard() {
     // ── 1. HEADER PERSONNALISÉ ──
     var userName = window._currentUser ? (window._currentUser.displayName || window._currentUser.email.split("@")[0]) : "";
     var hour = new Date().getHours();
-    var greeting = hour < 12 ? (isEN ? "Good morning" : "Bonjour") : hour < 18 ? (isEN ? "Good afternoon" : "Bonsoir") : (isEN ? "Good evening" : "Bonsoir");
+    var greeting = hour < 18 ? (isEN ? "Good morning" : "Bonjour") : (isEN ? "Good evening" : "Bonsoir");
     var headerEl = document.createElement("div");
     headerEl.style.cssText = "margin-bottom:16px;display:flex;align-items:flex-start;justify-content:space-between";
     headerEl.innerHTML = "<div>" +
@@ -5673,7 +5689,7 @@ function renderDashboard() {
     affEl.style.cssText = "background:linear-gradient(135deg,#C4726A,#A85A52);border-radius:20px;padding:18px 20px;margin-bottom:14px;position:relative;overflow:hidden";
     affEl.innerHTML = "<div style='position:absolute;top:-20px;right:-20px;width:80px;height:80px;border-radius:50%;background:rgba(255,255,255,.08)'></div>" +
       "<div style='font-size:10px;font-weight:700;color:rgba(255,255,255,.75);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px'>✨ " + (isEN ? "AFFIRMATION OF THE DAY" : "AFFIRMATION DU JOUR") + "</div>" +
-      "<div style='font-size:15px;font-style:italic;color:#fff;line-height:1.6;font-family:Georgia,serif'>" + affirmations[affIdx] + "</div>";
+      "<div style='font-size:16px;font-style:italic;color:#fff;line-height:1.7;font-family:Georgia,serif'>" + affirmations[affIdx] + "</div>";
     wrap.appendChild(affEl);
 
     // ── 3. SCORE DE PEAU ──
@@ -5750,7 +5766,7 @@ function renderDashboard() {
     var tipEl = document.createElement("div");
     tipEl.style.cssText = "background:var(--blush);border-radius:16px;padding:16px;margin-bottom:14px;border:1px solid var(--rose)";
     tipEl.innerHTML = "<div style='font-size:10px;font-weight:700;color:var(--acc2);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px'>💡 " + (isEN ? "TIP OF THE DAY" : "CONSEIL DU JOUR") + "</div>" +
-      "<div style='font-size:13px;line-height:1.6;color:var(--pri)'>" + tips[dayIdx] + "</div>";
+      "<div style='font-size:14px;line-height:1.7;color:var(--pri)'>" + tips[dayIdx] + "</div>";
     wrap.appendChild(tipEl);
 
     // ── 7. ROUTINE DU MOMENT ──
@@ -5797,7 +5813,7 @@ function renderDashboard() {
         var chDesc = isEN ? ch.descEN : ch.desc;
         info.innerHTML = "<div style='font-size:13px;font-weight:700;color:var(--pri)'>" + chLabel + "</div>" +
             "<div style='font-size:11px;color:var(--mut);margin-top:2px'>" + chDesc + "</div>";
-        if (chData.started) {
+        if (chData.started && chData.days > 0) {
             var pct = Math.min(100, Math.round((chData.days / ch.days) * 100));
             var barWrap = document.createElement("div");
             barWrap.style.cssText = "height:4px;border-radius:2px;background:var(--bdr);overflow:hidden;margin-top:6px";
@@ -5807,7 +5823,8 @@ function renderDashboard() {
             info.appendChild(barWrap);
             var daysLbl = document.createElement("div");
             daysLbl.style.cssText = "font-size:10px;color:var(--acc2);margin-top:3px;font-weight:600";
-            daysLbl.textContent = chData.days + "/" + ch.days + (isEN ? " days" : " jours");
+            var pctDone = Math.min(100, Math.round((chData.days / ch.days) * 100));
+            daysLbl.textContent = chData.days + "/" + ch.days + (isEN ? " days" : " jours") + " · " + pctDone + "%";
             info.appendChild(daysLbl);
         }
         row.appendChild(info);
@@ -5893,7 +5910,7 @@ function renderDashboard() {
       card.innerHTML = "<div style='font-size:26px;flex-shrink:0'>" + a.emoji + "</div>" +
         "<div style='flex:1;min-width:0'>" +
         "<div style='font-size:10px;color:var(--acc2);font-weight:600;margin-bottom:2px'>" + a.tag + " · " + a.read + "</div>" +
-        "<div style='font-size:13px;font-weight:700;color:var(--pri);line-height:1.3;overflow:hidden;text-overflow:ellipsis;white-space:nowrap'>" + a.title + "</div></div>" +
+        "<div style='font-size:14px;font-weight:700;color:var(--pri);line-height:1.3;overflow:hidden;text-overflow:ellipsis;white-space:nowrap'>" + a.title + "</div></div>" +
         "<div style='font-size:16px;color:var(--mut);flex-shrink:0'>›</div>";
       artPreviewGrid.appendChild(card);
     });
@@ -6798,8 +6815,8 @@ function showWelcomeToast(name) {
   var firstName = name ? name.split(' ')[0] : '';
   var hour = new Date().getHours();
   var greeting = LANG === 'en'
-    ? (hour < 12 ? 'Good morning' : hour < 18 ? 'Good afternoon' : 'Good evening')
-    : (hour < 12 ? 'Bonjour' : hour < 18 ? 'Bon après-midi' : 'Bonsoir');
+    ? (hour < 18 ? 'Good morning' : 'Good evening')
+    : (hour < 18 ? 'Bonjour' : 'Bonsoir');
   var msg = greeting + (firstName ? ' ' + firstName : '') + ' 👋';
   var toast = document.createElement('div');
   toast.style.cssText = 'position:fixed;top:60px;left:50%;transform:translateX(-50%);background:#3D2B1F;color:#fff;padding:14px 24px;border-radius:50px;font-size:14px;font-weight:600;z-index:9999;opacity:0;transition:opacity .3s;white-space:nowrap;box-shadow:0 4px 20px rgba(0,0,0,.3)';
