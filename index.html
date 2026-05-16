@@ -2046,10 +2046,13 @@ function go(screen){
 function setLang(l){
   LANG = l;
   localStorage.setItem('skinmatch_lang', l);
+  // Sauvegarder dans Firestore si connecté
+  if (window._currentUser && window._firebaseReady) {
+    window._updateDoc(window._doc(window._db, 'users', window._currentUser.uid), { lang: l }).catch(function(){});
+  }
   initQuestions();
   go('welcome');
   setTimeout(applyWelcomeLang, 50);
-  // Afficher la modale région après 300ms
   setTimeout(function(){ showRegionModal(); }, 300);
 }
 
@@ -6561,8 +6564,15 @@ window.onFirebaseUserReady = function(user) {
     var shortName = user.displayName ? user.displayName.split(' ')[0] : user.email.split('@')[0];
     if (btnLog) { btnLog.textContent = '👤 ' + shortName; btnLog.onclick = function(){ renderProfile(); go('profile'); }; }
     if (btnReg) btnReg.style.display = 'none';
-    // Charger routine sauvegardée
-    loadSavedRoutine(user);
+    // Charger routine + préférences depuis Firestore
+    loadSavedRoutine(user).then(function() {
+      // Après chargement Firestore, si lang disponible → ne plus demander
+      if (LANG && REGION && ST.screen === 'lang') {
+        go('welcome');
+        setTimeout(applyWelcomeLang, 100);
+      }
+      setTimeout(applyWelcomeLang, 200);
+    });
   } else {
     if (btnLog) { btnLog.textContent = 'Se connecter'; btnLog.onclick = function(){ go('login'); }; }
     if (btnReg) { btnReg.style.display = ''; btnReg.textContent = 'Créer un compte'; }
@@ -6573,8 +6583,23 @@ async function loadSavedRoutine(user) {
   if (!window._firebaseReady || !user) return;
   try {
     var snap = await window._getDoc(window._doc(window._db, 'users', user.uid));
-    if (snap.exists() && snap.data().lastRoutine) {
-      window._savedRoutine = snap.data().lastRoutine;
+    var data = snap.exists() ? snap.data() : {};
+    
+    // Restaurer langue et région depuis Firestore
+    if (data.lang && !localStorage.getItem('skinmatch_lang')) {
+      LANG = data.lang;
+      localStorage.setItem('skinmatch_lang', data.lang);
+      initQuestions();
+      setTimeout(applyWelcomeLang, 100);
+    }
+    if (data.region && !localStorage.getItem('skinmatch_region')) {
+      REGION = data.region;
+      localStorage.setItem('skinmatch_region', data.region);
+    }
+    
+    // Restaurer routine
+    if (data.lastRoutine) {
+      window._savedRoutine = data.lastRoutine;
     }
   } catch(e) { console.log('loadSavedRoutine error:', e); }
 }
