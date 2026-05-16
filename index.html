@@ -958,7 +958,7 @@ h2{font-family:var(--serif);font-size:20px;font-weight:700;margin-bottom:3px}
           </svg>
           <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center">
             <div id="score-number" style="font-size:32px;font-weight:700;color:#fff;font-family:Georgia,serif;line-height:1">0</div>
-            <div style="font-size:12px;color:rgba(255,255,255,.7)">/100</div>
+            <div style="font-size:12px;color:rgba(255,255,255,.7)">%</div>
           </div>
         </div>
         
@@ -3361,22 +3361,46 @@ function switchTab(tab){
 }
 
 function toggleShare(){
-  // Utiliser le Web Share API directement
   var r = ST.result;
   if (!r) return;
-  var skinLabels = {dry: LANG==="en"?"dry":"sèche", oily: LANG==="en"?"oily":"grasse", combo: LANG==="en"?"combination":"mixte", sensitive: LANG==="en"?"sensitive":"sensible", normal: LANG==="en"?"normal":"normale"};
-  var skinLabel = skinLabels[ST.skinType] || ST.skinType;
-  var productNames = r.steps.slice(0, 4).map(function(s) { return "✨ " + s.nom + " — " + s.marque; }).join("\n");
+  
+  // Encoder la routine dans l'URL pour que le destinataire la voie
+  var routineData = {
+    skin: ST.skinType,
+    age: ST.ageGroup,
+    budget: ST.budget,
+    products: (r.steps || []).slice(0, 6).map(function(s) { return s.key; })
+  };
+  var encoded = btoa(encodeURIComponent(JSON.stringify(routineData)));
   var appUrl = "https://mohamedhambli-oss.github.io/skinnmatch";
+  var shareUrl = appUrl + "?routine=" + encoded;
+  
+  var skinLabels = {grasse:"grasse",seche:"sèche",mixte:"mixte",sensible:"sensible",normale:"normale"};
+  var skinLabel = skinLabels[ST.skinType] || ST.skinType || "mixte";
+  var productNames = (r.steps || []).slice(0, 4).map(function(s) { return "✨ " + s.nom + " — " + s.marque; }).join("\n");
+  
   var shareText = LANG === "en"
-    ? "🌸 My SkinMatch routine for " + skinLabel + " skin:\n\n" + productNames + "\n\n🔗 Get your free personalized routine: " + appUrl
-    : "🌸 Ma routine SkinMatch pour peau " + skinLabel + " :\n\n" + productNames + "\n\n🔗 Obtiens ta routine personnalisée gratuite : " + appUrl;
-
+    ? "🌸 My personalized SkinMatch routine (" + skinLabel + " skin):\n\n" + productNames + "\n\n\U0001f449 See my full routine & get yours free:"
+    : "🌸 Ma routine skincare SkinMatch personnalis\u00e9e (peau " + skinLabel + ") :\n\n" + productNames + "\n\n\U0001f449 Voir ma routine compl\u00e8te & obtenir la tienne gratuitement:";
   if (navigator.share) {
-    navigator.share({ title: "Ma routine SkinMatch 🌸", text: shareText, url: appUrl })
-      .catch(function() { copyShareText(shareText); });
+    navigator.share({ title: "Ma routine SkinMatch 🌸", text: shareText, url: shareUrl })
+      .catch(function() { copyShareToClipboard(shareText + "\n" + shareUrl); });
   } else {
-    copyShareText(shareText);
+    copyShareToClipboard(shareText + "\n" + shareUrl);
+  }
+}
+
+function copyShareToClipboard(text) {
+  if (navigator.clipboard) {
+    navigator.clipboard.writeText(text).then(function() { showShareCopied(); });
+  } else {
+    var ta = document.createElement("textarea");
+    ta.value = text;
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand("copy");
+    document.body.removeChild(ta);
+    showShareCopied();
   }
 }
 
@@ -3482,8 +3506,8 @@ function showWhyAI(key, nom, marque) {
   html += "<div style=\"position:absolute;top:-30px;right:-30px;width:120px;height:120px;border-radius:50%;background:rgba(255,255,255,.06)\"></div>";
   html += "<div style=\"display:flex;align-items:center;gap:16px\">";
   html += "<div style=\"text-align:center;flex-shrink:0\">";
-  html += "<div style=\"font-size:48px;font-weight:900;color:#fff;font-family:Georgia,serif;line-height:1\">" + compat + "</div>";
-  html += "<div style=\"font-size:11px;color:rgba(255,255,255,.75);font-weight:600;letter-spacing:.5px\">/100 · " + compatLabel.toUpperCase() + "</div></div>";
+  html += "<div style=\"font-size:48px;font-weight:900;color:#fff;font-family:Georgia,serif;line-height:1\">" + compat + "%</div>";
+  html += "<div style=\"font-size:12px;color:rgba(255,255,255,.85);font-weight:700;margin-top:4px\">" + compatLabel.toUpperCase() + "</div></div>";
   html += "<div style=\"flex:1;border-left:1px solid rgba(255,255,255,.2);padding-left:16px\">";
   html += "<div style=\"font-size:13px;font-weight:700;color:#fff;margin-bottom:6px\">Compatibilité peau " + skinLabel + (age ? " · " + age + " ans" : "") + "</div>";
   html += "<div style=\"font-size:11px;color:rgba(255,255,255,.7);line-height:1.5\">" + (skinExplain[ST.skinType] || "") + "</div></div></div>";
@@ -3547,18 +3571,65 @@ function showWhyAI(key, nom, marque) {
     html += "</div>";
   }
 
-  // Pour qui
-  if (pq) {
-    html += "<div style=\"padding:10px 0;border-bottom:1px solid #F5F0ED\">";
-    html += "<div style=\"font-size:10px;color:#B0958F;font-weight:700;text-transform:uppercase;letter-spacing:.8px;margin-bottom:6px\">Idéal pour</div>";
-    html += "<div style=\"font-size:13px;color:#3D2B1F;line-height:1.6\">" + pq + "</div></div>";
+  // ── POURQUOI CE PRODUIT POUR TOI (raisonnement IA) ──
+  html += "<div style=\"padding:10px 0;border-bottom:1px solid #F5F0ED\">";
+  html += "<div style=\"font-size:10px;color:#C4726A;font-weight:700;text-transform:uppercase;letter-spacing:.8px;margin-bottom:10px\">🎯 Pourquoi ce produit pour toi</div>";
+  
+  // Raisonnement basé sur le profil réel
+  var reasoning = [];
+  var skinReasons = {
+    grasse: "Ta peau grasse produit un excès de sébum qui bouche les pores. Ce produit cible spécifiquement cette problématique en régulant la sécrétion sébacée sans agresser ta barrière cutanée.",
+    seche: "Ta peau sèche manque de lipides pour retenir l'hydratation. Ce produit apporte les nutriments essentiels pour restaurer ta barrière cutanée et prévenir les tiraillements.",
+    mixte: "Ta peau mixte nécessite un équilibre délicat — hydrater sans alourdir la zone T. Ce produit est formulé pour répondre aux deux zones sans déséquilibrer.",
+    sensible: "Ta peau réactive a besoin d'ingrédients doux et sans irritants. Ce produit a été sélectionné pour l'absence de parfums et d'actifs potentiellement agressifs.",
+    normale: "Ta peau équilibrée bénéficiera de ce produit pour maintenir son homeostasie naturelle et prévenir les futurs déséquilibres."
+  };
+  if (ST.skinType && skinReasons[ST.skinType]) {
+    reasoning.push({ icon: "🧬", text: skinReasons[ST.skinType] });
+  }
+  
+  // Raisonnement par problématique
+  var concernReasons = {
+    acne: "L'acné que tu as signalée implique des pores bouchés et une inflammation. Les actifs de ce produit agissent directement sur ces deux mécanismes.",
+    taches: "Tes taches pigmentaires nécessitent des actifs dépigmentants ciblés. Ce produit contient des molécules reconnues pour uniformiser le teint.",
+    rides: "Pour le vieillissement cutané, ce produit stimule le renouvellement cellulaire et la synthèse de collagène.",
+    rougeurs: "Tes rougeurs indiquent une inflammation. Ce produit contient des actifs apaisants cliniquement éprouvés.",
+    brillance: "La brillance excessive que tu signales sera régulée par les actifs sébostatiques de ce produit.",
+    imperfections: "Ce produit a été choisi pour son action directe sur les imperfections grâce à ses actifs anti-bactériens et régulateurs."
+  };
+  if (ST.concerns && ST.concerns.length > 0) {
+    var firstConcern = ST.concerns[0];
+    if (concernReasons[firstConcern]) {
+      reasoning.push({ icon: "💡", text: concernReasons[firstConcern] });
+    }
+  }
+  
+  // Raisonnement budget
+  var budgetReasons = {
+    petit: "Dans ta tranche de budget, ce produit offre le meilleur rapport qualité/efficacité de notre base.",
+    moyen: "Ce produit représente le juste milieu entre formulation premium et accessibilité — le meilleur choix dans ta gamme de prix.",
+    mid: "Ce produit représente le juste milieu entre formulation premium et accessibilité — le meilleur choix dans ta gamme de prix.",
+    premium: "Dans la gamme premium, ce produit se distingue par sa concentration en actifs et ses études cliniques.",
+    luxe: "Ce produit de luxe utilise des technologies de pointe et des concentrations d'actifs supérieures aux formules standards."
+  };
+  if (ST.budget && budgetReasons[ST.budget]) {
+    reasoning.push({ icon: "💰", text: budgetReasons[ST.budget] });
   }
 
-  // Comment utiliser
-  if (app) {
+  reasoning.forEach(function(r) {
+    html += "<div style=\"display:flex;gap:10px;margin-bottom:10px\">";
+    html += "<div style=\"font-size:16px;flex-shrink:0\">" + r.icon + "</div>";
+    html += "<div style=\"font-size:13px;color:#3D2B1F;line-height:1.7\">" + r.text + "</div></div>";
+  });
+  html += "</div>";
+
+  // ── COMMENT UTILISER ──
+  if (app || pq) {
     html += "<div style=\"padding:10px 0;border-bottom:1px solid #F5F0ED\">";
-    html += "<div style=\"font-size:10px;color:#B0958F;font-weight:700;text-transform:uppercase;letter-spacing:.8px;margin-bottom:6px\">Application</div>";
-    html += "<div style=\"font-size:13px;color:#3D2B1F;line-height:1.6\">" + app + "</div></div>";
+    html += "<div style=\"font-size:10px;color:#B0958F;font-weight:700;text-transform:uppercase;letter-spacing:.8px;margin-bottom:8px\">📋 Comment l'utiliser</div>";
+    if (pq) html += "<div style=\"font-size:12px;color:#5A4A42;margin-bottom:6px\"><strong>Idéal pour :</strong> " + pq + "</div>";
+    if (app) html += "<div style=\"font-size:13px;color:#3D2B1F;line-height:1.6\">" + app + "</div>";
+    html += "</div>";
   }
 
   // Moment
@@ -4706,7 +4777,7 @@ function displayScanResult(data) {
   html += "<div style='display:inline-block;margin-top:5px;padding:3px 10px;background:#F5E8E6;border-radius:20px;font-size:10px;font-weight:700;color:#C4726A'>" + data.cat + "</div></div>";
   html += "<div style='text-align:center;background:" + scoreBg + ";border-radius:14px;padding:10px 14px;flex-shrink:0'>";
   html += "<div style='font-size:32px;font-weight:900;color:" + scoreColor + ";font-family:Georgia,serif;line-height:1'>" + globalScore + "</div>";
-  html += "<div style='font-size:10px;color:" + scoreColor + ";font-weight:700'>/100</div>";
+  
   html += "<div style='font-size:9px;color:" + scoreColor + ";margin-top:2px'>" + (globalScore>=75?"Excellent":globalScore>=65?"Bien adapté":globalScore>=50?"Moyen":"Peu adapté") + "</div></div></div>";
 
   // Score principal avec jauge SVG
@@ -5590,25 +5661,25 @@ var CHALLENGES = [
 
 // ══ ARTICLES ══
 var ARTICLES_FR = [
-  { id:"a1", emoji:"☀️", tag:"Protection", title:"Le SPF, indispensable même en hiver", intro:"Les UV ne s'arrêtent pas en décembre. En hiver, les UVA pénètrent toujours autant dans la peau — et sont responsables du vieillissement prématuré.", content:"Les UVB (coups de soleil) diminuent en hiver, mais les UVA restent présents toute l'année, même par temps nuageux. Ils pénètrent jusqu'au derme et accélèrent le vieillissement, les taches et le relâchement cutané. Un SPF 30 ou 50 le matin prend 10 secondes et protège ta peau pour la journée entière. C'est l'anti-âge le moins cher du marché.", read:"3 min" },
-  { id:"a2", emoji:"🌙", tag:"Routine du soir", title:"5 erreurs qui abîment ta peau la nuit", intro:"La nuit, ta peau se répare. Mais certaines habitudes sabotent ce processus sans que tu le saches.", content:"1. Dormir avec du maquillage — les résidus obstruent les pores et génèrent des imperfections. 2. Utiliser une taie d'oreiller en coton — il absorbe le sébum et les produits. Essaie la soie ou le satin. 3. Toucher ton visage avec tes mains — chaque contact transfère des bactéries. 4. Sauter l'hydratant parce que ta peau est grasse — la peau grasse peut aussi être déshydratée. 5. Ne pas nettoyer ton téléphone — c'est l'objet le plus bactérien que tu approches de ton visage.", read:"4 min" },
-  { id:"a3", emoji:"💧", tag:"Hydratation", title:"Peau grasse et hydratation : un duo mal compris", intro:"Beaucoup de peaux grasses évitent les hydratants par peur d'aggraver les brillances. C'est souvent l'erreur inverse.", content:"Une peau grasse peut être déshydratée. Quand la peau manque d'eau, elle compense en produisant plus de sébum — créant un cercle vicieux. La solution : un gel hydratant sans huile, à base d'acide hyaluronique. Il apporte de l'eau sans alourdir. Ta peau sera plus équilibrée, moins brillante et moins sujette aux imperfections.", read:"3 min" },
-  { id:"a4", emoji:"🧬", tag:"Actifs", title:"Niacinamide : l'actif qui convient (presque) à tout le monde", intro:"Pores dilatés, taches, rougeurs, imperfections — le niacinamide s'attaque à tout ça. Et il est rarement irritant.", content:"Le niacinamide (vitamine B3) est l'un des actifs les plus polyvalents en skincare. Il régule la production de sébum, réduit l'apparence des pores, uniformise le teint, atténue les rougeurs et renforce la barrière cutanée. Compatible avec presque tous les types de peau et la plupart des autres actifs. La concentration idéale : entre 5% et 10%.", read:"3 min" },
-  { id:"a5", emoji:"🌿", tag:"Naturel", title:"Les huiles végétales : lesquelles pour quel type de peau ?", intro:"Pas toutes les huiles se valent. Certaines conviennent aux peaux grasses, d'autres aux peaux sèches.", content:"Peau sèche : huile d'argan, rosehip, avocat — riches et nourrissantes. Peau mixte : huile de jojoba — proche du sébum naturel, équilibrante. Peau grasse : huile de nigelle, pépins de raisin — légères et régulatrices. Peau sensible : huile de calendula, camomille — apaisantes. Évite l'huile de coco sur le visage si tu as tendance acnéique — elle est comédogène.", read:"4 min" },
-  { id:"a6", emoji:"🔬", tag:"Science", title:"Rétinol : tout ce qu'il faut savoir avant de commencer", intro:"Le rétinol est l'actif anti-âge le plus étudié. Mais mal utilisé, il peut irriter. Voici comment l'intégrer en douceur.", content:"Le rétinol accélère le renouvellement cellulaire et stimule la production de collagène. Résultat : moins de rides, pores affinés, teint uniformisé. Pour commencer : 0,1% à 0,3%, 2 fois par semaine le soir. Augmenter progressivement. Ne jamais utiliser avec du benzoyle de peroxyde. Toujours suivre d'un SPF le matin. Les premières semaines peuvent inclure légère irritation — c'est normal.", read:"5 min" },
-  { id:"a7", emoji:"🧘", tag:"Bien-être", title:"Le lien entre stress et imperfections", intro:"Quand tu stresses, ta peau le ressent. Ce n'est pas dans ta tête — c'est de la biochimie.", content:"Le stress provoque une libération de cortisol. Cette hormone stimule les glandes sébacées et augmente la production de sébum. Plus de sébum = plus d'obstruction = plus d'imperfections. Le stress affecte aussi la barrière cutanée, la rendant plus perméable aux irritants. Gérer son stress (sommeil, exercice, respiration) fait partie intégrante d'une bonne routine skincare.", read:"3 min" },
-  { id:"a8", emoji:"🍎", tag:"Nutrition", title:"Les aliments qui font du bien à ta peau", intro:"Ce que tu manges se lit sur ton visage. Certains aliments sont de véritables boosts pour la peau.", content:"Top aliments peau : avocat (vitamine E et graisses saines), poissons gras (oméga-3 anti-inflammatoires), tomates (lycopène protecteur), noix du Brésil (sélénium), fruits rouges (antioxydants). À limiter : sucre raffiné (accélère le vieillissement par glycation), produits laitiers (lien avec l'acné chez certaines personnes), alcool (déshydratation).", read:"4 min" },
-  { id:"a9", emoji:"💤", tag:"Sommeil", title:"Pourquoi le sommeil est le meilleur soin de nuit", intro:"Aucune crème ne remplace 8 heures de sommeil réparateur. Pendant que tu dors, ta peau travaille.", content:"Entre 22h et 2h du matin, la production de mélatonine et d'hormone de croissance est maximale. Ces hormones stimulent la régénération cellulaire, la synthèse de collagène et la réparation des dommages UV. Le manque de sommeil se lit directement sur le visage : teint terne, cernes, pores dilatés. Dormir sur le dos préserve aussi la peau du visage des frottements.", read:"3 min" },
-  { id:"a10", emoji:"🧪", tag:"Ingrédients", title:"Les ingrédients à ne jamais mélanger", intro:"Certains actifs se neutralisent ou s'irritent mutuellement. Voici les combos à éviter.", content:"À éviter ensemble : Rétinol + AHA/BHA (sur-exfoliation). Vitamine C + Niacinamide à forte dose (peut réduire l'efficacité). Rétinol + Benzoyle de peroxyde (irritation sévère). Acide hyaluronique + alcools dénaturés (contre-productif). Les bons combos : Niacinamide + Zinc (sébum). SPF + Antioxydants (protection maximale). Rétinol + Peptides (anti-âge complet).", read:"4 min" },
-  { id:"a11", emoji:"🌊", tag:"Hydratation", title:"Combien d'eau faut-il vraiment boire pour la peau ?", intro:"L'hydratation interne compte autant que les soins topiques.", content:"1,5 à 2 litres d'eau par jour restent la référence. Mais l'hydratation de la peau dépend aussi de ta barrière cutanée — si elle est altérée, l'eau s'évapore plus vite. Utiliser un hydratant contenant des occlutants (comme la vaseline ou les céramides) aide à retenir l'eau dans les couches superficielles. Thé vert, eau de coco et bouillons de légumes comptent aussi dans ton apport hydrique.", read:"3 min" },
-  { id:"a12", emoji:"✨", tag:"Routine", title:"Comment construire une routine skincare en 3 étapes", intro:"Pas besoin de 15 produits. Une routine efficace peut tenir en 3 étapes.", content:"Matin : 1. Nettoyant doux → 2. Hydratant léger → 3. SPF. C'est tout. Le soir : 1. Double nettoyage (huile puis mousse) → 2. Sérum ciblé (rétinol, niacinamide...) → 3. Crème plus riche. Le secret : la régularité. Une routine simple faite chaque jour dépasse toujours une routine complexe faite de temps en temps.", read:"3 min" },
+  { id:"a1", emoji:"☀️", tag:"Protection", title:"Le SPF, indispensable même en hiver", intro:"Les UV ne s\'arrêtent pas en décembre. En hiver, les UVA pénètrent toujours autant dans la peau — et sont responsables du vieillissement prématuré et des taches.", content:"<strong>Pourquoi le SPF est-il indispensable toute l\'année ?</strong><br><br>Il existe deux types de rayons UV : les UVB, responsables des coups de soleil, et les UVA, responsables du vieillissement prématuré. Les UVB diminuent effectivement en hiver, mais les UVA — qui représentent 95% des UV atteignant la Terre — sont présents avec la même intensité 365 jours par an, même derrière les nuages, même à travers une vitre.<br><br><strong>Ce que font les UVA à ta peau</strong><br><br>Les UVA pénètrent jusqu\'au derme profond. Ils dégradent le collagène et l\'élastine, provoquent des taches pigmentaires et accélèrent le relâchement cutané. 80% du vieillissement visible de la peau est dû aux UV — pas au temps qui passe.<br><br><strong>Quel SPF choisir ?</strong><br><br>SPF 30 bloque 97% des UVB. SPF 50 bloque 98%. La différence semble faible mais compte pour les peaux sensibles et les expositions prolongées. Pour la vie quotidienne en hiver : SPF 30 minimum. En été ou en montagne : SPF 50+ obligatoire.<br><br><strong>Comment bien appliquer</strong><br><br>Applique en dernière étape de ta routine du matin, après le sérum et l\'hydratant. Utilise une quantité suffisante — environ 1/4 de cuillère à café pour le visage. Renouvelle toutes les 2h en cas d\'exposition directe.<br><br><strong>Les meilleurs SPF de notre base</strong><br><br>La Roche-Posay Anthelios et Avène SPF 50+ sont les références en France. Formulations légères, non grasses, adaptées aux peaux sensibles.", read:"5 min" },
+  { id:"a2", emoji:"🌙", tag:"Routine du soir", title:"5 erreurs qui abîment ta peau la nuit", intro:"Entre 22h et 2h du matin, ta peau est en plein pic de régénération cellulaire. Voici les habitudes qui sabotent ce processus chaque nuit.", content:"<strong>1. Dormir avec du maquillage</strong><br><br>Le fond de teint et le mascara obstruent les pores pendant 7 à 8 heures. Résultat : microkystes, imperfections et teint terne. Le double nettoyage (huile + mousse) en 2 minutes élimine tout résidu efficacement.<br><br><strong>2. La taie d\'oreiller en coton</strong><br><br>Le coton absorbe les produits de soin appliqués le soir et les bactéries de ta peau. Une taie en soie ou satin naturel réduit les frottements, préserve l\'hydratation et est plus douce pour les peaux acnéiques. Laver sa taie tous les 3 jours est recommandé.<br><br><strong>3. Sauter l\'hydratant parce que ta peau est grasse</strong><br><br>C\'est l\'erreur la plus fréquente. Une peau grasse peut être déshydratée — ce sont deux choses différentes. Quand elle manque d\'eau, elle compense en produisant plus de sébum. Un gel hydratant léger le soir régule cette production.<br><br><strong>4. Utiliser son téléphone au lit</strong><br><br>La lumière bleue perturbe la mélatonine et donc le cycle de réparation cutanée. De plus, un écran de téléphone contient 10 fois plus de bactéries qu\'une lunette de toilettes. Nettoie-le quotidiennement avec un chiffon microfibre.<br><br><strong>5. Ne pas appliquer les actifs dans le bon ordre</strong><br><br>L\'ordre d\'application conditionne l\'efficacité des actifs. La règle : du plus léger au plus épais. Sérum d\'abord, puis hydratant, puis huile ou baume si besoin. Appliquer dans l\'ordre inverse empêche la pénétration des actifs.", read:"5 min" },
+  { id:"a3", emoji:"💧", tag:"Hydratation", title:"Peau grasse et hydratation : un duo mal compris", intro:"Sauter l\'hydratant parce qu\'on a la peau grasse est l\'une des erreurs les plus répandues. Voici ce qui se passe réellement dans ta peau.", content:"<strong>La différence entre peau grasse et peau déshydratée</strong><br><br>La peau grasse produit trop de sébum — une substance lipidique. La peau déshydratée manque d\'eau. Ces deux conditions sont indépendantes et peuvent coexister. Une peau peut être grasse ET déshydratée en même temps.<br><br><strong>Le cercle vicieux de l\'absence d\'hydratation</strong><br><br>Quand tu prives ta peau d\'hydratation, ses capteurs détectent un manque et envoient un signal aux glandes sébacées pour produire plus de sébum en compensation. Tu obtiens l\'effet inverse de celui recherché : encore plus de brillance et plus d\'imperfections.<br><br><strong>Quel hydratant choisir pour une peau grasse ?</strong><br><br>Évite les crèmes riches en huiles végétales et en beurres. Choisis des textures gel ou gel-crème à base d\'acide hyaluronique. L\'acide hyaluronique attire l\'eau sans aucun corps gras — il hydrate en profondeur sans occlure les pores.<br><br><strong>Les ingrédients à privilégier</strong><br><br>Acide hyaluronique (hydratation), niacinamide (régulation sébum), glycérine (humectant), aloe vera (apaisant et hydratant léger). Les ingrédients à éviter : huile de coco (comédogène), lanoline, acides gras saturés en grande quantité.<br><br><strong>Notre recommandation</strong><br><br>La Roche-Posay Effaclar Hydra et CeraVe Gel Hydratant sont formulés spécifiquement pour les peaux grasses à mixtes.", read:"5 min" },
+  { id:"a4", emoji:"🧬", tag:"Actifs", title:"Niacinamide : l\'actif qui convient (presque) à tout le monde", intro:"Pores dilatés, taches, rougeurs, sébum — le niacinamide s\'attaque à tout ça avec une tolérance exceptionnelle. Décryptage complet.", content:"<strong>Qu\'est-ce que le niacinamide ?</strong><br><br>Le niacinamide, ou vitamine B3, est une forme soluble dans l\'eau de la niacine. Il est présent naturellement dans la peau mais se dégrade avec l\'âge, le stress et les UV.<br><br><strong>Ses actions prouvées scientifiquement</strong><br><br>Il réduit la production de sébum en agissant sur les glandes sébacées. Il diminue l\'apparence des pores dilatés en affinant la texture. Il inhibe le transfert de mélanine vers les cellules de surface, réduisant les taches. Il renforce la barrière cutanée en stimulant la production de céramides. Il a des propriétés anti-inflammatoires documentées.<br><br><strong>Quelle concentration choisir ?</strong><br><br>Entre 2% et 5% pour débuter — efficace et bien toléré. Entre 5% et 10% pour des effets plus prononcés. Au-delà de 10%, peu d\'études montrent un bénéfice supplémentaire et le risque d\'irritation augmente légèrement.<br><br><strong>Comment l\'intégrer dans sa routine ?</strong><br><br>Le niacinamide s\'applique matin et soir après le nettoyage et avant l\'hydratant. Il se combine bien avec la plupart des actifs. Exception : évite de le mélanger directement avec de la vitamine C pure (acide ascorbique) — ils peuvent se neutraliser. Utilise-les à des moments différents.<br><br><strong>Les meilleurs produits au niacinamide de notre base</strong><br><br>The Ordinary Niacinamide 10% + Zinc 1% est la référence rapport qualité/prix. Paula\'s Choice 10% Niacinamide Booster et la gamme La Roche-Posay Effaclar en contiennent également.", read:"5 min" },
+  { id:"a5", emoji:"🌿", tag:"Naturel", title:"Les huiles végétales : lesquelles pour quel type de peau ?", intro:"Pas toutes les huiles se valent. La bonne huile peut transformer ta peau — la mauvaise peut déclencher des imperfections. Guide complet.", content:"<strong>Comment fonctionnent les huiles végétales sur la peau ?</strong><br><br>Les huiles végétales contiennent des acides gras qui s\'intègrent dans la structure lipidique de la peau. Leur indice de comédogénicité (de 0 à 5) indique leur risque d\'obstruer les pores. Une huile comédogène n\'est pas mauvaise en soi, mais elle est inadaptée aux peaux à tendance acnéique.<br><br><strong>Pour les peaux sèches et déshydratées</strong><br><br>Huile d\'argan (comédogénicité : 0) — légère, non grasse, riche en vitamine E. Huile de rosehip (comédogénicité : 1) — régénérante, riche en acides gras essentiels, excellente pour les cicatrices. Huile d\'avocat (comédogénicité : 3) — très nourrissante, idéale pour les peaux très sèches mais à éviter si peau mixte.<br><br><strong>Pour les peaux mixtes</strong><br><br>Huile de jojoba (comédogénicité : 2) — sa composition proche du sébum naturel en fait un régulateur unique. Elle équilibre sans graisser. Huile de squalane (comédogénicité : 1) — ultra légère, universelle, idéale pour hydrater sans résidu.<br><br><strong>Pour les peaux grasses et acnéiques</strong><br><br>Huile de nigelle (comédogénicité : 2) — antibactérienne naturelle, régule le sébum. Huile de pépins de raisin (comédogénicité : 1) — légère, astringente, riche en linoleic acid qui est déficient dans les peaux acnéiques.<br><br><strong>À éviter sur le visage</strong><br><br>Huile de coco (comédogénicité : 4) — très comédogène malgré sa popularité. Huile de germe de blé (comédogénicité : 5) — réservée au corps.", read:"6 min" },
+  { id:"a6", emoji:"🔬", tag:"Science", title:"Rétinol : tout ce qu\'il faut savoir avant de commencer", intro:"Le rétinol est l\'actif anti-âge le plus étudié. Mais mal utilisé, il peut irriter. Voici comment l\'intégrer en douceur.", content:"<strong>Qu\'est-ce que le rétinol et pourquoi est-il si populaire ?</strong><br><br>Le rétinol est une forme de vitamine A. Dans la peau, il est converti en acide rétinoïque, la forme active qui agit sur les récepteurs cellulaires. C\'est l\'actif anti-âge le plus étudié avec plus de 40 ans de recherches cliniques.<br><br><strong>Ses effets prouvés</strong><br><br>Stimulation du renouvellement cellulaire — les cellules mortes sont éliminées plus rapidement. Stimulation de la production de collagène et d\'élastine. Réduction des rides fines et des rides profondes. Affinement de la texture. Désobstruction des pores. Réduction des taches pigmentaires.<br><br><strong>Comment commencer sans irriter sa peau</strong><br><br>Commence à 0,1% ou 0,3%, 2 fois par semaine le soir uniquement. Si bien toléré après 2 semaines, passe à 3 fois par semaine. Puis toutes les nuits après 4-6 semaines. Monte à 0,5% après 2-3 mois si tu veux plus d\'efficacité.<br><br><strong>Les erreurs à ne pas faire</strong><br><br>Ne jamais utiliser avec du benzoyle de peroxyde — irritation sévère garantie. Ne jamais appliquer sur peau humide — augmente la pénétration et donc l\'irritation. Ne jamais sauter le SPF le lendemain matin — le rétinol photosensibilise la peau. Ne pas utiliser pendant la grossesse ou l\'allaitement — contre-indication formelle.<br><br><strong>Que faire en cas de purge ?</strong><br><br>Les premières semaines peuvent provoquer une \"purge\" — poussée d\'imperfections liée à l\'accélération du renouvellement cellulaire. C\'est normal et temporaire. Si l\'irritation est trop forte, espacer les applications et appliquer par-dessus l\'hydratant.", read:"5 min" },
+  { id:"a7", emoji:"🧘", tag:"Bien-être", title:"Le lien entre stress et imperfections", intro:"Quand tu stresses, ta peau le ressent. Ce n\'est pas dans ta tête — c\'est de la biochimie.", content:"<strong>Le mécanisme biologique du stress sur la peau</strong><br><br>Quand tu stresses, ton cerveau déclenche la libération de cortisol — l\'hormone du stress. Cette hormone envoie un signal aux glandes sébacées pour augmenter leur production de sébum. Plus de sébum signifie plus de pores bouchés, plus de bactéries Cutibacterium acnes, et donc plus d\'imperfections.<br><br><strong>Les effets du stress sur la barrière cutanée</strong><br><br>Le cortisol affaiblit la barrière cutanée en réduisant la production de céramides. Une barrière fragilisée laisse entrer les irritants, les allergènes et les bactéries. Résultat : peau plus réactive, rougeurs, sensibilité accrue et cicatrisation plus lente.<br><br><strong>Le cercle vicieux</strong><br><br>Les imperfections causées par le stress génèrent elles-mêmes du stress. Ce stress aggrave les imperfections. Identifier ce cercle est la première étape pour le briser.<br><br><strong>Stratégies pour gérer l\'impact cutané du stress</strong><br><br>Le sommeil est prioritaire — c\'est pendant le sommeil que les niveaux de cortisol baissent et que la peau se régénère. L\'exercice physique régulier réduit le cortisol chronique. La cohérence cardiaque (5 respirations lentes par minute pendant 5 minutes) a des effets mesurables sur la sécrétion de cortisol.<br><br><strong>Les actifs skincare pour les peaux stressées</strong><br><br>Niacinamide pour réguler le sébum en excès. Acide hyaluronique pour réparer la barrière. Centella asiatica pour ses propriétés anti-inflammatoires et cicatrisantes. Éviter les actifs agressifs pendant les périodes de stress intense.", read:"3 min" },
+  { id:"a8", emoji:"🍎", tag:"Nutrition", title:"Les aliments qui font du bien à ta peau", intro:"Ce que tu manges se lit sur ton visage. Certains aliments sont de véritables boosts pour la peau.", content:"<strong>Le lien peau-intestin : une réalité scientifique</strong><br><br>L\'axe intestin-peau est maintenant bien documenté. La dysbiose intestinale (déséquilibre du microbiote) se manifeste souvent en premier sur la peau. Ce que tu manges modifie directement la composition de ton microbiome intestinal, et par extension l\'état de ta peau.<br><br><strong>Les aliments pro-peau à privilégier</strong><br><br>Poissons gras (saumon, maquereau, sardines) — riches en oméga-3 qui réduisent l\'inflammation systémique. Les peaux acnéiques présentent souvent un déficit en acide linoléique. Avocat — vitamine E (antioxydant), graisses monoinsaturées et vitamine C pour la synthèse de collagène. Fruits rouges — anthocyanes à forte action antioxydante contre les radicaux libres. Noix du Brésil — 1 à 2 noix par jour couvrent les besoins en sélénium, minéral clé pour la protection contre le stress oxydatif. Tomates cuites — le lycopène est mieux assimilé cuit, il protège contre les dommages UV.<br><br><strong>Ce qui aggrave la peau</strong><br><br>Sucre raffiné — déclenche la glycation, un processus qui détruit le collagène. Index glycémique élevé corrélé avec l\'acné dans plusieurs études. Produits laitiers — chez certaines personnes, les hormones bovines contenues dans le lait stimulent la production de sébum. Alcool — déshydratation, inflammation, dilate les vaisseaux et aggrave la rosacée. Aliments ultra-transformés — perturbent le microbiome intestinal.<br><br><strong>L\'hydratation interne</strong><br><br>1,5 à 2 litres d\'eau par jour minimum. Le thé vert apporte des catéchines anti-inflammatoires en plus de l\'hydratation. Les bouillons de légumes comptent dans l\'apport hydrique et apportent des minéraux.", read:"4 min" },
+  { id:"a9", emoji:"💤", tag:"Sommeil", title:"Pourquoi le sommeil est le meilleur soin de nuit", intro:"Aucune crème ne remplace 8 heures de sommeil réparateur. Pendant que tu dors, ta peau travaille.", content:"<strong>Ce qui se passe dans ta peau pendant que tu dors</strong><br><br>Entre 22h et 2h du matin, la sécrétion d\'hormone de croissance atteint son pic. Cette hormone stimule directement la production de collagène, le renouvellement cellulaire et la réparation des dommages. C\'est la fenêtre de régénération la plus active de la journée — aucune crème ne peut la reproduire.<br><br><strong>La mélatonine, antioxydant naturel</strong><br><br>La mélatonine n\'est pas seulement l\'hormone du sommeil — c\'est aussi un puissant antioxydant produit localement dans la peau. Elle neutralise les radicaux libres accumulés pendant la journée. La lumière bleue des écrans supprime sa production même à faible intensité.<br><br><strong>Ce que le manque de sommeil fait à ta peau</strong><br><br>Teint terne et gris — réduction de la microcirculation. Cernes plus prononcés — congestion vasculaire. Pores dilatés — augmentation du sébum par le cortisol. Cicatrisation plus lente des imperfections. Sensibilité accrue aux irritants.<br><br><strong>Optimiser sa nuit pour sa peau</strong><br><br>Température idéale : 18-19°C pour un sommeil profond. Taie d\'oreiller en soie ou satin — réduit les frottements et l\'absorption des produits. Dormir sur le dos — prévient les marques de compression et les ridules mécaniques. Humidificateur en hiver — l\'air sec déshydrate la peau pendant la nuit.<br><br><strong>La routine du soir idéale</strong><br><br>Double nettoyage → actifs ciblés (rétinol ou niacinamide) → hydratant riche → baume contour des yeux. La peau absorbant mieux la nuit, c\'est le moment optimal pour les actifs anti-âge et réparateurs.", read:"3 min" },
+  { id:"a10", emoji:"🧪", tag:"Ingrédients", title:"Les ingrédients à ne jamais mélanger", intro:"Certains actifs se neutralisent ou s\'irritent mutuellement. Voici les combos à éviter.", content:"<strong>Pourquoi certains actifs ne se mélangent pas</strong><br><br>Certains actifs sont incompatibles car ils ont des pH différents, se neutralisent chimiquement ou créent ensemble des réactions irritantes. La compréhension de ces interactions te permettra d\'optimiser chaque produit sans risquer d\'irriter ta peau.<br><br><strong>Combos à éviter absolument</strong><br><br>Rétinol + AHA/BHA — double exfoliation chimique, risque de sur-exfoliation, irritation sévère et sensibilisation. Utilise les AHA/BHA le matin et le rétinol le soir, ou alternez les jours. Vitamine C (acide ascorbique) + Niacinamide en forte concentration — peuvent former du niacinate qui réduit l\'efficacité de la vitamine C. Utilise la vitamine C le matin et le niacinamide le soir. Benzoyle de peroxyde + Rétinol — s\'oxydent mutuellement, perdent leur efficacité et peuvent irriter. Benzoyle de peroxyde + Vitamine C — même problème d\'oxydation. Acide hyaluronique + Alcools dénaturés — l\'alcool déshydrate et détruit l\'effet humectant de l\'HA.<br><br><strong>Les bons combos à utiliser</strong><br><br>Niacinamide + Zinc — synergie prouvée pour réguler le sébum. SPF + Antioxydants (vitamine C, E) — protection maximale contre les UV et radicaux libres. Rétinol + Peptides — anti-âge complet, pas d\'interaction négative. Acide hyaluronique + Céramides — hydratation + réparation de la barrière.<br><br><strong>La règle du pH</strong><br><br>La vitamine C et les AHA/BHA fonctionnent à pH bas (3-4). Le niacinamide fonctionne à pH neutre. Si tu les appliques ensemble, le pH du mélange peut annuler l\'efficacité de l\'un ou de l\'autre. Attends 20-30 minutes entre deux actifs à pH différents.", read:"4 min" },
+  { id:"a11", emoji:"🌊", tag:"Hydratation", title:"Combien d\'eau faut-il vraiment boire pour la peau ?", intro:"L\'hydratation interne compte autant que les soins topiques.", content:"<strong>Hydratation interne vs hydratation topique</strong><br><br>Ces deux types d\'hydratation agissent à des niveaux différents. L\'eau que tu bois hydrate en profondeur, de l\'intérieur. Les soins topiques hydratent les couches superficielles de l\'épiderme. Les deux sont nécessaires et complémentaires.<br><br><strong>La réalité scientifique sur l\'eau et la peau</strong><br><br>Une étude de 2018 publiée dans Clinical, Cosmetic and Investigational Dermatology a montré qu\'une hydratation insuffisante (moins de 2L par jour) réduit mesurablemet l\'hydratation de la peau, la rend plus terne et moins élastique. À l\'inverse, boire plus de 2L quand on est déjà bien hydraté n\'améliore pas la peau.<br><br><strong>La règle des 1,5 à 2 litres par jour</strong><br><br>C\'est la recommandation minimale en conditions normales. En été, en cas d\'activité physique ou de chauffage intense, augmente à 2,5L. Répartis sur la journée — boire tout d\'un coup est moins efficace que de s\'hydrater régulièrement.<br><br><strong>L\'hydratation interne ne suffit pas seule</strong><br><br>L\'eau bue atteint la peau via la circulation sanguine, mais une grande partie s\'évapore par Perte Insensible en Eau (PIE). Si ta barrière cutanée est fragilisée, la PIE augmente et ta peau reste sèche malgré une bonne hydratation interne. C\'est pourquoi les produits occlusifs (céramides, glycérine, beurre de karité) sont essentiels — ils \"scellent\" l\'eau dans la peau.<br><br><strong>Les boissons hydratantes</strong><br><br>Eau pure est optimale. Thé vert et tisanes comptent dans l\'apport. Café en petites quantités — effet diurétique modéré. Alcool est contre-productif — inhibe l\'hormone antidiurétique et déshydrate activement.", read:"3 min" },
+  { id:"a12", emoji:"✨", tag:"Routine", title:"Comment construire une routine skincare en 3 étapes", intro:"Pas besoin de 15 produits. Une routine efficace peut tenir en 3 étapes.", content:"<strong>La règle fondamentale : moins c\'est plus</strong><br><br>Le marché du skincare crée l\'illusion qu\'une routine efficace doit comporter 8 étapes. C\'est faux. La régularité d\'une routine simple bat toujours l\'irrégularité d\'une routine complexe. Commencer par 3 étapes et les maîtriser est toujours la meilleure approche.<br><br><strong>La routine matin en 3 étapes</strong><br><br>1. Nettoyant doux — eau fraîche ou nettoyant doux pour éliminer le sébum nocturne sans dessécher. 2. Hydratant léger adapté à ton type de peau — gel pour les peaux grasses, crème pour les peaux sèches. 3. SPF 30 minimum — c\'est l\'étape la plus importante et la plus impactante à long terme. Elle seule peut prévenir 80% du vieillissement visible.<br><br><strong>La routine soir en 3 étapes</strong><br><br>1. Double nettoyage — d\'abord une huile ou baume pour dissoudre maquillage et pollution, puis un nettoyant moussant pour éliminer les résidus. 2. Sérum ciblé — c\'est ici qu\'on place les actifs (rétinol, niacinamide, vitamine C). 3. Hydratant plus riche qu\'au matin — la nuit, la peau est en mode réparation et absorbe mieux.<br><br><strong>Comment évoluer vers une routine plus complète</strong><br><br>Mois 1 : maîtrise les 3 étapes. Mois 2 : ajoute un sérum ciblé (niacinamide ou acide hyaluronique). Mois 3 : intègre un actif anti-âge (rétinol ou vitamine C). Ne jamais introduire plus d\'un nouveau produit à la fois — sinon impossible d\'identifier la cause d\'une réaction.<br><br><strong>L\'ordre d\'application</strong><br><br>Du plus léger au plus lourd : eau thermale/tonique → sérum → contour des yeux → hydratant → huile → SPF (le matin uniquement, toujours en dernier). Les actifs à pH bas (vitamine C, AHA) s\'appliquent en premier sur peau propre.", read:"3 min" },
 ];
 
 var ARTICLES_EN = [
-  { id:"a1", emoji:"☀️", tag:"Protection", title:"SPF: Essential Even in Winter", intro:"UV rays don't stop in December. UVA rays still penetrate skin all year round — causing premature aging.", content:"UVB rays (sunburn) decrease in winter, but UVA rays remain present year-round, even on cloudy days. They penetrate into the dermis and accelerate aging, spots and sagging. SPF 30 or 50 in the morning takes 10 seconds and protects your skin all day. It's the cheapest anti-aging product on the market.", read:"3 min" },
-  { id:"a2", emoji:"🌙", tag:"Evening Routine", title:"5 Habits That Damage Your Skin at Night", intro:"At night, your skin repairs itself. But some habits sabotage this process without you knowing.", content:"1. Sleeping with makeup — residues clog pores and cause blemishes. 2. Cotton pillowcase — absorbs sebum and products. Try silk or satin. 3. Touching your face — every contact transfers bacteria. 4. Skipping moisturizer because your skin is oily — oily skin can also be dehydrated. 5. Not cleaning your phone — it's the most bacteria-laden object near your face.", read:"4 min" },
-  { id:"a3", emoji:"💧", tag:"Hydration", title:"Oily Skin and Hydration: A Misunderstood Duo", intro:"Many oily skin types avoid moisturizers fearing they'll worsen shine. This is often the opposite mistake.", content:"Oily skin can be dehydrated. When skin lacks water, it compensates by producing more sebum — creating a vicious cycle. The solution: an oil-free hydrating gel, based on hyaluronic acid. It provides water without weighing skin down. Your skin will be more balanced, less shiny and less prone to blemishes.", read:"3 min" },
-  { id:"a4", emoji:"🧬", tag:"Actives", title:"Niacinamide: The Active That Suits (Almost) Everyone", intro:"Enlarged pores, spots, redness, blemishes — niacinamide tackles all of this. And it's rarely irritating.", content:"Niacinamide (vitamin B3) is one of the most versatile skincare actives. It regulates sebum production, reduces the appearance of pores, evens skin tone, reduces redness and strengthens the skin barrier. Compatible with almost all skin types and most other actives. Ideal concentration: between 5% and 10%.", read:"3 min" },
+  { id:"a1", emoji:"☀️", tag:"Protection", title:"SPF: Essential Even in Winter", intro:"UV rays don\'t stop in December. UVA rays still penetrate skin all year round — causing premature aging.", content:"UVB rays (sunburn) decrease in winter, but UVA rays remain present year-round, even on cloudy days. They penetrate into the dermis and accelerate aging, spots and sagging. SPF 30 or 50 in the morning takes 10 seconds and protects your skin all day. It\'s the cheapest anti-aging product on the market.", read:"3 min" },
+  { id:"a2", emoji:"🌙", tag:"Evening Routine", title:"5 Habits That Damage Your Skin at Night", intro:"At night, your skin repairs itself. But some habits sabotage this process without you knowing.", content:"1. Sleeping with makeup — residues clog pores and cause blemishes. 2. Cotton pillowcase — absorbs sebum and products. Try silk or satin. 3. Touching your face — every contact transfers bacteria. 4. Skipping moisturizer because your skin is oily — oily skin can also be dehydrated. 5. Not cleaning your phone — it\'s the most bacteria-laden object near your face.", read:"4 min" },
+  { id:"a3", emoji:"💧", tag:"Hydration", title:"Oily Skin and Hydration: A Misunderstood Duo", intro:"Many oily skin types avoid moisturizers fearing they\'ll worsen shine. This is often the opposite mistake.", content:"Oily skin can be dehydrated. When skin lacks water, it compensates by producing more sebum — creating a vicious cycle. The solution: an oil-free hydrating gel, based on hyaluronic acid. It provides water without weighing skin down. Your skin will be more balanced, less shiny and less prone to blemishes.", read:"3 min" },
+  { id:"a4", emoji:"🧬", tag:"Actives", title:"Niacinamide: The Active That Suits (Almost) Everyone", intro:"Enlarged pores, spots, redness, blemishes — niacinamide tackles all of this. And it\'s rarely irritating.", content:"Niacinamide (vitamin B3) is one of the most versatile skincare actives. It regulates sebum production, reduces the appearance of pores, evens skin tone, reduces redness and strengthens the skin barrier. Compatible with almost all skin types and most other actives. Ideal concentration: between 5% and 10%.", read:"3 min" },
 ];
 
 // ══ AFFIRMATIONS ══
@@ -5726,7 +5797,7 @@ function renderDashboard() {
     scoreEl.innerHTML = "<div style='font-size:10px;font-weight:700;color:var(--mut);text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px'>" + (isEN ? "SKIN SCORE" : "SCORE DE PEAU") + "</div>" +
       "<div style='display:flex;align-items:center;gap:14px'>" +
       "<div style='width:64px;height:64px;border-radius:50%;background:" + (skinScore > 0 ? "linear-gradient(135deg," + scoreColor + ",#fff3)" : "var(--blush)") + ";border:3px solid " + (skinScore > 0 ? scoreColor : "var(--rose)") + ";display:flex;align-items:center;justify-content:center;flex-shrink:0'>" +
-      "<div style='font-family:Georgia,serif;font-size:20px;font-weight:700;color:" + (skinScore > 0 ? scoreColor : "var(--acc2)") + "'>" + (skinScore || "--") + "</div></div>" +
+      "<div style='font-family:Georgia,serif;font-size:20px;font-weight:700;color:" + (skinScore > 0 ? scoreColor : "var(--acc2)") + "'>" + (skinScore ? skinScore + "%" : "--") + "</div></div>" +
       "<div><div style='font-size:14px;font-weight:700;color:var(--pri)'>" + (skinScore > 0 ? (skinScore >= 70 ? (isEN ? "Great skin 🌸" : "Belle peau 🌸") : skinScore >= 50 ? (isEN ? "Good progress" : "Bons progrès") : (isEN ? "Getting better 🌱" : "En progression 🌱")) : (isEN ? "Start your 4-week tracking" : "Commence ton suivi 4 semaines")) + "</div>" +
       "<div style='font-size:11px;color:var(--mut);margin-top:2px'>" + scoreLabel + "</div>" +
       (skinScore === 0 ? '<button onclick="go(\'suivi\')" style="margin-top:8px;padding:7px 14px;border-radius:20px;border:none;background:#C4726A;color:#fff;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit">' + (isEN ? "Start tracking \u2192" : "Commencer le suivi \u2192") + '</button>' : "") +
@@ -5862,16 +5933,38 @@ function renderDashboard() {
             btn.style.background = "#C4726A"; btn.style.color = "#fff";
             btn.textContent = isEN ? "Start" : "Démarrer";
             btn.onclick = (function(chId) { return function() { startChallenge(chId); }; })(ch.id);
-        } else if (chData.lastCheck === today) {
-            btn.style.background = "#E8F5E9"; btn.style.color = "#2E7D32";
-            btn.textContent = "✓";
         } else if (chData.days >= ch.days) {
             btn.style.background = "#E8F5E9"; btn.style.color = "#2E7D32";
             btn.textContent = "🏆";
+            btn.title = isEN ? "Challenge completed!" : "Défi terminé !";
+        } else if (chData.lastCheck === today) {
+            btn.style.background = "#E8F5E9"; btn.style.color = "#2E7D32";
+            btn.textContent = "✓ " + (isEN ? "Done" : "Fait");
+            // Long press ou double-tap pour annuler
+            btn.title = isEN ? "Double-tap to cancel" : "Double-tap pour annuler";
+            var clickCount = 0;
+            btn.onclick = (function(chId) { return function() {
+              clickCount++;
+              if (clickCount >= 2) { clickCount = 0; cancelChallenge(chId); }
+              else { setTimeout(function(){ clickCount = 0; }, 400); }
+            }; })(ch.id);
         } else {
+            // Bouton principal : valider OU annuler (2 actions)
+            var btnWrap = document.createElement("div");
+            btnWrap.style.cssText = "display:flex;flex-direction:column;gap:4px;align-items:flex-end";
             btn.style.background = "var(--blush)"; btn.style.color = "#C4726A";
             btn.textContent = isEN ? "Done ✓" : "Fait ✓";
             btn.onclick = (function(chId) { return function() { checkChallenge(chId); }; })(ch.id);
+            var cancelBtn = document.createElement("button");
+            cancelBtn.style.cssText = "padding:4px 10px;border-radius:20px;border:none;background:transparent;color:#B0958F;font-size:10px;cursor:pointer;font-family:var(--sans)";
+            cancelBtn.textContent = isEN ? "Cancel" : "Annuler";
+            cancelBtn.onclick = (function(chId) { return function() { cancelChallenge(chId); }; })(ch.id);
+            row.appendChild(info);
+            btnWrap.appendChild(btn);
+            btnWrap.appendChild(cancelBtn);
+            row.appendChild(btnWrap);
+            challengeEl.appendChild(row);
+            return;
         }
         row.appendChild(btn);
         challengeEl.appendChild(row);
@@ -6000,7 +6093,7 @@ function showArticle(idx, isEN) {
     "<button onclick=\"document.getElementById('article-modal').remove()\" style=\"background:var(--bg);border:none;border-radius:50%;width:32px;height:32px;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--mut)\">&#x2715;</button></div>" +
     "<div style='font-size:22px;font-family:Georgia,serif;font-weight:700;color:var(--pri);line-height:1.3;margin-bottom:12px'>" + a.emoji + " " + a.title + "</div>" +
     "<div style='font-size:13px;color:var(--acc2);font-style:italic;line-height:1.6;margin-bottom:16px;padding:12px;background:var(--blush);border-radius:12px'>" + a.intro + "</div>" +
-    "<div style='font-size:14px;color:var(--pri);line-height:1.8'>" + a.content.replace(/\. /g, ".<br><br>").replace(/\d\./g, function(m) { return "<strong>" + m + "</strong>"; }) + "</div>" +
+    "<div style='font-size:14px;color:var(--pri);line-height:1.9'>" + a.content + "</div>" +
     "</div>";
   document.body.appendChild(modal);
   modal.onclick = function(e) { if (e.target === modal) modal.remove(); };
@@ -6011,6 +6104,16 @@ function startChallenge(id) {
     var data = getDashData();
     if (!data.challenges) data.challenges = {};
     data.challenges[id] = { started: true, days: 0, lastCheck: null };
+    saveDashData(data);
+    renderDashboard();
+}
+
+function cancelChallenge(id) {
+    var isEN = LANG === "en";
+    var msg = isEN ? "Cancel this challenge? Your progress will be lost." : "Annuler ce défi ? Ta progression sera perdue.";
+    if (!confirm(msg)) return;
+    var data = getDashData();
+    if (data.challenges) delete data.challenges[id];
     saveDashData(data);
     renderDashboard();
 }
@@ -6839,8 +6942,9 @@ function renderSettings() {
     {
       title: isEN ? '🔔 Notifications' : '🔔 Notifications',
       items: [
-        { label: isEN ? 'Morning reminder (8:00)' : 'Rappel matin (8h00)', value: notifGranted ? (isEN ? 'Active' : 'Actif') : (isEN ? 'Inactive' : 'Inactif'), action: 'requestNotifPermission()', toggle: notifGranted },
-        { label: isEN ? 'Evening reminder (21:00)' : 'Rappel soir (21h00)', value: notifGranted ? (isEN ? 'Active' : 'Actif') : (isEN ? 'Inactive' : 'Inactif'), toggle: notifGranted },
+        { label: isEN ? 'Morning & evening reminders' : 'Rappels matin & soir', value: notifGranted ? (isEN ? 'Active ✓' : 'Actif ✓') : (isEN ? 'Tap to activate' : 'Appuyer pour activer'), action: 'toggleNotifications()', toggle: notifGranted },
+        { label: isEN ? 'Morning time' : 'Heure du matin', value: localStorage.getItem("skinmatch_notif_morning") || "08:00", action: 'changeNotifTime("morning")' },
+        { label: isEN ? 'Evening time' : 'Heure du soir', value: localStorage.getItem("skinmatch_notif_evening") || "21:00", action: 'changeNotifTime("evening")' },
       ]
     },
     {
@@ -6975,6 +7079,41 @@ function reloadSavedRoutine() {
 }
 
 // ══ NOTIFICATIONS ══
+function toggleNotifications() {
+  if (!('Notification' in window)) {
+    alert(LANG === 'en' ? 'Notifications not supported on this browser.' : 'Les notifications ne sont pas supportées sur ce navigateur.');
+    return;
+  }
+  if (Notification.permission === 'granted') {
+    // Désactiver — on ne peut pas révoquer programmatiquement, on informe l'utilisateur
+    if (confirm(LANG === 'en' 
+      ? 'To disable notifications, go to your browser settings → Notifications → Block for this site.' 
+      : 'Pour désactiver les notifications, va dans Réglages Safari → Notifications → Bloquer pour ce site.')) {}
+    return;
+  }
+  requestNotifPermission();
+}
+
+function changeNotifTime(type) {
+  var isEN = LANG === 'en';
+  var current = type === 'morning' 
+    ? (localStorage.getItem('skinmatch_notif_morning') || '08:00')
+    : (localStorage.getItem('skinmatch_notif_evening') || '21:00');
+  var newTime = prompt(
+    isEN ? "Enter time (HH:MM):" : "Entrer l'heure (HH:MM) :",
+    current
+  );
+  if (!newTime || !/^\d{2}:\d{2}$/.test(newTime)) return;
+  localStorage.setItem('skinmatch_notif_' + type, newTime);
+  renderSettings();
+  // Toast confirmation
+  var toast = document.createElement('div');
+  toast.style.cssText = 'position:fixed;top:70px;left:50%;transform:translateX(-50%);background:#2E7D32;color:#fff;padding:12px 20px;border-radius:50px;font-size:13px;font-weight:600;z-index:9999';
+  toast.textContent = (isEN ? 'Time updated: ' : 'Heure mise à jour : ') + newTime;
+  document.body.appendChild(toast);
+  setTimeout(function() { toast.remove(); }, 2500);
+}
+
 function requestNotifPermission() {
   if (!('Notification' in window)) return;
   Notification.requestPermission().then(function(perm) {
@@ -6989,8 +7128,9 @@ function requestNotifPermission() {
 function scheduleRoutineReminders() {
   // Notification matin 8h
   var now = new Date();
+  var morningTime = (localStorage.getItem('skinmatch_notif_morning') || '08:00').split(':');
   var morning = new Date(now);
-  morning.setHours(8, 0, 0, 0);
+  morning.setHours(parseInt(morningTime[0]) || 8, parseInt(morningTime[1]) || 0, 0, 0);
   if (morning <= now) morning.setDate(morning.getDate() + 1);
   var msUntilMorning = morning - now;
   setTimeout(function() {
@@ -7012,8 +7152,9 @@ function scheduleRoutineReminders() {
   }, msUntilMorning);
   
   // Notification soir 21h
+  var eveningTime = (localStorage.getItem('skinmatch_notif_evening') || '21:00').split(':');
   var evening = new Date(now);
-  evening.setHours(21, 0, 0, 0);
+  evening.setHours(parseInt(eveningTime[0]) || 21, parseInt(eveningTime[1]) || 0, 0, 0);
   if (evening <= now) evening.setDate(evening.getDate() + 1);
   var msUntilEvening = evening - now;
   setTimeout(function() {
