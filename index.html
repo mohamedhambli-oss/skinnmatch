@@ -403,8 +403,13 @@ h2{font-family:var(--serif);font-size:20px;font-weight:700;margin-bottom:3px}
         </div>
       </div>
 
-      <!-- Boutons connexion — toujours visibles -->
+      <!-- Boutons connexion — masqués si connecté -->
       <div id="auth-btns" style="display:flex;align-items:center;gap:8px;width:100%;max-width:340px;margin-bottom:12px">
+        <div id="auth-connected-badge" style="display:none;align-items:center;gap:8px;background:#E8F5E9;border-radius:50px;padding:10px 16px;width:100%">
+          <div style="width:8px;height:8px;border-radius:50%;background:#2E7D32;flex-shrink:0"></div>
+          <span id="auth-connected-label" style="font-size:13px;font-weight:600;color:#2E7D32;flex:1"></span>
+          <button onclick="go('profile')" style="font-size:11px;color:#2E7D32;font-weight:700;background:none;border:none;cursor:pointer;font-family:inherit">Mon compte →</button>
+        </div>
         <button onclick="go('login')" style="flex:1;padding:11px 16px;border-radius:50px;border:1.5px solid #C4726A;background:transparent;color:#C4726A;font-size:13px;font-weight:600;cursor:pointer;font-family:'Outfit',sans-serif" id="btn-log">Se connecter</button>
         <button onclick="go('register')" style="flex:1;padding:11px 16px;border-radius:50px;border:none;background:#C4726A;color:#fff;font-size:13px;font-weight:600;cursor:pointer;font-family:'Outfit',sans-serif" id="btn-reg">Créer un compte</button>
       </div>
@@ -1045,11 +1050,7 @@ h2{font-family:var(--serif);font-size:20px;font-weight:700;margin-bottom:3px}
     <div class="logo"><div class="logo-icon">SM</div>Skin<span>Match</span></div>
   </div>
   <div class="content">
-    <div style="margin:8px 0 20px">
-      <div class="step-lbl">Mon espace</div>
-      <h2 style="margin-bottom:4px" id="dash-title">Bonjour 👋</h2>
-      <p class="sub" id="dash-sub">Votre tableau de bord skincare personnalisé</p>
-    </div>
+    <div id="dash-static-header" style="margin:8px 0 4px"></div>
     <div id="dashboard-content"></div>
   </div>
 </div>
@@ -2194,6 +2195,24 @@ function applyWelcomeLang(){
   if(s3s) s3s.textContent = LANG==='en' ? 'Products tailored to you, direct purchase links' : "Produits adaptés à toi, liens d'achat directs";
   // Afficher la nav sur welcome
   updateNav('welcome');
+  // Badge connecté / boutons connexion
+  var authBtns = document.getElementById('auth-btns');
+  var connectedBadge = document.getElementById('auth-connected-badge');
+  var btnLog = document.getElementById('btn-log');
+  var btnReg = document.getElementById('btn-reg');
+  var connLabel = document.getElementById('auth-connected-label');
+  if (window._currentUser) {
+    var uname = window._currentUser.displayName || window._currentUser.email.split('@')[0];
+    var isConnectedEN = LANG === 'en';
+    if (connectedBadge) { connectedBadge.style.display = 'flex'; }
+    if (connLabel) connLabel.textContent = isConnectedEN ? 'Connected as ' + uname : 'Connecté en tant que ' + uname;
+    if (btnLog) btnLog.style.display = 'none';
+    if (btnReg) btnReg.style.display = 'none';
+  } else {
+    if (connectedBadge) connectedBadge.style.display = 'none';
+    if (btnLog) btnLog.style.display = '';
+    if (btnReg) btnReg.style.display = '';
+  }
   // Bouton diagnostic
   const diagBtn = document.querySelector('#q1-opts .sr');
   if(diagBtn){
@@ -5759,11 +5778,11 @@ function renderDashboard() {
     artEl.style.cssText = "background:var(--surf);border-radius:18px;border:1px solid var(--bdr);overflow:hidden;margin-bottom:14px;cursor:pointer";
     artEl.onclick = function() { showArticle(artIdx, isEN); };
     artEl.innerHTML = "<div style='background:var(--blush);padding:14px 16px;border-bottom:1px solid var(--rose)'>" +
-      "<div style='font-size:10px;font-weight:700;color:var(--acc2);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px'>📰 " + (isEN ? "ARTICLE OF THE DAY" : "ARTICLE DU JOUR") + " · " + art.read + "</div>" +
+      "<div style='font-size:10px;font-weight:700;color:var(--acc2);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px'>📰 " + (isEN ? "BEAUTY TIP OF THE DAY" : "CONSEIL BEAUTÉ DU JOUR") + " · " + art.read + "</div>" +
       "<div style='font-size:15px;font-weight:700;color:var(--pri);line-height:1.4'>" + art.emoji + " " + art.title + "</div></div>" +
       "<div style='padding:14px 16px'>" +
       "<div style='font-size:12px;color:var(--mut);line-height:1.6;margin-bottom:10px'>" + art.intro + "</div>" +
-      "<div style='color:#C4726A;font-size:12px;font-weight:700'>" + (isEN ? "Read the full article →" : "Lire l'article complet →") + "</div></div>";
+      "<div style='color:#C4726A;font-size:12px;font-weight:700'>" + (isEN ? "Lire la suite →" : "Lire la suite →") + "</div></div>";
     wrap.appendChild(artEl);
 
     // ── 6. CONSEIL DU JOUR ──
@@ -5860,7 +5879,7 @@ function renderDashboard() {
     var otherArticles = isEN ? ARTICLES_EN : ARTICLES_FR;
     var otherEl = document.createElement("div");
     otherEl.style.cssText = "margin-bottom:14px";
-    otherEl.innerHTML = "<div style='font-size:11px;font-weight:700;color:var(--mut);text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px'>📚 " + (isEN ? "MORE ARTICLES" : "PLUS D'ARTICLES") + "</div>";
+    otherEl.innerHTML = "<div style='font-size:11px;font-weight:700;color:var(--mut);text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px'>📚 " + (isEN ? "MORE TIPS" : "PLUS DE CONSEILS") + "</div>";
     var artGrid = document.createElement("div");
     artGrid.style.cssText = "display:flex;flex-direction:column;gap:8px";
     otherArticles.forEach(function(a, i) {
@@ -5899,8 +5918,8 @@ function renderDashboard() {
     var allArticlesEl = document.createElement("div");
     allArticlesEl.style.cssText = "margin-bottom:14px";
     allArticlesEl.innerHTML = "<div style='display:flex;align-items:center;justify-content:space-between;margin-bottom:10px'>" +
-      "<div style='font-size:11px;font-weight:700;color:var(--mut);text-transform:uppercase;letter-spacing:.5px'>📚 " + (isEN ? "ARTICLES" : "ARTICLES") + "</div>" +
-      "<div style='font-size:11px;font-weight:700;color:var(--mut);text-transform:uppercase;letter-spacing:.5px'>\uD83D\uDCDA " + (isEN ? "ARTICLES" : "ARTICLES") + "</div>" +
+      "<div style='font-size:11px;font-weight:700;color:var(--mut);text-transform:uppercase;letter-spacing:.5px'>📚 " + (isEN ? "CONSEILS" : "CONSEILS") + "</div>" +
+      "<div style='font-size:11px;font-weight:700;color:var(--mut);text-transform:uppercase;letter-spacing:.5px'>\uD83D\uDCDA " + (isEN ? "CONSEILS" : "CONSEILS") + "</div>" +
       "</div>";
     var artPreviewGrid = document.createElement("div");
     artPreviewGrid.style.cssText = "display:flex;flex-direction:column;gap:8px";
@@ -6382,6 +6401,10 @@ function renderCompare() {
 function doReset(){
   ST.skinType=null;ST.ageGroup=null;ST.concerns=[];ST.allergies=[];ST.budget=null;ST.routine=null;ST.result=null;ST.showShare=false;
   window._routineSaved = false;
+  window._savedRoutine = null;
+  window._lastResult = null;
+  // Supprimer du localStorage
+  try { localStorage.removeItem('skinmatch_last_routine'); } catch(e) {}
   // Réafficher le bouton retour
   var backBtn = document.getElementById('result-back-btn');
   if (backBtn) backBtn.style.display = '';
@@ -6430,6 +6453,7 @@ async function doLogin() {
     if (snap.exists() && snap.data().lastRoutine) window._savedRoutine = snap.data().lastRoutine;
     showWelcomeToast(cred.user.displayName || cred.user.email.split('@')[0]);
     go('welcome');
+    setTimeout(applyWelcomeLang, 100);
   } catch(e) {
     var isENl = LANG === 'en';
     var msg = (e.code === 'auth/user-not-found' || e.code === 'auth/wrong-password' || e.code === 'auth/invalid-credential')
@@ -6459,6 +6483,7 @@ async function doLogout() {
   await window._signOut(window._auth);
   window._currentUser = null; window._userProfile = null;
   go('welcome');
+  setTimeout(applyWelcomeLang, 100);
 }
 
 async function saveAndConfirm() {
@@ -6484,6 +6509,23 @@ async function saveAndConfirm() {
   };
   
   await saveRoutineToFirestore(routineData);
+  
+  // Sauvegarder aussi dans localStorage pour récupération sans Firebase
+  try {
+    localStorage.setItem('skinmatch_last_routine', JSON.stringify({
+      ST: {
+        skinType: ST.skinType,
+        ageGroup: ST.ageGroup,
+        concerns: ST.concerns,
+        allergies: ST.allergies,
+        budget: ST.budget,
+        routine: ST.routine
+      },
+      result: ST.result,
+      savedAt: new Date().toISOString()
+    }));
+  } catch(e) {}
+  window._savedRoutine = routineData;
   
   // Masquer le bouton Retour — routine enregistrée, pas besoin de revenir
   var backBtn = document.getElementById('result-back-btn');
@@ -6615,26 +6657,33 @@ function navTo(screen) {
   
   if (screen === 'result') {
     if (ST.result) {
-      // Routine déjà générée — afficher directement
       renderResult();
       go('result');
       updateNav('result');
-      // Cacher bouton retour si routine déjà sauvegardée
       setTimeout(function() {
         var backBtn = document.getElementById('result-back-btn');
         if (backBtn && window._routineSaved) backBtn.style.display = 'none';
+        var saveWrap = document.getElementById('btn-save-routine-wrap');
+        if (saveWrap && window._routineSaved) saveWrap.style.display = 'none';
       }, 50);
       return;
-    } else if (window._savedRoutine) {
+    }
+    // Vérifier localStorage
+    try {
+      var _local = localStorage.getItem('skinmatch_last_routine');
+      if (_local) {
+        reloadSavedRoutine();
+        return;
+      }
+    } catch(e) {}
+    if (window._savedRoutine) {
       reloadSavedRoutine();
-      updateNav('result');
-      return;
-    } else {
-      // Pas de routine → diagnostic
-      go('q1');
-      updateNav(null);
       return;
     }
+    // Pas de routine → diagnostic
+    go('q1');
+    updateNav(null);
+    return;
   }
   if (screen === 'articles') {
     renderArticlesScreen();
@@ -6694,7 +6743,7 @@ function renderArticlesScreen() {
   var sub = document.getElementById('articles-sub');
   if (eyebrow) eyebrow.textContent = isEN ? 'Library' : 'Bibliothèque';
   if (title) title.textContent = isEN ? 'All articles' : 'Tous les articles';
-  if (sub) sub.textContent = isEN ? "Tips, actives, routines — everything you need to know" : "Conseils, actifs, routines — tout ce qu'il faut savoir";
+  if (sub) sub.textContent = isEN ? "Conseils, actifs, routines — everything you need to know" : "Conseils, actifs, routines — tout ce qu'il faut savoir";
   
   // Tags uniques
   var tags = [...new Set(articles.map(function(a) { return a.tag; }))];
@@ -6857,6 +6906,33 @@ function toggleLowYuka() {
 }
 
 function reloadSavedRoutine() {
+  // Essayer localStorage en priorité
+  try {
+    var _local = localStorage.getItem('skinmatch_last_routine');
+    if (_local) {
+      var _p = JSON.parse(_local);
+      if (_p && _p.result && _p.ST) {
+        ST.skinType = _p.ST.skinType;
+        ST.ageGroup = _p.ST.ageGroup;
+        ST.concerns = _p.ST.concerns || [];
+        ST.allergies = _p.ST.allergies || [];
+        ST.budget = _p.ST.budget;
+        ST.routine = _p.ST.routine;
+        ST.result = _p.result;
+        window._routineSaved = true;
+        renderResult();
+        go('result');
+        updateNav('result');
+        setTimeout(function() {
+          var backBtn = document.getElementById('result-back-btn');
+          if (backBtn) backBtn.style.display = 'none';
+          var saveWrap = document.getElementById('btn-save-routine-wrap');
+          if (saveWrap) saveWrap.style.display = 'none';
+        }, 100);
+        return;
+      }
+    }
+  } catch(e) {}
   var saved = window._savedRoutine;
   if (!saved) return;
   // Restaurer ST depuis la routine sauvegardée
@@ -6978,13 +7054,33 @@ if (_savedLang && _savedRegion) {
   LANG = _savedLang;
   REGION = _savedRegion;
   go('welcome');
-  // Afficher la nav dès le départ
   setTimeout(function() { updateNav('welcome'); }, 100);
 } else {
   go('lang');
 }
 initQuestions();
 setTimeout(applyWelcomeLang, 50);
+
+// Restaurer la routine depuis localStorage si disponible
+try {
+  var _localRoutine = localStorage.getItem('skinmatch_last_routine');
+  if (_localRoutine) {
+    var _parsed = JSON.parse(_localRoutine);
+    if (_parsed && _parsed.result && _parsed.ST) {
+      // Restaurer l'état complet
+      ST.skinType = _parsed.ST.skinType;
+      ST.ageGroup = _parsed.ST.ageGroup;
+      ST.concerns = _parsed.ST.concerns || [];
+      ST.allergies = _parsed.ST.allergies || [];
+      ST.budget = _parsed.ST.budget;
+      ST.routine = _parsed.ST.routine;
+      ST.result = _parsed.result;
+      window._routineSaved = true;
+      window._lastResult = _parsed.result;
+      console.log('Routine restaurée depuis localStorage');
+    }
+  }
+} catch(e) { console.log('Restore error:', e); }
 </script>
 <!-- Modale Pourquoi ce produit -->
 <div id="why-modal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.55);z-index:9999;align-items:flex-end;justify-content:center">
