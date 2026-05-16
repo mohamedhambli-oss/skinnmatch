@@ -6364,43 +6364,19 @@ async function doGoogleLogin() {
 async function doLogout() {
   await window._signOut(window._auth);
   window._currentUser = null; window._userProfile = null;
+  var b1=document.getElementById("btn-log"); if(b1){b1.style.display="";b1.textContent="Se connecter";b1.onclick=function(){go("login")};}
+  var b2=document.getElementById("btn-reg"); if(b2) b2.style.display="";
+  var cb=document.getElementById("auth-connected-badge"); if(cb) cb.style.display="none";
   go('welcome');
 }
-
 async function saveAndConfirm() {
   var btn = document.getElementById('btn-save-routine');
-  if (btn) {
-    btn.disabled = true;
-    btn.innerHTML = '<span style="font-size:20px">⏳</span><span>' + (LANG==="en" ? "Saving..." : "Enregistrement...") + '</span>';
-  }
-  
   if (!ST.result) return;
-  
-  var routineData = {
-    skinType: ST.skinType,
-    ageGroup: ST.ageGroup,
-    concerns: ST.concerns,
-    allergies: ST.allergies,
-    budget: ST.budget,
-    routine: ST.routine,
-    products: (ST.result.steps || []).map(function(s) {
-      return { key: s.key, nom: s.nom, marque: s.marque, prix: s.prix };
-    }),
-    savedAt: new Date().toISOString()
-  };
-  
-  await saveRoutineToFirestore(routineData);
-  
-  // Toast confirmation
-  if (btn) {
-    btn.innerHTML = '<span style="font-size:20px">✅</span><span>' + (LANG==="en" ? "Routine saved!" : "Routine enregistrée !") + '</span>';
-    btn.style.background = 'linear-gradient(135deg,#1B5E20,#2E7D32)';
-    setTimeout(function() {
-      btn.disabled = false;
-      btn.innerHTML = '<span style="font-size:20px">💾</span><span>' + (LANG==="en" ? "Save my routine" : "Enregistrer ma routine") + '</span>';
-      btn.style.background = 'linear-gradient(135deg,#2E7D32,#388E3C)';
-    }, 3000);
-  }
+  await saveRoutineToFirestore({skinType:ST.skinType,ageGroup:ST.ageGroup,concerns:ST.concerns,allergies:ST.allergies,budget:ST.budget,routine:ST.routine,products:(ST.result.steps||[]).map(function(s){return{key:s.key,nom:s.nom,marque:s.marque,prix:s.prix};}),savedAt:new Date().toISOString()});
+  if(btn) btn.style.display='none';
+  window._routineSaved=true;
+  try{localStorage.setItem('skinmatch_last_routine',JSON.stringify({ST:{skinType:ST.skinType,ageGroup:ST.ageGroup,concerns:ST.concerns,allergies:ST.allergies,budget:ST.budget,routine:ST.routine},result:ST.result,savedAt:new Date().toISOString()}));}catch(e){}
+  var t=document.createElement('div');t.style.cssText='position:fixed;top:70px;left:50%;transform:translateX(-50%);background:#2E7D32;color:#fff;padding:14px 24px;border-radius:50px;font-size:14px;font-weight:600;z-index:9999';t.textContent=(LANG==="en"?"Routine saved!":"Routine enregistr\u00e9e !");document.body.appendChild(t);setTimeout(function(){t.remove();},3000);
 }
 
 async function saveRoutineToFirestore(routineData) {
@@ -6415,10 +6391,16 @@ async function saveRoutineToFirestore(routineData) {
 window.onFirebaseUserReady = function(user) {
   var btnLog = document.getElementById('btn-log');
   var btnReg = document.getElementById('btn-reg');
+  var connBadge = document.getElementById('auth-connected-badge');
+  var connLabel = document.getElementById('auth-connected-label');
   if (user) {
     var shortName = user.displayName ? user.displayName.split(' ')[0] : user.email.split('@')[0];
-    if (btnLog) { btnLog.textContent = '👤 ' + shortName; btnLog.onclick = function(){ renderProfile(); go('profile'); }; }
+    // Masquer les boutons login/register
+    if (btnLog) btnLog.style.display = 'none';
     if (btnReg) btnReg.style.display = 'none';
+    // Afficher le badge connecté
+    if (connBadge) connBadge.style.display = 'flex';
+    if (connLabel) connLabel.textContent = (LANG === 'en' ? 'Connected as ' : 'Connecté en tant que ') + shortName;
     // Charger routine sauvegardée
     loadSavedRoutine(user);
   } else {
@@ -6861,20 +6843,59 @@ function submitFeedback(key, type, btn) {
   setTimeout(function() { toast.style.opacity = '0'; setTimeout(function() { toast.remove(); }, 300); }, 2500);
 }
 
-// Init — vérifier si langue déjà mémorisée
+// Init — attendre Firebase avant d'afficher
 var _savedLang = localStorage.getItem('skinmatch_lang');
 var _savedRegion = localStorage.getItem('skinmatch_region');
-if (_savedLang && _savedRegion) {
-  LANG = _savedLang;
-  REGION = _savedRegion;
-  go('welcome');
-} else {
-  go('lang');
+
+// Splash screen pendant l'init
+var _splashEl = document.createElement('div');
+_splashEl.id = 'app-splash';
+_splashEl.style.cssText = 'position:fixed;inset:0;background:#FBF0ED;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:99999;transition:opacity .4s';
+_splashEl.innerHTML = '<div style="font-family:Georgia,serif;font-size:28px;font-weight:700;color:#3D2B1F">Skin<span style="color:#C4726A">Match</span></div><div style="margin-top:20px;width:28px;height:28px;border:3px solid #F5E8E5;border-top-color:#C4726A;border-radius:50%;animation:spin 1s linear infinite"></div>';
+document.body.appendChild(_splashEl);
+
+function _hideSplash() {
+  var s = document.getElementById('app-splash');
+  if (s) { s.style.opacity = '0'; setTimeout(function(){ if(s.parentNode) s.parentNode.removeChild(s); }, 400); }
 }
+
+// Timeout 2.5s si Firebase ne répond pas
+var _firebaseWait = setTimeout(function() {
+  if (_savedLang && _savedRegion) {
+    LANG = _savedLang; REGION = _savedRegion;
+    initQuestions(); go('welcome'); updateNav('welcome');
+    setTimeout(applyWelcomeLang, 50);
+  } else { go('lang'); }
+  _hideSplash();
+}, 2500);
+
+window._onAuthResolved = function(user) {
+  clearTimeout(_firebaseWait);
+  if (user) {
+    loadSavedRoutine(user).then(function() {
+      var lang = LANG || localStorage.getItem('skinmatch_lang');
+      var region = REGION || localStorage.getItem('skinmatch_region');
+      if (lang && region) {
+        LANG = lang; REGION = region;
+        localStorage.setItem('skinmatch_lang', lang);
+        localStorage.setItem('skinmatch_region', region);
+        initQuestions(); go('welcome'); updateNav('welcome');
+        setTimeout(applyWelcomeLang, 50);
+      } else { go('lang'); }
+      _hideSplash();
+    });
+  } else {
+    if (_savedLang && _savedRegion) {
+      LANG = _savedLang; REGION = _savedRegion;
+      initQuestions(); go('welcome'); updateNav('welcome');
+      setTimeout(applyWelcomeLang, 50);
+    } else { go('lang'); }
+    _hideSplash();
+  }
+};
 initQuestions();
-setTimeout(applyWelcomeLang, 50);
 </script>
-<!-- Modale Pourquoi ce produit -->
+
 <div id="why-modal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.55);z-index:9999;align-items:flex-end;justify-content:center">
   <div style="background:#fff;border-radius:24px 24px 0 0;padding:24px 20px 36px;width:100%;max-width:460px;max-height:75vh;overflow-y:auto;box-shadow:0 -8px 40px rgba(0,0,0,.15)">
     <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:16px">
