@@ -3628,7 +3628,7 @@ function showWhyAI(key, nom, marque) {
     html += "<div style=\"padding:10px 0;border-bottom:1px solid #F5F0ED\">";
     html += "<div style=\"font-size:10px;color:#B0958F;font-weight:700;text-transform:uppercase;letter-spacing:.8px;margin-bottom:8px\">📋 Comment l'utiliser</div>";
     if (pq) html += "<div style=\"font-size:12px;color:#5A4A42;margin-bottom:6px\"><strong>Idéal pour :</strong> " + pq + "</div>";
-    if (app) html += "<div style=\"font-size:13px;color:#3D2B1F;line-height:1.6\">" + app + "</div>";
+    if (app) { var appClean = app.replace(/[Mm]atin et soir,?\s*/gi,"").replace(/[Mm]atin seulement,?\s*/gi,"").replace(/[Ss]oir seulement,?\s*/gi,"").trim(); if (appClean) html += "<div style=\"font-size:13px;color:#3D2B1F;line-height:1.6\">" + appClean + "</div>"; }
     html += "</div>";
   }
 
