@@ -627,7 +627,7 @@ h2{font-family:var(--serif);font-size:20px;font-weight:700;margin-bottom:3px}
 <!-- ══ REGISTER ══ -->
 <div id="sc-register" class="hidden">
   <div class="topbar"><button class="btn-back" onclick="go('welcome')">← Retour</button><div class="logo"><div class="logo-icon">SM</div>Skin<span>Match</span></div><button onclick="changeLangRegion()" style="background:rgba(196,114,106,.12);border:1px solid rgba(196,114,106,.25);border-radius:20px;padding:4px 10px;font-size:11px;font-weight:600;color:#C4726A;cursor:pointer;font-family:'Outfit',sans-serif">🌐 Lang</button></div>
-  <div class="content">
+  <div class="content" style="padding-bottom:120px">
     <div style="margin:22px 0">
       <h2>Créer votre compte</h2>
       <p class="sub">Enregistrez votre profil pour accéder à vos recommandations.</p>
@@ -649,7 +649,7 @@ h2{font-family:var(--serif);font-size:20px;font-weight:700;margin-bottom:3px}
 <!-- ══ LOGIN ══ -->
 <div id="sc-login" class="hidden">
   <div class="topbar"><button class="btn-back" onclick="go('welcome')">← Retour</button><div class="logo"><div class="logo-icon">SM</div>Skin<span>Match</span></div><button onclick="changeLangRegion()" style="background:rgba(196,114,106,.12);border:1px solid rgba(196,114,106,.25);border-radius:20px;padding:4px 10px;font-size:11px;font-weight:600;color:#C4726A;cursor:pointer;font-family:'Outfit',sans-serif">🌐 Lang</button></div>
-  <div class="content">
+  <div class="content" style="padding-bottom:120px">
     <div style="margin:22px 0"><h2>Bon retour</h2><p class="sub">Connectez-vous pour accéder à votre profil.</p></div>
     <div class="inp-wrap"><svg width="15" height="15" viewBox="0 0 24 24" fill="#9A8B7C"><path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg><input id="inp-email-l" type="email" placeholder="Adresse email"></div>
     <div class="inp-wrap"><svg width="15" height="15" viewBox="0 0 24 24" fill="#9A8B7C"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/></svg><input id="inp-pw-l" type="password" placeholder="Mot de passe"></div>
@@ -6581,12 +6581,17 @@ function navTo(screen) {
   if (typeof stopBarcodeCamera === 'function') stopBarcodeCamera();
   
   if (screen === 'result') {
-    if (!ST.result && window._savedRoutine) {
-      // Routine sauvegardée en mémoire — la recharger
+    if (ST.result) {
+      // Routine déjà générée — afficher directement
+      renderResult();
+      go('result');
+      updateNav('result');
+      return;
+    } else if (window._savedRoutine) {
       reloadSavedRoutine();
       updateNav('result');
       return;
-    } else if (!ST.result) {
+    } else {
       // Pas de routine → diagnostic
       go('q1');
       updateNav(null);
