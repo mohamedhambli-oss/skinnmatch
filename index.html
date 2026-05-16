@@ -976,11 +976,7 @@ h2{font-family:var(--serif);font-size:20px;font-weight:700;margin-bottom:3px}
     <div class="logo"><div class="logo-icon">SM</div>Skin<span>Match</span></div>
   </div>
   <div class="content">
-    <div style="margin:8px 0 20px">
-      <div class="step-lbl">Mon espace</div>
-      <h2 style="margin-bottom:4px" id="dash-title">Bonjour 👋</h2>
-      <p class="sub" id="dash-sub">Votre tableau de bord skincare personnalisé</p>
-    </div>
+    <div id="dash-static-header" style="margin:8px 0 4px"></div>
     <div id="dashboard-content"></div>
   </div>
 </div>
@@ -5903,6 +5899,15 @@ function startChallenge(id) {
     renderDashboard();
 }
 
+function cancelChallenge(id) {
+    var isEN = LANG === "en";
+    if (!confirm(isEN ? "Cancel this challenge? Progress will be lost." : "Annuler ce défi ? Ta progression sera perdue.")) return;
+    var data = getDashData();
+    if (data.challenges) delete data.challenges[id];
+    saveDashData(data);
+    renderDashboard();
+}
+
 function checkChallenge(id) {
     var data = getDashData();
     if (!data.challenges) data.challenges = {};
@@ -6402,10 +6407,21 @@ window.onFirebaseUserReady = function(user) {
     if (connBadge) connBadge.style.display = 'flex';
     if (connLabel) connLabel.textContent = (LANG === 'en' ? 'Connected as ' : 'Connecté en tant que ') + shortName;
     // Charger routine sauvegardée
-    loadSavedRoutine(user);
+    if (typeof window._onAuthResolved === 'function') {
+      window._onAuthResolved(user);
+      window._onAuthResolved = null;
+    } else {
+      loadSavedRoutine(user);
+      setTimeout(applyWelcomeLang, 100);
+    }
   } else {
-    if (btnLog) { btnLog.textContent = 'Se connecter'; btnLog.onclick = function(){ go('login'); }; }
+    if (btnLog) { btnLog.style.display = ''; btnLog.textContent = 'Se connecter'; btnLog.onclick = function(){ go('login'); }; }
     if (btnReg) { btnReg.style.display = ''; btnReg.textContent = 'Créer un compte'; }
+    if (connBadge) connBadge.style.display = 'none';
+    if (typeof window._onAuthResolved === 'function') {
+      window._onAuthResolved(null);
+      window._onAuthResolved = null;
+    }
   }
 };
 
@@ -6745,6 +6761,34 @@ function reloadSavedRoutine() {
 }
 
 // ══ NOTIFICATIONS ══
+function toggleNotifications() {
+  if (!('Notification' in window)) {
+    alert(LANG === 'en' ? 'Notifications not supported.' : 'Notifications non supportées sur ce navigateur.');
+    return;
+  }
+  if (Notification.permission === 'granted') {
+    alert(LANG === 'en'
+      ? 'To disable: Safari Settings → Notifications → Block this site.'
+      : 'Pour désactiver : Réglages Safari → Notifications → Bloquer ce site.');
+    return;
+  }
+  requestNotifPermission();
+}
+
+function changeNotifTime(type) {
+  var isEN = LANG === 'en';
+  var current = localStorage.getItem('skinmatch_notif_' + type) || (type === 'morning' ? '08:00' : '21:00');
+  var newTime = prompt(isEN ? 'Enter time (HH:MM):' : "Entrer l'heure (HH:MM) :", current);
+  if (!newTime || !/^\d{2}:\d{2}$/.test(newTime)) return;
+  localStorage.setItem('skinmatch_notif_' + type, newTime);
+  renderSettings();
+  var t = document.createElement('div');
+  t.style.cssText = 'position:fixed;top:70px;left:50%;transform:translateX(-50%);background:#2E7D32;color:#fff;padding:12px 20px;border-radius:50px;font-size:13px;font-weight:600;z-index:9999';
+  t.textContent = (isEN ? 'Updated: ' : 'Mis à jour : ') + newTime;
+  document.body.appendChild(t);
+  setTimeout(function() { t.remove(); }, 2500);
+}
+
 function requestNotifPermission() {
   if (!('Notification' in window)) return;
   Notification.requestPermission().then(function(perm) {
