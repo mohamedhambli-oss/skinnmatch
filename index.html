@@ -6564,18 +6564,19 @@ window.onFirebaseUserReady = function(user) {
     var shortName = user.displayName ? user.displayName.split(' ')[0] : user.email.split('@')[0];
     if (btnLog) { btnLog.textContent = '👤 ' + shortName; btnLog.onclick = function(){ renderProfile(); go('profile'); }; }
     if (btnReg) btnReg.style.display = 'none';
-    // Charger routine + préférences depuis Firestore
-    loadSavedRoutine(user).then(function() {
-      // Après chargement Firestore, si lang disponible → ne plus demander
-      if (LANG && REGION && ST.screen === 'lang') {
-        go('welcome');
-        setTimeout(applyWelcomeLang, 100);
-      }
-      setTimeout(applyWelcomeLang, 200);
-    });
   } else {
     if (btnLog) { btnLog.textContent = 'Se connecter'; btnLog.onclick = function(){ go('login'); }; }
     if (btnReg) { btnReg.style.display = ''; btnReg.textContent = 'Créer un compte'; }
+  }
+  // Résoudre l'init
+  if (typeof window._onAuthResolved === 'function') {
+    window._onAuthResolved(user);
+    window._onAuthResolved = null;
+  } else {
+    // Déjà initialisé — juste mettre à jour l'UI
+    if (user) {
+      setTimeout(applyWelcomeLang, 100);
+    }
   }
 };
 
@@ -7075,16 +7076,65 @@ function submitFeedback(key, type, btn) {
 // Init — vérifier si langue déjà mémorisée
 var _savedLang = localStorage.getItem('skinmatch_lang');
 var _savedRegion = localStorage.getItem('skinmatch_region');
-if (_savedLang && _savedRegion) {
-  LANG = _savedLang;
-  REGION = _savedRegion;
-  go('welcome');
-  setTimeout(function() { updateNav('welcome'); }, 100);
-} else {
-  go('lang');
+
+// Afficher un écran de chargement pendant l'init Firebase
+var _splashEl = document.createElement('div');
+_splashEl.id = 'app-splash';
+_splashEl.style.cssText = 'position:fixed;inset:0;background:#FDF8F5;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:99999;transition:opacity .4s';
+_splashEl.innerHTML = '<div style="font-family:Georgia,serif;font-size:28px;font-weight:700;color:#3D2B1F">Skin<span style="color:#C4726A">Match</span></div>' +
+  '<div style="margin-top:16px;width:32px;height:32px;border:3px solid #F5E8E5;border-top-color:#C4726A;border-radius:50%;animation:spin 1s linear infinite"></div>';
+document.body.appendChild(_splashEl);
+
+function _hideSplash() {
+  var s = document.getElementById('app-splash');
+  if (s) { s.style.opacity = '0'; setTimeout(function() { if(s.parentNode) s.parentNode.removeChild(s); }, 400); }
 }
+
+// Attendre Firebase (max 2.5 secondes) avant de décider quoi afficher
+var _firebaseWaitTimeout = setTimeout(function() {
+  // Firebase n'a pas répondu — utiliser localStorage
+  _initFromLocalStorage();
+}, 2500);
+
+window._onAuthResolved = function(user) {
+  clearTimeout(_firebaseWaitTimeout);
+  if (user) {
+    // Utilisateur connecté — charger ses préférences depuis Firestore puis afficher
+    loadSavedRoutine(user).then(function() {
+      var lang = localStorage.getItem('skinmatch_lang') || LANG;
+      var region = localStorage.getItem('skinmatch_region') || REGION;
+      if (lang && region) {
+        LANG = lang; REGION = region;
+        initQuestions();
+        go('welcome');
+        updateNav('welcome');
+        setTimeout(applyWelcomeLang, 50);
+      } else {
+        go('lang');
+      }
+      _hideSplash();
+    });
+  } else {
+    // Pas connecté — utiliser localStorage
+    _initFromLocalStorage();
+  }
+};
+
+function _initFromLocalStorage() {
+  if (_savedLang && _savedRegion) {
+    LANG = _savedLang;
+    REGION = _savedRegion;
+    initQuestions();
+    go('welcome');
+    updateNav('welcome');
+    setTimeout(applyWelcomeLang, 50);
+  } else {
+    go('lang');
+  }
+  _hideSplash();
+}
+
 initQuestions();
-setTimeout(applyWelcomeLang, 50);
 
 // Restaurer la routine depuis localStorage si disponible
 try {
