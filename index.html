@@ -3253,12 +3253,14 @@ function toggleShare(){
   if (!r) return;
   
   // Encoder les données de la routine dans l'URL pour que le destinataire voie MA routine
+  var userName = window._currentUser ? (window._currentUser.displayName || window._currentUser.email.split('@')[0]) : '';
   var routineData = {
     skin: ST.skinType,
     age: ST.ageGroup,
     budget: ST.budget,
     concerns: ST.concerns,
-    products: (r.steps || []).slice(0, 8).map(function(s) { return s.key; })
+    products: (r.steps || []).slice(0, 8).map(function(s) { return s.key; }),
+    sharedBy: userName
   };
   var encoded = '';
   try { encoded = btoa(unescape(encodeURIComponent(JSON.stringify(routineData)))); } catch(e) {}
@@ -7006,6 +7008,29 @@ var _savedLang = localStorage.getItem('skinmatch_lang');
 var _savedRegion = localStorage.getItem('skinmatch_region');
 
 // Splash screen pendant l'init
+// Détecter si une routine est partagée dans l'URL — AVANT tout
+var _sharedView = false;
+var _sharedBy = '';
+try {
+  var _urlP = new URLSearchParams(window.location.search);
+  var _rParam = _urlP.get('r');
+  if (_rParam) {
+    var _sd = JSON.parse(decodeURIComponent(escape(atob(_rParam))));
+    if (_sd && _sd.products && _sd.products.length > 0) {
+      ST.skinType = _sd.skin || 'mixte';
+      ST.ageGroup = _sd.age || '26-35';
+      ST.budget = _sd.budget || 'moyen';
+      ST.concerns = _sd.concerns || [];
+      ST.routine = _sd.products;
+      ST.result = build();
+      _sharedView = true;
+      _sharedBy = _sd.sharedBy || '';
+      window._sharedView = true;
+      window._sharedBy = _sharedBy;
+    }
+  }
+} catch(e) {}
+
 var _splashEl = document.createElement('div');
 _splashEl.id = 'app-splash';
 _splashEl.style.cssText = 'position:fixed;inset:0;background:#FBF0ED;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:99999;transition:opacity .4s';
@@ -7021,7 +7046,25 @@ function _hideSplash() {
 var _firebaseWait = setTimeout(function() {
   if (_savedLang && _savedRegion) {
     LANG = _savedLang; REGION = _savedRegion;
-    initQuestions(); if (window._sharedView && ST.result) { go('result'); updateNav('result'); renderResult(); setTimeout(function(){ var b=document.getElementById('result-back-btn'); if(b) b.style.display='none'; }, 100); } else { go('welcome'); updateNav('welcome'); }
+    initQuestions(); if (window._sharedView && ST.result) {
+        go('result'); updateNav('result'); renderResult();
+        setTimeout(function(){
+          var b = document.getElementById('result-back-btn');
+          if (b) b.style.display = 'none';
+          var sw = document.getElementById('btn-save-routine-wrap');
+          if (sw) sw.style.display = 'none';
+          // Bannière avec prénom
+          var sharedName = window._sharedBy || (LANG === 'en' ? 'a user' : 'un utilisateur');
+          var banner = document.createElement('div');
+          banner.style.cssText = 'background:linear-gradient(135deg,#FBF0ED,#F5E1DC);padding:12px 20px;text-align:center;font-size:13px;color:#C4726A;font-weight:600;border-bottom:1px solid rgba(196,114,106,.2);cursor:pointer';
+          banner.textContent = LANG === 'en'
+            ? '🌸 Routine shared by ' + sharedName + ' — Get yours free!'
+            : '🌸 Routine partagée par ' + sharedName + ' — Obtiens la tienne gratuitement !';
+          banner.onclick = function() { go('welcome'); updateNav('welcome'); };
+          var rc = document.getElementById('result-content');
+          if (rc) rc.insertBefore(banner, rc.firstChild);
+        }, 150);
+      } else { go('welcome'); updateNav('welcome'); }
     setTimeout(applyWelcomeLang, 50);
   } else { go('lang'); }
   _hideSplash();
@@ -7037,7 +7080,25 @@ window._onAuthResolved = function(user) {
         LANG = lang; REGION = region;
         localStorage.setItem('skinmatch_lang', lang);
         localStorage.setItem('skinmatch_region', region);
-        initQuestions(); if (window._sharedView && ST.result) { go('result'); updateNav('result'); renderResult(); setTimeout(function(){ var b=document.getElementById('result-back-btn'); if(b) b.style.display='none'; }, 100); } else { go('welcome'); updateNav('welcome'); }
+        initQuestions(); if (window._sharedView && ST.result) {
+        go('result'); updateNav('result'); renderResult();
+        setTimeout(function(){
+          var b = document.getElementById('result-back-btn');
+          if (b) b.style.display = 'none';
+          var sw = document.getElementById('btn-save-routine-wrap');
+          if (sw) sw.style.display = 'none';
+          // Bannière avec prénom
+          var sharedName = window._sharedBy || (LANG === 'en' ? 'a user' : 'un utilisateur');
+          var banner = document.createElement('div');
+          banner.style.cssText = 'background:linear-gradient(135deg,#FBF0ED,#F5E1DC);padding:12px 20px;text-align:center;font-size:13px;color:#C4726A;font-weight:600;border-bottom:1px solid rgba(196,114,106,.2);cursor:pointer';
+          banner.textContent = LANG === 'en'
+            ? '🌸 Routine shared by ' + sharedName + ' — Get yours free!'
+            : '🌸 Routine partagée par ' + sharedName + ' — Obtiens la tienne gratuitement !';
+          banner.onclick = function() { go('welcome'); updateNav('welcome'); };
+          var rc = document.getElementById('result-content');
+          if (rc) rc.insertBefore(banner, rc.firstChild);
+        }, 150);
+      } else { go('welcome'); updateNav('welcome'); }
         setTimeout(applyWelcomeLang, 50);
       } else { go('lang'); }
       _hideSplash();
@@ -7045,35 +7106,31 @@ window._onAuthResolved = function(user) {
   } else {
     if (_savedLang && _savedRegion) {
       LANG = _savedLang; REGION = _savedRegion;
-      initQuestions(); if (window._sharedView && ST.result) { go('result'); updateNav('result'); renderResult(); setTimeout(function(){ var b=document.getElementById('result-back-btn'); if(b) b.style.display='none'; }, 100); } else { go('welcome'); updateNav('welcome'); }
+      initQuestions(); if (window._sharedView && ST.result) {
+        go('result'); updateNav('result'); renderResult();
+        setTimeout(function(){
+          var b = document.getElementById('result-back-btn');
+          if (b) b.style.display = 'none';
+          var sw = document.getElementById('btn-save-routine-wrap');
+          if (sw) sw.style.display = 'none';
+          // Bannière avec prénom
+          var sharedName = window._sharedBy || (LANG === 'en' ? 'a user' : 'un utilisateur');
+          var banner = document.createElement('div');
+          banner.style.cssText = 'background:linear-gradient(135deg,#FBF0ED,#F5E1DC);padding:12px 20px;text-align:center;font-size:13px;color:#C4726A;font-weight:600;border-bottom:1px solid rgba(196,114,106,.2);cursor:pointer';
+          banner.textContent = LANG === 'en'
+            ? '🌸 Routine shared by ' + sharedName + ' — Get yours free!'
+            : '🌸 Routine partagée par ' + sharedName + ' — Obtiens la tienne gratuitement !';
+          banner.onclick = function() { go('welcome'); updateNav('welcome'); };
+          var rc = document.getElementById('result-content');
+          if (rc) rc.insertBefore(banner, rc.firstChild);
+        }, 150);
+      } else { go('welcome'); updateNav('welcome'); }
       setTimeout(applyWelcomeLang, 50);
     } else { go('lang'); }
     _hideSplash();
   }
 };
 initQuestions();
-
-// Détecter si une routine est partagée dans l'URL (?r=...)
-try {
-  var _urlParams = new URLSearchParams(window.location.search);
-  var _sharedRoutine = _urlParams.get('r');
-  if (_sharedRoutine) {
-    var _sharedData = JSON.parse(decodeURIComponent(escape(atob(_sharedRoutine))));
-    if (_sharedData && _sharedData.products && _sharedData.products.length > 0) {
-      // Restaurer le profil partagé
-      ST.skinType = _sharedData.skin || 'mixte';
-      ST.ageGroup = _sharedData.age || '26-35';
-      ST.budget = _sharedData.budget || 'moyen';
-      ST.concerns = _sharedData.concerns || [];
-      ST.routine = _sharedData.products;
-      ST.result = build();
-      if (ST.result) {
-        window._sharedView = true; // mode consultation
-        window._routineSaved = false; // pas la sienne, ne pas masquer retour
-      }
-    }
-  }
-} catch(e) {}
 
 // Restaurer routine depuis localStorage au démarrage
 try {
