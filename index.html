@@ -3266,7 +3266,7 @@ function toggleShare(){
   try { encoded = btoa(unescape(encodeURIComponent(JSON.stringify(routineData)))); } catch(e) {}
   
   var appUrl = "https://mohamedhambli-oss.github.io/skinnmatch/";
-  var shareUrl = appUrl + "?r=" + encoded;
+  var shareUrl = appUrl + "#r=" + encoded;
   
   var skinLabels = {grasse:"grasse", seche:"sèche", mixte:"mixte", sensible:"sensible", normale:"normale"};
   var skinLabel = skinLabels[ST.skinType] || ST.skinType || "mixte";
@@ -7012,8 +7012,8 @@ var _savedRegion = localStorage.getItem('skinmatch_region');
 var _sharedView = false;
 var _sharedBy = '';
 try {
-  var _urlP = new URLSearchParams(window.location.search);
-  var _rParam = _urlP.get('r');
+  var _hashParam = window.location.hash.replace('#r=', '');
+  var _rParam = (window.location.hash.indexOf('#r=') === 0) ? _hashParam : null;
   if (_rParam) {
     var _sd = JSON.parse(decodeURIComponent(escape(atob(_rParam))));
     if (_sd && _sd.products && _sd.products.length > 0) {
