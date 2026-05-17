@@ -668,8 +668,10 @@ h2{font-family:var(--serif);font-size:20px;font-weight:700;margin-bottom:3px}
 <!-- ══ RESULT ══ -->
 <div id="sc-result" class="hidden">
   <div class="topbar" id="result-topbar">
-    <button class="btn-back" id="result-back-btn" onclick="go('q5')">← Retour</button><div class="logo"><div class="logo-icon">SM</div>Skin<span>Match</span></div><button onclick="go('scan-product')" style="background:linear-gradient(135deg,#1F3864,#2E5496);border:none;border-radius:20px;padding:6px 12px;font-size:11px;font-weight:700;color:#fff;cursor:pointer;font-family:var(--sans);margin-right:4px">📷 Scanner</button>
-    <button onclick="openCompare()" id="btn-compare-top" style="background:#C4726A;border:none;border-radius:20px;padding:6px 12px;font-size:11px;font-weight:700;color:#fff;cursor:pointer;font-family:var(--sans)">⚖️ Comparer</button></div>
+    <button class="btn-back" id="result-back-btn" onclick="go('q5')">← Retour</button>
+    <div class="logo"><div class="logo-icon">SM</div>Skin<span>Match</span></div>
+    <button onclick="openCompare()" id="btn-compare-top" style="background:#C4726A;border:none;border-radius:20px;padding:6px 12px;font-size:11px;font-weight:700;color:#fff;cursor:pointer;font-family:var(--sans)">⚖️ Comparer</button>
+  </div>
 
   <div class="content" id="result-content"></div>
 </div>
@@ -3249,18 +3251,37 @@ function switchTab(tab){
 function toggleShare(){
   var r = ST.result;
   if (!r) return;
-  var skinLabel = ST.skinType || "mixte";
-  var products = (r.steps || []).slice(0, 4).map(function(s) { return "- " + s.nom + " / " + s.marque; }).join(", ");
+  
+  // Encoder les données de la routine dans l'URL pour que le destinataire voie MA routine
+  var routineData = {
+    skin: ST.skinType,
+    age: ST.ageGroup,
+    budget: ST.budget,
+    concerns: ST.concerns,
+    products: (r.steps || []).slice(0, 8).map(function(s) { return s.key; })
+  };
+  var encoded = '';
+  try { encoded = btoa(unescape(encodeURIComponent(JSON.stringify(routineData)))); } catch(e) {}
+  
   var appUrl = "https://mohamedhambli-oss.github.io/skinnmatch/";
-  var shareText = LANG === "en" ? "My SkinMatch routine: " + products + " | Get yours free: " + appUrl : "Ma routine SkinMatch : " + products + " | Obtiens la tienne gratuitement : " + appUrl;
+  var shareUrl = appUrl + "?r=" + encoded;
+  
+  var skinLabels = {grasse:"grasse", seche:"sèche", mixte:"mixte", sensible:"sensible", normale:"normale"};
+  var skinLabel = skinLabels[ST.skinType] || ST.skinType || "mixte";
+  var products = (r.steps || []).slice(0, 4).map(function(s) { return "• " + s.nom; }).join(", ");
+  
+  var shareText = LANG === "en"
+    ? "My personalized SkinMatch routine (" + skinLabel + " skin): " + products + " — See my full routine:"
+    : "Ma routine skincare SkinMatch (peau " + skinLabel + ") : " + products + " — Voir ma routine complète :";
+
   if (navigator.share) {
-    navigator.share({ title: "SkinMatch", text: shareText, url: appUrl }).catch(function(){});
+    navigator.share({ title: "Ma routine SkinMatch 🌸", text: shareText, url: shareUrl }).catch(function(){});
   } else {
     try {
-      navigator.clipboard.writeText(shareText).then(function() {
+      navigator.clipboard.writeText(shareText + " " + shareUrl).then(function() {
         var t = document.createElement("div");
         t.style.cssText = "position:fixed;top:70px;left:50%;transform:translateX(-50%);background:#3D2B1F;color:#fff;padding:12px 20px;border-radius:50px;font-size:13px;font-weight:600;z-index:9999";
-        t.textContent = LANG === "en" ? "Copied!" : "Copié !";
+        t.textContent = LANG === "en" ? "Link copied!" : "Lien copié !";
         document.body.appendChild(t);
         setTimeout(function(){ t.remove(); }, 2500);
       });
@@ -7000,7 +7021,7 @@ function _hideSplash() {
 var _firebaseWait = setTimeout(function() {
   if (_savedLang && _savedRegion) {
     LANG = _savedLang; REGION = _savedRegion;
-    initQuestions(); go('welcome'); updateNav('welcome');
+    initQuestions(); if (window._sharedView && ST.result) { go('result'); updateNav('result'); renderResult(); setTimeout(function(){ var b=document.getElementById('result-back-btn'); if(b) b.style.display='none'; }, 100); } else { go('welcome'); updateNav('welcome'); }
     setTimeout(applyWelcomeLang, 50);
   } else { go('lang'); }
   _hideSplash();
@@ -7016,7 +7037,7 @@ window._onAuthResolved = function(user) {
         LANG = lang; REGION = region;
         localStorage.setItem('skinmatch_lang', lang);
         localStorage.setItem('skinmatch_region', region);
-        initQuestions(); go('welcome'); updateNav('welcome');
+        initQuestions(); if (window._sharedView && ST.result) { go('result'); updateNav('result'); renderResult(); setTimeout(function(){ var b=document.getElementById('result-back-btn'); if(b) b.style.display='none'; }, 100); } else { go('welcome'); updateNav('welcome'); }
         setTimeout(applyWelcomeLang, 50);
       } else { go('lang'); }
       _hideSplash();
@@ -7024,13 +7045,35 @@ window._onAuthResolved = function(user) {
   } else {
     if (_savedLang && _savedRegion) {
       LANG = _savedLang; REGION = _savedRegion;
-      initQuestions(); go('welcome'); updateNav('welcome');
+      initQuestions(); if (window._sharedView && ST.result) { go('result'); updateNav('result'); renderResult(); setTimeout(function(){ var b=document.getElementById('result-back-btn'); if(b) b.style.display='none'; }, 100); } else { go('welcome'); updateNav('welcome'); }
       setTimeout(applyWelcomeLang, 50);
     } else { go('lang'); }
     _hideSplash();
   }
 };
 initQuestions();
+
+// Détecter si une routine est partagée dans l'URL (?r=...)
+try {
+  var _urlParams = new URLSearchParams(window.location.search);
+  var _sharedRoutine = _urlParams.get('r');
+  if (_sharedRoutine) {
+    var _sharedData = JSON.parse(decodeURIComponent(escape(atob(_sharedRoutine))));
+    if (_sharedData && _sharedData.products && _sharedData.products.length > 0) {
+      // Restaurer le profil partagé
+      ST.skinType = _sharedData.skin || 'mixte';
+      ST.ageGroup = _sharedData.age || '26-35';
+      ST.budget = _sharedData.budget || 'moyen';
+      ST.concerns = _sharedData.concerns || [];
+      ST.routine = _sharedData.products;
+      ST.result = build();
+      if (ST.result) {
+        window._sharedView = true; // mode consultation
+        window._routineSaved = false; // pas la sienne, ne pas masquer retour
+      }
+    }
+  }
+} catch(e) {}
 
 // Restaurer routine depuis localStorage au démarrage
 try {
