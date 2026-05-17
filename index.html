@@ -1708,31 +1708,64 @@ function normalizeAutreAllergies(allergies) {
 
 
 function buildFromKeys(keys) {
-  // Reconstruit une routine depuis une liste de keys de produits
   if (!keys || keys.length === 0) return null;
   var steps = [];
+  
+  // Mapping cat → etape lisible
+  var catToEtape = {
+    nettoyant: 'Nettoyant', serum: 'Sérum', hydratant: 'Hydratant',
+    spf: 'Protection solaire', contour: 'Contour des yeux',
+    masque: 'Masque', tonique: 'Tonique', huile: 'Huile',
+    exfoliant: 'Exfoliant', baume: 'Baume', creme: 'Crème'
+  };
+  // Mapping moment
+  var momentMap = { matin: 'AM', soir: 'PM', 'matin et soir': 'AM+PM',
+                    'matin seulement': 'AM', 'soir seulement': 'PM',
+                    'AM': 'AM', 'PM': 'PM', 'AM+PM': 'AM+PM' };
+  
   keys.forEach(function(key) {
     var p = DB[key];
     if (!p) return;
+    var momentRaw = (p.moment || 'AM+PM').toLowerCase();
+    var moment = momentMap[momentRaw] || 'AM+PM';
     steps.push({
       key: key,
       nom: p.nom || key,
       marque: p.marque || '',
       prix: p.prix || 0,
       cat: p.cat || '',
-      moment: p.moment || 'matin',
-      desc: p.desc || '',
-      pourquoi: p.pourquoi || '',
+      etape: catToEtape[p.cat] || p.cat || 'Soin',
+      moment: moment,
+      compat: p.compat || 85,
+      pourquoi: p.pourquoi || ('Ce produit est adapté à votre profil cutané.'),
+      link: p.lien || p.link || '',
       lien: p.lien || '',
       img: IMGS[key] || null,
       inci: p.inci || [],
       yuka: p.yuka || 0,
+      ak: p.ak || false,
+      yl: p.yuka >= 50,
       application: p.application || '',
       pourQui: p.pourQui || ''
     });
   });
+  
   if (steps.length === 0) return null;
-  return { steps: steps, totalPrix: steps.reduce(function(s,p){ return s + (p.prix||0); }, 0) };
+  
+  var totalPrix = steps.reduce(function(s, p) { return s + (p.prix || 0); }, 0);
+  
+  // Générer l'intro
+  var skinLabels = {grasse:'grasse', seche:'sèche', mixte:'mixte', sensible:'sensible', normale:'normale'};
+  var skinLabel = skinLabels[ST.skinType] || ST.skinType || 'mixte';
+  var ageLabel = ST.ageGroup || '26-35';
+  var intro = 'Votre routine sur-mesure pour une peau ' + skinLabel + ' (' + ageLabel + '). Chaque produit sélectionné selon vos problématiques et votre budget.';
+  
+  return {
+    steps: steps,
+    totalPrix: totalPrix,
+    intro: intro,
+    conseil: 'Une routine simple appliquée chaque jour surpasse une routine complexe abandonnée.'
+  };
 }
 
 function build(){
