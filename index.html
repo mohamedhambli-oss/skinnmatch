@@ -324,7 +324,7 @@ h2{font-family:var(--serif);font-size:20px;font-weight:700;margin-bottom:3px}
 
 <!-- ══ WELCOME ══ -->
 <div id="sc-welcome" class="hidden">
-  <div style="min-height:100vh;display:flex;flex-direction:column;background:#FBF0ED;position:relative;overflow:hidden;padding-bottom:110px">
+  <div style="min-height:100vh;display:flex;flex-direction:column;background:#FBF0ED;position:relative;overflow:hidden;padding-bottom:80px">
 
     <div style="position:absolute;top:-60px;right:-60px;width:220px;height:220px;border-radius:50%;background:radial-gradient(circle,#E8A898 0%,transparent 70%);opacity:.5;pointer-events:none"></div>
     <div style="position:absolute;bottom:120px;left:-40px;width:160px;height:160px;border-radius:50%;background:radial-gradient(circle,#D4857A 0%,transparent 70%);opacity:.25;pointer-events:none"></div>
@@ -334,7 +334,7 @@ h2{font-family:var(--serif);font-size:20px;font-weight:700;margin-bottom:3px}
       <div id="region-badge" style="font-size:16px;cursor:pointer" onclick="showRegionModal()">&#127757;</div>
     </div>
 
-    <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px 28px 32px;text-align:center">
+    <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;padding:20px 28px 32px;text-align:center">
 
       <!-- BULLES 3 ÉTAPES -->
       <div style="width:100%;max-width:300px;margin-bottom:26px">
@@ -694,8 +694,11 @@ h2{font-family:var(--serif);font-size:20px;font-weight:700;margin-bottom:3px}
 
 <!-- ══ RESULT ══ -->
 <div id="sc-result" class="hidden">
-  <div class="topbar"><button class="btn-back" onclick="go('q5')">← Retour</button><div class="logo"><div class="logo-icon">SM</div>Skin<span>Match</span></div><button onclick="go('scan-product')" style="background:linear-gradient(135deg,#1F3864,#2E5496);border:none;border-radius:20px;padding:6px 12px;font-size:11px;font-weight:700;color:#fff;cursor:pointer;font-family:var(--sans);margin-right:4px">📷 Scanner</button>
-    <button onclick="openCompare()" id="btn-compare-top" style="background:#C4726A;border:none;border-radius:20px;padding:6px 12px;font-size:11px;font-weight:700;color:#fff;cursor:pointer;font-family:var(--sans)">⚖️ Comparer</button></div>
+  <div class="topbar" id="result-topbar">
+    <button class="btn-back" id="result-back-btn" onclick="go('q5')">← Retour</button>
+    <div class="logo"><div class="logo-icon">SM</div>Skin<span>Match</span></div>
+    <button onclick="openCompare()" id="btn-compare-top" style="background:#C4726A;border:none;border-radius:20px;padding:6px 12px;font-size:11px;font-weight:700;color:#fff;cursor:pointer;font-family:var(--sans)">⚖️ Comparer</button>
+  </div>
 
   <div class="content" id="result-content"></div>
 </div>
