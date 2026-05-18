@@ -19,18 +19,15 @@
 <meta name="apple-mobile-web-app-title" content="SkinMatch">
 <link rel="apple-touch-icon" href="icon-192.png">
 <meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="SkinMatch">
 <meta name="theme-color" content="#FDF8F5">
 <meta name="description" content="SkinMatch — Analyse ta peau en 60 secondes et découvre ta routine skincare personnalisée. Gratuit.">
 <meta property="og:title" content="SkinMatch — Ta routine skincare personnalisée">
 <meta property="og:description" content="Diagnostic de peau personnalisé et recommandations de produits selon ton profil, ton âge et ton budget.">
 <meta property="og:type" content="website">
-<meta property="og:image" content="https://mohamedhambli-oss.github.io/skinnmatch/og-image.jpg">
-<meta property="og:image:width" content="1200">
-<meta property="og:image:height" content="630">
-<meta property="og:url" content="https://mohamedhambli-oss.github.io/skinnmatch/">
-<meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:image" content="https://mohamedhambli-oss.github.io/skinnmatch/og-image.jpg">
-<title>SkinMatch — Ta routine skincare personnalisée</title>
+<title>SkinMatch — Your Skin, Your Routine</title>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
 <!-- Firebase SDK -->
 <script type="module">
@@ -498,7 +495,7 @@ h2{font-family:var(--serif);font-size:20px;font-weight:700;margin-bottom:3px}
     </div>
 
     <!-- Bouton analyser -->
-    <button id="scan-btn" class="btn-p" disabled onclick="analyzeSkin()" style="margin-bottom:12px">
+    <button id="scan-btn" class="btn-p" disabled onclick="analyzeSkin()" style="margin-bottom:12px" id="scan-btn">
       <span id="scan-btn-text">Analyser ma peau</span>
     </button>
 
@@ -2012,7 +2009,13 @@ function go(screen){
   window.scrollTo(0,0);
   if(screen==='welcome') setTimeout(applyWelcomeLang,10);
   if(screen==='scan') setTimeout(function(){ startCamera(); }, 100);
-  if(screen==='scan-product') setTimeout(function(){ startBarcodeCamera(); }, 100);
+  if(screen==='scan-product') {
+    if (!window._currentUser) {
+      _showLoginRequired('scan-product');
+      return;
+    }
+    setTimeout(function(){ startBarcodeCamera(); }, 100);
+  }
   // Afficher/cacher la nav
   var navScreens = ['welcome','result','scan-product','articles','dashboard','profile'];
   var nav = document.getElementById('bottom-nav');
@@ -2561,6 +2564,12 @@ function resetScan() {
 
 function analyzeSkin() {
     if (!scanBase64) return;
+
+    // Vérifier le quota scan visage
+    if (!_canScan('skin')) {
+      _showScanPaywall('skin');
+      return;
+    }
     var isEN = LANG === "en";
     document.getElementById("scan-product-result").style.display = "block";
     document.getElementById("scan-loading").style.display = "block";
@@ -2606,6 +2615,7 @@ function analyzeSkin() {
                 throw new Error("Invalid JSON");
             }
         }
+        _incrementScan('skin'); // Scan visage réussi → on compte
         scanResult = analysis;
         showScanResult(analysis);
     })
@@ -3659,6 +3669,21 @@ function toggleChatbot() {
   if (chatbotOpen) {
     var input = document.getElementById('chatbot-input');
     if (input) input.focus();
+    // Message de bienvenue avec prénom si connecté
+    var msgs = document.getElementById('chatbot-messages');
+    if (msgs && msgs.children.length === 0) {
+      var prenom = '';
+      if (window._currentUser) {
+        prenom = window._currentUser.displayName
+          ? window._currentUser.displayName.split(' ')[0]
+          : window._currentUser.email.split('@')[0];
+      }
+      var isEN = LANG === 'en';
+      var greeting = prenom
+        ? (isEN ? "Hello " + prenom + "! 🌸 I'm Skin Coach, your personalized skincare advisor. How can I help?" : "Bonjour " + prenom + " ! 🌸 Je suis Skin Coach, ta conseillère skincare. Comment puis-je t'aider ?")
+        : (isEN ? "Hello! 🌸 I'm Skin Coach. How can I help?" : "Bonjour ! 🌸 Je suis Skin Coach, ta conseillere skincare. Comment puis-je t'aider ?");
+      addChatMessage(greeting, false);
+    }
   }
 }
 
@@ -3924,6 +3949,113 @@ var barcodeFacingMode = "environment"; // caméra arrière pour scanner
 var barcodeDetector = null;
 var barcodeScanning = false;
 
+// ══ GESTION DES QUOTAS DE SCAN ══
+var SCAN_PRODUCT_LIMIT = 4; // scans produit gratuits par mois
+var SCAN_SKIN_LIMIT = 1;    // scan visage gratuit par mois
+
+function _getScanData() {
+  try {
+    var raw = localStorage.getItem('skinmatch_scans');
+    var data = raw ? JSON.parse(raw) : {};
+    var monthKey = new Date().toISOString().slice(0, 7); // "2026-05"
+    if (!data.month || data.month !== monthKey) {
+      // Nouveau mois — reset les compteurs
+      data = { month: monthKey, product: 0, skin: 0 };
+      localStorage.setItem('skinmatch_scans', JSON.stringify(data));
+    }
+    return data;
+  } catch(e) { return { month: '', product: 0, skin: 0 }; }
+}
+
+function _saveScanData(data) {
+  try { localStorage.setItem('skinmatch_scans', JSON.stringify(data)); } catch(e) {}
+}
+
+function _incrementScan(type) {
+  // Appelé UNIQUEMENT quand le scan réussit
+  var data = _getScanData();
+  data[type] = (data[type] || 0) + 1;
+  _saveScanData(data);
+}
+
+function _canScan(type) {
+  var data = _getScanData();
+  var limit = type === 'product' ? SCAN_PRODUCT_LIMIT : SCAN_SKIN_LIMIT;
+  var used = data[type] || 0;
+  return used < limit;
+}
+
+function _scansLeft(type) {
+  var data = _getScanData();
+  var limit = type === 'product' ? SCAN_PRODUCT_LIMIT : SCAN_SKIN_LIMIT;
+  return Math.max(0, limit - (data[type] || 0));
+}
+
+function _closeScanPaywall() {
+  var el = document.getElementById('skinmatch-paywall');
+  if (el) el.remove();
+}
+
+function _showScanPaywall(type) {
+  var isEN = LANG === 'en';
+  var isProduct = type === 'product';
+  var t = document.createElement('div');
+  t.id = 'skinmatch-paywall';
+  t.style.cssText = 'position:fixed;inset:0;background:rgba(61,43,31,.7);z-index:9999;display:flex;align-items:center;justify-content:center;padding:24px';
+
+  var icon = isProduct ? '🔍' : '📸';
+  var titleTxt = isEN ? 'Monthly limit reached' : 'Limite mensuelle atteinte';
+  var msgTxt = isProduct
+    ? (isEN ? 'You have used your 4 free product scans this month.' : 'Tu as utilisé tes 4 scans produit gratuits ce mois-ci.')
+    : (isEN ? 'You have used your free skin scan this month.' : 'Tu as utilisé ton scan de peau gratuit ce mois-ci.');
+  var priceTxt = isEN ? 'Unlimited scans + all features' : 'Scans illimités + toutes les fonctionnalités';
+  var ctaTxt = isEN ? 'Coming soon — Stay tuned!' : 'Bientôt disponible !';
+  var closeTxt = isEN ? 'Close' : 'Fermer';
+
+  var inner = document.createElement('div');
+  inner.style.cssText = 'background:#fff;border-radius:24px;padding:28px 24px;max-width:320px;width:100%;text-align:center';
+  inner.innerHTML =
+    '<div style="font-size:40px;margin-bottom:12px">' + icon + '</div>' +
+    '<div style="font-family:Georgia,serif;font-size:20px;font-weight:700;color:#3D2B1F;margin-bottom:8px">' + titleTxt + '</div>' +
+    '<div style="font-size:13px;color:#8B6F5E;line-height:1.6;margin-bottom:20px">' + msgTxt + '</div>' +
+    '<div style="background:linear-gradient(135deg,#FBF0ED,#F5E1DC);border-radius:16px;padding:16px;margin-bottom:20px">' +
+      '<div style="font-size:10px;font-weight:700;color:#C4726A;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">SkinMatch Essentiel</div>' +
+      '<div style="font-size:24px;font-weight:700;color:#3D2B1F;margin-bottom:4px">4,99€<span style="font-size:13px;color:#8B6F5E">/mois</span></div>' +
+      '<div style="font-size:12px;color:#8B6F5E">' + priceTxt + '</div>' +
+    '</div>';
+
+  var btn1 = document.createElement('button');
+  btn1.textContent = ctaTxt;
+  btn1.style.cssText = 'width:100%;padding:12px;border-radius:50px;border:none;background:#C4726A;color:#fff;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;margin-bottom:10px';
+  btn1.onclick = _closeScanPaywall;
+
+  var btn2 = document.createElement('button');
+  btn2.textContent = closeTxt;
+  btn2.style.cssText = 'width:100%;padding:10px;border-radius:50px;border:none;background:none;color:#8B6F5E;font-size:13px;cursor:pointer;font-family:inherit';
+  btn2.onclick = _closeScanPaywall;
+
+  inner.appendChild(btn1);
+  inner.appendChild(btn2);
+  t.appendChild(inner);
+  document.body.appendChild(t);
+}
+
+
+function _showScanCounter(type) {
+  // Affiche le compteur de scans restants dans l'interface
+  var left = _scansLeft(type);
+  var limit = type === 'product' ? SCAN_PRODUCT_LIMIT : SCAN_SKIN_LIMIT;
+  var isEN = LANG === 'en';
+  var elId = type === 'product' ? 'scan-product-counter' : 'scan-skin-counter';
+  var el = document.getElementById(elId);
+  if (!el) return;
+  if (left === 0) {
+    el.innerHTML = '<span style="color:#E65100;font-weight:700">⚠️ ' + (isEN ? 'No more scans this month' : 'Plus de scans ce mois-ci') + '</span>';
+  } else {
+    el.innerHTML = '<span style="color:#8B6F5E">' + (isEN ? left + ' scan' + (left > 1 ? 's' : '') + ' left this month' : left + ' scan' + (left > 1 ? 's' : '') + ' restant' + (left > 1 ? 's' : '') + ' ce mois</span>');
+  }
+}
+
 function startBarcodeCamera() {
   var video = document.getElementById("barcode-video");
   var noCam = document.getElementById("barcode-no-camera");
@@ -4004,6 +4136,12 @@ async function onBarcodeDetected(code) {
   barcodeScanning = false;
   stopBarcodeCamera();
 
+  // Vérifier le quota AVANT de chercher
+  if (!_canScan('product')) {
+    _showScanPaywall('product');
+    return;
+  }
+
   // Feedback visuel
   var guide = document.getElementById("barcode-guide");
   if (guide) guide.textContent = "✅ Code détecté : " + code;
@@ -4011,6 +4149,7 @@ async function onBarcodeDetected(code) {
   // 1. Chercher dans notre DB locale
   var found = searchByBarcode(code);
   if (found) {
+    _incrementScan('product'); // Scan réussi → on compte
     simulateScanWithKey(found);
     return;
   }
@@ -4018,6 +4157,7 @@ async function onBarcodeDetected(code) {
   // 2. Chercher dans Firestore (produits ajoutés par les utilisateurs)
   var firestoreKey = await searchBarcodeInFirestore(code);
   if (firestoreKey) {
+    _incrementScan('product'); // Scan réussi → on compte
     simulateScanWithKey(firestoreKey);
     return;
   }
@@ -4030,12 +4170,13 @@ async function onBarcodeDetected(code) {
     if (data.status === 1 && data.product && data.product.product_name) {
       var productName = data.product.product_name;
       var brand = data.product.brands || "";
+      _incrementScan('product'); // Produit trouvé via API → on compte
       showBarcodeExternalResult(code, productName, brand);
     } else {
-      showBarcodeNotFound(code);
+      showBarcodeNotFound(code); // Produit non trouvé → on ne compte PAS
     }
   } catch(e) {
-    showBarcodeNotFound(code);
+    showBarcodeNotFound(code); // Erreur réseau → on ne compte PAS
   }
 }
 
@@ -5901,6 +6042,12 @@ function renderDashboard() {
         } else if (chData.lastCheck === today) {
             btn.style.background = "#E8F5E9"; btn.style.color = "#2E7D32";
             btn.textContent = "✓";
+            // Bouton annuler
+            var cancelBtn = document.createElement("button");
+            cancelBtn.textContent = isEN ? "Cancel" : "Annuler";
+            cancelBtn.style.cssText = "font-size:10px;color:var(--mut);background:none;border:none;cursor:pointer;font-family:inherit;text-decoration:underline;margin-left:8px;padding:0";
+            cancelBtn.onclick = (function(chId) { return function() { cancelChallenge(chId); }; })(ch.id);
+            btn.parentNode.appendChild(cancelBtn);
         } else if (chData.days >= ch.days) {
             btn.style.background = "#E8F5E9"; btn.style.color = "#2E7D32";
             btn.textContent = "🏆";
@@ -6049,6 +6196,60 @@ function startChallenge(id) {
     data.challenges[id] = { started: true, days: 0, lastCheck: null };
     saveDashData(data);
     renderDashboard();
+}
+
+function _showLoginRequired(context) {
+  var isEN = LANG === 'en';
+  var messages = {
+    dashboard: isEN ? 'Create an account to access your personal space.' : 'Crée un compte pour accéder à ton espace personnel.',
+    'scan-product': isEN ? 'Create an account to scan products.' : 'Crée un compte pour scanner des produits.',
+    save: isEN ? 'Create an account to save your routine.' : 'Crée un compte pour enregistrer ta routine.',
+  };
+  var msg = messages[context] || (isEN ? 'Create an account to unlock this feature.' : 'Crée un compte pour débloquer cette fonctionnalité.');
+
+  var t = document.createElement('div');
+  t.style.cssText = 'position:fixed;inset:0;background:rgba(61,43,31,.7);z-index:9999;display:flex;align-items:center;justify-content:center;padding:24px';
+
+  var inner = document.createElement('div');
+  inner.style.cssText = 'background:#fff;border-radius:24px;padding:28px 24px;max-width:320px;width:100%;text-align:center';
+
+  var closeModal = function() { t.remove(); };
+
+  var icon = document.createElement('div');
+  icon.style.cssText = 'font-size:44px;margin-bottom:14px';
+  icon.textContent = '🔒';
+
+  var title = document.createElement('div');
+  title.style.cssText = 'font-family:Georgia,serif;font-size:20px;font-weight:700;color:#3D2B1F;margin-bottom:10px';
+  title.textContent = isEN ? 'Account required' : 'Compte requis';
+
+  var desc = document.createElement('div');
+  desc.style.cssText = 'font-size:13px;color:#8B6F5E;line-height:1.6;margin-bottom:24px';
+  desc.textContent = msg;
+
+  var btnRegister = document.createElement('button');
+  btnRegister.textContent = isEN ? 'Create a free account' : 'Créer un compte gratuit';
+  btnRegister.style.cssText = 'width:100%;padding:13px;border-radius:50px;border:none;background:linear-gradient(135deg,#3D2B1F,#5A3D2B);color:#fff;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;margin-bottom:10px';
+  btnRegister.onclick = function() { closeModal(); go('register'); };
+
+  var btnLogin = document.createElement('button');
+  btnLogin.textContent = isEN ? 'Already have an account? Sign in' : 'Déjà un compte ? Se connecter';
+  btnLogin.style.cssText = 'width:100%;padding:11px;border-radius:50px;border:1.5px solid #C4726A;background:transparent;color:#C4726A;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;margin-bottom:10px';
+  btnLogin.onclick = function() { closeModal(); go('login'); };
+
+  var btnClose = document.createElement('button');
+  btnClose.textContent = isEN ? 'Continue without account' : 'Continuer sans compte';
+  btnClose.style.cssText = 'width:100%;padding:10px;border-radius:50px;border:none;background:none;color:#B0958F;font-size:12px;cursor:pointer;font-family:inherit';
+  btnClose.onclick = closeModal;
+
+  inner.appendChild(icon);
+  inner.appendChild(title);
+  inner.appendChild(desc);
+  inner.appendChild(btnRegister);
+  inner.appendChild(btnLogin);
+  inner.appendChild(btnClose);
+  t.appendChild(inner);
+  document.body.appendChild(t);
 }
 
 function cancelChallenge(id) {
@@ -6527,6 +6728,11 @@ async function doLogout() {
   go('welcome');
 }
 async function saveAndConfirm() {
+  // Vérifier si connecté
+  if (!window._currentUser) {
+    _showLoginRequired('save');
+    return;
+  }
   var btn = document.getElementById('btn-save-routine');
   if (!ST.result) return;
   await saveRoutineToFirestore({skinType:ST.skinType,ageGroup:ST.ageGroup,concerns:ST.concerns,allergies:ST.allergies,budget:ST.budget,routine:ST.routine,products:(ST.result.steps||[]).map(function(s){return{key:s.key,nom:s.nom,marque:s.marque,prix:s.prix};}),savedAt:new Date().toISOString()});
@@ -6716,6 +6922,10 @@ function navTo(screen) {
     renderArticlesScreen();
   }
   if (screen === 'dashboard') {
+    if (!window._currentUser) {
+      _showLoginRequired('dashboard');
+      return;
+    }
     renderDashboard();
   }
   if (screen === 'scan-product') {
