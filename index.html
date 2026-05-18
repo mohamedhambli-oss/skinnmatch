@@ -425,6 +425,330 @@ h2{font-family:var(--serif);font-size:20px;font-weight:700;margin-bottom:3px}
   </div>
 </div>
 
+<!-- ══ SCAN DE PEAU ══ -->
+<div id="sc-scan" class="hidden">
+  <div class="topbar">
+    <button class="btn-back" onclick="go('welcome')">← Retour</button>
+    <div class="logo"><div class="logo-icon">SM</div>Skin<span>Match</span></div>
+  </div>
+  <div class="content">
+    <div style="margin:16px 0 20px">
+      <div class="step-lbl" id="scan-eyebrow">SkinMatch Analyse · Bêta</div>
+      <h2 id="scan-title" style="margin-bottom:6px">Scan de votre peau</h2>
+      <p class="sub" id="scan-sub">Prenez une photo de votre visage ou importez-en une. SkinMatch analyse votre peau en quelques secondes.</p>
+    </div>
+    <div id="scan-camera-zone" style="margin-bottom:16px">
+      <div style="position:relative;width:100%;height:340px;background:#111;border-radius:20px;overflow:hidden">
+        <video id="scan-video" autoplay playsinline muted style="width:100%;height:100%;object-fit:cover;display:block;transform:scaleX(-1)"></video>
+        <canvas id="scan-canvas" style="display:none"></canvas>
+        <svg id="scan-overlay" style="position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none" viewBox="0 0 360 340" preserveAspectRatio="xMidYMid slice">
+          <defs><mask id="oval-mask"><rect width="360" height="340" fill="white"/><ellipse cx="180" cy="170" rx="160" ry="162" fill="black"/></mask></defs>
+          <rect width="360" height="340" fill="rgba(0,0,0,0.45)" mask="url(#oval-mask)"/>
+          <ellipse id="oval-border" cx="180" cy="170" rx="160" ry="162" fill="none" stroke="#C4726A" stroke-width="3" opacity="0.95"/>
+        </svg>
+        <div style="position:absolute;top:12px;left:0;right:0;text-align:center;z-index:10;pointer-events:none">
+          <span style="background:rgba(0,0,0,.65);color:#fff;border-radius:20px;padding:6px 16px;font-size:12px;font-weight:600">📍 Centrez votre visage dans l'ovale</span>
+        </div>
+        <div style="position:absolute;bottom:12px;left:0;right:0;z-index:10">
+          <div style="display:flex;justify-content:center;gap:6px;margin-bottom:10px;pointer-events:none">
+            <span style="background:rgba(0,0,0,.65);color:#fff;border-radius:20px;padding:3px 9px;font-size:10px;font-weight:600">💡 Lumière</span>
+            <span style="background:rgba(0,0,0,.65);color:#fff;border-radius:20px;padding:3px 9px;font-size:10px;font-weight:600">😐 Face caméra</span>
+            <span style="background:rgba(0,0,0,.65);color:#fff;border-radius:20px;padding:3px 9px;font-size:10px;font-weight:600">🕶️ Sans lunettes</span>
+          </div>
+          <div style="display:flex;justify-content:center;align-items:center;gap:24px">
+            <button onclick="flipCamera()" style="width:44px;height:44px;border-radius:50%;background:rgba(255,255,255,.2);border:2px solid rgba(255,255,255,.3);color:#fff;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center">🔄</button>
+            <button onclick="capturePhoto()" style="width:70px;height:70px;border-radius:50%;background:#fff;border:4px solid #C4726A;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 20px rgba(0,0,0,.5)">
+              <div style="width:54px;height:54px;border-radius:50%;background:#C4726A"></div>
+            </button>
+            <button onclick="document.getElementById('scan-file-input').click()" style="width:44px;height:44px;border-radius:50%;background:rgba(255,255,255,.2);border:2px solid rgba(255,255,255,.3);color:#fff;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center">🖼️</button>
+          </div>
+        </div>
+        <div id="scan-no-camera" style="display:none;position:absolute;inset:0;background:#111;border-radius:20px;flex-direction:column;align-items:center;justify-content:center;gap:12px;padding:24px">
+          <div style="font-size:40px">📷</div>
+          <div style="font-size:14px;font-weight:600;color:#fff;text-align:center">Caméra non disponible</div>
+          <div style="font-size:12px;color:rgba(255,255,255,.6);text-align:center">Importez une photo depuis votre galerie</div>
+          <button onclick="document.getElementById('scan-file-input').click()" style="padding:12px 24px;border-radius:50px;border:none;background:#C4726A;color:#fff;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">Choisir une photo 🖼️</button>
+        </div>
+      </div>
+      <input type="file" id="scan-file-input" accept="image/*" style="display:none" onchange="handleScanFile(this)">
+    </div>
+    <div id="scan-preview" style="display:none;margin-bottom:16px">
+      <div style="position:relative;width:100%;height:340px;background:#111;border-radius:20px;overflow:hidden">
+        <img id="scan-img" style="width:100%;height:100%;object-fit:cover;display:block" alt="Photo peau">
+        <button onclick="resetScan()" style="position:absolute;top:12px;right:12px;background:rgba(0,0,0,.6);border:none;border-radius:50%;width:34px;height:34px;color:#fff;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:10">×</button>
+        <div style="position:absolute;bottom:14px;left:0;right:0;text-align:center;z-index:10">
+          <span style="background:rgba(196,114,106,.9);color:#fff;border-radius:20px;padding:6px 16px;font-size:12px;font-weight:700">✓ Photo prête — lancez l'analyse</span>
+        </div>
+      </div>
+    </div>
+    <button id="scan-btn" class="btn-p" disabled onclick="analyzeSkin()" style="margin-bottom:12px">
+      <span id="scan-btn-text">Analyser ma peau</span>
+    </button>
+    <div id="scan-result" style="display:none">
+      <div id="scan-loading" style="text-align:center;padding:24px;display:none">
+        <div style="width:44px;height:44px;border:3px solid var(--rose);border-top-color:#C4726A;border-radius:50%;animation:spin 1s linear infinite;margin:0 auto 14px"></div>
+        <div style="font-size:13px;color:var(--mut)"><span id="scan-analyzing-text">Analyse en cours...</span></div>
+      </div>
+      <div id="scan-analysis" style="display:none">
+        <div style="background:var(--blush);border-radius:18px;border:1px solid var(--rose);padding:18px;margin-bottom:14px">
+          <div style="font-size:10px;font-weight:700;color:var(--acc2);text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px">Résultat de l'analyse</div>
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
+            <div id="scan-type-icon" style="font-size:28px"></div>
+            <div>
+              <div id="scan-type-label" style="font-family:var(--serif);font-size:20px;font-weight:700"></div>
+              <div id="scan-confidence" style="font-size:12px;color:var(--acc2);font-weight:600"></div>
+            </div>
+          </div>
+          <div id="scan-description" style="font-size:13px;color:var(--pri);line-height:1.6;margin-bottom:12px"></div>
+          <div id="scan-concerns-wrap" style="display:none">
+            <div style="font-size:10px;font-weight:700;color:var(--mut);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">Problèmes détectés</div>
+            <div id="scan-concerns-list" style="display:flex;flex-wrap:wrap;gap:6px"></div>
+          </div>
+        </div>
+        <div id="scan-advice" style="background:#fff;border-radius:14px;border:1px solid var(--bdr);border-left:3px solid var(--acc);padding:14px;margin-bottom:16px;font-size:12px;line-height:1.6;color:var(--pri)"></div>
+        <button class="btn-p" onclick="applyScanResult()" style="margin-bottom:8px">
+          <span id="scan-apply-btn">Utiliser ces résultats pour ma routine</span>
+        </button>
+        <button class="btn-o" onclick="resetScan()" style="font-size:12px">
+          <span id="scan-retry-btn">Reprendre une photo</span>
+        </button>
+      </div>
+    </div>
+    <div style="margin-top:16px;padding:12px;background:#fff;border-radius:12px;border:1px solid var(--bdr)">
+      <div style="font-size:11px;color:var(--mut);line-height:1.5;text-align:center">🔒 <strong>Votre photo n'est pas stockée.</strong> Elle est analysée localement et supprimée immédiatement après l'analyse.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ REGISTER ══ -->
+<div id="sc-register" class="hidden">
+  <div class="topbar"><button class="btn-back" onclick="go('welcome')">← Retour</button><div class="logo"><div class="logo-icon">SM</div>Skin<span>Match</span></div></div>
+  <div class="content">
+    <div style="margin:22px 0"><h2>Créer votre compte</h2><p class="sub">Enregistrez votre profil pour accéder à vos recommandations.</p></div>
+    <div class="inp-wrap"><svg width="15" height="15" viewBox="0 0 24 24" fill="#9A8B7C"><path d="M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12zm0 2.4c-3.2 0-9.6 1.6-9.6 4.8v2.4h19.2v-2.4c0-3.2-6.4-4.8-9.6-4.8z"/></svg><input id="inp-name" type="text" placeholder="Prénom"></div>
+    <div class="inp-wrap"><svg width="15" height="15" viewBox="0 0 24 24" fill="#9A8B7C"><path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg><input id="inp-email-r" type="email" placeholder="Adresse email"></div>
+    <div class="inp-wrap"><svg width="15" height="15" viewBox="0 0 24 24" fill="#9A8B7C"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/></svg><input id="inp-pw-r" type="password" placeholder="Mot de passe (6 min.)"></div>
+    <div id="err-r" class="err-msg hidden"></div>
+    <button class="btn-p" onclick="doRegister()">Continuer</button>
+    <div class="divider"><hr><span>ou</span><hr></div>
+    <button class="btn-o" onclick="doGoogleLogin()" style="margin-bottom:8px">
+      <svg width="18" height="18" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.5 0 6.6 1.2 9 3.2l6.7-6.7C35.8 2.5 30.3 0 24 0 14.7 0 6.8 5.5 3 13.5l7.8 6C12.7 13.5 17.9 9.5 24 9.5z"/><path fill="#4285F4" d="M46.5 24.5c0-1.6-.1-3.1-.4-4.5H24v8.5h12.7c-.6 3-2.3 5.5-4.8 7.2l7.5 5.8C43.7 37 46.5 31.3 46.5 24.5z"/><path fill="#FBBC05" d="M10.8 28.5c-.5-1.5-.8-3-.8-4.5s.3-3 .8-4.5L3 13.5C1.1 17.1 0 21.1 0 25.3c0 4.2 1.1 8.2 3 11.7l7.8-8.5z"/><path fill="#34A853" d="M24 48c6.5 0 11.9-2.1 15.9-5.8l-7.5-5.8c-2.1 1.4-4.8 2.2-8.4 2.2-6.1 0-11.3-4.1-13.2-9.6l-7.8 6C6.8 42.5 14.7 48 24 48z"/></svg>
+      Continuer avec Google
+    </button>
+    <button class="btn-ghost" onclick="go('login')">J'ai déjà un compte</button>
+  </div>
+</div>
+
+<!-- ══ LOGIN ══ -->
+<div id="sc-login" class="hidden">
+  <div class="topbar"><button class="btn-back" onclick="go('welcome')">← Retour</button><div class="logo"><div class="logo-icon">SM</div>Skin<span>Match</span></div></div>
+  <div class="content">
+    <div style="margin:22px 0"><h2>Bon retour</h2><p class="sub">Connectez-vous pour accéder à votre profil.</p></div>
+    <div class="inp-wrap"><svg width="15" height="15" viewBox="0 0 24 24" fill="#9A8B7C"><path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg><input id="inp-email-l" type="email" placeholder="Adresse email"></div>
+    <div class="inp-wrap"><svg width="15" height="15" viewBox="0 0 24 24" fill="#9A8B7C"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/></svg><input id="inp-pw-l" type="password" placeholder="Mot de passe"></div>
+    <div id="err-l" class="err-msg hidden"></div>
+    <button class="btn-p" onclick="doLogin()">Se connecter</button>
+    <div class="divider"><hr><span>ou</span><hr></div>
+    <button class="btn-o" onclick="doGoogleLogin()" style="margin-bottom:8px">
+      <svg width="18" height="18" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.5 0 6.6 1.2 9 3.2l6.7-6.7C35.8 2.5 30.3 0 24 0 14.7 0 6.8 5.5 3 13.5l7.8 6C12.7 13.5 17.9 9.5 24 9.5z"/><path fill="#4285F4" d="M46.5 24.5c0-1.6-.1-3.1-.4-4.5H24v8.5h12.7c-.6 3-2.3 5.5-4.8 7.2l7.5 5.8C43.7 37 46.5 31.3 46.5 24.5z"/><path fill="#FBBC05" d="M10.8 28.5c-.5-1.5-.8-3-.8-4.5s.3-3 .8-4.5L3 13.5C1.1 17.1 0 21.1 0 25.3c0 4.2 1.1 8.2 3 11.7l7.8-8.5z"/><path fill="#34A853" d="M24 48c6.5 0 11.9-2.1 15.9-5.8l-7.5-5.8c-2.1 1.4-4.8 2.2-8.4 2.2-6.1 0-11.3-4.1-13.2-9.6l-7.8 6C6.8 42.5 14.7 48 24 48z"/></svg>
+      Continuer avec Google
+    </button>
+    <button class="btn-ghost" onclick="go('register')">Créer un compte</button>
+  </div>
+</div>
+
+<!-- ══ Q1 : TYPE DE PEAU ══ -->
+<div id="sc-q1" class="hidden">
+  <div class="topbar"><button class="btn-back" onclick="go('welcome')">← Retour</button><div class="logo"><div class="logo-icon">SM</div>Skin<span>Match</span></div></div>
+  <div class="content">
+    <div class="progress"><div class="pd on"></div><div class="pd"></div><div class="pd"></div><div class="pd"></div><div class="pd"></div></div>
+    <div class="step-lbl" id="step-lbl-1">Étape 1 / 5</div>
+    <h2 id="q1-title">Type de peau</h2><p class="sub" id="q1-sub">Choisissez celui qui vous correspond le mieux.</p>
+    <div id="q1-opts"></div>
+    <button class="btn-p" id="q1-next" disabled onclick="go('q2')" style="margin-top:14px">Continuer</button>
+  </div>
+</div>
+
+<!-- ══ DIAGNOSTIC TYPE DE PEAU ══ -->
+<div id="sc-diag" class="hidden">
+  <div class="topbar"><button class="btn-back" onclick="go('q1')">← Retour</button><div class="logo"><div class="logo-icon">SM</div>Skin<span>Match</span></div></div>
+  <div class="content">
+    <div class="progress"><div class="pd on"></div><div class="pd"></div><div class="pd"></div><div class="pd"></div><div class="pd"></div></div>
+    <div class="step-lbl" id="diag-step-lbl">Question 1 / 5</div>
+    <h2 id="diag-question" style="margin-bottom:10px;line-height:1.3"></h2>
+    <p class="sub" id="diag-sub"></p>
+    <div id="diag-opts"></div>
+    <div id="diag-result" class="hidden" style="margin-top:16px;padding:20px;background:var(--blush);border-radius:16px;border:1px solid var(--rose)">
+      <div id="diag-result-eyebrow" style="font-size:11px;font-weight:700;color:var(--acc2);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">Votre type de peau</div>
+      <div id="diag-result-type" style="font-family:var(--serif);font-size:24px;font-weight:700;margin-bottom:6px"></div>
+      <div id="diag-result-desc" style="font-size:13px;color:var(--mut);line-height:1.6;margin-bottom:16px"></div>
+      <button class="btn-p" onclick="confirmDiagResult()" style="margin-top:0">Confirmer mon type de peau</button>
+      <button onclick="restartDiag()" style="width:100%;padding:10px;border:none;background:none;color:var(--mut);font-size:12px;cursor:pointer;margin-top:8px;font-family:var(--sans);text-decoration:underline">Refaire le diagnostic</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ Q2 : ÂGE ══ -->
+<div id="sc-q2" class="hidden">
+  <div class="topbar"><button class="btn-back" onclick="go('q1')">← Retour</button><div class="logo"><div class="logo-icon">SM</div>Skin<span>Match</span></div></div>
+  <div class="content">
+    <div class="progress"><div class="pd on"></div><div class="pd on"></div><div class="pd"></div><div class="pd"></div><div class="pd"></div></div>
+    <div class="step-lbl" id="step-lbl-2">Étape 2 / 5</div>
+    <h2 id="q2-title">Votre tranche d'âge</h2><p class="sub" id="q2-sub">Les besoins de votre peau évoluent avec l'âge.</p>
+    <div id="q2-opts"></div>
+    <button class="btn-p" id="q2-next" disabled onclick="go('q3')" style="margin-top:10px">Continuer</button>
+  </div>
+</div>
+
+<!-- ══ Q3 : PROBLÈMES + ALLERGIES ══ -->
+<div id="sc-q3" class="hidden">
+  <div class="topbar"><button class="btn-back" onclick="go('q2')">← Retour</button><div class="logo"><div class="logo-icon">SM</div>Skin<span>Match</span></div></div>
+  <div class="content">
+    <div class="progress"><div class="pd on"></div><div class="pd on"></div><div class="pd on"></div><div class="pd"></div><div class="pd"></div></div>
+    <div class="step-lbl" id="step-lbl-3">Étape 3 / 5</div>
+    <h2 id="q3-title">Vos problèmes de peau</h2><p class="sub" id="q3-sub">Sélectionnez tout ce qui vous concerne.</p>
+    <div id="q3-concerns" class="chips"></div>
+    <div class="step-lbl" style="margin-bottom:10px">Allergies / Ingrédients à éviter</div>
+    <div id="q3-allergies" class="chips"></div>
+    <button class="btn-p" id="q3-next" disabled onclick="go('q4')">Continuer</button>
+  </div>
+</div>
+
+<!-- ══ Q4 : BUDGET ══ -->
+<div id="sc-q4" class="hidden">
+  <div class="topbar"><button class="btn-back" onclick="go('q3')">← Retour</button><div class="logo"><div class="logo-icon">SM</div>Skin<span>Match</span></div></div>
+  <div class="content">
+    <div class="progress"><div class="pd on"></div><div class="pd on"></div><div class="pd on"></div><div class="pd on"></div><div class="pd"></div></div>
+    <div class="step-lbl" id="step-lbl-4">Étape 4 / 5</div>
+    <h2 id="q4-title">Votre budget</h2><p class="sub" id="q4-sub">Par produit, en moyenne.</p>
+    <div id="q4-opts"></div>
+    <button class="btn-p" id="q4-next" disabled onclick="go('q5')" style="margin-top:10px">Continuer</button>
+  </div>
+</div>
+
+<!-- ══ Q5 : ROUTINE ══ -->
+<div id="sc-q5" class="hidden">
+  <div class="topbar"><button class="btn-back" onclick="go('q4')">← Retour</button><div class="logo"><div class="logo-icon">SM</div>Skin<span>Match</span></div></div>
+  <div class="content">
+    <div class="progress"><div class="pd on"></div><div class="pd on"></div><div class="pd on"></div><div class="pd on"></div><div class="pd on"></div></div>
+    <div class="step-lbl" id="step-lbl-5">Étape 5 / 5</div>
+    <h2 id="q5-title">Type de routine</h2><p class="sub" id="q5-sub">Selon le temps que vous souhaitez y consacrer.</p>
+    <div id="q5-opts"></div>
+    <button class="btn-p" id="q5-next" disabled onclick="doGenerate()" style="margin-top:10px">Générer ma routine</button>
+  </div>
+</div>
+
+<!-- ══ RESULT ══ -->
+<div id="sc-result" class="hidden">
+  <div class="topbar"><button class="btn-back" id="result-back-btn" onclick="go('q5')">← Retour</button><div class="logo"><div class="logo-icon">SM</div>Skin<span>Match</span></div>
+    <button onclick="go('scan-product')" style="background:linear-gradient(135deg,#1F3864,#2E5496);border:none;border-radius:20px;padding:6px 12px;font-size:11px;font-weight:700;color:#fff;cursor:pointer;font-family:var(--sans);margin-right:4px">📷 Scanner</button>
+    <button onclick="openCompare()" id="btn-compare-top" style="background:#C4726A;border:none;border-radius:20px;padding:6px 12px;font-size:11px;font-weight:700;color:#fff;cursor:pointer;font-family:var(--sans)">⚖️ Comparer</button>
+  </div>
+  <div class="content" id="result-content"></div>
+</div>
+
+<!-- ══ MODAL ══ -->
+<div id="modal-overlay" class="modal-overlay hidden" onclick="closeModal()">
+  <div class="modal" onclick="event.stopPropagation()" id="modal-content"></div>
+</div>
+
+<!-- ══ SCAN PRODUCT ══ -->
+<div id="sc-scan-product" class="hidden">
+  <div class="topbar">
+    <button class="btn-back" onclick="go('result')">← Retour</button>
+    <div class="logo"><div class="logo-icon">SM</div>Skin<span>Match</span></div>
+  </div>
+  <div class="content" style="padding-bottom:80px">
+    <div style="text-align:center;margin-bottom:24px">
+      <div style="font-size:10px;font-weight:700;color:#C4726A;text-transform:uppercase;letter-spacing:3px;margin-bottom:8px">📷 Scanner un produit</div>
+      <h2 style="font-family:Georgia,serif;font-size:22px;font-weight:700;color:#3D2B1F;margin-bottom:6px">Analyse instantanée</h2>
+      <p style="font-size:13px;color:#8B6F5E">Scanne le code-barres d'un produit pour savoir s'il est adapté à ta peau</p>
+    </div>
+    <div id="barcode-camera-zone" style="margin-bottom:16px">
+      <div style="position:relative;width:100%;height:260px;background:#111;border-radius:20px;overflow:hidden">
+        <video id="barcode-video" autoplay playsinline muted style="width:100%;height:100%;object-fit:cover;display:block"></video>
+        <canvas id="barcode-canvas" style="display:none"></canvas>
+        <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none">
+          <div style="width:75%;height:110px;position:relative">
+            <div style="position:absolute;top:0;left:0;width:24px;height:24px;border-top:3px solid #C4726A;border-left:3px solid #C4726A;border-radius:3px 0 0 0"></div>
+            <div style="position:absolute;top:0;right:0;width:24px;height:24px;border-top:3px solid #C4726A;border-right:3px solid #C4726A;border-radius:0 3px 0 0"></div>
+            <div style="position:absolute;bottom:0;left:0;width:24px;height:24px;border-bottom:3px solid #C4726A;border-left:3px solid #C4726A;border-radius:0 0 0 3px"></div>
+            <div style="position:absolute;bottom:0;right:0;width:24px;height:24px;border-bottom:3px solid #C4726A;border-right:3px solid #C4726A;border-radius:0 0 3px 0"></div>
+            <div id="scan-line" style="position:absolute;left:4px;right:4px;height:2px;background:linear-gradient(90deg,transparent,#C4726A,transparent);animation:scanLine 2s ease-in-out infinite"></div>
+          </div>
+        </div>
+        <div style="position:absolute;top:0;left:0;right:0;height:30%;background:rgba(0,0,0,0.5);pointer-events:none"></div>
+        <div style="position:absolute;bottom:0;left:0;right:0;height:30%;background:rgba(0,0,0,0.5);pointer-events:none"></div>
+        <div style="position:absolute;top:12px;left:0;right:0;text-align:center;pointer-events:none">
+          <span id="barcode-guide" style="background:rgba(0,0,0,.65);color:#fff;border-radius:20px;padding:5px 14px;font-size:12px;font-weight:600">📷 Pointez le code-barres vers la caméra</span>
+        </div>
+        <div style="position:absolute;bottom:12px;left:0;right:0;display:flex;justify-content:center;gap:16px">
+          <button onclick="flipBarcodeCamera()" style="width:40px;height:40px;border-radius:50%;background:rgba(255,255,255,.2);border:2px solid rgba(255,255,255,.3);color:#fff;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center">🔄</button>
+          <button onclick="document.getElementById('barcode-file-input').click()" style="width:40px;height:40px;border-radius:50%;background:rgba(255,255,255,.2);border:2px solid rgba(255,255,255,.3);color:#fff;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center">🖼️</button>
+        </div>
+        <div id="barcode-no-camera" style="display:none;position:absolute;inset:0;background:#111;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding:20px">
+          <div style="font-size:36px">📷</div>
+          <div style="font-size:13px;font-weight:600;color:#fff">Caméra non disponible</div>
+          <div style="font-size:11px;color:rgba(255,255,255,.6);text-align:center">Recherche le produit par son nom</div>
+        </div>
+      </div>
+      <input type="file" id="barcode-file-input" accept="image/*" style="display:none" onchange="scanBarcodeFromFile(this)">
+    </div>
+    <div style="margin-bottom:16px">
+      <div style="display:flex;gap:8px">
+        <input id="product-search-input" type="text" placeholder="Ou cherche un produit par nom..." autocomplete="off" style="flex:1;padding:12px 16px;border-radius:50px;border:1.5px solid var(--bdr);font-size:15px;font-family:inherit;outline:none;background:#fff" oninput="searchProductScan(this.value)">
+        <button onclick="simulateScan()" style="padding:12px 16px;border-radius:50px;background:#C4726A;border:none;color:#fff;font-weight:700;cursor:pointer;font-size:13px;font-family:inherit;white-space:nowrap">🔍</button>
+      </div>
+    </div>
+    <style>@keyframes scanLine{0%{top:4px;opacity:1}50%{top:calc(100% - 6px);opacity:.8}100%{top:4px;opacity:1}}</style>
+    <div id="scan-suggestions" style="display:none;margin-bottom:16px">
+      <p style="font-size:11px;color:#B0958F;font-weight:600;margin-bottom:8px;text-transform:uppercase;letter-spacing:.5px">Suggestions</p>
+      <div id="scan-suggestions-list" style="display:flex;flex-direction:column;gap:6px"></div>
+    </div>
+    <div id="scan-product-result" style="display:none">
+      <div id="scan-product-header" style="background:#fff;border-radius:16px;padding:16px;display:flex;align-items:center;gap:14px;margin-bottom:16px;box-shadow:0 2px 12px rgba(0,0,0,.06)">
+        <div id="scan-product-img" style="width:60px;height:60px;border-radius:12px;background:#F5E8E6;display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:700;color:#C4726A;flex-shrink:0"></div>
+        <div>
+          <div id="scan-product-name" style="font-size:16px;font-weight:700;color:#3D2B1F;font-family:Georgia,serif"></div>
+          <div id="scan-product-brand" style="font-size:13px;color:#8B6F5E;margin-top:2px"></div>
+          <div id="scan-product-cat" style="font-size:11px;color:#C4726A;font-weight:600;margin-top:4px;text-transform:uppercase;letter-spacing:.5px"></div>
+        </div>
+      </div>
+      <div style="background:linear-gradient(135deg,#1F3864,#2E5496);border-radius:20px;padding:24px;text-align:center;margin-bottom:16px;position:relative;overflow:hidden">
+        <p style="font-size:11px;font-weight:700;color:rgba(255,255,255,.7);text-transform:uppercase;letter-spacing:3px;margin-bottom:12px">Score d'adaptation</p>
+        <div style="position:relative;width:120px;height:120px;margin:0 auto 12px">
+          <svg width="120" height="120" viewBox="0 0 120 120">
+            <circle cx="60" cy="60" r="50" fill="none" stroke="rgba(255,255,255,.15)" stroke-width="10"/>
+            <circle id="score-circle" cx="60" cy="60" r="50" fill="none" stroke="#C4726A" stroke-width="10" stroke-linecap="round" stroke-dasharray="314" stroke-dashoffset="314" transform="rotate(-90 60 60)" style="transition:stroke-dashoffset 1s ease"/>
+          </svg>
+          <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center">
+            <div id="score-number" style="font-size:32px;font-weight:700;color:#fff;font-family:Georgia,serif;line-height:1">0</div>
+            <div style="font-size:12px;color:rgba(255,255,255,.7)">/100</div>
+          </div>
+        </div>
+        <div id="score-label" style="font-size:16px;font-weight:700;color:#fff;margin-bottom:4px"></div>
+        <div id="score-sublabel" style="font-size:13px;color:rgba(255,255,255,.7)"></div>
+      </div>
+      <div style="background:#fff;border-radius:16px;padding:16px;margin-bottom:16px;box-shadow:0 2px 12px rgba(0,0,0,.06)">
+        <p style="font-size:12px;font-weight:700;color:#3D2B1F;text-transform:uppercase;letter-spacing:.5px;margin-bottom:14px">Détail du score</p>
+        <div id="score-dimensions" style="display:flex;flex-direction:column;gap:12px"></div>
+      </div>
+      <div id="pros-section" style="margin-bottom:12px"></div>
+      <div id="cons-section" style="margin-bottom:12px"></div>
+      <div id="alternatives-section" style="margin-bottom:16px"></div>
+      <div style="display:flex;gap:10px;margin-bottom:8px">
+        <button onclick="saveScan()" style="flex:1;padding:13px;border-radius:50px;border:1.5px solid #C4726A;background:#fff;color:#C4726A;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">❤️ Sauvegarder</button>
+        <button onclick="shareScan()" style="flex:1;padding:13px;border-radius:50px;border:none;background:linear-gradient(135deg,#C4726A,#A85A52);color:#fff;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">📤 Partager</button>
+      </div>
+      <button id="scan-easypara-btn" style="width:100%;padding:13px;border-radius:50px;border:none;background:#1F3864;color:#fff;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;margin-top:4px">🛒 Commander sur Easypara</button>
+    </div>
+    <div id="scan-history" style="margin-top:20px">
+      <p style="font-size:12px;font-weight:700;color:#3D2B1F;text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px">Scans récents</p>
+      <div id="scan-history-list" style="display:flex;flex-direction:column;gap:8px"></div>
+    </div>
+  </div>
+</div>
+
 <!-- ══ COMPARE ══ -->
 <div id="sc-compare" class="hidden">
   <div class="topbar">
@@ -657,8 +981,8 @@ const T = {
     },
     buy_easypara:"Easypara →",buy_cibleskin:"Cible Skin →",
     buy_easypara_modal:"Acheter sur Easypara →",buy_cibleskin_modal:"Acheter sur Cible Skin →",
-    buy_note:"Liens affiliés sélectionnés par SkinMatch.",
-    share_footer:"Routine générée par SkinMatch.",
+    buy_note:"${t('buy_note')}",
+    share_footer:"${t('share_footer')}",
   },
   en:{
     welcome_title:"Your routine.<br>Tailored for you.",
@@ -1498,7 +1822,7 @@ function getRegionProducts() {
   return available;
 }
 
-const SCREENS=["lang","welcome","register","login","scan","q1","diag","q2","q3","q4","q5","result","compare","suivi","dashboard","scan-product","profile","articles","settings"];
+const SCREENS=["lang","welcome","register","login","scan","q1","diag","q2","q3","q4","q5","result","compare","suivi","dashboard","scan-product","profile","articles","settings","privacy","cgu"];
 
 const ST={
   screen:'lang',user:null,
@@ -1726,29 +2050,6 @@ function applyWelcomeLang(){
   document.querySelectorAll('[onclick="go(\'lang\')"]').forEach(b=>{
     // keep as is
   });
-}
-
-function doRegister(){
-  const n=document.getElementById("inp-name").value.trim();
-  const e=document.getElementById("inp-email-r").value.trim();
-  const p=document.getElementById("inp-pw-r").value;
-  const err=document.getElementById("err-r");
-  if(!n){err.textContent="Veuillez entrer votre prénom.";err.classList.remove("hidden");return;}
-  if(!e.includes("@")){err.textContent="Email invalide.";err.classList.remove("hidden");return;}
-  if(p.length<6){err.textContent="Mot de passe : 6 caractères minimum.";err.classList.remove("hidden");return;}
-  err.classList.add("hidden");
-  ST.user={name:n,email:e};
-  initQuestions();go("q1");
-}
-function doLogin(){
-  const e=document.getElementById("inp-email-l").value.trim();
-  const p=document.getElementById("inp-pw-l").value;
-  const err=document.getElementById("err-l");
-  if(!e.includes("@")){err.textContent="Email invalide.";err.classList.remove("hidden");return;}
-  if(!p){err.textContent="Mot de passe requis.";err.classList.remove("hidden");return;}
-  err.classList.add("hidden");
-  ST.user={name:e.split("@")[0],email:e};
-  initQuestions();go("q1");
 }
 
 // ─── QUESTIONS INIT ───────────────────────────────────────────────────────────
@@ -6265,17 +6566,20 @@ window.onFirebaseUserReady = function(user) {
   var connLabel = document.getElementById('auth-connected-label');
   if (user) {
     var shortName = user.displayName ? user.displayName.split(' ')[0] : user.email.split('@')[0];
-    // Masquer les boutons login/register
     if (btnLog) btnLog.style.display = 'none';
     if (btnReg) btnReg.style.display = 'none';
-    // Afficher le badge connecté
     if (connBadge) connBadge.style.display = 'flex';
     if (connLabel) connLabel.textContent = (LANG === 'en' ? 'Connected as ' : 'Connecté en tant que ') + shortName;
-    // Charger routine sauvegardée
     loadSavedRoutine(user);
   } else {
     if (btnLog) { btnLog.textContent = 'Se connecter'; btnLog.onclick = function(){ go('login'); }; }
     if (btnReg) { btnReg.style.display = ''; btnReg.textContent = 'Créer un compte'; }
+  }
+  // Déclencher la navigation de démarrage (efface le timeout de 5s)
+  if (typeof window._onAuthResolved === 'function') {
+    var _resolve = window._onAuthResolved;
+    window._onAuthResolved = null;
+    _resolve(user);
   }
 };
 
@@ -6812,7 +7116,6 @@ function submitFeedback(key, type, btn) {
   var toast = document.createElement('div');
   toast.style.cssText = 'position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:#3D2B1F;color:#fff;padding:10px 20px;border-radius:20px;font-size:12px;font-weight:600;z-index:9999;opacity:0;transition:opacity .3s';
   toast.textContent = type === "like" ? (LANG === "en" ? "Noted! We will show more like this." : "Noté ! On t'en proposera de similaires.") : (LANG === "en" ? "Noted! We will refine your recommendations." : "Noté ! On affinera tes recommandations.");
-  toast.textContent = type === 'like' 
   document.body.appendChild(toast);
   setTimeout(function() { toast.style.opacity = '1'; }, 10);
   setTimeout(function() { toast.style.opacity = '0'; setTimeout(function() { toast.remove(); }, 300); }, 2500);
