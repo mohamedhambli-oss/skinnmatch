@@ -7376,37 +7376,49 @@ function _checkSharedRoutine() {
   } catch(e) { console.log('Shared routine error:', e); }
 }
 
-// Timeout 2.5s si Firebase ne répond pas
+// Timeout 5s si Firebase ne répond pas
 var _firebaseWait = setTimeout(function() {
+  // Timeout — utiliser localStorage
   if (_savedLang && _savedRegion) {
     LANG = _savedLang; REGION = _savedRegion;
-    initQuestions(); go('welcome'); updateNav('welcome'); setTimeout(applyWelcomeLang, 50);
+    initQuestions(); go('welcome'); updateNav('welcome');
     setTimeout(applyWelcomeLang, 50);
-  } else { go('lang'); }
+  } else {
+    // Vraiment aucune langue connue → demander
+    go('lang');
+  }
   _hideSplash();
-}, 2500);
+}, 5000);
 
 window._onAuthResolved = function(user) {
   clearTimeout(_firebaseWait);
   if (user) {
+    // Utilisateur connecté — on a déjà le localStorage, on affiche welcome IMMÉDIATEMENT
+    // puis on charge Firestore en arrière-plan
+    var langNow = _savedLang || 'fr';
+    var regionNow = _savedRegion || 'fr';
+    LANG = langNow; REGION = regionNow;
+    initQuestions(); go('welcome'); updateNav('welcome');
+    setTimeout(applyWelcomeLang, 50);
+    _hideSplash();
+    // Charger Firestore en arrière-plan pour mettre à jour si nécessaire
     loadSavedRoutine(user).then(function() {
-      var lang = LANG || localStorage.getItem('skinmatch_lang');
-      var region = REGION || localStorage.getItem('skinmatch_region');
-      if (lang && region) {
-        LANG = lang; REGION = region;
-        localStorage.setItem('skinmatch_lang', lang);
-        localStorage.setItem('skinmatch_region', region);
-        initQuestions(); go('welcome'); updateNav('welcome'); setTimeout(applyWelcomeLang, 50);
-        setTimeout(applyWelcomeLang, 50);
-      } else { go('lang'); }
-      _hideSplash();
-    });
+      // Si Firestore a une langue différente, l'appliquer silencieusement
+      var lang = LANG || _savedLang || 'fr';
+      var region = REGION || _savedRegion || 'fr';
+      if (lang) { LANG = lang; localStorage.setItem('skinmatch_lang', lang); }
+      if (region) { REGION = region; localStorage.setItem('skinmatch_region', region); }
+    }).catch(function() {});
   } else {
+    // Pas connecté — utiliser localStorage
     if (_savedLang && _savedRegion) {
       LANG = _savedLang; REGION = _savedRegion;
-      initQuestions(); go('welcome'); updateNav('welcome'); setTimeout(applyWelcomeLang, 50);
+      initQuestions(); go('welcome'); updateNav('welcome');
       setTimeout(applyWelcomeLang, 50);
-    } else { go('lang'); }
+    } else {
+      // Première visite sans compte → choisir la langue
+      go('lang');
+    }
     _hideSplash();
   }
 };
