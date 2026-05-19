@@ -122,9 +122,16 @@ h2{font-family:var(--serif);font-size:20px;font-weight:700;margin-bottom:3px}
 .err-msg{color:var(--err);font-size:12px;margin-bottom:10px}
 
 /* PROGRESS */
-.progress{display:flex;gap:5px;margin-bottom:22px}
-.pd{flex:1;height:3px;border-radius:2px;background:var(--bdr)}
-.pd.on{background:var(--pri)}
+.progress{margin-bottom:20px}
+.progress-track{height:5px;border-radius:50px;background:var(--bdr);overflow:hidden;margin-bottom:6px}
+.progress-fill{height:100%;border-radius:50px;background:linear-gradient(90deg,#C4726A,#E8906A);transition:width .4s ease}
+.progress-info{display:flex;justify-content:space-between;align-items:center;margin-bottom:5px}
+.progress-pct{font-size:11px;font-weight:700;color:#C4726A}
+.progress-step-txt{font-size:10px;color:var(--mut)}
+.progress-dots{display:flex;gap:4px}
+.pd{flex:1;height:3px;border-radius:2px;background:var(--bdr);transition:all .3s}
+.pd.on{background:#C4726A}
+.pd.done{background:rgba(196,114,106,.35)}
 
 /* BUTTONS */
 .btn-p{width:100%;padding:14px;border-radius:50px;border:none;background:linear-gradient(135deg,#D4A5A0,#C4887F);color:#fff;font-size:13px;font-weight:600;cursor:pointer;font-family:var(--sans);margin-top:4px;letter-spacing:.3px;box-shadow:0 4px 15px rgba(212,165,160,.4)}
@@ -399,6 +406,27 @@ h2{font-family:var(--serif);font-size:20px;font-weight:700;margin-bottom:3px}
       </div>
 
       <div style="width:100%;max-width:300px;display:flex;flex-direction:column;gap:10px">
+      <!-- TÉMOIGNAGES -->
+      <div style="width:100%;max-width:300px;margin-bottom:20px">
+        <div style="font-size:9px;font-weight:700;color:rgba(196,114,106,.7);text-transform:uppercase;letter-spacing:3px;text-align:center;margin-bottom:12px">Elles ont teste SkinMatch</div>
+        <div style="background:rgba(255,255,255,.75);border-radius:16px;padding:14px 16px;border:1px solid rgba(196,114,106,.12)">
+          <div style="display:flex;gap:2px;margin-bottom:8px"><span style="color:#C4726A;font-size:12px">&#9733;&#9733;&#9733;&#9733;&#9733;</span></div>
+          <div id="test-text" style="font-size:13px;color:#3D2B1F;line-height:1.6;font-style:italic;margin-bottom:10px;transition:opacity .3s">"Ma peau n'a jamais ete aussi equilibree. SkinMatch a tout change."</div>
+          <div style="display:flex;align-items:center;gap:8px">
+            <div id="test-av" style="width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,#C4726A,#A85A52);display:flex;align-items:center;justify-content:center;color:#fff;font-size:11px;font-weight:700">S</div>
+            <div>
+              <div id="test-name" style="font-size:11px;font-weight:700;color:#3D2B1F">Sarah M.</div>
+              <div id="test-skin" style="font-size:10px;color:#B0958F">Peau mixte · Paris</div>
+            </div>
+          </div>
+        </div>
+        <div style="display:flex;justify-content:center;gap:6px;margin-top:8px" id="test-dots">
+          <div style="width:6px;height:6px;border-radius:50%;background:#C4726A;transition:all .3s"></div>
+          <div style="width:6px;height:6px;border-radius:50%;background:rgba(196,114,106,.3);transition:all .3s"></div>
+          <div style="width:6px;height:6px;border-radius:50%;background:rgba(196,114,106,.3);transition:all .3s"></div>
+        </div>
+      </div>
+
         <button onclick="showTermsModal()" id="btn-start" style="width:100%;padding:14px 20px;border-radius:50px;border:none;background:linear-gradient(135deg,#3D2B1F,#5A3D2B);color:#fff;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;letter-spacing:.2px">
           <span id="btn-start-text">Commencer mon diagnostic</span> &#8594;
         </button>
@@ -616,7 +644,7 @@ h2{font-family:var(--serif);font-size:20px;font-weight:700;margin-bottom:3px}
 <div id="sc-q1" class="hidden">
   <div class="topbar"><button class="btn-back" onclick="go('welcome')">← Retour</button><div class="logo"><div class="logo-icon">SM</div>Skin<span>Match</span></div><button onclick="changeLangRegion()" style="background:rgba(196,114,106,.12);border:1px solid rgba(196,114,106,.25);border-radius:20px;padding:4px 10px;font-size:11px;font-weight:600;color:#C4726A;cursor:pointer;font-family:'Outfit',sans-serif">🌐 Lang</button></div>
   <div class="content">
-    <div class="progress"><div class="pd on"></div><div class="pd"></div><div class="pd"></div><div class="pd"></div><div class="pd"></div></div>
+    <div class="progress"><div class="progress-info"><div class="progress-pct">20%</div><div class="progress-step-txt">Etape 1 / 5</div></div><div class="progress-track"><div class="progress-fill" style="width:20%"></div></div><div class="progress-dots"><div class="pd on"></div><div class="pd "></div><div class="pd "></div><div class="pd "></div><div class="pd "></div></div></div>
     <div class="step-lbl" id="step-lbl-1">Étape 1 / 5</div>
     <h2 id="q1-title">Type de peau</h2><p class="sub" id="q1-sub">Choisissez celui qui vous correspond le mieux.</p>
     <div id="q1-opts"></div>
@@ -647,7 +675,7 @@ h2{font-family:var(--serif);font-size:20px;font-weight:700;margin-bottom:3px}
 <div id="sc-q2" class="hidden">
   <div class="topbar"><button class="btn-back" onclick="go('q1')">← Retour</button><div class="logo"><div class="logo-icon">SM</div>Skin<span>Match</span></div></div>
   <div class="content">
-    <div class="progress"><div class="pd on"></div><div class="pd on"></div><div class="pd"></div><div class="pd"></div><div class="pd"></div></div>
+    <div class="progress"><div class="progress-info"><div class="progress-pct">40%</div><div class="progress-step-txt">Etape 2 / 5</div></div><div class="progress-track"><div class="progress-fill" style="width:40%"></div></div><div class="progress-dots"><div class="pd done"></div><div class="pd on"></div><div class="pd "></div><div class="pd "></div><div class="pd "></div></div></div>
     <div class="step-lbl" id="step-lbl-2">Étape 2 / 5</div>
     <h2 id="q2-title">Votre tranche d'âge</h2><p class="sub" id="q2-sub">Les besoins de votre peau évoluent avec l'âge.</p>
     <div id="q2-opts"></div>
@@ -659,7 +687,7 @@ h2{font-family:var(--serif);font-size:20px;font-weight:700;margin-bottom:3px}
 <div id="sc-q3" class="hidden">
   <div class="topbar"><button class="btn-back" onclick="go('q2')">← Retour</button><div class="logo"><div class="logo-icon">SM</div>Skin<span>Match</span></div></div>
   <div class="content">
-    <div class="progress"><div class="pd on"></div><div class="pd on"></div><div class="pd on"></div><div class="pd"></div><div class="pd"></div></div>
+    <div class="progress"><div class="progress-info"><div class="progress-pct">60%</div><div class="progress-step-txt">Etape 3 / 5</div></div><div class="progress-track"><div class="progress-fill" style="width:60%"></div></div><div class="progress-dots"><div class="pd done"></div><div class="pd done"></div><div class="pd on"></div><div class="pd "></div><div class="pd "></div></div></div>
     <div class="step-lbl" id="step-lbl-3">Étape 3 / 5</div>
     <h2 id="q3-title">Vos problèmes de peau</h2><p class="sub" id="q3-sub">Sélectionnez tout ce qui vous concerne.</p>
     <div id="q3-concerns" class="chips"></div>
@@ -673,7 +701,7 @@ h2{font-family:var(--serif);font-size:20px;font-weight:700;margin-bottom:3px}
 <div id="sc-q4" class="hidden">
   <div class="topbar"><button class="btn-back" onclick="go('q3')">← Retour</button><div class="logo"><div class="logo-icon">SM</div>Skin<span>Match</span></div></div>
   <div class="content">
-    <div class="progress"><div class="pd on"></div><div class="pd on"></div><div class="pd on"></div><div class="pd on"></div><div class="pd"></div></div>
+    <div class="progress"><div class="progress-info"><div class="progress-pct">80%</div><div class="progress-step-txt">Etape 4 / 5</div></div><div class="progress-track"><div class="progress-fill" style="width:80%"></div></div><div class="progress-dots"><div class="pd done"></div><div class="pd done"></div><div class="pd done"></div><div class="pd on"></div><div class="pd "></div></div></div>
     <div class="step-lbl" id="step-lbl-4">Étape 4 / 5</div>
     <h2 id="q4-title">Votre budget</h2><p class="sub" id="q4-sub">Par produit, en moyenne.</p>
     <div id="q4-opts"></div>
@@ -685,7 +713,7 @@ h2{font-family:var(--serif);font-size:20px;font-weight:700;margin-bottom:3px}
 <div id="sc-q5" class="hidden">
   <div class="topbar"><button class="btn-back" onclick="go('q4')">← Retour</button><div class="logo"><div class="logo-icon">SM</div>Skin<span>Match</span></div></div>
   <div class="content">
-    <div class="progress"><div class="pd on"></div><div class="pd on"></div><div class="pd on"></div><div class="pd on"></div><div class="pd on"></div></div>
+    <div class="progress"><div class="progress-info"><div class="progress-pct">100%</div><div class="progress-step-txt">Etape 5 / 5</div></div><div class="progress-track"><div class="progress-fill" style="width:100%"></div></div><div class="progress-dots"><div class="pd done"></div><div class="pd done"></div><div class="pd done"></div><div class="pd done"></div><div class="pd on"></div></div></div>
     <div class="step-lbl" id="step-lbl-5">Étape 5 / 5</div>
     <h2 id="q5-title">Type de routine</h2><p class="sub" id="q5-sub">Selon le temps que vous souhaitez y consacrer.</p>
     <div id="q5-opts"></div>
@@ -2009,6 +2037,33 @@ function setLang(l){
 }
 
 // ─── AUTH ─────────────────────────────────────────────────────────────────────
+var _TESTS = [
+  {av:"S", color:"linear-gradient(135deg,#C4726A,#A85A52)", text:"Ma peau n'a jamais ete aussi equilibree. SkinMatch a tout change.", name:"Sarah M.", skin:"Peau mixte · Paris"},
+  {av:"L", color:"linear-gradient(135deg,#2E7D32,#1B5E20)", text:"Enfin une appli qui comprend ma peau grasse sans me ruiner.", name:"Lea D.", skin:"Peau grasse · Lyon"},
+  {av:"A", color:"linear-gradient(135deg,#C62828,#8B1A1A)", text:"Mes rougeurs ont vraiment diminue en 3 semaines.", name:"Amina K.", skin:"Peau sensible · Marseille"}
+];
+var _testIdx = 0;
+function _rotateTest() {
+  _testIdx = (_testIdx+1) % _TESTS.length;
+  var t = _TESTS[_testIdx];
+  var el = document.getElementById("test-text");
+  var av = document.getElementById("test-av");
+  var nm = document.getElementById("test-name");
+  var sk = document.getElementById("test-skin");
+  var dots = document.querySelectorAll("#test-dots div");
+  if (!el) return;
+  el.style.opacity = "0";
+  setTimeout(function(){
+    el.textContent = t.text;
+    if (av) { av.textContent = t.av; av.style.background = t.color; }
+    if (nm) nm.textContent = t.name;
+    if (sk) sk.textContent = t.skin;
+    dots.forEach(function(d,i){ d.style.background = i===_testIdx?"#C4726A":"rgba(196,114,106,.3)"; });
+    el.style.opacity = "1";
+  }, 200);
+}
+setInterval(_rotateTest, 4000);
+
 function applyWelcomeLang(){
   const l = T[LANG]||T.fr;
   // Welcome
@@ -3291,6 +3346,42 @@ function switchTab(tab){
 }
 
 function toggleShare(){
+  var r = ST.result;
+  if (!r) return;
+  var userName = window._currentUser
+    ? (window._currentUser.displayName || window._currentUser.email.split("@")[0])
+    : "";
+  var routineData = {
+    skin: ST.skinType, age: ST.ageGroup, budget: ST.budget,
+    concerns: ST.concerns,
+    products: (r.steps||[]).slice(0,8).map(function(s){return s.key;}),
+    sharedBy: userName
+  };
+  var encoded = "";
+  try { encoded = btoa(unescape(encodeURIComponent(JSON.stringify(routineData)))); } catch(e) {}
+  var appUrl = "https://mohamedhambli-oss.github.io/skinnmatch/";
+  var shareUrl = appUrl + "#r=" + encoded;
+  var skinLabels = {grasse:"grasse",seche:"seche",mixte:"mixte",sensible:"sensible",normale:"normale"};
+  var skinLabel = skinLabels[ST.skinType] || ST.skinType || "mixte";
+  var products = (r.steps||[]).slice(0,4).map(function(s){return "• "+s.nom;}).join(", ");
+  var shareText = LANG==="en"
+    ? "My SkinMatch routine ("+skinLabel+" skin): "+products+" — See my full routine:"
+    : "Ma routine SkinMatch (peau "+skinLabel+") : "+products+" — Voir ma routine :";
+  if (navigator.share) {
+    navigator.share({title:"Ma routine SkinMatch 🌸", text:shareText, url:shareUrl}).catch(function(){});
+  } else {
+    try {
+      navigator.clipboard.writeText(shareText+" "+shareUrl).then(function(){
+        var t=document.createElement("div");
+        t.style.cssText="position:fixed;top:70px;left:50%;transform:translateX(-50%);background:#3D2B1F;color:#fff;padding:12px 20px;border-radius:50px;font-size:13px;font-weight:600;z-index:9999";
+        t.textContent=LANG==="en"?"Link copied!":"Lien copie !";
+        document.body.appendChild(t);
+        setTimeout(function(){t.remove();},2500);
+      });
+    } catch(e){}
+  }
+}
+function _oldToggleShare(){
   ST.showShare=!ST.showShare;
   document.getElementById("share-card-wrap").style.display=ST.showShare?"block":"none";
 }
@@ -5748,7 +5839,50 @@ function renderDashboard() {
     challengeEl.style.cssText = "background:var(--surf);border-radius:18px;border:1px solid var(--bdr);overflow:hidden;margin-bottom:14px";
     var challHeader = document.createElement("div");
     challHeader.style.cssText = "padding:14px 16px;font-size:11px;font-weight:700;color:var(--mut);text-transform:uppercase;letter-spacing:.5px;border-bottom:1px solid var(--bdr)";
-    challHeader.textContent = isEN ? "🎯 30-DAY CHALLENGES" : "🎯 DÉFIS 30 JOURS";
+    
+    // ── STREAK QUOTIDIEN ──
+    var _todayStr = new Date().toISOString().split("T")[0];
+    var _streakN = data.streak && typeof data.streak === "object" ? (data.streak.current||0) : (data.streak||0);
+    var _streakBest = data.streakBest || 0;
+    var _streakLast = data.streakLastDate || null;
+    var _streakFire = _streakN >= 7 ? "🔥" : _streakN >= 3 ? "✨" : "💧";
+    var _circles = "";
+    for (var _ci=0; _ci<7; _ci++) {
+      var _act = _ci < Math.min(_streakN,7);
+      _circles += "<div style='width:26px;height:26px;border-radius:50%;background:"+(_act?"#C4726A":"rgba(196,114,106,.12)")+";display:flex;align-items:center;justify-content:center;font-size:9px;color:#fff;font-weight:700'>"+(_act?"✓":"")+"</div>";
+    }
+    var streakEl = document.createElement("div");
+    streakEl.style.cssText = "background:linear-gradient(135deg,#FBF0ED,#F5E1DC);border-radius:18px;padding:16px;margin-bottom:14px;border:1px solid rgba(196,114,106,.15)";
+    streakEl.innerHTML = "<div style='display:flex;align-items:center;justify-content:space-between;margin-bottom:10px'><div style='font-size:10px;font-weight:700;color:#C4726A;text-transform:uppercase;letter-spacing:.8px'>"+(isEN?"Daily streak":"Serie quotidienne")+"</div><div style='font-size:10px;color:var(--mut)'>"+(isEN?"Best:":"Record :")+" "+_streakBest+"j</div></div>"+
+      "<div style='display:flex;align-items:center;gap:12px;margin-bottom:12px'><div style='font-size:44px;line-height:1'>"+_streakFire+"</div><div><div style='font-family:Georgia,serif;font-size:34px;font-weight:700;color:#C4726A;line-height:1'>"+_streakN+"</div><div style='font-size:11px;color:var(--mut);margin-top:2px'>"+(isEN?"days in a row":"jours de suite")+"</div></div><div style='flex:1;display:flex;flex-wrap:wrap;gap:3px;justify-content:flex-end'>"+_circles+"</div></div>"+
+      (_streakLast !== _todayStr
+        ? "<button onclick='incrementStreak()' style='width:100%;padding:9px;border-radius:50px;border:none;background:#C4726A;color:#fff;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit'>"+(isEN?"Validate today's routine ✓":"Valider ma routine du jour ✓")+"</button>"
+        : "<div style='text-align:center;font-size:12px;color:#2E7D32;font-weight:600'>✅ "+(isEN?"Validated today!":"Routine validee aujourd'hui !")+"</div>");
+    wrap.appendChild(streakEl);
+
+    // ── BADGES ──
+    var _allBadges = [
+      {icon:"🌱", name:isEN?"First step":"Premier pas", earned:!!ST.result},
+      {icon:"🔥", name:isEN?"7 days":"7 jours", earned:_streakN>=7},
+      {icon:"💎", name:isEN?"30 days":"30 jours", earned:_streakN>=30},
+      {icon:"📔", name:isEN?"Journal":"Journal", earned:(data.journal||[]).length>=10},
+      {icon:"🌸", name:isEN?"Ambassador":"Ambassadrice", earned:!!(data.shared)},
+    ];
+    var badgesEl = document.createElement("div");
+    badgesEl.style.cssText = "margin-bottom:14px";
+    badgesEl.innerHTML = "<div style='font-size:10px;font-weight:700;color:var(--mut);text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px'>🏆 Badges</div>";
+    var badgesGrid = document.createElement("div");
+    badgesGrid.style.cssText = "display:grid;grid-template-columns:repeat(5,1fr);gap:8px";
+    _allBadges.forEach(function(b){
+      var d = document.createElement("div");
+      d.style.cssText = "display:flex;flex-direction:column;align-items:center;gap:4px";
+      d.innerHTML = "<div style='width:44px;height:44px;border-radius:50%;background:"+(b.earned?"linear-gradient(135deg,#C4726A,#A85A52)":"rgba(196,114,106,.08)")+";display:flex;align-items:center;justify-content:center;font-size:18px;border:1.5px solid "+(b.earned?"rgba(196,114,106,.3)":"rgba(196,114,106,.08)")+";"+(b.earned?"":"filter:grayscale(1);opacity:.4")+">"+b.icon+"</div><div style='font-size:8px;font-weight:600;color:"+(b.earned?"#C4726A":"var(--mut)")+";text-align:center;line-height:1.3'>"+b.name+"</div>";
+      badgesGrid.appendChild(d);
+    });
+    badgesEl.appendChild(badgesGrid);
+    wrap.appendChild(badgesEl);
+
+challHeader.textContent = isEN ? "🎯 30-DAY CHALLENGES" : "🎯 DÉFIS 30 JOURS";
     challengeEl.appendChild(challHeader);
     CHALLENGES.forEach(function(ch) {
         var chData = (data.challenges && data.challenges[ch.id]) || { started: false, days: 0, lastCheck: null };
@@ -6781,6 +6915,31 @@ function reloadSavedRoutine() {
 }
 
 // ══ NOTIFICATIONS ══
+function toggleNotifications() {
+  if (!("Notification" in window)) {
+    alert(LANG==="en" ? "Notifications not supported." : "Notifications non supportees sur ce navigateur.");
+    return;
+  }
+  if (Notification.permission === "granted") {
+    alert(LANG==="en" ? "To disable: Safari Settings > Notifications." : "Pour desactiver : Reglages Safari > Notifications.");
+    return;
+  }
+  requestNotifPermission();
+}
+
+function changeNotifTime(type) {
+  var isEN = LANG === "en";
+  var current = localStorage.getItem("skinmatch_notif_" + type) || (type==="morning" ? "08:00" : "21:00");
+  var newTime = prompt(isEN ? "Enter time (HH:MM):" : "Entrer l'heure (HH:MM) :", current);
+  if (!newTime || !/^\d{2}:\d{2}$/.test(newTime)) return;
+  localStorage.setItem("skinmatch_notif_" + type, newTime);
+  var t = document.createElement("div");
+  t.style.cssText = "position:fixed;top:70px;left:50%;transform:translateX(-50%);background:#2E7D32;color:#fff;padding:12px 20px;border-radius:50px;font-size:13px;font-weight:600;z-index:9999";
+  t.textContent = (isEN ? "Updated: " : "Mis a jour : ") + newTime;
+  document.body.appendChild(t);
+  setTimeout(function(){t.remove();}, 2500);
+}
+
 function requestNotifPermission() {
   if (!('Notification' in window)) return;
   Notification.requestPermission().then(function(perm) {
@@ -6893,6 +7052,65 @@ document.body.appendChild(_splashEl);
 function _hideSplash() {
   var s = document.getElementById('app-splash');
   if (s) { s.style.opacity = '0'; setTimeout(function(){ if(s.parentNode) s.parentNode.removeChild(s); }, 400); }
+  _checkSharedRoutine();
+}
+
+function buildFromKeys(keys) {
+  if (!keys || !keys.length) return null;
+  var catToEtape = {nettoyant:'Nettoyant',serum:'Serum',hydratant:'Hydratant',spf:'Protection solaire',contour:'Contour des yeux',masque:'Masque',tonique:'Tonique',huile:'Huile',exfoliant:'Exfoliant',baume:'Baume',creme:'Creme'};
+  var momentMap = {matin:'AM',soir:'PM','matin et soir':'AM+PM','matin seulement':'AM','soir seulement':'PM','AM':'AM','PM':'PM','AM+PM':'AM+PM'};
+  var steps = [];
+  keys.forEach(function(key) {
+    var p = DB[key];
+    if (!p) return;
+    var mom = momentMap[(p.moment||'AM+PM').toLowerCase()] || 'AM+PM';
+    steps.push({
+      key:key, nom:p.nom||key, marque:p.marque||'', prix:p.prix||0,
+      cat:p.cat||'', etape:catToEtape[p.cat]||p.cat||'Soin',
+      moment:mom, compat:p.compat||85,
+      pourquoi:p.pourquoi||'Ce produit est adapte a votre profil cutane.',
+      link:p.lien||'', lien:p.lien||'',
+      inci:p.inci||[], yuka:p.yuka||0, ak:p.ak||false, yl:(p.yuka||0)>=50,
+      application:p.application||'', pourQui:p.pourQui||''
+    });
+  });
+  if (!steps.length) return null;
+  var totalPrix = steps.reduce(function(s,p){return s+(p.prix||0);},0);
+  var skinLabels = {grasse:'grasse',seche:'seche',mixte:'mixte',sensible:'sensible',normale:'normale'};
+  var skinLabel = skinLabels[ST.skinType]||ST.skinType||'mixte';
+  var intro = 'Votre routine sur-mesure pour une peau '+skinLabel+' ('+( ST.ageGroup||'26-35')+').';
+  return {steps:steps, totalPrix:totalPrix, intro:intro, conseil:'La constance, pas la perfection, transforme ta peau.'};
+}
+
+function _checkSharedRoutine() {
+  try {
+    var hash = window.location.hash;
+    if (!hash || hash.indexOf('#r=') !== 0) return;
+    var encoded = hash.replace('#r=', '');
+    if (!encoded) return;
+    var sd = JSON.parse(decodeURIComponent(escape(atob(encoded))));
+    if (!sd || !sd.products || !sd.products.length) return;
+    var sharedResult = buildFromKeys(sd.products);
+    if (!sharedResult) return;
+    ST.skinType = sd.skin||'mixte'; ST.ageGroup = sd.age||'26-35';
+    ST.budget = sd.budget||'moyen'; ST.concerns = sd.concerns||[];
+    ST.result = sharedResult;
+    window._sharedBy = sd.sharedBy || '';
+    renderResult(); go('result'); updateNav('result');
+    setTimeout(function(){
+      var b = document.getElementById('result-back-btn');
+      if (b) b.style.display = 'none';
+      var existBanner = document.getElementById('shared-banner');
+      if (existBanner) existBanner.remove();
+      var sharedName = window._sharedBy || (LANG==='en' ? 'a user' : 'un utilisateur');
+      var banner = document.createElement('div');
+      banner.id = 'shared-banner';
+      banner.style.cssText = 'background:linear-gradient(135deg,#FBF0ED,#F5E1DC);padding:14px 20px;text-align:center;font-size:13px;color:#C4726A;font-weight:700;border-bottom:2px solid rgba(196,114,106,.2)';
+      banner.innerHTML = '🌸 Routine partagee par <strong>' + sharedName + '</strong> — <span onclick="showTermsModal()" style="text-decoration:underline;cursor:pointer">Obtiens la tienne gratuitement</span>';
+      var rc = document.getElementById('result-content');
+      if (rc) rc.insertBefore(banner, rc.firstChild);
+    }, 200);
+  } catch(e) {}
 }
 
 // Timeout 2.5s si Firebase ne répond pas
@@ -7100,6 +7318,28 @@ function _showLoginRequired(context) {
 }
 
 // ── CANCEL CHALLENGE ──
+function incrementStreak() {
+  var data = getDashData();
+  var today = new Date().toISOString().split("T")[0];
+  var yesterday = new Date(); yesterday.setDate(yesterday.getDate()-1);
+  var yest = yesterday.toISOString().split("T")[0];
+  var last = data.streakLastDate || null;
+  var cur = data.streak && typeof data.streak==="object" ? (data.streak.current||0) : (data.streak||0);
+  if (last === today) return;
+  cur = (last === yest) ? cur+1 : 1;
+  var best = Math.max(data.streakBest||0, cur);
+  data.streak = {current:cur};
+  data.streakBest = best;
+  data.streakLastDate = today;
+  saveDashData(data);
+  var t = document.createElement("div");
+  t.style.cssText = "position:fixed;top:70px;left:50%;transform:translateX(-50%);background:#C4726A;color:#fff;padding:12px 20px;border-radius:50px;font-size:13px;font-weight:600;z-index:9999";
+  t.textContent = "🔥 Serie : " + cur + " jour" + (cur>1?"s":"") + " !";
+  document.body.appendChild(t);
+  setTimeout(function(){t.remove();}, 3000);
+  renderDashboard();
+}
+
 function cancelChallenge(id) {
   var isEN = LANG === 'en';
   if (!confirm(isEN ? 'Cancel this challenge?' : 'Annuler ce défi ? Ta progression sera perdue.')) return;
