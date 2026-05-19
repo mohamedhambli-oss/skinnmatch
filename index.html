@@ -7351,26 +7351,78 @@ function _checkSharedRoutine() {
     if (!sd || !sd.products || !sd.products.length) return;
     var sharedResult = buildFromKeys(sd.products);
     if (!sharedResult) return;
-    ST.skinType = sd.skin||'mixte'; ST.ageGroup = sd.age||'26-35';
-    ST.budget = sd.budget||'moyen'; ST.concerns = sd.concerns||[];
+
+    // Stocker les données partagées
+    ST.skinType = sd.skin || 'mixte';
+    ST.ageGroup = sd.age || '26-35';
+    ST.budget = sd.budget || 'moyen';
+    ST.concerns = sd.concerns || [];
     ST.result = sharedResult;
     window._sharedBy = sd.sharedBy || '';
-    renderResult(); go('result'); updateNav('result');
-    setTimeout(function(){
-      var b = document.getElementById('result-back-btn');
-      if (b) b.style.display = 'none';
-      var existBanner = document.getElementById('shared-banner');
-      if (existBanner) existBanner.remove();
-      var sharedName = window._sharedBy || (LANG==='en' ? 'a user' : 'un utilisateur');
-      var banner = document.createElement('div');
-      banner.id = 'shared-banner';
-      banner.style.cssText = 'background:linear-gradient(135deg,#FBF0ED,#F5E1DC);padding:14px 20px;text-align:center;font-size:13px;color:#C4726A;font-weight:700;border-bottom:2px solid rgba(196,114,106,.2)';
-      banner.innerHTML = '🌸 Routine partagee par <strong>' + sharedName + '</strong> — <span onclick="showTermsModal()" style="text-decoration:underline;cursor:pointer">Obtiens la tienne gratuitement</span>';
-      var rc = document.getElementById('result-content');
-      if (rc) rc.insertBefore(banner, rc.firstChild);
-    }, 200);
-  } catch(e) {}
+    window._isSharedView = true;
+
+    // Afficher la carte de la routine partagée directement
+    var isEN = LANG === 'en';
+    var sharedName = window._sharedBy || (isEN ? "someone" : "quelqu'un");
+
+    // Remplir la carte
+    var nameEl = document.getElementById('sc-card-name');
+    if (nameEl) nameEl.textContent = window._sharedBy || 'Routine';
+
+    var skinLabels = {grasse:'Peau grasse',seche:'Peau sèche',mixte:'Peau mixte',sensible:'Peau sensible',normale:'Peau normale'};
+    var skinEl = document.getElementById('sc-card-skin');
+    if (skinEl) skinEl.textContent = (skinLabels[ST.skinType] || ST.skinType) + ' · ' + ST.ageGroup + ' ans';
+
+    var steps = sharedResult.steps || [];
+    var totalPrix = steps.reduce(function(s,p){ return s+(p.prix||0); }, 0);
+    var compat = steps.length > 0 ? Math.round(steps.reduce(function(s,p){ return s+(p.compat||85); },0)/steps.length) : 87;
+
+    var scoreTxt = document.getElementById('sc-score-txt');
+    if (scoreTxt) scoreTxt.textContent = compat + '%';
+    var scoreArc = document.getElementById('sc-score-arc');
+    if (scoreArc) {
+      var offset = 94.2 - (compat/100)*94.2;
+      scoreArc.setAttribute('stroke-dashoffset', offset.toFixed(1));
+    }
+    var scoreLbl = document.getElementById('sc-card-score-lbl');
+    if (scoreLbl) scoreLbl.textContent = compat >= 90 ? (isEN?'Perfect':'Parfait') : compat >= 75 ? (isEN?'Well adapted':'Très adapté') : (isEN?'Adapted':'Adapté');
+
+    var countEl = document.getElementById('sc-card-count');
+    if (countEl) countEl.textContent = steps.length;
+    var totalEl = document.getElementById('sc-card-total');
+    if (totalEl) totalEl.textContent = '~' + totalPrix + '€';
+
+    var prodsEl = document.getElementById('sc-card-products');
+    if (prodsEl) {
+      prodsEl.innerHTML = steps.slice(0,5).map(function(s,i){
+        return "<div class='sc-prod'><div class='sc-prod-n'>0"+(i+1)+"</div><div class='sc-prod-name'>"+s.nom+"</div><div class='sc-prod-price'>"+(s.prix?'~'+s.prix+'€':'')+"</div></div>";
+      }).join('');
+    }
+
+    // Changer le titre de la modale
+    var modalTitle = document.getElementById('share-modal-title');
+    if (modalTitle) {
+      modalTitle.textContent = isEN
+        ? '🌸 Routine shared by ' + sharedName
+        : '🌸 Routine partagée par ' + sharedName;
+    }
+
+    // Remplacer les boutons par "Obtiens la tienne"
+    var btnsEl = document.querySelector('.share-btns');
+    if (btnsEl) {
+      btnsEl.innerHTML =
+        '<button class="share-btn share-btn-share" style="flex:1" onclick="closeShareModal();showTermsModal()">' +
+        (isEN ? '✨ Get my free routine' : '✨ Obtiens la mienne gratuitement') +
+        '</button>';
+    }
+
+    // Ouvrir la modale
+    var modal = document.getElementById('share-card-modal');
+    if (modal) modal.classList.add('open');
+
+  } catch(e) { console.log('shared routine error:', e); }
 }
+
 
 // Timeout 2.5s si Firebase ne répond pas
 var _firebaseWait = setTimeout(function() {
