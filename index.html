@@ -177,15 +177,15 @@ h2{font-family:var(--serif);font-size:20px;font-weight:700;margin-bottom:3px}
   background:linear-gradient(90deg,#B8635A,#D4856A,#C4726A);
 }
 .sc-body {
-  padding:20px;
+  padding:16px;
   display:grid;
   grid-template-columns:1fr 0.5px 1fr;
   gap:0;
-  min-height:0;
+  overflow:hidden;
 }
 .sc-vsep { background:rgba(196,114,106,.12); margin:0; }
-.sc-left { padding-right:16px; display:flex; flex-direction:column; gap:10px; }
-.sc-right { padding-left:16px; display:flex; flex-direction:column; }
+.sc-left { padding-right:12px; display:flex; flex-direction:column; gap:8px; }
+.sc-right { padding-left:12px; display:flex; flex-direction:column; }
 .sc-logo {
   font-family:Georgia,serif;font-size:11px;color:rgba(61,43,31,.35);letter-spacing:1px;
 }
@@ -3543,7 +3543,7 @@ function toggleShare(){
   if (skinEl) skinEl.textContent = skinLabel + " · " + ageLabel + " ans";
 
   var steps = r.steps || [];
-  var totalPrix = steps.reduce(function(s,p){ return s + (p.prix||0); }, 0);
+  var totalPrix = steps.reduce(function(s,p){ return s + (parseFloat(String(p.prix||0).replace(/[^0-9.]/g,""))||0); }, 0);
   var compat = steps.length > 0 ? Math.round(steps.reduce(function(s,p){ return s + (p.compat||85); },0) / steps.length) : 87;
 
   var scoreTxt = document.getElementById("sc-score-txt");
@@ -3560,7 +3560,7 @@ function toggleShare(){
   var countEl = document.getElementById("sc-card-count");
   if (countEl) countEl.textContent = steps.length;
   var totalEl = document.getElementById("sc-card-total");
-  if (totalEl) totalEl.textContent = "~" + totalPrix + "€";
+  if (totalEl) totalEl.textContent = Math.round(totalPrix)+"€";
 
   var prodsEl = document.getElementById("sc-card-products");
   if (prodsEl) {
@@ -3568,7 +3568,7 @@ function toggleShare(){
       return "<div class='sc-prod'>" +
         "<div class='sc-prod-n'>0"+(i+1)+"</div>" +
         "<div class='sc-prod-name'>"+s.nom+"</div>" +
-        "<div class='sc-prod-price'>"+(s.prix?"~"+s.prix+"€":"")+"</div>" +
+        "<div class='sc-prod-price'>"+(s.prix?(parseFloat(String(s.prix).replace(/[^0-9.]/g,""))||0)+"€":"")+"</div>" +
         "</div>";
     }).join("");
   }
@@ -7374,7 +7374,7 @@ function _checkSharedRoutine() {
     if (skinEl) skinEl.textContent = (skinLabels[ST.skinType] || ST.skinType) + ' · ' + ST.ageGroup + ' ans';
 
     var steps = sharedResult.steps || [];
-    var totalPrix = steps.reduce(function(s,p){ return s+(p.prix||0); }, 0);
+    var totalPrix = steps.reduce(function(s,p){ return s+(parseFloat(String(p.prix||0).replace(/[^0-9.]/g,""))||0); }, 0);
     var compat = steps.length > 0 ? Math.round(steps.reduce(function(s,p){ return s+(p.compat||85); },0)/steps.length) : 87;
 
     var scoreTxt = document.getElementById('sc-score-txt');
