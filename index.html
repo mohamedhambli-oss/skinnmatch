@@ -1936,7 +1936,7 @@ const DB = {
   "aha-mud": {nom:"Dead Sea Mud Mask",marque:"AHAVA",prix:"35€",link:"https://www.amazon.fr/s?k=AHAVA+Dead+Sea+Mud+Mask",yuka:82,yl:"Excellent",usage:"Masque purifiant à la boue de mer Morte",texture:"Masque",ak:["Boue de mer Morte","Minéraux"],comp:["Dead Sea Mud","Minerals","Glycerin"],clean:false,vegan:true,pq:"Tous types de peau, peaux grasses.",ben:"Purifie en profondeur et resserre les pores.",app:"1-2x par semaine, laisser 10 min.",moment:"PM",ben_en:"Deep purifies and tightens pores."},
 
   // ── DUCRAY ───────────────────────────────────────────────────────────────────
-  "duc-melascréen": {nom:"Melascréen Crème Légère SPF50+",marque:"Ducray",prix:"26€",link:"https://www.ducray.com/fr/soins-du-visage/melascréen/melascréen-uv-creme-legere-spf50",yuka:65,yl:"Bon",usage:"Crème anti-taches SPF50+ peaux normales",texture:"Crème légère",ak:["Mexoryl SX","Vitamine PP","Glycolique"],comp:["Mexoryl SX","Niacinamide","Glycolic Acid"],clean:false,vegan:false,pq:"Peaux avec taches pigmentaires.",ben:"Corrige les taches et protège du soleil.",app:"Le matin comme dernière étape.",video:"https://www.youtube.com/results?search_query=Ducray+soin+peau",moment:"AM",ben_en:"Corrects dark spots and protects from sun."},
+  "duc-melascreen": {nom:"Melascreen Crème Légère SPF50+",marque:"Ducray",prix:"26€",link:"https://www.ducray.com/fr/soins-du-visage/melascreen/melascreen-uv-creme-legere-spf50",yuka:65,yl:"Bon",usage:"Crème anti-taches SPF50+ peaux normales",texture:"Crème légère",ak:["Mexoryl SX","Vitamine PP","Glycolique"],comp:["Mexoryl SX","Niacinamide","Glycolic Acid"],clean:false,vegan:false,pq:"Peaux avec taches pigmentaires.",ben:"Corrige les taches et protège du soleil.",app:"Le matin comme dernière étape.",video:"https://www.youtube.com/results?search_query=Ducray+soin+peau",moment:"AM",ben_en:"Corrects dark spots and protects from sun."},
   "duc-kertyol": {nom:"Kertyol Shampooing",marque:"Ducray",prix:"15€",link:"https://www.ducray.com/fr/soins-cheveux/kertyol-pso/kertyol-pso-shampooing",yuka:68,yl:"Bon",usage:"Shampooing kératorégulateur psoriasis",texture:"Shampooing",ak:["Acide salicylique","Piroctone Olamine"],comp:["Salicylic Acid","Piroctone Olamine"],clean:false,vegan:false,pq:"Cuir chevelu avec psoriasis.",ben:"Réduit les squames et démangeaisons.",app:"1-2x par semaine.",moment:"AM+PM",ben_en:"Reduces scales and itching."},
   "duc-anaphase": {nom:"Anaphase+ Shampooing",marque:"Ducray",prix:"14€",link:"https://www.ducray.com/fr/soins-cheveux/anaphase/anaphase-shampooing-complement-anti-chute",yuka:72,yl:"Bon",usage:"Shampooing anti-chute",texture:"Shampooing",ak:["Vitamines B","Arginine","Taurine"],comp:["Vitamins B","Arginine","Taurine"],clean:false,vegan:false,pq:"Chute de cheveux.",ben:"Renforce et stimule la pousse des cheveux.",app:"Chaque lavage.",moment:"AM+PM",ben_en:"Strengthens and stimulates hair growth."},
   "duc-ictyane": {nom:"Ictyane Crème Hydratante",marque:"Ducray",prix:"16€",link:"https://www.ducray.com/fr/soins-corps/ictyane/ictyane-creme-hydratante",yuka:76,yl:"Bon",usage:"Crème hydratante peaux sèches",texture:"Crème",ak:["Urée","Glycérine","Beurre de karité"],comp:["Urea","Glycerin","Shea Butter"],clean:false,vegan:false,pq:"Peaux sèches.",ben:"Hydrate durablement les peaux sèches.",app:"Matin et soir.",moment:"AM+PM",ben_en:"Durably hydrates dry skin."},
@@ -2507,37 +2507,37 @@ function getRegionProducts() {
 const SCREENS=["lang","welcome","register","login","scan","q1","diag","q2","q3","q4","q5","result","compare","suivi","dashboard","scan-product","profile","articles","settings","community","subscription","history","shopping"];
 
 const ST={
-  scréen:'lang',user:null,
+  screen:'lang',user:null,
   skinType:null,ageGroup:null,
   concerns:[],allergies:[],
   budget:null,routine:null,
   result:null,showShare:false,
 };
 
-function go(scréen){
-  if (ST.scréen === 'scan' && scréen !== 'scan') stopCamera();
-  if (ST.scréen === 'scan-product' && scréen !== 'scan-product') stopBarcodeCamera();
-  SCREENS.forEach(s=>{const el=document.getElementById("sc-"+s);if(el)el.classList.toggle("hidden",s!==scréen);});
-  ST.scréen=scréen;
+function go(screen){
+  if (ST.screen === 'scan' && screen !== 'scan') stopCamera();
+  if (ST.screen === 'scan-product' && screen !== 'scan-product') stopBarcodeCamera();
+  SCREENS.forEach(s=>{const el=document.getElementById("sc-"+s);if(el)el.classList.toggle("hidden",s!==screen);});
+  ST.screen=screen;
   setTimeout(function() {
     window.scrollTo({top:0, behavior:'instant'});
     document.documentElement.scrollTop = 0;
     document.body.scrollTop = 0;
-    var activeEl = document.getElementById("sc-"+scréen);
+    var activeEl = document.getElementById("sc-"+screen);
     if (activeEl) { activeEl.scrollTop = 0; activeEl.scrollIntoView({block:'start'}); }
   }, 0);
-  if(scréen==='welcome') setTimeout(applyWelcomeLang,10);
-  if(scréen==='scan') setTimeout(function(){ startCamera(); }, 100);
-  if(scréen==='scan-product') {
+  if(screen==='welcome') setTimeout(applyWelcomeLang,10);
+  if(screen==='scan') setTimeout(function(){ startCamera(); }, 100);
+  if(screen==='scan-product') {
     if (!window._currentUser) { _showLoginRequired('scan-product'); return; }
     setTimeout(function(){ startBarcodeCamera(); }, 100);
   }
   // Afficher/cacher la nav
-  var navScréens = ['welcome','result','scan-product','articles','dashboard','profile'];
+  var navScreens = ['welcome','result','scan-product','articles','dashboard','profile'];
   var nav = document.getElementById('bottom-nav');
-  if (nav) nav.style.display = navScréens.indexOf(scréen) !== -1 ? 'block' : 'none';
+  if (nav) nav.style.display = navScreens.indexOf(screen) !== -1 ? 'block' : 'none';
   // Activer le bon onglet
-  if (typeof updateNav === 'function') updateNav(scréen);
+  if (typeof updateNav === 'function') updateNav(screen);
 }
 
 function setLang(l){
@@ -3977,12 +3977,7 @@ function downloadCard() {
     setTimeout(function(){ t.remove(); }, 4000);
   }
 }
-function _oldToggleShare(){
-  ST.showShare=!ST.showShare;
-  document.getElementById("share-card-wrap").style.display=ST.showShare?"block":"none";
-}
 
-// ─── MODAL ────────────────────────────────────────────────────────────────────
 function toggleYuka(id){
   const el=document.getElementById(id);
   if(el)el.style.display=el.style.display==='none'?'block':'none';
@@ -4718,7 +4713,7 @@ function searchByBarcode(code) {
     "3282770147308": "ader-protect",
     "3282770204735": "ader-dermalibour",
     "3282770204841": "av-tol",
-    "3282779001427": "duc-melascréen",
+    "3282779001427": "duc-melascreen",
     "3282779001434": "duc-kertyol",
     "3282779002509": "duc-ictyane",
     "3282779003025": "duc-anaphase",
@@ -5638,7 +5633,7 @@ var INCI_DB = {
   "uri-roseliane": {retinol:false,parfum:false,paraben:false,alcohol:false,sulfate:false,silicone:false,vitc:false,salicylic:false,aha_bha:false},
   "uri-isdin": {retinol:false,parfum:false,paraben:false,alcohol:false,sulfate:false,silicone:false,vitc:false,salicylic:true,aha_bha:true},
   "uri-prederma": {retinol:false,parfum:false,paraben:false,alcohol:false,sulfate:false,silicone:false,vitc:false,salicylic:false,aha_bha:false},
-  "duc-melascréen": {retinol:false,parfum:true,paraben:false,alcohol:true,sulfate:false,silicone:false,vitc:false,salicylic:false,aha_bha:false},
+  "duc-melascreen": {retinol:false,parfum:true,paraben:false,alcohol:true,sulfate:false,silicone:false,vitc:false,salicylic:false,aha_bha:false},
   "duc-ictyane": {retinol:false,parfum:false,paraben:false,alcohol:false,sulfate:false,silicone:false,vitc:false,salicylic:false,aha_bha:false},
   "duc-anaphase": {retinol:false,parfum:false,paraben:false,alcohol:false,sulfate:false,silicone:false,vitc:false,salicylic:false,aha_bha:false},
   "ader-epitheliale": {retinol:false,parfum:false,paraben:false,alcohol:false,sulfate:false,silicone:false,vitc:false,salicylic:false,aha_bha:false},
@@ -7321,41 +7316,55 @@ function startDiagFromProfile() {
 // ══ NAVIGATION BAS ══
 var NAV_SCREENS = ['welcome','result','scan-product','articles','dashboard'];
 
-function navTo(scréen) {
+function navTo(screen) {
   // Arrêter caméras si on quitte
   if (typeof stopCamera === 'function') stopCamera();
   if (typeof stopBarcodeCamera === 'function') stopBarcodeCamera();
-  
-  if (scréen === 'result') {
+
+  if (screen === 'result') {
     if (!ST.result && window._savedRoutine) {
-      // Routine sauvegardée en mémoire — la recharger
       reloadSavedRoutine();
       updateNav('result');
       return;
     } else if (!ST.result) {
-      // Pas de routine → diagnostic
       go('q1');
       updateNav(null);
       return;
     }
   }
-  if (scréen === 'articles') {
-    renderArticlesScréen();
+  if (screen === 'articles') {
+    renderArticlesScreen();
   }
-  if (scréen === 'dashboard') {
+  if (screen === 'dashboard') {
     if (!window._currentUser) { _showLoginRequired('dashboard'); return; }
     renderDashboard();
   }
-  if (scréen === 'scan-product') {
+  if (screen === 'scan-product') {
+    if (!window._currentUser) { _showLoginRequired('scan-product'); return; }
     setTimeout(function() { startBarcodeCamera(); }, 100);
   }
-  go(scréen);
-  updateNav(scréen);
+  if (screen === 'community') {
+    go('community');
+    updateNav('community');
+    renderCommunity();
+    return;
+  }
+  if (screen === 'history') {
+    renderHistory();
+  }
+  if (screen === 'shopping') {
+    renderShoppingList();
+  }
+  if (screen === 'subscription') {
+    // écran statique
+  }
+  go(screen);
+  updateNav(screen);
 }
 
-function updateNav(scréen) {
+function updateNav(screen) {
   var isEN = LANG === 'en';
-  var navVisible = NAV_SCREENS.indexOf(scréen) !== -1 || scréen === 'welcome';
+  var navVisible = NAV_SCREENS.indexOf(screen) !== -1 || screen === 'welcome';
   var nav = document.getElementById('bottom-nav');
   if (nav) nav.style.display = navVisible ? 'block' : 'none';
   
@@ -7375,8 +7384,8 @@ function updateNav(scréen) {
   // Activer le bon bouton
   var map = { 'welcome':'nav-home', 'result':'nav-routine', 'scan-product':'nav-scan', 'dashboard':'nav-space' };
   document.querySelectorAll('.nav-btn').forEach(function(b) { b.classList.remove('active'); });
-  if (map[scréen]) {
-    var activeBtn = document.getElementById(map[scréen]);
+  if (map[screen]) {
+    var activeBtn = document.getElementById(map[screen]);
     if (activeBtn) activeBtn.classList.add('active');
   }
   
@@ -7386,7 +7395,7 @@ function updateNav(scréen) {
   });
 }
 
-function renderArticlesScréen() {
+function renderArticlesScreen() {
   var isEN = LANG === 'en';
   var articles = isEN ? ARTICLES_EN : ARTICLES_FR;
   var list = document.getElementById('articles-list');
@@ -7411,7 +7420,7 @@ function renderArticlesScréen() {
       ['<button onclick="renderArticlesFilter(null)" id="tag-all" style="flex-shrink:0;padding:6px 14px;border-radius:20px;border:1.5px solid ' + (!filterTag ? '#C4726A' : 'var(--bdr)') + ';background:' + (!filterTag ? '#C4726A' : '#fff') + ';color:' + (!filterTag ? '#fff' : 'var(--mut)') + ';font-size:12px;font-weight:600;cursor:pointer;font-family:inherit">' + (isEN ? 'All' : 'Tous') + '</button>',
       ...tags.map(function(tag) {
         var isActive = filterTag === tag;
-        return "<button onclick=\"window._artFilter='' + tag.replace(/'/g,'') + '';renderArticlesScréen()\" style=\"flex-shrink:0;padding:6px 14px;border-radius:20px;border:1.5px solid " + (isActive ? "#C4726A" : "var(--bdr)") + ";background:" + (isActive ? "#C4726A" : "#fff") + ";color:" + (isActive ? "#fff" : "var(--mut)") + ";font-size:12px;font-weight:600;cursor:pointer;font-family:inherit\">" + tag + "</button>";
+        return "<button onclick=\"window._artFilter='' + tag.replace(/'/g,'') + '';renderArticlesScreen()\" style=\"flex-shrink:0;padding:6px 14px;border-radius:20px;border:1.5px solid " + (isActive ? "#C4726A" : "var(--bdr)") + ";background:" + (isActive ? "#C4726A" : "#fff") + ";color:" + (isActive ? "#fff" : "var(--mut)") + ";font-size:12px;font-weight:600;cursor:pointer;font-family:inherit\">" + tag + "</button>";
 
       })].join('') + '</div>' +
       '<div style="display:flex;flex-direction:column;gap:10px">' +
@@ -7704,7 +7713,7 @@ function submitFeedback(key, type, btn) {
 var _savedLang = localStorage.getItem('skinmatch_lang');
 var _savedRegion = localStorage.getItem('skinmatch_region');
 
-// Splash scréen pendant l'init
+// Splash screen pendant l'init
 var _splashEl = document.createElement('div');
 _splashEl.id = 'app-splash';
 _splashEl.style.cssText = 'position:fixed;inset:0;background:#FBF0ED;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:99999;transition:opacity .4s';
@@ -7904,7 +7913,7 @@ initQuestions();
       <button onclick="closeVideo()" style="background:rgba(255,255,255,.2);border:none;border-radius:50%;width:34px;height:34px;color:#fff;font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center">×</button>
     </div>
     <div style="position:relative;width:100%;padding-bottom:56.25%;border-radius:14px;overflow:hidden;background:#000">
-      <iframe id="video-iframe" src="" frameborder="0" allowfullscréen allow="autoplay; encrypted-media" style="position:absolute;top:0;left:0;width:100%;height:100%;border:none"></iframe>
+      <iframe id="video-iframe" src="" frameborder="0" allowfullscreen allow="autoplay; encrypted-media" style="position:absolute;top:0;left:0;width:100%;height:100%;border:none"></iframe>
     </div>
     <p style="color:rgba(255,255,255,.5);font-size:11px;text-align:center;margin-top:10px">Source : YouTube</p>
   </div>
