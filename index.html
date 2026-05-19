@@ -129,6 +129,122 @@ h2{font-family:var(--serif);font-size:20px;font-weight:700;margin-bottom:3px}
 .progress-pct{font-size:11px;font-weight:700;color:#C4726A}
 .progress-step-txt{font-size:10px;color:var(--mut)}
 .progress-dots{display:flex;gap:4px}
+
+/* ── MODALE CARTE PARTAGE ── */
+#share-card-modal {
+  display:none;position:fixed;inset:0;
+  background:rgba(61,43,31,.65);
+  backdrop-filter:blur(6px);
+  z-index:9999;
+  align-items:flex-end;
+  justify-content:center;
+  padding:0;
+}
+#share-card-modal.open { display:flex; }
+#share-card-inner {
+  width:100%;max-width:460px;
+  background:#F8F2ED;
+  border-radius:28px 28px 0 0;
+  padding:20px 20px 40px;
+  animation:slideUp .3s ease;
+}
+@keyframes slideUp {
+  from{transform:translateY(100%)}
+  to{transform:translateY(0)}
+}
+.share-modal-handle {
+  width:36px;height:4px;border-radius:2px;
+  background:rgba(196,114,106,.25);
+  margin:0 auto 16px;
+}
+.share-modal-title {
+  font-family:Georgia,serif;font-size:16px;
+  font-weight:700;color:#3D2B1F;
+  text-align:center;margin-bottom:16px;
+}
+
+/* Carte dans la modale */
+.share-card-wrap {
+  background:#F8F2ED;
+  border-radius:16px;
+  overflow:hidden;
+  border:0.5px solid rgba(196,114,106,.15);
+  box-shadow:0 4px 24px rgba(61,43,31,.1);
+  margin-bottom:16px;
+}
+.sc-topbar-stripe {
+  height:3px;
+  background:linear-gradient(90deg,#B8635A,#D4856A,#C4726A);
+}
+.sc-body {
+  padding:20px;
+  display:grid;
+  grid-template-columns:1fr 0.5px 1fr;
+  gap:0;
+  min-height:0;
+}
+.sc-vsep { background:rgba(196,114,106,.12); margin:0; }
+.sc-left { padding-right:16px; display:flex; flex-direction:column; gap:10px; }
+.sc-right { padding-left:16px; display:flex; flex-direction:column; }
+.sc-logo {
+  font-family:Georgia,serif;font-size:11px;color:rgba(61,43,31,.35);letter-spacing:1px;
+}
+.sc-logo em { color:#C4726A;font-style:normal; }
+.sc-name {
+  font-family:Georgia,serif;font-size:32px;font-weight:400;font-style:italic;
+  color:#3D2B1F;line-height:.92;letter-spacing:-1px;
+}
+.sc-skintype { font-size:9px;color:rgba(61,43,31,.4);margin-top:2px; }
+.sc-score-row {
+  display:flex;align-items:center;gap:8px;
+  padding:8px 0;border-top:.5px solid rgba(196,114,106,.12);
+}
+.sc-score-label { font-size:10px;font-weight:600;color:#C4726A; }
+.sc-score-sub { font-size:8px;color:rgba(61,43,31,.35);letter-spacing:.5px; }
+.sc-stats {
+  display:flex;gap:0;
+  border-top:.5px solid rgba(196,114,106,.12);
+  padding-top:10px;margin-top:auto;
+}
+.sc-st { flex:1;text-align:center; }
+.sc-st+.sc-st { border-left:.5px solid rgba(196,114,106,.12); }
+.sc-st-val { font-family:Georgia,serif;font-size:18px;font-weight:600;color:#C4726A;line-height:1; }
+.sc-st-lbl { font-size:7px;font-weight:500;letter-spacing:1.5px;text-transform:uppercase;color:rgba(61,43,31,.3); }
+.sc-prod-lbl { font-size:7px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:rgba(61,43,31,.28);margin-bottom:8px; }
+.sc-prod { display:flex;align-items:center;gap:7px;padding:6px 0;border-bottom:.5px solid rgba(196,114,106,.07); }
+.sc-prod:last-child { border:none; }
+.sc-prod-n { font-family:Georgia,serif;font-size:9px;color:rgba(196,114,106,.4);width:12px;flex-shrink:0; }
+.sc-prod-name { font-size:9.5px;font-weight:500;color:#3D2B1F;flex:1;overflow:hidden;white-space:nowrap;text-overflow:ellipsis; }
+.sc-prod-price { font-family:Georgia,serif;font-size:11px;font-weight:600;color:#C4726A;flex-shrink:0; }
+.sc-footer {
+  display:flex;justify-content:space-between;align-items:center;
+  padding:10px 20px;
+  border-top:.5px solid rgba(196,114,106,.1);
+  background:rgba(248,242,237,.95);
+}
+.sc-footer-brand { font-family:Georgia,serif;font-size:9px;color:rgba(61,43,31,.3);letter-spacing:1.5px; }
+.sc-footer-brand em { color:#C4726A;font-style:normal; }
+.sc-footer-url { font-size:7px;font-weight:500;letter-spacing:1px;text-transform:uppercase;color:rgba(61,43,31,.25); }
+
+/* Boutons de partage */
+.share-btns { display:flex;gap:10px; }
+.share-btn {
+  flex:1;padding:13px;border-radius:50px;
+  font-size:13px;font-weight:700;cursor:pointer;
+  font-family:inherit;border:none;
+  display:flex;align-items:center;justify-content:center;gap:8px;
+  transition:opacity .15s;
+}
+.share-btn:active { opacity:.8; }
+.share-btn-dl {
+  background:rgba(196,114,106,.12);
+  border:1.5px solid rgba(196,114,106,.25);
+  color:#C4726A;
+}
+.share-btn-share {
+  background:linear-gradient(135deg,#3D2B1F,#5A3D2B);
+  color:#fff;
+}
 .pd{flex:1;height:3px;border-radius:2px;background:var(--bdr);transition:all .3s}
 .pd.on{background:#C4726A}
 .pd.done{background:rgba(196,114,106,.35)}
@@ -288,6 +404,7 @@ h2{font-family:var(--serif);font-size:20px;font-weight:700;margin-bottom:3px}
   30% { transform: translateY(-6px); }
 }
 </style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 </head>
 <body>
 <div class="app" id="app">
@@ -1101,6 +1218,67 @@ h2{font-family:var(--serif);font-size:20px;font-weight:700;margin-bottom:3px}
       </div>
       <span style="font-size:10px;font-weight:600" id="nav-chat-lbl">Skin Coach</span>
     </button>
+  </div>
+</div>
+
+<!-- ══ MODALE CARTE PARTAGE ══ -->
+<div id="share-card-modal" onclick="if(event.target===this)closeShareModal()">
+  <div id="share-card-inner">
+    <div class="share-modal-handle"></div>
+    <div class="share-modal-title" id="share-modal-title">Ta routine à partager</div>
+
+    <!-- Carte générée dynamiquement -->
+    <div class="share-card-wrap" id="share-card-preview">
+      <div class="sc-topbar-stripe"></div>
+      <div class="sc-body">
+        <div class="sc-left">
+          <div class="sc-logo">Skin<em>Match</em></div>
+          <div>
+            <div class="sc-name" id="sc-card-name">—</div>
+            <div class="sc-skintype" id="sc-card-skin">—</div>
+          </div>
+          <div class="sc-score-row">
+            <svg width="38" height="38" viewBox="0 0 38 38">
+              <circle cx="19" cy="19" r="15" fill="none" stroke="rgba(196,114,106,.12)" stroke-width="3"/>
+              <circle id="sc-score-arc" cx="19" cy="19" r="15" fill="none" stroke="#C4726A" stroke-width="3"
+                stroke-dasharray="94.2" stroke-dashoffset="12.2"
+                stroke-linecap="round" transform="rotate(-90 19 19)"/>
+              <text x="19" y="19" text-anchor="middle" dominant-baseline="central"
+                font-family="Georgia,serif" font-size="9" font-weight="600" fill="#3D2B1F" id="sc-score-txt">87%</text>
+            </svg>
+            <div>
+              <div class="sc-score-label" id="sc-card-score-lbl">Très adapté</div>
+              <div class="sc-score-sub">à ton profil cutané</div>
+            </div>
+          </div>
+          <div class="sc-stats">
+            <div class="sc-st"><div class="sc-st-val" id="sc-card-count">4</div><div class="sc-st-lbl">Produits</div></div>
+            <div class="sc-st"><div class="sc-st-val" id="sc-card-total">65€</div><div class="sc-st-lbl">Budget</div></div>
+          </div>
+        </div>
+        <div class="sc-vsep"></div>
+        <div class="sc-right">
+          <div class="sc-prod-lbl">Ma sélection</div>
+          <div id="sc-card-products"></div>
+        </div>
+      </div>
+      <div class="sc-footer">
+        <div class="sc-footer-brand">Skin<em>Match</em></div>
+        <div class="sc-footer-url">100% gratuit</div>
+      </div>
+    </div>
+
+    <!-- Boutons -->
+    <div class="share-btns">
+      <button class="share-btn share-btn-dl" onclick="downloadCard()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        Télécharger
+      </button>
+      <button class="share-btn share-btn-share" onclick="shareRoutineLink()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+        Partager le lien
+      </button>
+    </div>
   </div>
 </div>
 
@@ -3348,37 +3526,118 @@ function switchTab(tab){
 function toggleShare(){
   var r = ST.result;
   if (!r) return;
+
+  var isEN = LANG === "en";
   var userName = window._currentUser
     ? (window._currentUser.displayName || window._currentUser.email.split("@")[0])
     : "";
+
+  // ── Remplir la carte ──
+  var name = document.getElementById("sc-card-name");
+  if (name) name.textContent = userName || (isEN ? "My routine" : "Ma routine");
+
+  var skinLabels = {grasse:"Peau grasse",seche:"Peau sèche",mixte:"Peau mixte",sensible:"Peau sensible",normale:"Peau normale"};
+  var skinLabel = skinLabels[ST.skinType] || (ST.skinType || "mixte");
+  var ageLabel = ST.ageGroup || "26-35";
+  var skinEl = document.getElementById("sc-card-skin");
+  if (skinEl) skinEl.textContent = skinLabel + " · " + ageLabel + " ans";
+
+  var steps = r.steps || [];
+  var totalPrix = steps.reduce(function(s,p){ return s + (p.prix||0); }, 0);
+  var compat = steps.length > 0 ? Math.round(steps.reduce(function(s,p){ return s + (p.compat||85); },0) / steps.length) : 87;
+
+  var scoreTxt = document.getElementById("sc-score-txt");
+  if (scoreTxt) scoreTxt.textContent = compat + "%";
+  var scoreArc = document.getElementById("sc-score-arc");
+  if (scoreArc) {
+    var circ = 94.2;
+    var offset = circ - (compat/100) * circ;
+    scoreArc.setAttribute("stroke-dashoffset", offset.toFixed(1));
+  }
+  var scoreLbl = document.getElementById("sc-card-score-lbl");
+  if (scoreLbl) scoreLbl.textContent = compat >= 90 ? (isEN?"Perfect match":"Parfait pour toi") : compat >= 75 ? (isEN?"Well adapted":"Très adapté") : (isEN?"Adapted":"Adapté");
+
+  var countEl = document.getElementById("sc-card-count");
+  if (countEl) countEl.textContent = steps.length;
+  var totalEl = document.getElementById("sc-card-total");
+  if (totalEl) totalEl.textContent = "~" + totalPrix + "€";
+
+  var prodsEl = document.getElementById("sc-card-products");
+  if (prodsEl) {
+    prodsEl.innerHTML = steps.slice(0,5).map(function(s, i) {
+      return "<div class='sc-prod'>" +
+        "<div class='sc-prod-n'>0"+(i+1)+"</div>" +
+        "<div class='sc-prod-name'>"+s.nom+"</div>" +
+        "<div class='sc-prod-price'>"+(s.prix?"~"+s.prix+"€":"")+"</div>" +
+        "</div>";
+    }).join("");
+  }
+
+  // ── Ouvrir la modale ──
+  var modal = document.getElementById("share-card-modal");
+  if (modal) modal.classList.add("open");
+
+  // ── Préparer le deeplink ──
   var routineData = {
     skin: ST.skinType, age: ST.ageGroup, budget: ST.budget,
     concerns: ST.concerns,
-    products: (r.steps||[]).slice(0,8).map(function(s){return s.key;}),
+    products: steps.slice(0,8).map(function(s){ return s.key; }),
     sharedBy: userName
   };
-  var encoded = "";
-  try { encoded = btoa(unescape(encodeURIComponent(JSON.stringify(routineData)))); } catch(e) {}
+  try { window._shareEncoded = btoa(unescape(encodeURIComponent(JSON.stringify(routineData)))); } catch(e) { window._shareEncoded = ""; }
+}
+
+function closeShareModal() {
+  var modal = document.getElementById("share-card-modal");
+  if (modal) modal.classList.remove("open");
+}
+
+function shareRoutineLink() {
+  var isEN = LANG === "en";
   var appUrl = "https://mohamedhambli-oss.github.io/skinnmatch/";
-  var shareUrl = appUrl + "#r=" + encoded;
-  var skinLabels = {grasse:"grasse",seche:"seche",mixte:"mixte",sensible:"sensible",normale:"normale"};
-  var skinLabel = skinLabels[ST.skinType] || ST.skinType || "mixte";
-  var products = (r.steps||[]).slice(0,4).map(function(s){return "• "+s.nom;}).join(", ");
-  var shareText = LANG==="en"
-    ? "My SkinMatch routine ("+skinLabel+" skin): "+products+" — See my full routine:"
-    : "Ma routine SkinMatch (peau "+skinLabel+") : "+products+" — Voir ma routine :";
+  var shareUrl = window._shareEncoded ? appUrl + "#r=" + window._shareEncoded : appUrl;
+  var userName = window._currentUser
+    ? (window._currentUser.displayName || window._currentUser.email.split("@")[0])
+    : "";
+  var skinLabels = {grasse:"grasse",seche:"sèche",mixte:"mixte",sensible:"sensible",normale:"normale"};
+  var skinLabel = skinLabels[ST.skinType] || "mixte";
+  var shareText = isEN
+    ? "My SkinMatch skincare routine (" + skinLabel + " skin). Get yours free:"
+    : "Ma routine skincare SkinMatch (peau " + skinLabel + "). Obtiens la tienne gratuitement :";
+
   if (navigator.share) {
-    navigator.share({title:"Ma routine SkinMatch 🌸", text:shareText, url:shareUrl}).catch(function(){});
+    navigator.share({ title: "Ma routine SkinMatch 🌸", text: shareText, url: shareUrl }).catch(function(){});
   } else {
     try {
-      navigator.clipboard.writeText(shareText+" "+shareUrl).then(function(){
-        var t=document.createElement("div");
-        t.style.cssText="position:fixed;top:70px;left:50%;transform:translateX(-50%);background:#3D2B1F;color:#fff;padding:12px 20px;border-radius:50px;font-size:13px;font-weight:600;z-index:9999";
-        t.textContent=LANG==="en"?"Link copied!":"Lien copie !";
+      navigator.clipboard.writeText(shareText + " " + shareUrl).then(function(){
+        var t = document.createElement("div");
+        t.style.cssText = "position:fixed;top:70px;left:50%;transform:translateX(-50%);background:#3D2B1F;color:#fff;padding:12px 20px;border-radius:50px;font-size:13px;font-weight:600;z-index:99999";
+        t.textContent = isEN ? "Link copied!" : "Lien copié !";
         document.body.appendChild(t);
-        setTimeout(function(){t.remove();},2500);
+        setTimeout(function(){ t.remove(); }, 2500);
       });
     } catch(e){}
+  }
+  closeShareModal();
+}
+
+function downloadCard() {
+  var isEN = LANG === "en";
+  // Utiliser html2canvas si disponible, sinon message
+  if (typeof html2canvas !== "undefined") {
+    var card = document.getElementById("share-card-preview");
+    html2canvas(card, { scale:2, backgroundColor:"#F8F2ED", useCORS:true }).then(function(canvas) {
+      var link = document.createElement("a");
+      link.download = "ma-routine-skinmatch.png";
+      link.href = canvas.toDataURL("image/png");
+      link.click();
+    });
+  } else {
+    var t = document.createElement("div");
+    t.style.cssText = "position:fixed;top:70px;left:50%;transform:translateX(-50%);background:#3D2B1F;color:#fff;padding:12px 20px;border-radius:50px;font-size:13px;font-weight:600;z-index:99999;text-align:center;max-width:280px";
+    t.textContent = isEN ? "To save: press and hold the card to save as image." : "Pour sauvegarder : appuie longuement sur la carte pour l'enregistrer.";
+    document.body.appendChild(t);
+    setTimeout(function(){ t.remove(); }, 4000);
   }
 }
 function _oldToggleShare(){
