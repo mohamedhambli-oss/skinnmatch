@@ -111,6 +111,8 @@ html,body{height:100%;overflow:hidden}body{background:var(--bg);font-family:var(
 .nav-btn svg{display:block}
 .has-nav .content{padding-bottom:90px !important}
 #sc-welcome,#sc-q1,#sc-q2,#sc-q3,#sc-q4,#sc-q5,#sc-result,#sc-scan,#sc-scan-product,#sc-dashboard,#sc-articles,#sc-article-detail,#sc-login,#sc-register,#sc-profile,#sc-settings,#sc-compare,#sc-lang,#sc-region,#sc-community,#sc-subscription,#sc-history,#sc-shopping{scroll-margin-top:0}
+#sc-scan-product .content{padding-bottom:160px}
+#sc-scan-product #scan-product-result{min-height:auto}
 .logo{font-family:var(--serif);font-size:24px;font-weight:700;letter-spacing:.5px;color:#3D2B1F;display:flex;align-items:center;gap:10px}
 .logo-icon{width:34px;height:34px;border-radius:9px;background:#C4726A;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#fff;font-family:var(--serif);flex-shrink:0;box-shadow:0 2px 8px rgba(196,114,106,.35)}
 .logo span{color:#C4726A}
@@ -4946,6 +4948,7 @@ function showBarcodeNotFound(code) {
 
   resultDiv.innerHTML = "";
   resultDiv.appendChild(wrap);
+  _scrollScanToTop();
 }
 
 function runManualSearch() {
@@ -5009,82 +5012,116 @@ function runManualSearch() {
 }
 
 
+function _scrollScanToTop() {
+  var sc = document.getElementById("sc-scan-product");
+  if (sc) { sc.scrollTop = 0; }
+  // Aussi s'assurer que le résultat est visible
+  setTimeout(function() {
+    var res = document.getElementById("scan-product-result");
+    var sc2 = document.getElementById("sc-scan-product");
+    if (res && sc2) {
+      sc2.scrollTop = res.offsetTop > 0 ? 0 : 0;
+    }
+  }, 150);
+}
+
 function showBarcodeExternalResult(code, name, brand) {
   var resultDiv = document.getElementById("scan-product-result");
   if (!resultDiv) return;
   var isEN = LANG === "en";
+
+  // Créer une fiche produit externe avec analyse basée sur le profil utilisateur
+  var skinLabel = ST.skinType || "mixte";
+  var skinLabels = {grasse:"grasse",seche:"sèche",mixte:"mixte",sensible:"sensible",normale:"normale"};
+  var skinDisplay = skinLabels[skinLabel] || skinLabel;
+
+  // Deviner la catégorie depuis le nom
+  var nameLow = (name || "").toLowerCase();
+  var cat = "soin";
+  if (nameLow.includes("gel") || nameLow.includes("nettoy") || nameLow.includes("foam") || nameLow.includes("wash")) cat = "nettoyant";
+  else if (nameLow.includes("spf") || nameLow.includes("soleil") || nameLow.includes("sun")) cat = "protection";
+  else if (nameLow.includes("sérum") || nameLow.includes("serum")) cat = "sérum";
+  else if (nameLow.includes("crème") || nameLow.includes("creme") || nameLow.includes("hydrat")) cat = "hydratant";
+  else if (nameLow.includes("huile") || nameLow.includes("oil")) cat = "huile";
+  else if (nameLow.includes("masque") || nameLow.includes("mask")) cat = "masque";
+  else if (nameLow.includes("exfol") || nameLow.includes("gommage")) cat = "exfoliant";
+
+  // Score de base adapté au profil
+  var baseScore = 72;
+  if (ST.skinType === "sensible") baseScore = 68;
+  if (ST.skinType === "grasse" && cat === "huile") baseScore = 55;
+  if (ST.skinType === "seche" && cat === "nettoyant") baseScore = 70;
+  var scoreColor = baseScore >= 75 ? "#2E7D32" : baseScore >= 55 ? "#E65100" : "#C62828";
+  var scoreBg = baseScore >= 75 ? "#E8F5E9" : baseScore >= 55 ? "#FFF3E0" : "#FFEBEE";
+  var scoreLabel = baseScore >= 75 ? (isEN ? "Good match" : "Bon pour ta peau") : baseScore >= 55 ? (isEN ? "Moderate match" : "Compatible avec réserves") : (isEN ? "Not ideal" : "Peu adapté");
+
+  // Conseil personnalisé
+  var conseil = "";
+  if (ST.skinType === "grasse") {
+    if (cat === "nettoyant") conseil = isEN ? "Good choice for oily skin — gel cleansers help control sebum." : "Bon choix pour peau grasse — les gels nettoyants contrôlent bien le sébum.";
+    else if (cat === "huile") conseil = isEN ? "Be careful with oils on oily skin — test on a small area first." : "Attention aux huiles sur peau grasse — tester sur une petite zone d'abord.";
+    else conseil = isEN ? "Check that the texture is non-comedogenic." : "Vérifie que la texture est non-comédogène.";
+  } else if (ST.skinType === "seche") {
+    if (cat === "hydratant") conseil = isEN ? "Great choice for dry skin — look for ceramides or hyaluronic acid." : "Excellent pour peau sèche — cherche des céramides ou de l'acide hyaluronique.";
+    else conseil = isEN ? "Make sure this product doesn't dry out your skin further." : "Assure-toi que ce produit ne dessèche pas davantage ta peau.";
+  } else if (ST.skinType === "sensible") {
+    conseil = isEN ? "For sensitive skin, check for fragrance-free and paraben-free claims." : "Pour peau sensible, vérifie l'absence de parfum et de parabènes.";
+  } else {
+    conseil = isEN ? "This product looks compatible with your profile based on its category." : "Ce produit semble compatible avec ton profil selon sa catégorie.";
+  }
+
+  var html = "";
+  html += "<div style='background:#fff;border:1px solid var(--bdr);border-radius:16px;overflow:hidden'>";
+
+  // Header produit
+  html += "<div style='padding:16px 16px 0'>";
+  html += "<div style='display:flex;align-items:center;gap:12px;margin-bottom:12px'>";
+  html += "<div style='width:52px;height:52px;border-radius:14px;background:linear-gradient(135deg,#FBF0ED,#F0D5CF);display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0'>🧴</div>";
+  html += "<div style='flex:1'><div style='font-size:15px;font-weight:700;color:#3D2B1F'>" + name + "</div>";
+  if (brand) html += "<div style='font-size:12px;color:#8B6F5E;margin-top:2px'>" + brand + "</div>";
+  html += "</div>";
+  html += "<div style='background:" + scoreBg + ";border-radius:50px;padding:6px 12px;text-align:center'>";
+  html += "<div style='font-size:18px;font-weight:700;color:" + scoreColor + "'>" + baseScore + "%</div>";
+  html += "<div style='font-size:9px;font-weight:600;color:" + scoreColor + ";text-transform:uppercase;letter-spacing:.5px'>" + scoreLabel + "</div>";
+  html += "</div></div>";
+
+  // Badge catégorie
+  html += "<div style='margin-bottom:14px'><span style='background:rgba(196,114,106,.1);border-radius:20px;padding:4px 12px;font-size:11px;font-weight:700;color:#C4726A;text-transform:uppercase;letter-spacing:.5px'>" + cat + "</span></div>";
+  html += "</div>";
+
+  // Analyse pour ton profil
+  html += "<div style='background:#FAF4F2;padding:14px 16px;margin:0;border-top:1px solid var(--bdr)'>";
+  html += "<div style='font-size:11px;font-weight:700;color:#C4726A;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px'>🔬 " + (isEN ? "Analysis for your profile" : "Analyse pour ton profil") + "</div>";
+  html += "<div style='font-size:13px;color:#3D2B1F;line-height:1.7;margin-bottom:10px'>" + conseil + "</div>";
+
+  // Note sur Open Beauty Facts
+  html += "<div style='font-size:11px;color:#B0958F;font-style:italic;padding-top:8px;border-top:1px solid rgba(196,114,106,.1)'>";
+  html += (isEN ? "ℹ️ Found via Open Beauty Facts. Not yet in our personalized system — analysis is based on category." : "ℹ️ Trouvé via Open Beauty Facts. Pas encore dans notre système — analyse basée sur la catégorie.");
+  html += "</div></div>";
+
+  // Boutons action
+  html += "<div style='padding:14px 16px;display:flex;gap:10px'>";
+  html += "<button id='scan-again-btn' style='flex:1;padding:12px;border-radius:50px;border:1.5px solid rgba(196,114,106,.3);background:#fff;color:#C4726A;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit'>← " + (isEN ? "Scan another" : "Scanner un autre") + "</button>";
+
+  html += "<button id='contrib-btn2' style='flex:1;padding:12px;border-radius:50px;border:none;background:linear-gradient(135deg,#3D2B1F,#5A3D2B);color:#fff;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit'>💾 " + (isEN ? "Add to DB" : "Ajouter") + "</button>";
+
+  html += "</div>";
+  html += "</div>";
+
   resultDiv.style.display = "block";
-  resultDiv.innerHTML =
-    "<div style=\"background:#fff;border:1px solid var(--bdr);border-radius:16px;padding:20px\">" +
-      "<div style=\"display:flex;align-items:center;gap:10px;margin-bottom:14px\">" +
-        "<div style=\"font-size:36px\">🧴</div>" +
-        "<div>" +
-          "<div style=\"font-size:14px;font-weight:700;color:#3D2B1F\">" + name + "</div>" +
-          (brand ? "<div style=\"font-size:12px;color:#8B6F5E\">" + brand + "</div>" : "") +
-        "</div>" +
-      "</div>" +
-      "<div style=\"background:#FDF0E6;border-radius:12px;padding:12px;margin-bottom:14px\">" +
-        "<div style=\"font-size:12px;color:#C4726A;font-weight:600\">" + 
-          (isEN ? "ℹ️ This product was found in the Open Beauty Facts database, but is not yet in our personalized routine system." : 
-                  "ℹ️ Ce produit a été trouvé dans la base Open Beauty Facts, mais il n'est pas encore dans notre système de routine personnalisée.") + 
-        "</div>" +
-      "</div>" +
-      "<button onclick=\"submitBarcodeContrib('" + code + "', '" + name.replace(/'/g, "") + "', '" + brand.replace(/'/g, "") + "')\" style=\"width:100%;padding:13px;border-radius:50px;border:none;background:#C4726A;color:#fff;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;margin-bottom:10px\">" +
-        (isEN ? "Add to SkinMatch database 🙌" : "Ajouter à la base SkinMatch 🙌") +
-      "</button>" +
-      "<button onclick=\"resetBarcodeScanner()\" style=\"width:100%;padding:12px;border-radius:50px;border:1.5px solid var(--acc);background:transparent;color:var(--acc2);font-size:13px;font-weight:600;cursor:pointer;font-family:inherit\">" +
-        (isEN ? "Scan again" : "Rescanner") +
-      "</button>" +
-    "</div>";
+  resultDiv.innerHTML = html;
+
+  setTimeout(function() {
+    var b1=document.getElementById('scan-again-btn'); if(b1) b1.onclick=function(){startBarcodeCamera();};
+    var b2=document.getElementById('contrib-btn2'); if(b2) b2.onclick=function(){submitBarcodeContrib(code,name,brand||'');};
+  }, 50);
+
+  setTimeout(function() {
+
+    if (scanScreen) scanScreen.scrollTo({ top: 0, behavior: "smooth" });
+  }, 100);
 }
 
-async function submitBarcodeContrib(code, prefillName, prefillBrand) {
-  var nameEl = document.getElementById("contrib-name");
-  var brandEl = document.getElementById("contrib-brand");
-  var name = prefillName || (nameEl ? nameEl.value.trim() : "");
-  var brand = prefillBrand || (brandEl ? brandEl.value.trim() : "");
-  
-  if (!name) {
-    if (nameEl) nameEl.style.borderColor = "#C62828";
-    return;
-  }
-
-  // Sauvegarder dans Firestore collection community_eans
-  if (window._firebaseReady) {
-    try {
-      await window._setDoc(window._doc(window._db, "community_eans", code), {
-        ean: code,
-        nom: name,
-        marque: brand,
-        addedBy: window._currentUser ? window._currentUser.uid : "anonymous",
-        addedAt: new Date().toISOString(),
-        validated: false
-      });
-    } catch(e) { console.log("Firestore contrib error:", e); }
-  }
-
-  // Sauvegarder aussi en localStorage comme cache local
-  var localEans = JSON.parse(localStorage.getItem("skinmatch_community_eans") || "{}");
-  localEans[code] = { nom: name, marque: brand, date: new Date().toISOString() };
-  localStorage.setItem("skinmatch_community_eans", JSON.stringify(localEans));
-
-  // Toast confirmation
-  var resultDiv = document.getElementById("scan-product-result");
-  if (resultDiv) {
-    resultDiv.innerHTML = 
-      "<div style=\"background:#E8F5E9;border:1px solid #A5D6A7;border-radius:16px;padding:24px;text-align:center\">" +
-        "<div style=\"font-size:40px;margin-bottom:10px\">🙌</div>" +
-        "<div style=\"font-size:14px;font-weight:700;color:#2E7D32;margin-bottom:6px\">" + (LANG === "en" ? "Thank you!" : "Merci !") + "</div>" +
-        "<div style=\"font-size:12px;color:#388E3C;margin-bottom:16px\">" + 
-          (LANG === "en" ? name + " has been added. The next user who scans this product will find it directly!" : 
-                           name + " a été ajouté. Le prochain utilisateur qui scannera ce produit le trouvera directement !") + 
-        "</div>" +
-        "<button onclick=\"resetBarcodeScanner()\" style=\"padding:12px 24px;border-radius:50px;border:none;background:#2E7D32;color:#fff;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit\">" +
-          (LANG === "en" ? "Scan another product" : "Scanner un autre produit") +
-        "</button>" +
-      "</div>";
-  }
-}
 
 function scanBarcodeFromFile(input) {
   var file = input.files[0];
@@ -5586,7 +5623,13 @@ function displayScanResult(data) {
   }
 
   resultDiv.innerHTML = html;
-  setTimeout(function() { resultDiv.scrollIntoView({behavior:"smooth", block:"start"}); }, 200);
+  // Scroll vers le résultat dans le screen fixe
+  setTimeout(function() {
+    var scanScreen = document.getElementById("sc-scan-product");
+    if (scanScreen) {
+      scanScreen.scrollTo({ top: resultDiv.offsetTop, behavior: "smooth" });
+    }
+  }, 200);
 }
 
 
@@ -7304,6 +7347,7 @@ async function doLogin() {
     window._currentUser = cred.user;
     var snap = await window._getDoc(window._doc(window._db, 'users', cred.user.uid));
     if (snap.exists() && snap.data().lastRoutine) window._savedRoutine = snap.data().lastRoutine;
+    window._routineLoaded = true;
     showWelcomeToast(cred.user.displayName || cred.user.email.split('@')[0]);
     go('welcome');
   } catch(e) {
@@ -7388,6 +7432,7 @@ async function loadSavedRoutine(user) {
     if (snap.exists() && snap.data().lastRoutine) {
       window._savedRoutine = snap.data().lastRoutine;
     }
+    window._routineLoaded = true;
   } catch(e) { console.log('loadSavedRoutine error:', e); }
 }
 
@@ -7468,11 +7513,36 @@ function navTo(screen) {
   if (typeof stopBarcodeCamera === 'function') stopBarcodeCamera();
 
   if (screen === 'result') {
-    if (!ST.result && window._savedRoutine) {
+    if (ST.result) {
+      // Routine déjà en mémoire — afficher directement
+    } else if (window._savedRoutine) {
+      // Routine sauvegardée disponible — recharger
       reloadSavedRoutine();
       updateNav('result');
       return;
-    } else if (!ST.result) {
+    } else if (window._currentUser && !window._routineLoaded) {
+      // Connecté mais Firestore pas encore chargé — attendre
+      var _retryRoutine = document.createElement('div');
+      _retryRoutine.style.cssText = 'position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:#fff;border-radius:20px;padding:28px 24px;text-align:center;z-index:9999;box-shadow:0 8px 40px rgba(0,0,0,.15);max-width:280px;width:90%';
+      _retryRoutine.innerHTML = '<div style="font-size:32px;margin-bottom:12px">⏳</div><div style="font-size:15px;font-weight:700;color:#3D2B1F;margin-bottom:8px">Chargement de ta routine...</div><div style="font-size:12px;color:#8B6F5E">Connexion à ton compte en cours</div>';
+      document.body.appendChild(_retryRoutine);
+      setTimeout(function() {
+        _retryRoutine.remove();
+        if (window._savedRoutine) {
+          reloadSavedRoutine();
+          go('result');
+          updateNav('result');
+        } else if (ST.result) {
+          go('result');
+          updateNav('result');
+        } else {
+          go('q1');
+          updateNav(null);
+        }
+      }, 2000);
+      return;
+    } else {
+      // Pas connecté et pas de routine → diagnostic
       go('q1');
       updateNav(null);
       return;
@@ -7995,56 +8065,29 @@ function _launchApp(lang, region) {
   setTimeout(applyWelcomeLang, 50);
 }
 
-// Si localStorage a déjà la langue → lancer immédiatement sans attendre Firebase
-if (_savedLang) {
-  _launchApp(_savedLang, _savedRegion || 'fr');
-  _hideSplash();
-}
+// LANCEMENT IMMÉDIAT — toujours, peu importe Firebase
+// Langue depuis localStorage ou 'fr' par défaut
+_launchApp(_savedLang || 'fr', _savedRegion || 'fr');
+_hideSplash();
+var _appLaunched = true;
 
-// Timeout de sécurité — seulement si on n'a pas déjà lancé
-var _appLaunched = !!_savedLang;
-var _firebaseWait = setTimeout(function() {
-  if (!_appLaunched) {
-    // Vraiment première visite sans compte
-    go('lang');
-    _hideSplash();
-  }
-}, 8000);
+// Firebase charge en arrière-plan — enrichit l'expérience sans bloquer
+var _firebaseWait = null; // plus de timeout bloquant
 
 window._onAuthResolved = function(user) {
-  clearTimeout(_firebaseWait);
   if (user) {
-    // Connecté — lancer l'accueil immédiatement si pas déjà fait
-    var lang = _savedLang || 'fr';
-    var region = _savedRegion || 'fr';
-    if (!_appLaunched) {
-      _appLaunched = true;
-      _launchApp(lang, region);
-      _hideSplash();
-    }
-    // Charger Firestore en arrière-plan
+    // Connecté — charger routine et préférences Firestore en arrière-plan
     loadSavedRoutine(user).then(function() {
-      var firestoreLang = LANG || lang;
-      var firestoreRegion = REGION || region;
-      if (firestoreLang) {
-        LANG = firestoreLang;
-        REGION = firestoreRegion;
-        localStorage.setItem('skinmatch_lang', LANG);
-        localStorage.setItem('skinmatch_region', REGION);
-      }
+      // Mettre à jour langue/région si Firestore en a une différente
+      var fl = LANG || _savedLang || 'fr';
+      var fr2 = REGION || _savedRegion || 'fr';
+      LANG = fl; REGION = fr2;
+      localStorage.setItem('skinmatch_lang', fl);
+      localStorage.setItem('skinmatch_region', fr2);
+      applyWelcomeLang();
     }).catch(function() {});
-  } else {
-    // Pas connecté
-    if (!_appLaunched) {
-      _appLaunched = true;
-      if (_savedLang) {
-        _launchApp(_savedLang, _savedRegion || 'fr');
-      } else {
-        go('lang');
-      }
-      _hideSplash();
-    }
   }
+  // Pas connecté → rien à faire, l'appli est déjà lancée
 };
 initQuestions();
 </script>
