@@ -597,6 +597,7 @@ h2{font-family:var(--serif);font-size:20px;font-weight:700;margin-bottom:3px}
 }
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://unpkg.com/@zxing/library@0.19.1/umd/index.min.js"></script>
 </head>
 <body>
 <div class="app" id="app">
@@ -4552,9 +4553,16 @@ function startBarcodeCamera() {
   var noCam = document.getElementById("barcode-no-camera");
   if (!video) return;
 
-  // Init BarcodeDetector si disponible
-  if (window.BarcodeDetector) {
+  // Préférer ZXing sur Safari iOS (plus fiable)
+  var isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+  if (window.ZXing && (isSafari || !window.BarcodeDetector)) {
+    // ZXing sera utilisé dans la boucle
+    barcodeDetector = null;
+    window._useZXing = true;
+    console.log("ZXing activé pour ce navigateur");
+  } else if (window.BarcodeDetector) {
     barcodeDetector = new BarcodeDetector({ formats: ["ean_13","ean_8","upc_a","upc_e","code_128","code_39","qr_code"] });
+    window._useZXing = false;
   }
 
   if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
@@ -4563,7 +4571,13 @@ function startBarcodeCamera() {
   }
 
   navigator.mediaDevices.getUserMedia({
-    video: { facingMode: barcodeFacingMode, width: { ideal: 1280 }, height: { ideal: 720 } },
+    video: {
+      facingMode: barcodeFacingMode,
+      width: { ideal: 1920 },
+      height: { ideal: 1080 },
+      focusMode: { ideal: "continuous" },
+      advanced: [{ focusDistance: { ideal: 0.05 } }]
+    },
     audio: false
   }).then(function(stream) {
     barcodeStream = stream;
@@ -4605,20 +4619,46 @@ function scanBarcodeLoop() {
     return;
   }
 
-  // Utiliser BarcodeDetector natif si disponible
-  if (barcodeDetector) {
+  // ── ZXing (Safari iOS et navigateurs sans BarcodeDetector) ──
+  if (window._useZXing && window.ZXing) {
+    try {
+      var hints = new Map();
+      hints.set(window.ZXing.DecodeHintType.TRY_HARDER, true);
+      var reader = new window.ZXing.MultiFormatReader();
+      reader.setHints(hints);
+      var ctx = canvas.getContext("2d");
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight;
+      ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+      var imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+      var luminance = new window.ZXing.HTMLCanvasElementLuminanceSource(canvas);
+      var binaryBitmap = new window.ZXing.BinaryBitmap(new window.ZXing.HybridBinarizer(luminance));
+      try {
+        var result = reader.decode(binaryBitmap);
+        if (result && result.getText()) {
+          onBarcodeDetected(result.getText());
+          return;
+        }
+      } catch(e) {
+        // Pas de code détecté cette frame — continuer
+      }
+    } catch(e2) {}
+    if (barcodeScanning) setTimeout(scanBarcodeLoop, 200);
+
+  // ── BarcodeDetector natif (Chrome Android) ──
+  } else if (barcodeDetector) {
     barcodeDetector.detect(video).then(function(codes) {
       if (codes && codes.length > 0) {
-        var code = codes[0].rawValue;
-        onBarcodeDetected(code);
+        onBarcodeDetected(codes[0].rawValue);
       } else {
         if (barcodeScanning) setTimeout(scanBarcodeLoop, 300);
       }
     }).catch(function() {
       if (barcodeScanning) setTimeout(scanBarcodeLoop, 300);
     });
+
   } else {
-    // Fallback: scanner toutes les 500ms et chercher dans la DB par code EAN connu
+    // Aucun scanner disponible
     if (barcodeScanning) setTimeout(scanBarcodeLoop, 500);
   }
 }
@@ -5063,7 +5103,7 @@ function scanBarcodeFromFile(input) {
       });
     } else {
       URL.revokeObjectURL(url);
-      alert("BarcodeDetector non disponible sur cet appareil.");
+      alert("Scanner non disponible. Essaye de saisir le nom du produit manuellement.");
     }
   };
   img.src = url;
@@ -7943,37 +7983,67 @@ function _checkSharedRoutine() {
 
 
 // Timeout 2.5s si Firebase ne répond pas
-var _firebaseWait = setTimeout(function() {
-  if (_savedLang && _savedRegion) {
-    LANG = _savedLang; REGION = _savedRegion;
-    initQuestions(); go('welcome'); updateNav('welcome');
-    setTimeout(applyWelcomeLang, 50);
-  } else { go('lang'); }
+// Fonction helper pour lancer l'accueil
+function _launchApp(lang, region) {
+  LANG = lang || 'fr';
+  REGION = region || 'fr';
+  localStorage.setItem('skinmatch_lang', LANG);
+  localStorage.setItem('skinmatch_region', REGION);
+  initQuestions();
+  go('welcome');
+  updateNav('welcome');
+  setTimeout(applyWelcomeLang, 50);
+}
+
+// Si localStorage a déjà la langue → lancer immédiatement sans attendre Firebase
+if (_savedLang) {
+  _launchApp(_savedLang, _savedRegion || 'fr');
   _hideSplash();
-}, 5000);
+}
+
+// Timeout de sécurité — seulement si on n'a pas déjà lancé
+var _appLaunched = !!_savedLang;
+var _firebaseWait = setTimeout(function() {
+  if (!_appLaunched) {
+    // Vraiment première visite sans compte
+    go('lang');
+    _hideSplash();
+  }
+}, 8000);
 
 window._onAuthResolved = function(user) {
   clearTimeout(_firebaseWait);
   if (user) {
-    loadSavedRoutine(user).then(function() {
-      var lang = LANG || localStorage.getItem('skinmatch_lang');
-      var region = REGION || localStorage.getItem('skinmatch_region');
-      if (lang && region) {
-        LANG = lang; REGION = region;
-        localStorage.setItem('skinmatch_lang', lang);
-        localStorage.setItem('skinmatch_region', region);
-        initQuestions(); go('welcome'); updateNav('welcome');
-        setTimeout(applyWelcomeLang, 50);
-      } else { go('lang'); }
+    // Connecté — lancer l'accueil immédiatement si pas déjà fait
+    var lang = _savedLang || 'fr';
+    var region = _savedRegion || 'fr';
+    if (!_appLaunched) {
+      _appLaunched = true;
+      _launchApp(lang, region);
       _hideSplash();
-    });
+    }
+    // Charger Firestore en arrière-plan
+    loadSavedRoutine(user).then(function() {
+      var firestoreLang = LANG || lang;
+      var firestoreRegion = REGION || region;
+      if (firestoreLang) {
+        LANG = firestoreLang;
+        REGION = firestoreRegion;
+        localStorage.setItem('skinmatch_lang', LANG);
+        localStorage.setItem('skinmatch_region', REGION);
+      }
+    }).catch(function() {});
   } else {
-    if (_savedLang && _savedRegion) {
-      LANG = _savedLang; REGION = _savedRegion;
-      initQuestions(); go('welcome'); updateNav('welcome');
-      setTimeout(applyWelcomeLang, 50);
-    } else { go('lang'); }
-    _hideSplash();
+    // Pas connecté
+    if (!_appLaunched) {
+      _appLaunched = true;
+      if (_savedLang) {
+        _launchApp(_savedLang, _savedRegion || 'fr');
+      } else {
+        go('lang');
+      }
+      _hideSplash();
+    }
   }
 };
 initQuestions();
