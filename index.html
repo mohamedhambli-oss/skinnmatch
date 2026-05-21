@@ -599,7 +599,7 @@ h2{font-family:var(--serif);font-size:20px;font-weight:700;margin-bottom:3px}
 }
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-<script src="https://unpkg.com/@zxing/library@0.19.1/umd/index.min.js"></script>
+<script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
 </head>
 <body>
 <div class="app" id="app">
@@ -1145,74 +1145,23 @@ h2{font-family:var(--serif);font-size:20px;font-weight:700;margin-bottom:3px}
 
     <!-- Zone de scan caméra code-barres -->
     <div id="barcode-camera-zone" style="margin-bottom:16px">
-      <div style="position:relative;width:100%;height:260px;background:#111;border-radius:20px;overflow:hidden">
-        
-        <!-- Flux vidéo -->
-        <video id="barcode-video" autoplay playsinline muted style="width:100%;height:100%;object-fit:cover;display:block"></video>
-        
-        <!-- Canvas de scan -->
-        <canvas id="barcode-canvas" style="display:none"></canvas>
-        
-        <!-- Overlay viseur -->
-        <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none">
-          <!-- Zone de scan rectangulaire -->
-          <div style="width:75%;height:110px;position:relative">
-            <!-- Coins du viseur -->
-            <div style="position:absolute;top:0;left:0;width:24px;height:24px;border-top:3px solid #C4726A;border-left:3px solid #C4726A;border-radius:3px 0 0 0"></div>
-            <div style="position:absolute;top:0;right:0;width:24px;height:24px;border-top:3px solid #C4726A;border-right:3px solid #C4726A;border-radius:0 3px 0 0"></div>
-            <div style="position:absolute;bottom:0;left:0;width:24px;height:24px;border-bottom:3px solid #C4726A;border-left:3px solid #C4726A;border-radius:0 0 0 3px"></div>
-            <div style="position:absolute;bottom:0;right:0;width:24px;height:24px;border-bottom:3px solid #C4726A;border-right:3px solid #C4726A;border-radius:0 0 3px 0"></div>
-            <!-- Ligne de scan animée -->
-            <div id="scan-line" style="position:absolute;left:4px;right:4px;height:2px;background:linear-gradient(90deg,transparent,#C4726A,transparent);animation:scanLine 2s ease-in-out infinite"></div>
-          </div>
-        </div>
 
-        <!-- Overlay sombre haut/bas -->
-        <div style="position:absolute;top:0;left:0;right:0;height:30%;background:rgba(0,0,0,0.5);pointer-events:none"></div>
-        <div style="position:absolute;bottom:0;left:0;right:0;height:30%;background:rgba(0,0,0,0.5);pointer-events:none"></div>
+      <!-- Zone vidéo scan -->
+      <div id="reader" style="width:100%;border-radius:20px;overflow:hidden"></div>
 
-        <!-- Message guidage -->
-        <div style="position:absolute;top:12px;left:0;right:0;text-align:center;pointer-events:none">
-          <span id="barcode-guide" style="background:rgba(0,0,0,.65);color:#fff;border-radius:20px;padding:5px 14px;font-size:12px;font-weight:600">📷 Pointez le code-barres vers la caméra</span>
-        </div>
-
-        <!-- Bouton flip + galerie -->
-        <div style="position:absolute;bottom:12px;left:0;right:0;display:flex;justify-content:center;gap:16px">
-          <button onclick="flipBarcodeCamera()" style="width:40px;height:40px;border-radius:50%;background:rgba(255,255,255,.2);border:2px solid rgba(255,255,255,.3);color:#fff;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center">🔄</button>
-          <button onclick="document.getElementById('barcode-file-input').click()" style="width:40px;height:40px;border-radius:50%;background:rgba(255,255,255,.2);border:2px solid rgba(255,255,255,.3);color:#fff;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center">🖼️</button>
-        </div>
-
-        <!-- Pas de caméra -->
-        <div id="barcode-no-camera" style="display:none;position:absolute;inset:0;background:#111;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding:20px">
-          <div style="font-size:36px">📷</div>
-          <div style="font-size:13px;font-weight:600;color:#fff">Caméra non disponible</div>
-          <div style="font-size:11px;color:rgba(255,255,255,.6);text-align:center">Recherche le produit par son nom</div>
-        </div>
+      <!-- Loader pendant analyse -->
+      <div id="scan-loading" style="display:none;text-align:center;padding:24px">
+        <div style="font-size:32px;margin-bottom:10px">🔍</div>
+        <div style="font-size:14px;font-weight:600;color:#3D2B1F">Analyse en cours...</div>
       </div>
-      <input type="file" id="barcode-file-input" accept="image/*" style="display:none" onchange="scanBarcodeFromFile(this)">
-    </div>
 
-    <!-- Recherche manuelle -->
-    <div style="margin-bottom:16px">
-      <div style="display:flex;gap:8px">
-        <input id="product-search-input" type="text" placeholder="Ou cherche un produit par nom..." autocomplete="off" autocorrect="off" autocapitalize="off" style="flex:1;padding:12px 16px;border-radius:50px;border:1.5px solid var(--bdr);font-size:15px;font-family:inherit;outline:none;background:#fff;-webkit-appearance:none" oninput="searchProductScan(this.value)">
-        <button onclick="simulateScan()" style="padding:12px 16px;border-radius:50px;background:#C4726A;border:none;color:#fff;font-weight:700;cursor:pointer;font-size:13px;font-family:inherit;white-space:nowrap">🔍</button>
+      <!-- Message guide -->
+      <div id="scan-guide" style="text-align:center;padding:14px;font-size:13px;color:#8B6F5E;margin-top:8px">
+        Pointe la caméra vers le code-barres du produit
       </div>
+
     </div>
 
-    <style>
-      @keyframes scanLine {
-        0% { top: 4px; opacity: 1; }
-        50% { top: calc(100% - 6px); opacity: 0.8; }
-        100% { top: 4px; opacity: 1; }
-      }
-    </style>
-
-    <!-- Suggestions de recherche -->
-    <div id="scan-suggestions" style="display:none;margin-bottom:16px">
-      <p style="font-size:11px;color:#B0958F;font-weight:600;margin-bottom:8px;text-transform:uppercase;letter-spacing:.5px">Suggestions</p>
-      <div id="scan-suggestions-list" style="display:flex;flex-direction:column;gap:6px"></div>
-    </div>
 
     <!-- Résultat du scan -->
     <div id="scan-product-result" style="display:none">
@@ -4547,127 +4496,79 @@ var SCAN_DEMO_PRODUCTS = {
 // ══ CAMÉRA CODE-BARRES ══
 var barcodeStream = null;
 var barcodeFacingMode = "environment"; // caméra arrière pour scanner
-var barcodeDetector = null;
+var _barcodeDetectorOld = null;
 var barcodeScanning = false;
 
+var _html5QrScanner = null;
+
 function startBarcodeCamera() {
-  var video = document.getElementById("barcode-video");
-  var noCam = document.getElementById("barcode-no-camera");
-  if (!video) return;
+  var isEN = LANG === 'en';
 
-  // Préférer ZXing sur Safari iOS (plus fiable)
-  var isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
-  if (window.ZXing && (isSafari || !window.BarcodeDetector)) {
-    // ZXing sera utilisé dans la boucle
-    barcodeDetector = null;
-    window._useZXing = true;
-    console.log("ZXing activé pour ce navigateur");
-  } else if (window.BarcodeDetector) {
-    barcodeDetector = new BarcodeDetector({ formats: ["ean_13","ean_8","upc_a","upc_e","code_128","code_39","qr_code"] });
-    window._useZXing = false;
-  }
-
-  if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-    if (noCam) { noCam.style.display = "flex"; video.style.display = "none"; }
+  // Vérifier quota
+  if (!_canScan('product')) {
+    _showScanPaywall('product');
     return;
   }
 
-  navigator.mediaDevices.getUserMedia({
-    video: {
-      facingMode: barcodeFacingMode,
-      width: { ideal: 1920 },
-      height: { ideal: 1080 },
-      focusMode: { ideal: "continuous" },
-      advanced: [{ focusDistance: { ideal: 0.05 } }]
+  // Nettoyer si déjà actif
+  if (_html5QrScanner) {
+    try { _html5QrScanner.stop(); } catch(e) {}
+    _html5QrScanner = null;
+  }
+
+  document.getElementById('scan-guide').textContent =
+    isEN ? 'Point camera at the barcode' : 'Pointe la caméra vers le code-barres';
+
+  var config = {
+    fps: 15,
+    qrbox: { width: 280, height: 120 },
+    aspectRatio: 1.5,
+    formatsToSupport: [
+      Html5QrcodeSupportedFormats.EAN_13,
+      Html5QrcodeSupportedFormats.EAN_8,
+      Html5QrcodeSupportedFormats.UPC_A,
+      Html5QrcodeSupportedFormats.UPC_E,
+      Html5QrcodeSupportedFormats.CODE_128,
+      Html5QrcodeSupportedFormats.CODE_39
+    ]
+  };
+
+  _html5QrScanner = new Html5Qrcode("reader");
+  _html5QrScanner.start(
+    { facingMode: "environment" },
+    config,
+    function(decodedText) {
+      // Code détecté !
+      onBarcodeDetected(decodedText);
     },
-    audio: false
-  }).then(function(stream) {
-    barcodeStream = stream;
-    video.srcObject = stream;
-    video.style.display = "block";
-    if (noCam) noCam.style.display = "none";
-    video.onloadedmetadata = function() {
-      barcodeScanning = true;
-      scanBarcodeLoop();
-    };
-  }).catch(function(err) {
-    console.log("Barcode camera error:", err);
-    if (noCam) { noCam.style.display = "flex"; video.style.display = "none"; }
+    function(error) {
+      // Erreurs ignorées — c'est normal tant que rien n'est détecté
+    }
+  ).catch(function(err) {
+    document.getElementById('scan-guide').textContent =
+      isEN ? 'Camera access denied. Please allow camera.' : 'Accès caméra refusé. Autorise la caméra.';
+    console.log('Camera error:', err);
   });
 }
 
 function stopBarcodeCamera() {
-  barcodeScanning = false;
-  if (barcodeStream) {
-    barcodeStream.getTracks().forEach(function(t) { t.stop(); });
-    barcodeStream = null;
-  }
-  var video = document.getElementById("barcode-video");
-  if (video) video.srcObject = null;
-}
-
-function flipBarcodeCamera() {
-  barcodeFacingMode = barcodeFacingMode === "environment" ? "user" : "environment";
-  stopBarcodeCamera();
-  startBarcodeCamera();
-}
-
-function scanBarcodeLoop() {
-  if (!barcodeScanning) return;
-  var video = document.getElementById("barcode-video");
-  var canvas = document.getElementById("barcode-canvas");
-  if (!video || !canvas || !video.videoWidth) {
-    requestAnimationFrame(scanBarcodeLoop);
-    return;
-  }
-
-  // ── ZXing (Safari iOS et navigateurs sans BarcodeDetector) ──
-  if (window._useZXing && window.ZXing) {
+  if (_html5QrScanner) {
     try {
-      var hints = new Map();
-      hints.set(window.ZXing.DecodeHintType.TRY_HARDER, true);
-      var reader = new window.ZXing.MultiFormatReader();
-      reader.setHints(hints);
-      var ctx = canvas.getContext("2d");
-      canvas.width = video.videoWidth;
-      canvas.height = video.videoHeight;
-      ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-      var imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-      var luminance = new window.ZXing.HTMLCanvasElementLuminanceSource(canvas);
-      var binaryBitmap = new window.ZXing.BinaryBitmap(new window.ZXing.HybridBinarizer(luminance));
-      try {
-        var result = reader.decode(binaryBitmap);
-        if (result && result.getText()) {
-          onBarcodeDetected(result.getText());
-          return;
-        }
-      } catch(e) {
-        // Pas de code détecté cette frame — continuer
-      }
-    } catch(e2) {}
-    if (barcodeScanning) setTimeout(scanBarcodeLoop, 200);
-
-  // ── BarcodeDetector natif (Chrome Android) ──
-  } else if (barcodeDetector) {
-    barcodeDetector.detect(video).then(function(codes) {
-      if (codes && codes.length > 0) {
-        onBarcodeDetected(codes[0].rawValue);
-      } else {
-        if (barcodeScanning) setTimeout(scanBarcodeLoop, 300);
-      }
-    }).catch(function() {
-      if (barcodeScanning) setTimeout(scanBarcodeLoop, 300);
-    });
-
-  } else {
-    // Aucun scanner disponible
-    if (barcodeScanning) setTimeout(scanBarcodeLoop, 500);
+      _html5QrScanner.stop().then(function() {
+        _html5QrScanner = null;
+      }).catch(function() {
+        _html5QrScanner = null;
+      });
+    } catch(e) {
+      _html5QrScanner = null;
+    }
   }
 }
+
 
 async function onBarcodeDetected(code) {
-  barcodeScanning = false;
   stopBarcodeCamera();
+  document.getElementById("scan-loading").style.display = "block";
   if (!_canScan('product')) { _showScanPaywall('product'); return; }
   var guide = document.getElementById("barcode-guide");
   if (guide) guide.textContent = "✅ Code détecté : " + code;
@@ -5129,8 +5030,8 @@ function scanBarcodeFromFile(input) {
   var img = new Image();
   var url = URL.createObjectURL(file);
   img.onload = function() {
-    if (barcodeDetector) {
-      barcodeDetector.detect(img).then(function(codes) {
+    if (_barcodeDetectorOld) {
+      _barcodeDetectorOld.detect(img).then(function(codes) {
         URL.revokeObjectURL(url);
         if (codes && codes.length > 0) {
           onBarcodeDetected(codes[0].rawValue);
@@ -8573,6 +8474,149 @@ function replaceProduct(key) {
   });
   ov.appendChild(mo);document.body.appendChild(ov);
 }
+
+
+// ══ SCAN PAR PHOTO (Safari iOS) ══
+function switchToPhotoMode() {
+  document.getElementById('scan-photo-mode').style.display = 'block';
+  document.getElementById('scan-video-mode').style.display = 'none';
+  stopBarcodeCamera();
+}
+
+function switchToVideoMode() {
+  document.getElementById('scan-photo-mode').style.display = 'none';
+  document.getElementById('scan-video-mode').style.display = 'block';
+  startBarcodeCamera();
+}
+
+function handleBarcodePhoto(input) {
+  var file = input.files && input.files[0];
+  if (!file) return;
+
+  document.getElementById('scan-loading').style.display = 'block';
+  document.getElementById('scan-product-result').style.display = 'none';
+  input.value = '';
+
+  var reader = new FileReader();
+  reader.onload = function(e) {
+    var base64 = e.target.result.split(',')[1];
+    var mimeType = file.type || 'image/jpeg';
+    _analyzePhotoWithGemini(base64, mimeType);
+  };
+  reader.readAsDataURL(file);
+}
+
+async function _analyzePhotoWithGemini(base64, mimeType) {
+  var isEN = LANG === 'en';
+  var GEMINI_KEY = "AIzaSyAcnK0dToixkPc6jgteaDK5w3XD4XKuU_Y";
+
+  try {
+    var prompt = isEN
+      ? "Look at this image. If you see a barcode (EAN-13, EAN-8, UPC-A or similar), read it and return ONLY the numeric code, nothing else. If you cannot read a barcode, return ONLY the word NONE."
+      : "Regarde cette image. Si tu vois un code-barres (EAN-13, EAN-8, UPC-A ou similaire), lis-le et retourne UNIQUEMENT le code numérique, rien d'autre. Si tu ne peux pas lire de code-barres, retourne UNIQUEMENT le mot NONE.";
+
+    var response = await fetch(
+      "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=" + GEMINI_KEY,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          contents: [{
+            parts: [
+              { text: prompt },
+              { inline_data: { mime_type: mimeType, data: base64 } }
+            ]
+          }],
+          generationConfig: { temperature: 0, maxOutputTokens: 50 }
+        })
+      }
+    );
+
+    var data = await response.json();
+    var text = (data.candidates && data.candidates[0] &&
+                data.candidates[0].content && data.candidates[0].content.parts &&
+                data.candidates[0].content.parts[0].text || '').trim();
+
+    document.getElementById('scan-loading').style.display = 'none';
+
+    // Extraire le code numérique
+    var code = text.replace(/[^0-9]/g, '');
+    if (code && code.length >= 8) {
+      onBarcodeDetected(code);
+    } else if (text === 'NONE' || text === 'None' || code.length < 8) {
+      // Gemini n'a pas trouvé de code — essayer BarcodeDetector natif
+      _tryNativeDetect(base64, mimeType);
+    } else {
+      _photoNotDetected();
+    }
+
+  } catch(e) {
+    document.getElementById('scan-loading').style.display = 'none';
+    _tryNativeDetect(base64, mimeType);
+  }
+}
+
+function _tryNativeDetect(base64, mimeType) {
+  if (!window.BarcodeDetector) { _photoNotDetected(); return; }
+  var img = new Image();
+  img.onload = function() {
+    var canvas = document.createElement('canvas');
+    canvas.width = img.width; canvas.height = img.height;
+    canvas.getContext('2d').drawImage(img, 0, 0);
+    var detector = new BarcodeDetector({ formats: ['ean_13','ean_8','upc_a','upc_e','code_128'] });
+    detector.detect(canvas).then(function(codes) {
+      if (codes && codes.length > 0) {
+        document.getElementById('scan-loading').style.display = 'none';
+        onBarcodeDetected(codes[0].rawValue);
+      } else {
+        _photoNotDetected();
+      }
+    }).catch(function() { _photoNotDetected(); });
+  };
+  img.src = 'data:' + mimeType + ';base64,' + base64;
+}
+
+function _photoNotDetected() {
+  document.getElementById('scan-loading').style.display = 'none';
+  var resultDiv = document.getElementById('scan-product-result');
+  resultDiv.style.display = 'block';
+  var isEN = LANG === 'en';
+  resultDiv.innerHTML =
+    '<div style="background:#FFF8E1;border-radius:16px;padding:20px;text-align:center;border:1px solid #FFE082">' +
+    '<div style="font-size:32px;margin-bottom:10px">😕</div>' +
+    '<div style="font-size:15px;font-weight:700;color:#3D2B1F;margin-bottom:8px">' +
+      (isEN ? 'Code not detected' : 'Code non détecté') +
+    '</div>' +
+    '<div style="font-size:13px;color:#8B6F5E;margin-bottom:16px;line-height:1.7">' +
+      (isEN
+        ? 'Make sure the barcode is well-lit and fully visible in the photo. Try again or search manually below.'
+        : 'Assure-toi que le code-barres est bien éclairé et entièrement visible. Réessaie ou recherche manuellement.') +
+    '</div>' +
+    '<label for="barcode-photo-input" style="display:inline-block;padding:12px 24px;background:#C4726A;color:#fff;border-radius:50px;font-size:13px;font-weight:700;cursor:pointer;margin-bottom:10px">' +
+      '📷 ' + (isEN ? 'Retry' : 'Réessayer') +
+    '</label>' +
+    '<div style="margin-top:12px;font-size:13px;font-weight:700;color:#3D2B1F;margin-bottom:8px">' +
+      (isEN ? 'Or search manually:' : 'Ou rechercher manuellement :') +
+    '</div>' +
+    '<div style="display:flex;gap:8px">' +
+      '<input id="manual-search-input" type="text" placeholder="' + (isEN ? 'Product name...' : 'Nom du produit...') + '" style="flex:1;padding:10px 14px;border:1.5px solid rgba(196,114,106,.3);border-radius:50px;font-size:13px;font-family:inherit;outline:none">' +
+      '<button onclick="runManualSearch()" style="padding:10px 16px;border-radius:50px;border:none;background:#C4726A;color:#fff;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">' + (isEN ? 'Go' : 'OK') + '</button>' +
+    '</div>' +
+    '<div id="manual-search-results" style="margin-top:10px"></div>' +
+    '</div>';
+  _scrollScanToTop();
+}
+
+// Auto-détecter le mode selon le navigateur
+window.addEventListener('load', function() {
+  // Sur Safari iOS → mode photo par défaut (plus fiable)
+  // Sur Chrome Android → mode vidéo par défaut
+  var isChrome = /Chrome/.test(navigator.userAgent) && /Android/.test(navigator.userAgent);
+  if (isChrome) {
+    switchToVideoMode();
+  }
+  // Sur Safari iOS le mode photo est déjà affiché par défaut
+});
 
 </script>
 
