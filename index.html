@@ -30,46 +30,63 @@
 <title>SkinMatch — Your Skin, Your Routine</title>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
 <!-- Firebase SDK -->
-<script>
-// Firebase désactivé — mode hors-ligne
-window._firebaseReady = false;
-window._currentUser = null;
-window._auth = null;
-window._db = null;
-window._createUserWithEmailAndPassword = function() { return Promise.reject(new Error('Firebase non disponible')); };
-window._signInWithEmailAndPassword = function() { return Promise.reject(new Error('Firebase non disponible')); };
-window._signInWithPopup = function() { return Promise.reject(new Error('Firebase non disponible')); };
-window._signOut = function() { return Promise.resolve(); };
-window._updateProfile = function() { return Promise.resolve(); };
-window._doc = function() { return null; };
-window._setDoc = function() { return Promise.resolve(); };
-window._getDoc = function() { return Promise.resolve({exists: function(){return false;}, data: function(){return null;}}); };
-window._updateDoc = function() { return Promise.resolve(); };
-// Déclencher immédiatement sans attendre Firebase
-setTimeout(function() {
-    if (typeof window._onAuthResolved === 'function') window._onAuthResolved(null);
-}, 0);
-</script>
-<script>
-// Global error handler - prevents silent crashes on Safari
-window.onerror = function(msg, src, line, col, err) {
-  // Silently ignore cross-origin Firebase errors
-  if (!src || src.indexOf('gstatic.com') !== -1 || src.indexOf('firebase') !== -1) return true;
-  console.log('App error:', msg, src, line);
-  return false;
-};
-window.addEventListener('unhandledrejection', function(e) {
-  // Silently ignore Firebase promise rejections
-  try {
-    var msg = e.reason ? e.reason.toString() : '';
-    if (msg.indexOf('Firebase') !== -1 || msg.indexOf('firestore') !== -1) e.preventDefault();
-  } catch(ex) {}
-});
-</script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js" defer></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js" defer></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js" defer></script>
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+  import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut, updateProfile } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+  import { getFirestore, doc, setDoc, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
+  const firebaseConfig = {
+    apiKey: "AIzaSyBMWoVUUrj2R5FywcCl34z9ooFTI9ZMAE4",
+    authDomain: "skin-match-c7189.firebaseapp.com",
+    projectId: "skin-match-c7189",
+    storageBucket: "skin-match-c7189.firebasestorage.app",
+    messagingSenderId: "1033609385398",
+    appId: "1:1033609385398:web:4b08eef7db24e6470ddd17",
+    measurementId: "G-DBH333L5FB"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const db = getFirestore(app);
+  const googleProvider = new GoogleAuthProvider();
+
+  // Exposer globalement pour les fonctions existantes
+  window._auth = auth;
+  window._db = db;
+  window._googleProvider = googleProvider;
+  window._createUserWithEmailAndPassword = createUserWithEmailAndPassword;
+  window._signInWithEmailAndPassword = signInWithEmailAndPassword;
+  window._signInWithPopup = signInWithPopup;
+  window._signOut = signOut;
+  window._updateProfile = updateProfile;
+  window._doc = doc;
+  window._setDoc = setDoc;
+  window._getDoc = getDoc;
+  window._updateDoc = updateDoc;
+  window._firebaseReady = true;
+
+  // Observer état connexion
+  onAuthStateChanged(auth, (user) => {
+    window._currentUser = user;
+    if (user) {
+      // Charger profil Firestore
+      getDoc(doc(db, 'users', user.uid)).then(snap => {
+        if (snap.exists()) {
+          window._userProfile = snap.data();
+        }
+      });
+      // Mettre à jour l'UI si la fonction existe
+      if (typeof window.onFirebaseUserReady === 'function') {
+        window.onFirebaseUserReady(user);
+      }
+    } else {
+      window._userProfile = null;
+      if (typeof window.onFirebaseUserReady === 'function') {
+        window.onFirebaseUserReady(null);
+      }
+    }
+  });
+</script>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
@@ -80,12 +97,11 @@ window.addEventListener('unhandledrejection', function(e) {
   --sans:'Outfit','Helvetica Neue',sans-serif;
   color-scheme: light only;
 }
-html{color-scheme:light only;-webkit-color-scheme:light;overflow-x:hidden}
-body{background:var(--bg);font-family:var(--sans);color:var(--pri);min-height:100vh;color-scheme:light only;-webkit-color-scheme:light;overflow:hidden;position:fixed;width:100%;height:100%}
-.app{max-width:460px;margin:0 auto;min-height:100vh;display:flex;flex-direction:column;overflow:hidden;position:relative}
+html{color-scheme:light only;-webkit-color-scheme:light}
+body{background:var(--bg);font-family:var(--sans);color:var(--pri);min-height:100vh;color-scheme:light only;-webkit-color-scheme:light}
+.app{max-width:460px;margin:0 auto;min-height:100vh;display:flex;flex-direction:column}
 .hidden{display:none!important}
-.app > div:not(.hidden){position:fixed;top:0;left:0;right:0;bottom:0;overflow-y:scroll;-webkit-overflow-scrolling:touch;overscroll-behavior:none;z-index:10}
-.app > div.hidden{display:none!important;z-index:0}
+.app > div:not(.hidden){position:fixed;top:0;left:0;right:0;bottom:0;overflow-y:scroll;-webkit-overflow-scrolling:touch;overscroll-behavior:none}
 #sc-scan-product{display:flex;flex-direction:column;overflow:hidden}
 #sc-scan-product .content{flex:1;overflow-y:scroll;-webkit-overflow-scrolling:touch;padding:16px;padding-bottom:100px}
 #reader{width:100%;height:calc(45vh);border-radius:20px;overflow:hidden;background:#111;margin-bottom:12px}
@@ -241,7 +257,7 @@ body{background:var(--bg);font-family:var(--sans);color:var(--pri);min-height:10
 .suivi-txt{font-size:12px;color:var(--mut);line-height:1.5;margin-bottom:10px}
 
 /* MODAL */
-.modal-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.55);z-index:1000;display:flex;align-items:flex-end;justify-content:center}
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:1000;display:flex;align-items:flex-end;justify-content:center}
 .modal{background:var(--cream);border-radius:24px 24px 0 0;padding:24px 20px 44px;width:100%;max-width:460px;max-height:85vh;overflow-y:auto}
 .modal-head{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px}
 .modal-brand{font-size:10px;font-weight:600;color:var(--acc);text-transform:uppercase;letter-spacing:.8px;margin-bottom:3px}
@@ -285,22 +301,6 @@ body{background:var(--bg);font-family:var(--sans);color:var(--pri);min-height:10
   0%, 60%, 100% { transform: translateY(0); }
   30% { transform: translateY(-6px); }
 }
-@keyframes spin { to { transform: rotate(360deg); } }
-
-/* ── NAVIGATION BAS : fix couleur bleue Chrome/Safari ── */
-.nav-btn { color: #B0958F; -webkit-appearance: none; }
-.nav-btn svg { stroke: #B0958F; transition: stroke .15s; }
-.nav-btn span { color: #B0958F !important; transition: color .15s; }
-.nav-btn.active { color: #C4726A; }
-.nav-btn.active svg { stroke: #C4726A; }
-.nav-btn.active span { color: #C4726A !important; }
-#bottom-nav { left: 0 !important; right: 0 !important; max-width: 100% !important; width: 100% !important; box-sizing: border-box; }
-#bottom-nav > div { max-width: 460px; margin: 0 auto; }
-
-/* ── Fix Safari : contenus bien positionnés ── */
-@media screen and (min-width: 461px) {
-  .app { max-width: 460px; margin: 0 auto; }
-}
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
@@ -309,8 +309,8 @@ body{background:var(--bg);font-family:var(--sans);color:var(--pri);min-height:10
 <div class="app" id="app">
 
 <!-- ══ LANG ══ -->
-<div id="sc-lang" style="overflow:hidden;background:linear-gradient(160deg,#C4726A 0%,#B5625A 100%)">
-  <div style="min-height:100vh;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 28px;background:linear-gradient(160deg,#C4726A 0%,#B5625A 100%);position:relative;overflow:hidden">
+<div id="sc-lang">
+  <div style="min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 28px;background:linear-gradient(160deg,#C4726A 0%,#B5625A 100%);position:relative;overflow:hidden">
     <div style="position:absolute;top:-40px;right:-40px;width:200px;height:200px;border-radius:50%;background:rgba(255,255,255,.08)"></div>
     <div style="position:absolute;bottom:-30px;left:-30px;width:140px;height:140px;border-radius:50%;background:rgba(255,255,255,.06)"></div>
     <!-- Logo -->
@@ -347,7 +347,7 @@ body{background:var(--bg);font-family:var(--sans);color:var(--pri);min-height:10
 
 
 <!-- ══ WELCOME ══ -->
-<div id="sc-welcome" class="hidden" style="overflow:hidden">
+<div id="sc-welcome" class="hidden">
   <div style="min-height:100vh;display:flex;flex-direction:column;background:#FBF0ED;position:relative;overflow:hidden;padding-bottom:80px">
 
     <div style="position:absolute;top:-60px;right:-60px;width:220px;height:220px;border-radius:50%;background:radial-gradient(circle,#E8A898 0%,transparent 70%);opacity:.5;pointer-events:none"></div>
@@ -473,7 +473,7 @@ body{background:var(--bg);font-family:var(--sans);color:var(--pri);min-height:10
 </div>
 
 <!-- ══ SCAN DE PEAU ══ -->
-<div id="sc-scan" class="hidden" style="overflow:hidden">
+<div id="sc-scan" class="hidden">
   <div class="topbar">
     <button class="btn-back" onclick="go('welcome')">← Retour</button>
     <div class="logo"><div class="logo-icon">SM</div>Skin<span>Match</span></div>
@@ -535,7 +535,7 @@ body{background:var(--bg);font-family:var(--sans);color:var(--pri);min-height:10
         </div>
 
         <!-- Message caméra non disponible -->
-        <div id="scan-no-camera" style="display:none;position:absolute;top:0;left:0;right:0;bottom:0;background:#111;border-radius:20px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;padding:24px">
+        <div id="scan-no-camera" style="display:none;position:absolute;inset:0;background:#111;border-radius:20px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;padding:24px">
           <div style="font-size:40px">📷</div>
           <div style="font-size:14px;font-weight:600;color:#fff;text-align:center">Caméra non disponible</div>
           <div style="font-size:12px;color:rgba(255,255,255,.6);text-align:center">Importez une photo depuis votre galerie</div>
@@ -617,7 +617,7 @@ body{background:var(--bg);font-family:var(--sans);color:var(--pri);min-height:10
 </div>
 
 <!-- ══ REGISTER ══ -->
-<div id="sc-register" class="hidden" style="overflow:hidden">
+<div id="sc-register" class="hidden">
   <div class="topbar"><button class="btn-back" onclick="go('welcome')">← Retour</button><div class="logo"><div class="logo-icon">SM</div>Skin<span>Match</span></div><button onclick="changeLangRegion()" style="background:rgba(196,114,106,.12);border:1px solid rgba(196,114,106,.25);border-radius:20px;padding:4px 10px;font-size:11px;font-weight:600;color:#C4726A;cursor:pointer;font-family:'Outfit',sans-serif">🌐 Lang</button></div>
   <div class="content">
     <div style="margin:22px 0">
@@ -639,7 +639,7 @@ body{background:var(--bg);font-family:var(--sans);color:var(--pri);min-height:10
 </div>
 
 <!-- ══ LOGIN ══ -->
-<div id="sc-login" class="hidden" style="overflow:hidden">
+<div id="sc-login" class="hidden">
   <div class="topbar"><button class="btn-back" onclick="go('welcome')">← Retour</button><div class="logo"><div class="logo-icon">SM</div>Skin<span>Match</span></div><button onclick="changeLangRegion()" style="background:rgba(196,114,106,.12);border:1px solid rgba(196,114,106,.25);border-radius:20px;padding:4px 10px;font-size:11px;font-weight:600;color:#C4726A;cursor:pointer;font-family:'Outfit',sans-serif">🌐 Lang</button></div>
   <div class="content">
     <div style="margin:22px 0"><h2>Bon retour</h2><p class="sub">Connectez-vous pour accéder à votre profil.</p></div>
@@ -657,7 +657,7 @@ body{background:var(--bg);font-family:var(--sans);color:var(--pri);min-height:10
 </div>
 
 <!-- ══ Q1 : TYPE DE PEAU ══ -->
-<div id="sc-q1" class="hidden" style="overflow:hidden">
+<div id="sc-q1" class="hidden">
   <div class="topbar"><button class="btn-back" onclick="go('welcome')">← Retour</button><div class="logo"><div class="logo-icon">SM</div>Skin<span>Match</span></div><button onclick="changeLangRegion()" style="background:rgba(196,114,106,.12);border:1px solid rgba(196,114,106,.25);border-radius:20px;padding:4px 10px;font-size:11px;font-weight:600;color:#C4726A;cursor:pointer;font-family:'Outfit',sans-serif">🌐 Lang</button></div>
   <div class="content">
     <div class="progress"><div class="progress-info"><div class="progress-pct">20%</div><div class="progress-step-txt">Etape 1 / 5</div></div><div class="progress-track"><div class="progress-fill" style="width:20%"></div></div><div class="progress-dots"><div class="pd on"></div><div class="pd "></div><div class="pd "></div><div class="pd "></div><div class="pd "></div></div></div>
@@ -669,7 +669,7 @@ body{background:var(--bg);font-family:var(--sans);color:var(--pri);min-height:10
 </div>
 
 <!-- ══ DIAGNOSTIC TYPE DE PEAU ══ -->
-<div id="sc-diag" class="hidden" style="overflow:hidden">
+<div id="sc-diag" class="hidden">
   <div class="topbar"><button class="btn-back" onclick="go('q1')">← Retour</button><div class="logo"><div class="logo-icon">SM</div>Skin<span>Match</span></div></div>
   <div class="content">
     <div class="progress"><div class="pd on"></div><div class="pd"></div><div class="pd"></div><div class="pd"></div><div class="pd"></div></div>
@@ -688,7 +688,7 @@ body{background:var(--bg);font-family:var(--sans);color:var(--pri);min-height:10
 </div>
 
 <!-- ══ Q2 : ÂGE ══ -->
-<div id="sc-q2" class="hidden" style="overflow:hidden">
+<div id="sc-q2" class="hidden">
   <div class="topbar"><button class="btn-back" onclick="go('q1')">← Retour</button><div class="logo"><div class="logo-icon">SM</div>Skin<span>Match</span></div></div>
   <div class="content">
     <div class="progress"><div class="progress-info"><div class="progress-pct">40%</div><div class="progress-step-txt">Etape 2 / 5</div></div><div class="progress-track"><div class="progress-fill" style="width:40%"></div></div><div class="progress-dots"><div class="pd done"></div><div class="pd on"></div><div class="pd "></div><div class="pd "></div><div class="pd "></div></div></div>
@@ -700,7 +700,7 @@ body{background:var(--bg);font-family:var(--sans);color:var(--pri);min-height:10
 </div>
 
 <!-- ══ Q3 : PROBLÈMES + ALLERGIES ══ -->
-<div id="sc-q3" class="hidden" style="overflow:hidden">
+<div id="sc-q3" class="hidden">
   <div class="topbar"><button class="btn-back" onclick="go('q2')">← Retour</button><div class="logo"><div class="logo-icon">SM</div>Skin<span>Match</span></div></div>
   <div class="content">
     <div class="progress"><div class="progress-info"><div class="progress-pct">60%</div><div class="progress-step-txt">Etape 3 / 5</div></div><div class="progress-track"><div class="progress-fill" style="width:60%"></div></div><div class="progress-dots"><div class="pd done"></div><div class="pd done"></div><div class="pd on"></div><div class="pd "></div><div class="pd "></div></div></div>
@@ -714,7 +714,7 @@ body{background:var(--bg);font-family:var(--sans);color:var(--pri);min-height:10
 </div>
 
 <!-- ══ Q4 : BUDGET ══ -->
-<div id="sc-q4" class="hidden" style="overflow:hidden">
+<div id="sc-q4" class="hidden">
   <div class="topbar"><button class="btn-back" onclick="go('q3')">← Retour</button><div class="logo"><div class="logo-icon">SM</div>Skin<span>Match</span></div></div>
   <div class="content">
     <div class="progress"><div class="progress-info"><div class="progress-pct">80%</div><div class="progress-step-txt">Etape 4 / 5</div></div><div class="progress-track"><div class="progress-fill" style="width:80%"></div></div><div class="progress-dots"><div class="pd done"></div><div class="pd done"></div><div class="pd done"></div><div class="pd on"></div><div class="pd "></div></div></div>
@@ -726,7 +726,7 @@ body{background:var(--bg);font-family:var(--sans);color:var(--pri);min-height:10
 </div>
 
 <!-- ══ Q5 : ROUTINE ══ -->
-<div id="sc-q5" class="hidden" style="overflow:hidden">
+<div id="sc-q5" class="hidden">
   <div class="topbar"><button class="btn-back" onclick="go('q4')">← Retour</button><div class="logo"><div class="logo-icon">SM</div>Skin<span>Match</span></div></div>
   <div class="content">
     <div class="progress"><div class="progress-info"><div class="progress-pct">100%</div><div class="progress-step-txt">Etape 5 / 5</div></div><div class="progress-track"><div class="progress-fill" style="width:100%"></div></div><div class="progress-dots"><div class="pd done"></div><div class="pd done"></div><div class="pd done"></div><div class="pd done"></div><div class="pd on"></div></div></div>
@@ -738,7 +738,7 @@ body{background:var(--bg);font-family:var(--sans);color:var(--pri);min-height:10
 </div>
 
 <!-- ══ RESULT ══ -->
-<div id="sc-result" class="hidden" style="overflow:hidden">
+<div id="sc-result" class="hidden">
   <div class="topbar" id="result-topbar">
     <button class="btn-back" id="result-back-btn" onclick="go('q5')">← Retour</button>
     <div class="logo"><div class="logo-icon">SM</div>Skin<span>Match</span></div>
@@ -754,7 +754,7 @@ body{background:var(--bg);font-family:var(--sans);color:var(--pri);min-height:10
 </div>
 
 <!-- ══ PRIVACY ══ -->
-<div id="sc-privacy" class="hidden" style="overflow:hidden">
+<div id="sc-privacy" class="hidden">
   <div class="topbar">
     <button class="btn-back" onclick="history.back()||go('welcome')">← Retour</button>
     <div class="logo"><div class="logo-icon">SM</div>Skin<span>Match</span></div>
@@ -797,7 +797,7 @@ body{background:var(--bg);font-family:var(--sans);color:var(--pri);min-height:10
 </div>
 
 <!-- ══ CGU ══ -->
-<div id="sc-cgu" class="hidden" style="overflow:hidden">
+<div id="sc-cgu" class="hidden">
   <div class="topbar">
     <button class="btn-back" onclick="history.back()||go('welcome')">← Retour</button>
     <div class="logo"><div class="logo-icon">SM</div>Skin<span>Match</span></div>
@@ -862,7 +862,7 @@ body{background:var(--bg);font-family:var(--sans);color:var(--pri);min-height:10
   </div>
 </div>
 
-<div id="sc-dashboard" class="hidden" style="overflow:hidden">
+<div id="sc-dashboard" class="hidden">
   <div class="topbar">
     <button class="btn-back" onclick="go('result')">← Retour</button>
     <div class="logo"><div class="logo-icon">SM</div>Skin<span>Match</span></div>
@@ -878,7 +878,7 @@ body{background:var(--bg);font-family:var(--sans);color:var(--pri);min-height:10
 </div>
 
 <!-- ══ ÉCRAN ARTICLES ══ -->
-<div id="sc-articles" class="hidden" style="overflow:hidden">
+<div id="sc-articles" class="hidden">
   <div class="topbar">
     <div class="logo"><div class="logo-icon">SM</div>Skin<span>Match</span></div>
   </div>
@@ -893,7 +893,7 @@ body{background:var(--bg);font-family:var(--sans);color:var(--pri);min-height:10
 </div>
 
 <!-- ══ PROFIL FIREBASE ══ -->
-<div id="sc-profile" class="hidden" style="overflow:hidden">
+<div id="sc-profile" class="hidden">
   <div class="topbar">
     <button class="btn-back" onclick="go('welcome')">← Retour</button>
     <div class="logo"><div class="logo-icon">SM</div>Skin<span>Match</span></div>
@@ -909,7 +909,7 @@ body{background:var(--bg);font-family:var(--sans);color:var(--pri);min-height:10
 </div>
 
 <!-- ══ ÉCRAN RÉGLAGES ══ -->
-<div id="sc-settings" class="hidden" style="overflow:hidden">
+<div id="sc-settings" class="hidden">
   <div class="topbar">
     <button class="btn-back" onclick="go('dashboard')">← Retour</button>
     <div class="logo"><div class="logo-icon">SM</div>Skin<span>Match</span></div>
@@ -989,7 +989,7 @@ body{background:var(--bg);font-family:var(--sans);color:var(--pri);min-height:10
         <div class="sc-vsep"></div>
         <div class="sc-right">
           <div class="sc-prod-lbl">Ma sélection</div>
-          <div id="sc-card-products" style="overflow:hidden"></div>
+          <div id="sc-card-products"></div>
         </div>
       </div>
       <div class="sc-footer">
@@ -1013,7 +1013,7 @@ body{background:var(--bg);font-family:var(--sans);color:var(--pri);min-height:10
 </div>
 
 <!-- ══ LISTE DE COURSES ══ -->
-<div id="sc-shopping" class="hidden" style="overflow:hidden">
+<div id="sc-shopping" class="hidden">
   <div class="topbar">
     <button class="btn-back" onclick="go('result')">← Retour</button>
     <div class="logo"><div class="logo-icon">SM</div>Skin<span>Match</span></div>
@@ -1030,7 +1030,7 @@ body{background:var(--bg);font-family:var(--sans);color:var(--pri);min-height:10
 </div>
 
 <!-- ══ HISTORIQUE ROUTINES ══ -->
-<div id="sc-history" class="hidden" style="overflow:hidden">
+<div id="sc-history" class="hidden">
   <div class="topbar">
     <button class="btn-back" onclick="go('dashboard')">← Retour</button>
     <div class="logo"><div class="logo-icon">SM</div>Skin<span>Match</span></div>
@@ -1047,7 +1047,7 @@ body{background:var(--bg);font-family:var(--sans);color:var(--pri);min-height:10
 </div>
 
 <!-- ══ ABONNEMENT ══ -->
-<div id="sc-subscription" class="hidden" style="overflow:hidden">
+<div id="sc-subscription" class="hidden">
   <div class="topbar">
     <button class="btn-back" onclick="go('dashboard')">← Retour</button>
     <div class="logo"><div class="logo-icon">SM</div>Skin<span>Match</span></div>
@@ -1119,7 +1119,7 @@ body{background:var(--bg);font-family:var(--sans);color:var(--pri);min-height:10
 </div>
 
 <!-- ══ COMMUNAUTÉ ══ -->
-<div id="sc-community" class="hidden" style="overflow:hidden">
+<div id="sc-community" class="hidden">
   <div style="background:#FAF4F2;min-height:100vh;display:flex;flex-direction:column;padding-bottom:80px">
     <div style="background:rgba(250,244,242,.97);backdrop-filter:blur(12px);padding:16px 20px 0;border-bottom:1px solid #EFE6E3;position:sticky;top:0;z-index:10">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
@@ -1136,7 +1136,7 @@ body{background:var(--bg);font-family:var(--sans);color:var(--pri);min-height:10
     <div id="community-feed" style="padding:14px 16px;display:flex;flex-direction:column;gap:14px"></div>
   </div>
 </div>
-<div id="post-modal-overlay" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(61,43,31,.5);z-index:200;align-items:flex-end;justify-content:center" onclick="if(event.target===this)closePostModal()">
+<div id="post-modal-overlay" style="display:none;position:fixed;inset:0;background:rgba(61,43,31,.5);z-index:200;align-items:flex-end;justify-content:center" onclick="if(event.target===this)closePostModal()">
   <div style="background:#fff;border-radius:28px 28px 0 0;width:100%;max-width:430px;padding:16px 20px 40px">
     <div style="width:32px;height:4px;background:#E0D5D2;border-radius:2px;margin:0 auto 18px"></div>
     <div style="font-size:16px;font-weight:700;color:#3D2B1F;margin-bottom:16px">Partager avec la communauté</div>
@@ -1820,12 +1820,7 @@ function build(){
   };
 
   const safeAvail = (key) => avail(key) && !hasAllergen(key);
-  function mk(key,etape,moment){
-  var base=DB[key]||{};
-  var result={etape:etape,moment:moment,key:key,img:IMGS[key],pourquoi:getWhy(key,sk,c[0],ST.ageGroup),compat:getCompat(key,sk,c[0],ST.ageGroup,ST.allergies)};
-  for(var _k in base){if(base.hasOwnProperty(_k))result[_k]=base[_k];}
-  return result;
-}
+  const mk=(key,etape,moment)=>({etape,moment,key,...DB[key],img:IMGS[key],pourquoi:getWhy(key,sk,c[0],ST.ageGroup),compat:getCompat(key,sk,c[0],ST.ageGroup,ST.allergies)});
   // Trouver une alternative sans allergène pour une étape donnée
   const findSafeAlt = (etape, excludeKey) => {
     return Object.keys(DB).find(k => 
@@ -1857,18 +1852,18 @@ function build(){
     usedKeys.add(key);
     steps.push(mk(key,etape,moment));
   };
-  const nk=(ROUTE.net[sk]?ROUTE.net[sk][b]:undefined)||"cv-mou";
-  const hk=(ROUTE.hyd[sk]?ROUTE.hyd[sk][b]:undefined)||"cv-crem";
+  const nk=ROUTE.net[sk]?.[b]||"cv-mou";
+  const hk=ROUTE.hyd[sk]?.[b]||"cv-crem";
   const sk2=ROUTE.spf[b]||ROUTE.spf.mid;
   if(ST.routine==="simple"){addStep(nk,"Nettoyant","AM+PM");addStep(hk,"Hydratant","AM+PM");addStep(sk2,"Protection solaire","AM");}
   if(ST.routine==="specifique"){
-    const srk=(ROUTE.ser[c[0]]?ROUTE.ser[c[0]][b]:undefined)||"cv-vitc";
+    const srk=ROUTE.ser[c[0]]?.[b]||"cv-vitc";
     const prod=DB[srk];
     addStep(srk,"Soin ciblé",prod?prod.moment:"AM+PM");
   }
   if(ST.routine==="complete"){
     addStep(nk,"Nettoyant","AM+PM");
-    c.slice(0,2).forEach(function(cc,i){var srk=(ROUTE.ser[cc]?ROUTE.ser[cc][b]:undefined);addStep(srk,i===0?"Sérum principal":"Sérum soir",i===0?"AM+PM":"PM");});
+    c.slice(0,2).forEach((cc,i)=>{const srk=ROUTE.ser[cc]?.[b];addStep(srk,i===0?"Sérum principal":"Sérum soir",i===0?"AM+PM":"PM");});
     addStep(hk,"Hydratant","AM+PM");addStep(sk2,"Protection solaire","AM");
   }
   // Trier TOUS les produits par note Yuka décroissante (SPF toujours en dernier)
@@ -1972,7 +1967,7 @@ function go(screen){
   SCREENS.forEach(s=>{const el=document.getElementById("sc-"+s);if(el)el.classList.toggle("hidden",s!==screen);});
   ST.screen=screen;
   setTimeout(function() {
-    window.scrollTo(0, 0);
+    window.scrollTo({top:0, behavior:'instant'});
     document.documentElement.scrollTop = 0;
     document.body.scrollTop = 0;
     var activeEl = document.getElementById("sc-"+screen);
@@ -1981,7 +1976,8 @@ function go(screen){
   if(screen==='welcome') setTimeout(applyWelcomeLang,10);
   if(screen==='scan') setTimeout(function(){ startCamera(); }, 100);
   if(screen==='scan-product') {
-    setTimeout(function(){ startBarcodeCamera(); }, 300);
+    if (!window._currentUser) { _showLoginRequired('scan-product'); return; }
+    setTimeout(function(){ startBarcodeCamera(); }, 100);
   }
   // Afficher/cacher la nav
   var navScreens = ['welcome','result','scan-product','articles','dashboard','profile'];
@@ -1992,24 +1988,13 @@ function go(screen){
 }
 
 function setLang(l){
-  try {
-    LANG = l;
-    localStorage.setItem('skinmatch_lang', l);
-    initQuestions();
-    go('welcome');
-    updateNav('welcome');
-    setTimeout(applyWelcomeLang, 50);
-    setTimeout(function(){ try { showRegionModal(); } catch(e){} }, 300);
-  } catch(e) {
-    console.log('setLang error:', e);
-    // Fallback: forcer l'affichage de welcome
-    try {
-      var lang = document.getElementById('sc-lang');
-      if (lang) lang.classList.add('hidden');
-      var welcome = document.getElementById('sc-welcome');
-      if (welcome) welcome.classList.remove('hidden');
-    } catch(e2) {}
-  }
+  LANG = l;
+  localStorage.setItem('skinmatch_lang', l);
+  initQuestions();
+  go('welcome');
+  setTimeout(applyWelcomeLang, 50);
+  // Afficher la modale région après 300ms
+  setTimeout(function(){ showRegionModal(); }, 300);
 }
 
 // ─── AUTH ─────────────────────────────────────────────────────────────────────
@@ -2493,7 +2478,7 @@ function capturePhoto() {
     
     // Flash effect
     var flash = document.createElement("div");
-    flash.style.cssText = "position:fixed;top:0;left:0;right:0;bottom:0;background:#fff;z-index:9999;opacity:0.8;pointer-events:none;transition:opacity 0.3s";
+    flash.style.cssText = "position:fixed;inset:0;background:#fff;z-index:9999;opacity:0.8;pointer-events:none;transition:opacity 0.3s";
     document.body.appendChild(flash);
     setTimeout(function() { flash.style.opacity = "0"; setTimeout(function() { flash.remove(); }, 300); }, 50);
 }
@@ -3168,7 +3153,7 @@ function renderResult(){
   document.getElementById("result-content").innerHTML=`
     <div class="rh">
       <div class="rey">${t('result_eyebrow')}</div>
-      <div class="rt">${(ST.user&&ST.user.name)?((t('result_hello')||'Hello')+' '+ST.user.name):t('result_routine')}</div>
+      <div class="rt">${ST.user?.name?(t('result_hello')||'Hello')+' '+ST.user.name:t('result_routine')}</div>
       <div class="rsub">${ST.ageGroup?ST.ageGroup+(LANG==='fr'?' ans · ':' · '):''}${t('budget_total')} <strong>~${Math.round(r.totalPrix)}€</strong></div>
     </div>
     <div class="intro"><p class="intro-txt">${r.intro}</p></div>
@@ -3390,7 +3375,7 @@ function shareRoutineLink() {
         t.style.cssText = "position:fixed;top:70px;left:50%;transform:translateX(-50%);background:#3D2B1F;color:#fff;padding:12px 20px;border-radius:50px;font-size:13px;font-weight:600;z-index:99999";
         t.textContent = isEN ? "Link copied!" : "Lien copié !";
         document.body.appendChild(t);
-        setTimeout(function(){ t.remove(); }, 500);
+        setTimeout(function(){ t.remove(); }, 2500);
       });
     } catch(e){}
   }
@@ -3987,83 +3972,42 @@ var barcodeScanning = false;
 function startBarcodeCamera() {
   var isEN = LANG === 'en';
   if (!_canScan('product')) { _showScanPaywall('product'); return; }
-  // Arrêter proprement tout scanner existant
   if (window._html5Scanner) {
-    try {
-      var _scannerToStop = window._html5Scanner;
-      window._html5Scanner = null;
-      _scannerToStop.stop().then(function(){
-        _doStartScanner(isEN);
-      }, function(){
-        _doStartScanner(isEN);
-      });
-    } catch(e) {
-      window._html5Scanner = null;
-      _doStartScanner(isEN);
-    }
-    return;
+    try { window._html5Scanner.stop().catch(function(){}); } catch(e) {}
+    window._html5Scanner = null;
   }
-  _doStartScanner(isEN);
-}
-
-function _doStartScanner(isEN) {
   var guide = document.getElementById('scan-guide');
-  var readerEl = document.getElementById('reader');
-  if (!readerEl) return;
-  // Vider le reader pour éviter les erreurs "already started"
-  readerEl.innerHTML = '';
-  if (guide) guide.textContent = isEN ? 'Initializing camera...' : 'Initialisation caméra...';
+  if (guide) guide.textContent = isEN ? 'Initializing...' : 'Initialisation...';
   try {
     window._html5Scanner = new Html5Qrcode("reader");
-    var config = {
-      fps: 10,
-      qrbox: function(w, h) { return { width: Math.min(240, w*0.75), height: Math.min(100, h*0.35) }; },
-      formatsToSupport: [
-        Html5QrcodeSupportedFormats.EAN_13, Html5QrcodeSupportedFormats.EAN_8,
-        Html5QrcodeSupportedFormats.UPC_A, Html5QrcodeSupportedFormats.UPC_E,
-        Html5QrcodeSupportedFormats.CODE_128, Html5QrcodeSupportedFormats.CODE_39
-      ]
-    };
     window._html5Scanner.start(
       { facingMode: "environment" },
-      config,
+      {
+        fps: 10,
+        qrbox: function(w, h) { return { width: Math.min(260, w*0.8), height: Math.min(110, h*0.4) }; },
+        aspectRatio: 1.2,
+        formatsToSupport: [
+          Html5QrcodeSupportedFormats.EAN_13, Html5QrcodeSupportedFormats.EAN_8,
+          Html5QrcodeSupportedFormats.UPC_A, Html5QrcodeSupportedFormats.UPC_E,
+          Html5QrcodeSupportedFormats.CODE_128, Html5QrcodeSupportedFormats.CODE_39
+        ]
+      },
       function(code) { onBarcodeDetected(code); },
       function() {}
     ).then(function() {
-      if (guide) guide.textContent = isEN ? '📷 Point camera at barcode' : '📷 Pointe la caméra vers le code-barres';
-    }).catch(function(err) {
-      // Fallback : essayer avec facingMode "user" si "environment" échoue (certains appareils)
-      window._html5Scanner.start(
-        { facingMode: "user" },
-        config,
-        function(code) { onBarcodeDetected(code); },
-        function() {}
-      ).then(function() {
-        if (guide) guide.textContent = isEN ? '📷 Point camera at barcode' : '📷 Pointe la caméra vers le code-barres';
-      }).catch(function(err2) {
-        if (guide) {
-          guide.innerHTML = (isEN
-            ? '⚠️ Camera blocked — please allow camera access in your browser settings, then reload.'
-            : '⚠️ Caméra bloquée — autorise l'accès à la caméra dans les réglages de ton navigateur, puis recharge la page.');
-        }
-        window._html5Scanner = null;
-      });
+      if (guide) guide.textContent = isEN ? 'Point at barcode' : 'Pointe vers le code-barres';
+    }).catch(function() {
+      if (guide) guide.textContent = isEN ? 'Camera denied' : 'Caméra refusée — autorise dans les réglages';
     });
   } catch(e) {
-    if (guide) guide.textContent = (isEN ? 'Error: ' : 'Erreur : ') + e.message;
-    window._html5Scanner = null;
+    if (guide) guide.textContent = 'Erreur: ' + e.message;
   }
 }
 
 function stopBarcodeCamera() {
   if (window._html5Scanner) {
-    try {
-      var scanner = window._html5Scanner;
-      window._html5Scanner = null;
-      scanner.stop().catch(function(){});
-    } catch(e) {
-      window._html5Scanner = null;
-    }
+    try { window._html5Scanner.stop().catch(function(){}); } catch(e) {}
+    window._html5Scanner = null;
   }
 }
 
@@ -4071,7 +4015,7 @@ function stopBarcodeCamera() {
 async function onBarcodeDetected(code) {
   stopBarcodeCamera();
   if (!_canScan('product')) { _showScanPaywall('product'); return; }
-  var guide = document.getElementById("scan-guide");
+  var guide = document.getElementById("barcode-guide");
   if (guide) guide.textContent = "✅ Code détecté : " + code;
 
   // 1. Chercher dans notre DB locale
@@ -4421,13 +4365,11 @@ function scanBarcodeFromFile(input) {
 function resetBarcodeScanner() {
   var resultDiv = document.getElementById("scan-product-result");
   if (resultDiv) { resultDiv.style.display = "none"; resultDiv.innerHTML = ""; }
-  var zone = document.getElementById("barcode-camera-zone");
-  if (zone) zone.style.display = "block";
-  var guide = document.getElementById("scan-guide");
+  document.getElementById("barcode-camera-zone").style.display = "block";
+  var guide = document.getElementById("barcode-guide");
   if (guide) guide.textContent = "📷 Pointez le code-barres vers la caméra";
-  // Arrêter proprement avant de relancer
-  stopBarcodeCamera();
-  setTimeout(function() { startBarcodeCamera(); }, 400);
+  barcodeScanning = true;
+  startBarcodeCamera();
 }
 
 function searchProductScan(query) {
@@ -6159,7 +6101,7 @@ function showArticle(idx, isEN) {
   if (!a) return;
   var modal = document.createElement("div");
   modal.id = "article-modal";
-  modal.style.cssText = "position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.5);z-index:9999;display:flex;flex-direction:column;justify-content:flex-end";
+  modal.style.cssText = "position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:9999;display:flex;flex-direction:column;justify-content:flex-end";
   modal.innerHTML = "<div style='background:#fff;border-radius:24px 24px 0 0;max-height:85vh;overflow-y:auto;padding:24px 20px 40px'>" +
     "<div style='display:flex;justify-content:space-between;align-items:center;margin-bottom:16px'>" +
     "<div style='font-size:10px;font-weight:700;color:var(--acc2);text-transform:uppercase;letter-spacing:.5px'>" + a.tag + " · " + a.read + "</div>" +
@@ -6806,7 +6748,7 @@ function navTo(screen) {
     } else if (window._currentUser) {
       // Firestore pas encore chargé — attendre max 3s
       var _ov = document.createElement('div');
-      _ov.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(248,242,237,.97);display:flex;align-items:center;justify-content:center;z-index:9999;flex-direction:column;gap:12px';
+      _ov.style.cssText = 'position:fixed;inset:0;background:rgba(248,242,237,.97);display:flex;align-items:center;justify-content:center;z-index:9999;flex-direction:column;gap:12px';
       _ov.innerHTML = '<div style="font-size:40px">🌸</div><div style="font-family:Georgia,serif;font-size:16px;font-weight:700;color:#3D2B1F">Chargement de ta routine...</div><div style="font-size:13px;color:#8B6F5E;margin-top:4px">Quelques secondes...</div>';
       document.body.appendChild(_ov);
       var _n = 0;
@@ -6846,7 +6788,8 @@ function navTo(screen) {
     renderDashboard();
   }
   if (screen === 'scan-product') {
-    setTimeout(function() { startBarcodeCamera(); }, 300);
+    if (!window._currentUser) { _showLoginRequired('scan-product'); return; }
+    setTimeout(function() { startBarcodeCamera(); }, 100);
   }
 
   go(screen);
@@ -6902,19 +6845,19 @@ function renderArticlesScreen() {
   if (sub) sub.textContent = isEN ? "Tips, actives, routines — everything you need to know" : "Conseils, actifs, routines — tout ce qu'il faut savoir";
   
   // Tags uniques
-  var tags = Array.from(new Set(articles.map(function(a) { return a.tag; })));
+  var tags = [...new Set(articles.map(function(a) { return a.tag; }))];
   var activeTag = null;
   
   function renderList(filterTag) {
     var filtered = filterTag ? articles.filter(function(a) { return a.tag === filterTag; }) : articles;
     list.innerHTML = 
       '<div style="display:flex;gap:8px;overflow-x:auto;padding-bottom:8px;margin-bottom:16px;-webkit-overflow-scrolling:touch;scrollbar-width:none">' +
-      ['<button onclick="renderArticlesFilter(null)" id="tag-all" style="flex-shrink:0;padding:6px 14px;border-radius:20px;border:1.5px solid ' + (!filterTag ? '#C4726A' : 'var(--bdr)') + ';background:' + (!filterTag ? '#C4726A' : '#fff') + ';color:' + (!filterTag ? '#fff' : 'var(--mut)') + ';font-size:12px;font-weight:600;cursor:pointer;font-family:inherit">' + (isEN ? 'All' : 'Tous') + '</button>'].concat(
-      tags.map(function(tag) {
+      ['<button onclick="renderArticlesFilter(null)" id="tag-all" style="flex-shrink:0;padding:6px 14px;border-radius:20px;border:1.5px solid ' + (!filterTag ? '#C4726A' : 'var(--bdr)') + ';background:' + (!filterTag ? '#C4726A' : '#fff') + ';color:' + (!filterTag ? '#fff' : 'var(--mut)') + ';font-size:12px;font-weight:600;cursor:pointer;font-family:inherit">' + (isEN ? 'All' : 'Tous') + '</button>',
+      ...tags.map(function(tag) {
         var isActive = filterTag === tag;
         return "<button onclick=\"window._artFilter='' + tag.replace(/'/g,'') + '';renderArticlesScreen()\" style=\"flex-shrink:0;padding:6px 14px;border-radius:20px;border:1.5px solid " + (isActive ? "#C4726A" : "var(--bdr)") + ";background:" + (isActive ? "#C4726A" : "#fff") + ";color:" + (isActive ? "#fff" : "var(--mut)") + ";font-size:12px;font-weight:600;cursor:pointer;font-family:inherit\">" + tag + "</button>";
 
-      })).join('') + '</div>' +
+      })].join('') + '</div>' +
       '<div style="display:flex;flex-direction:column;gap:10px">' +
       filtered.map(function(a, i) {
         var realIdx = articles.indexOf(a);
@@ -7100,7 +7043,7 @@ function changeNotifTime(type) {
   t.style.cssText = "position:fixed;top:70px;left:50%;transform:translateX(-50%);background:#2E7D32;color:#fff;padding:12px 20px;border-radius:50px;font-size:13px;font-weight:600;z-index:9999";
   t.textContent = (isEN ? "Updated: " : "Mis a jour : ") + newTime;
   document.body.appendChild(t);
-  setTimeout(function(){t.remove();}, 500);
+  setTimeout(function(){t.remove();}, 2500);
 }
 
 function requestNotifPermission() {
@@ -7195,9 +7138,10 @@ function submitFeedback(key, type, btn) {
   var toast = document.createElement('div');
   toast.style.cssText = 'position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:#3D2B1F;color:#fff;padding:10px 20px;border-radius:20px;font-size:12px;font-weight:600;z-index:9999;opacity:0;transition:opacity .3s';
   toast.textContent = type === "like" ? (LANG === "en" ? "Noted! We will show more like this." : "Noté ! On t'en proposera de similaires.") : (LANG === "en" ? "Noted! We will refine your recommendations." : "Noté ! On affinera tes recommandations.");
+  toast.textContent = type === 'like' 
   document.body.appendChild(toast);
   setTimeout(function() { toast.style.opacity = '1'; }, 10);
-  setTimeout(function() { toast.style.opacity = '0'; setTimeout(function() { toast.remove(); }, 300); }, 500);
+  setTimeout(function() { toast.style.opacity = '0'; setTimeout(function() { toast.remove(); }, 300); }, 2500);
 }
 
 // Init — attendre Firebase avant d'afficher
@@ -7207,7 +7151,7 @@ var _savedRegion = localStorage.getItem('skinmatch_region');
 // Splash screen pendant l'init
 var _splashEl = document.createElement('div');
 _splashEl.id = 'app-splash';
-_splashEl.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:#FBF0ED;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:999999;transition:opacity .4s;overflow:hidden';
+_splashEl.style.cssText = 'position:fixed;inset:0;background:#FBF0ED;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:99999;transition:opacity .4s';
 _splashEl.innerHTML = '<div style="font-family:Georgia,serif;font-size:28px;font-weight:700;color:#3D2B1F">Skin<span style="color:#C4726A">Match</span></div><div style="margin-top:20px;width:28px;height:28px;border:3px solid #F5E8E5;border-top-color:#C4726A;border-radius:50%;animation:spin 1s linear infinite"></div>';
 document.body.appendChild(_splashEl);
 
@@ -7329,18 +7273,13 @@ function _checkSharedRoutine() {
 
 // Timeout 2.5s si Firebase ne répond pas
 var _firebaseWait = setTimeout(function() {
-  try {
-    if (_savedLang && _savedRegion) {
-      LANG = _savedLang; REGION = _savedRegion;
-      initQuestions(); go('welcome'); updateNav('welcome');
-      setTimeout(applyWelcomeLang, 50);
-    } else { go('lang'); }
-    _hideSplash();
-  } catch(e) {
-    go('lang');
-    _hideSplash();
-  }
-}, 500);
+  if (_savedLang && _savedRegion) {
+    LANG = _savedLang; REGION = _savedRegion;
+    initQuestions(); go('welcome'); updateNav('welcome');
+    setTimeout(applyWelcomeLang, 50);
+  } else { go('lang'); }
+  _hideSplash();
+}, 2500);
 
 window._onAuthResolved = function(user) {
   clearTimeout(_firebaseWait);
@@ -7497,7 +7436,7 @@ function _closeScanPaywall(){var e=document.getElementById('skinmatch-paywall');
 function _showScanPaywall(type) {
   var isEN=LANG==='en', isP=type==='product';
   var t=document.createElement('div'); t.id='skinmatch-paywall';
-  t.style.cssText='position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(61,43,31,.7);z-index:9999;display:flex;align-items:center;justify-content:center;padding:24px';
+  t.style.cssText='position:fixed;inset:0;background:rgba(61,43,31,.7);z-index:9999;display:flex;align-items:center;justify-content:center;padding:24px';
   var inner=document.createElement('div');
   inner.style.cssText='background:#fff;border-radius:24px;padding:28px 24px;max-width:320px;width:100%;text-align:center';
   inner.innerHTML='<div style="font-size:40px;margin-bottom:12px">'+(isP?'🔍':'📸')+'</div>'+
@@ -7519,7 +7458,7 @@ function _showLoginRequired(context) {
   var msgs={dashboard:isEN?'Create an account to access your personal space.':'Crée un compte pour accéder à ton espace personnel.','scan-product':isEN?'Create an account to scan products.':'Crée un compte pour scanner des produits.',save:isEN?'Create an account to save your routine.':'Crée un compte pour enregistrer ta routine.'};
   var msg=msgs[context]||(isEN?'Create an account to unlock this feature.':'Crée un compte pour débloquer cette fonctionnalité.');
   var t=document.createElement('div');
-  t.style.cssText='position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(61,43,31,.7);z-index:9999;display:flex;align-items:center;justify-content:center;padding:24px';
+  t.style.cssText='position:fixed;inset:0;background:rgba(61,43,31,.7);z-index:9999;display:flex;align-items:center;justify-content:center;padding:24px';
   var inner=document.createElement('div');
   inner.style.cssText='background:#fff;border-radius:24px;padding:28px 24px;max-width:320px;width:100%;text-align:center';
   var close=function(){t.remove();};
@@ -7782,9 +7721,22 @@ function renderShoppingList() {
     });
     var shareBtn = document.getElementById('share-shopping-btn');
     if (shareBtn) shareBtn.onclick = function() {
+    if (shareBtn) shareBtn.onclick = function() {
+
       var parts = allUniq.map(function(s){ return s.nom+" ("+s.marque+")"; });
+
       var txt = "Ma liste de courses SkinMatch : " + parts.join(", ") + " | Total: ~"+Math.round(total)+"euros";
+
       if (navigator.share) { navigator.share({title:"Liste SkinMatch",text:txt}).catch(function(){}); }
+
+      else { try { navigator.clipboard.writeText(txt); } catch(e) {} }
+
+    };
+
+
+
+
+
       else { try { navigator.clipboard.writeText(txt); } catch(e) {} }
     };
   }
@@ -7939,7 +7891,7 @@ function replaceProduct(key) {
   });
   alts = alts.sort(function(){ return Math.random()-0.5; }).slice(0,3);
   var overlay = document.createElement('div');
-  overlay.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(61,43,31,.6);z-index:9999;display:flex;align-items:flex-end;justify-content:center';
+  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(61,43,31,.6);z-index:9999;display:flex;align-items:flex-end;justify-content:center';
   overlay.onclick = function(e){ if(e.target===overlay) overlay.remove(); };
   var modal = document.createElement('div');
   modal.style.cssText = 'background:#fff;border-radius:28px 28px 0 0;width:100%;max-width:460px;padding:20px 20px 40px;max-height:85vh;overflow-y:auto';
