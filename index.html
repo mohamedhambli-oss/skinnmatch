@@ -301,6 +301,22 @@ body{background:var(--bg);font-family:var(--sans);color:var(--pri);min-height:10
   0%, 60%, 100% { transform: translateY(0); }
   30% { transform: translateY(-6px); }
 }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ── NAVIGATION BAS : fix couleur bleue Chrome/Safari ── */
+.nav-btn { color: #B0958F; -webkit-appearance: none; }
+.nav-btn svg { stroke: #B0958F; transition: stroke .15s; }
+.nav-btn span { color: #B0958F !important; transition: color .15s; }
+.nav-btn.active { color: #C4726A; }
+.nav-btn.active svg { stroke: #C4726A; }
+.nav-btn.active span { color: #C4726A !important; }
+#bottom-nav { left: 0 !important; right: 0 !important; max-width: 100% !important; width: 100% !important; box-sizing: border-box; }
+#bottom-nav > div { max-width: 460px; margin: 0 auto; }
+
+/* ── Fix Safari : contenus mal placés ── */
+@media screen and (min-width: 461px) {
+  .app > div:not(.hidden) { max-width: 460px !important; left: 50% !important; right: auto !important; transform: translateX(-50%) !important; }
+}
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
@@ -3972,42 +3988,80 @@ var barcodeScanning = false;
 function startBarcodeCamera() {
   var isEN = LANG === 'en';
   if (!_canScan('product')) { _showScanPaywall('product'); return; }
+  // Arrêter proprement tout scanner existant
   if (window._html5Scanner) {
-    try { window._html5Scanner.stop().catch(function(){}); } catch(e) {}
-    window._html5Scanner = null;
+    try {
+      window._html5Scanner.stop().catch(function(){}).finally(function(){
+        window._html5Scanner = null;
+        _doStartScanner(isEN);
+      });
+    } catch(e) {
+      window._html5Scanner = null;
+      _doStartScanner(isEN);
+    }
+    return;
   }
+  _doStartScanner(isEN);
+}
+
+function _doStartScanner(isEN) {
   var guide = document.getElementById('scan-guide');
-  if (guide) guide.textContent = isEN ? 'Initializing...' : 'Initialisation...';
+  var readerEl = document.getElementById('reader');
+  if (!readerEl) return;
+  // Vider le reader pour éviter les erreurs "already started"
+  readerEl.innerHTML = '';
+  if (guide) guide.textContent = isEN ? 'Initializing camera...' : 'Initialisation caméra...';
   try {
     window._html5Scanner = new Html5Qrcode("reader");
+    var config = {
+      fps: 10,
+      qrbox: function(w, h) { return { width: Math.min(240, w*0.75), height: Math.min(100, h*0.35) }; },
+      formatsToSupport: [
+        Html5QrcodeSupportedFormats.EAN_13, Html5QrcodeSupportedFormats.EAN_8,
+        Html5QrcodeSupportedFormats.UPC_A, Html5QrcodeSupportedFormats.UPC_E,
+        Html5QrcodeSupportedFormats.CODE_128, Html5QrcodeSupportedFormats.CODE_39
+      ]
+    };
     window._html5Scanner.start(
       { facingMode: "environment" },
-      {
-        fps: 10,
-        qrbox: function(w, h) { return { width: Math.min(260, w*0.8), height: Math.min(110, h*0.4) }; },
-        aspectRatio: 1.2,
-        formatsToSupport: [
-          Html5QrcodeSupportedFormats.EAN_13, Html5QrcodeSupportedFormats.EAN_8,
-          Html5QrcodeSupportedFormats.UPC_A, Html5QrcodeSupportedFormats.UPC_E,
-          Html5QrcodeSupportedFormats.CODE_128, Html5QrcodeSupportedFormats.CODE_39
-        ]
-      },
+      config,
       function(code) { onBarcodeDetected(code); },
       function() {}
     ).then(function() {
-      if (guide) guide.textContent = isEN ? 'Point at barcode' : 'Pointe vers le code-barres';
-    }).catch(function() {
-      if (guide) guide.textContent = isEN ? 'Camera denied' : 'Caméra refusée — autorise dans les réglages';
+      if (guide) guide.textContent = isEN ? '📷 Point camera at barcode' : '📷 Pointe la caméra vers le code-barres';
+    }).catch(function(err) {
+      // Fallback : essayer avec facingMode "user" si "environment" échoue (certains appareils)
+      window._html5Scanner.start(
+        { facingMode: "user" },
+        config,
+        function(code) { onBarcodeDetected(code); },
+        function() {}
+      ).then(function() {
+        if (guide) guide.textContent = isEN ? '📷 Point camera at barcode' : '📷 Pointe la caméra vers le code-barres';
+      }).catch(function(err2) {
+        if (guide) {
+          guide.innerHTML = (isEN
+            ? '⚠️ Camera blocked — please allow camera access in your browser settings, then reload.'
+            : '⚠️ Caméra bloquée — autorise l'accès à la caméra dans les réglages de ton navigateur, puis recharge la page.');
+        }
+        window._html5Scanner = null;
+      });
     });
   } catch(e) {
-    if (guide) guide.textContent = 'Erreur: ' + e.message;
+    if (guide) guide.textContent = (isEN ? 'Error: ' : 'Erreur : ') + e.message;
+    window._html5Scanner = null;
   }
 }
 
 function stopBarcodeCamera() {
   if (window._html5Scanner) {
-    try { window._html5Scanner.stop().catch(function(){}); } catch(e) {}
-    window._html5Scanner = null;
+    try {
+      var scanner = window._html5Scanner;
+      window._html5Scanner = null;
+      scanner.stop().catch(function(){});
+    } catch(e) {
+      window._html5Scanner = null;
+    }
   }
 }
 
@@ -4015,7 +4069,7 @@ function stopBarcodeCamera() {
 async function onBarcodeDetected(code) {
   stopBarcodeCamera();
   if (!_canScan('product')) { _showScanPaywall('product'); return; }
-  var guide = document.getElementById("barcode-guide");
+  var guide = document.getElementById("scan-guide");
   if (guide) guide.textContent = "✅ Code détecté : " + code;
 
   // 1. Chercher dans notre DB locale
@@ -4365,11 +4419,13 @@ function scanBarcodeFromFile(input) {
 function resetBarcodeScanner() {
   var resultDiv = document.getElementById("scan-product-result");
   if (resultDiv) { resultDiv.style.display = "none"; resultDiv.innerHTML = ""; }
-  document.getElementById("barcode-camera-zone").style.display = "block";
-  var guide = document.getElementById("barcode-guide");
+  var zone = document.getElementById("barcode-camera-zone");
+  if (zone) zone.style.display = "block";
+  var guide = document.getElementById("scan-guide");
   if (guide) guide.textContent = "📷 Pointez le code-barres vers la caméra";
-  barcodeScanning = true;
-  startBarcodeCamera();
+  // Arrêter proprement avant de relancer
+  stopBarcodeCamera();
+  setTimeout(function() { startBarcodeCamera(); }, 400);
 }
 
 function searchProductScan(query) {
@@ -6788,8 +6844,7 @@ function navTo(screen) {
     renderDashboard();
   }
   if (screen === 'scan-product') {
-    if (!window._currentUser) { _showLoginRequired('scan-product'); return; }
-    setTimeout(function() { startBarcodeCamera(); }, 100);
+    setTimeout(function() { startBarcodeCamera(); }, 300);
   }
 
   go(screen);
@@ -7138,7 +7193,6 @@ function submitFeedback(key, type, btn) {
   var toast = document.createElement('div');
   toast.style.cssText = 'position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:#3D2B1F;color:#fff;padding:10px 20px;border-radius:20px;font-size:12px;font-weight:600;z-index:9999;opacity:0;transition:opacity .3s';
   toast.textContent = type === "like" ? (LANG === "en" ? "Noted! We will show more like this." : "Noté ! On t'en proposera de similaires.") : (LANG === "en" ? "Noted! We will refine your recommendations." : "Noté ! On affinera tes recommandations.");
-  toast.textContent = type === 'like' 
   document.body.appendChild(toast);
   setTimeout(function() { toast.style.opacity = '1'; }, 10);
   setTimeout(function() { toast.style.opacity = '0'; setTimeout(function() { toast.remove(); }, 300); }, 2500);
@@ -7721,22 +7775,9 @@ function renderShoppingList() {
     });
     var shareBtn = document.getElementById('share-shopping-btn');
     if (shareBtn) shareBtn.onclick = function() {
-    if (shareBtn) shareBtn.onclick = function() {
-
       var parts = allUniq.map(function(s){ return s.nom+" ("+s.marque+")"; });
-
       var txt = "Ma liste de courses SkinMatch : " + parts.join(", ") + " | Total: ~"+Math.round(total)+"euros";
-
       if (navigator.share) { navigator.share({title:"Liste SkinMatch",text:txt}).catch(function(){}); }
-
-      else { try { navigator.clipboard.writeText(txt); } catch(e) {} }
-
-    };
-
-
-
-
-
       else { try { navigator.clipboard.writeText(txt); } catch(e) {} }
     };
   }
