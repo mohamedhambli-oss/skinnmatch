@@ -30,66 +30,25 @@
 <title>SkinMatch — Your Skin, Your Routine</title>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
 <!-- Firebase SDK -->
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 <script>
-(function() {
-  try {
-    var firebaseConfig = {
-      apiKey: "AIzaSyBMWoVUUrj2R5FywcCl34z9ooFTI9ZMAE4",
-      authDomain: "skin-match-c7189.firebaseapp.com",
-      projectId: "skin-match-c7189",
-      storageBucket: "skin-match-c7189.firebasestorage.app",
-      messagingSenderId: "1033609385398",
-      appId: "1:1033609385398:web:4b08eef7db24e6470ddd17"
-    };
-
-    firebase.initializeApp(firebaseConfig);
-    var auth = firebase.auth();
-    var db = firebase.firestore();
-
-    window._auth = auth;
-    window._db = db;
-    window._googleProvider = new firebase.auth.GoogleAuthProvider();
-    window._createUserWithEmailAndPassword = function(a, e, p) { return auth.createUserWithEmailAndPassword(e, p); };
-    window._signInWithEmailAndPassword = function(a, e, p) { return auth.signInWithEmailAndPassword(e, p); };
-    window._signInWithPopup = function(a, p) { return auth.signInWithPopup(p); };
-    window._signOut = function() { return auth.signOut(); };
-    window._updateProfile = function(user, data) { return user.updateProfile(data); };
-    window._doc = function(db, col, id) { return db.collection(col).doc(id); };
-    window._setDoc = function(ref, data, opts) { return opts && opts.merge ? ref.set(data, {merge:true}) : ref.set(data); };
-    window._getDoc = function(ref) {
-      return ref.get().then(function(snap) {
-        return { exists: function(){ return snap.exists; }, data: function(){ return snap.data(); } };
-      });
-    };
-    window._updateDoc = function(ref, data) { return ref.update(data); };
-    window._firebaseReady = true;
-
-    auth.onAuthStateChanged(function(user) {
-      try {
-        window._currentUser = user;
-        if (user) {
-          db.collection('users').doc(user.uid).get().then(function(snap) {
-            if (snap.exists) window._userProfile = snap.data();
-          }).catch(function(){});
-          if (typeof window._onAuthResolved === 'function') window._onAuthResolved(user);
-          if (typeof window.onFirebaseUserReady === 'function') window.onFirebaseUserReady(user);
-        } else {
-          window._userProfile = null;
-          if (typeof window._onAuthResolved === 'function') window._onAuthResolved(null);
-          if (typeof window.onFirebaseUserReady === 'function') window.onFirebaseUserReady(null);
-        }
-      } catch(e) {
-        if (typeof window._onAuthResolved === 'function') window._onAuthResolved(null);
-      }
-    });
-  } catch(e) {
-    console.log('Firebase init error:', e);
+// Firebase désactivé — mode hors-ligne
+window._firebaseReady = false;
+window._currentUser = null;
+window._auth = null;
+window._db = null;
+window._createUserWithEmailAndPassword = function() { return Promise.reject(new Error('Firebase non disponible')); };
+window._signInWithEmailAndPassword = function() { return Promise.reject(new Error('Firebase non disponible')); };
+window._signInWithPopup = function() { return Promise.reject(new Error('Firebase non disponible')); };
+window._signOut = function() { return Promise.resolve(); };
+window._updateProfile = function() { return Promise.resolve(); };
+window._doc = function() { return null; };
+window._setDoc = function() { return Promise.resolve(); };
+window._getDoc = function() { return Promise.resolve({exists: function(){return false;}, data: function(){return null;}}); };
+window._updateDoc = function() { return Promise.resolve(); };
+// Déclencher immédiatement sans attendre Firebase
+setTimeout(function() {
     if (typeof window._onAuthResolved === 'function') window._onAuthResolved(null);
-  }
-})();
+}, 0);
 </script>
 <script>
 // Global error handler - prevents silent crashes on Safari
@@ -107,6 +66,9 @@ window.addEventListener('unhandledrejection', function(e) {
   } catch(ex) {}
 });
 </script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js" defer></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js" defer></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js" defer></script>
 
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
@@ -3428,7 +3390,7 @@ function shareRoutineLink() {
         t.style.cssText = "position:fixed;top:70px;left:50%;transform:translateX(-50%);background:#3D2B1F;color:#fff;padding:12px 20px;border-radius:50px;font-size:13px;font-weight:600;z-index:99999";
         t.textContent = isEN ? "Link copied!" : "Lien copié !";
         document.body.appendChild(t);
-        setTimeout(function(){ t.remove(); }, 2500);
+        setTimeout(function(){ t.remove(); }, 500);
       });
     } catch(e){}
   }
@@ -7138,7 +7100,7 @@ function changeNotifTime(type) {
   t.style.cssText = "position:fixed;top:70px;left:50%;transform:translateX(-50%);background:#2E7D32;color:#fff;padding:12px 20px;border-radius:50px;font-size:13px;font-weight:600;z-index:9999";
   t.textContent = (isEN ? "Updated: " : "Mis a jour : ") + newTime;
   document.body.appendChild(t);
-  setTimeout(function(){t.remove();}, 2500);
+  setTimeout(function(){t.remove();}, 500);
 }
 
 function requestNotifPermission() {
@@ -7235,7 +7197,7 @@ function submitFeedback(key, type, btn) {
   toast.textContent = type === "like" ? (LANG === "en" ? "Noted! We will show more like this." : "Noté ! On t'en proposera de similaires.") : (LANG === "en" ? "Noted! We will refine your recommendations." : "Noté ! On affinera tes recommandations.");
   document.body.appendChild(toast);
   setTimeout(function() { toast.style.opacity = '1'; }, 10);
-  setTimeout(function() { toast.style.opacity = '0'; setTimeout(function() { toast.remove(); }, 300); }, 2500);
+  setTimeout(function() { toast.style.opacity = '0'; setTimeout(function() { toast.remove(); }, 300); }, 500);
 }
 
 // Init — attendre Firebase avant d'afficher
@@ -7378,7 +7340,7 @@ var _firebaseWait = setTimeout(function() {
     go('lang');
     _hideSplash();
   }
-}, 2500);
+}, 500);
 
 window._onAuthResolved = function(user) {
   clearTimeout(_firebaseWait);
