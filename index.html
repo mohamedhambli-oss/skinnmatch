@@ -102,6 +102,13 @@ body{background:var(--bg);font-family:var(--sans);color:var(--pri);min-height:10
 .app{max-width:460px;margin:0 auto;min-height:100vh;display:flex;flex-direction:column}
 .hidden{display:none!important}
 .app > div:not(.hidden){position:fixed;top:0;left:0;right:0;bottom:0;overflow-y:scroll;-webkit-overflow-scrolling:touch;overscroll-behavior:none;max-width:460px;left:50%;transform:translateX(-50%)}
+#sc-scan-product{display:flex;flex-direction:column;overflow:hidden}
+#sc-scan-product .content{flex:1;overflow-y:scroll;-webkit-overflow-scrolling:touch;padding:16px;padding-bottom:100px}
+#reader{width:100%;height:calc(45vh);border-radius:20px;overflow:hidden;background:#111;margin-bottom:12px}
+#reader video{width:100%!important;height:100%!important;object-fit:cover!important}
+#reader__scan_region{height:100%!important;min-height:unset!important}
+#reader__dashboard{display:none!important}
+#reader__camera_permission_button{display:none!important}
 #reader video{object-fit:cover!important}
 #reader__dashboard{display:none!important}
 
@@ -832,12 +839,12 @@ body{background:var(--bg);font-family:var(--sans);color:var(--pri);min-height:10
     <div class="logo"><div class="logo-icon">SM</div>Skin<span>Match</span></div>
     <div></div>
   </div>
-  <div class="content" style="padding:16px;padding-bottom:100px">
+  <div class="content">
     <div style="text-align:center;margin-bottom:16px">
       <div style="font-size:10px;font-weight:700;color:#C4726A;text-transform:uppercase;letter-spacing:2px;margin-bottom:6px">📷 Scanner un produit</div>
       <p style="font-size:13px;color:#8B6F5E">Pointe la caméra vers le code-barres du produit</p>
     </div>
-    <div id="reader" style="width:100%;border-radius:20px;overflow:hidden;background:#111;margin-bottom:12px;min-height:240px"></div>
+    <div id="reader"></div>
     <div id="scan-guide" style="text-align:center;font-size:13px;color:#8B6F5E;margin-bottom:12px">Initialisation caméra...</div>
     <div id="scan-loading" style="display:none;text-align:center;padding:20px">
       <div style="font-size:28px;margin-bottom:8px">🔍</div>
@@ -6723,59 +6730,72 @@ function startDiagFromProfile() {
 var NAV_SCREENS = ['welcome','result','scan-product','articles','dashboard','community'];
 
 function navTo(screen) {
-  // Arrêter caméras si on quitte
   if (typeof stopCamera === 'function') stopCamera();
   if (typeof stopBarcodeCamera === 'function') stopBarcodeCamera();
-  
+
+  // ── Routine ──
   if (screen === 'result') {
     if (ST.result) {
-      // OK
+      renderResult();
+      go('result');
+      updateNav('result');
+      return;
     } else if (window._savedRoutine) {
-      reloadSavedRoutine(); updateNav('result'); return;
+      reloadSavedRoutine();
+      go('result');
+      updateNav('result');
+      return;
     } else if (window._currentUser) {
-      var _ov=document.createElement('div');
-      _ov.style.cssText='position:fixed;inset:0;background:rgba(248,242,237,.97);display:flex;align-items:center;justify-content:center;z-index:9999;flex-direction:column;gap:12px';
-      _ov.innerHTML='<div style="font-size:36px">🌸</div><div style="font-family:Georgia,serif;font-size:16px;font-weight:700;color:#3D2B1F">Chargement de ta routine...</div>';
+      // Firestore pas encore chargé — attendre max 3s
+      var _ov = document.createElement('div');
+      _ov.style.cssText = 'position:fixed;inset:0;background:rgba(248,242,237,.97);display:flex;align-items:center;justify-content:center;z-index:9999;flex-direction:column;gap:12px';
+      _ov.innerHTML = '<div style="font-size:40px">🌸</div><div style="font-family:Georgia,serif;font-size:16px;font-weight:700;color:#3D2B1F">Chargement de ta routine...</div><div style="font-size:13px;color:#8B6F5E;margin-top:4px">Quelques secondes...</div>';
       document.body.appendChild(_ov);
-      var _n=0; var _waitRoutine=setInterval(function(){
+      var _n = 0;
+      var _waitRoutine = setInterval(function() {
         _n++;
-        if(window._savedRoutine||ST.result){clearInterval(_waitRoutine);_ov.remove();if(window._savedRoutine)reloadSavedRoutine();go('result');updateNav('result');}
-        else if(_n>=10){clearInterval(_waitRoutine);_ov.remove();go('q1');updateNav(null);}
-      },300); return;
-    } else { go('q1'); updateNav(null); return; }
+        if (window._savedRoutine || ST.result) {
+          clearInterval(_waitRoutine);
+          _ov.remove();
+          if (window._savedRoutine) reloadSavedRoutine();
+          renderResult();
+          go('result');
+          updateNav('result');
+        } else if (_n >= 15) {
+          clearInterval(_waitRoutine);
+          _ov.remove();
+          // Pas de routine — lancer le diagnostic
+          go('q1');
+          updateNav(null);
+        }
+      }, 200);
+      return;
+    } else {
+      go('q1');
+      updateNav(null);
+      return;
+    }
   }
-  if (screen === 'articles') {
-    renderArticlesScreen();
-  }
+
+  // ── Autres écrans ──
+  if (screen === 'articles') { renderArticlesScreen(); }
   if (screen === 'community') { go('community'); updateNav('community'); renderCommunity(); return; }
   if (screen === 'history') { renderHistory(); }
   if (screen === 'shopping') { renderShoppingList(); }
   if (screen === 'subscription') { /* statique */ }
-  if (screen === 'community') {
-    go('community');
-    updateNav('community');
-    renderCommunity();
-    return;
-  }
-  if (screen === 'history') {
-    renderHistory();
-  }
-  if (screen === 'shopping') {
-    renderShoppingList();
-  }
-  if (screen === 'subscription') {
-    // écran statique
-  }
   if (screen === 'dashboard') {
     if (!window._currentUser) { _showLoginRequired('dashboard'); return; }
     renderDashboard();
   }
   if (screen === 'scan-product') {
+    if (!window._currentUser) { _showLoginRequired('scan-product'); return; }
     setTimeout(function() { startBarcodeCamera(); }, 100);
   }
+
   go(screen);
   updateNav(screen);
 }
+
 
 function updateNav(screen) {
   var isEN = LANG === 'en';
