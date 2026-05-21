@@ -30,62 +30,66 @@
 <title>SkinMatch — Your Skin, Your Routine</title>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
 <!-- Firebase SDK -->
-<script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-  import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut, updateProfile } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-  import { getFirestore, doc, setDoc, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<script>
+(function() {
+  try {
+    var firebaseConfig = {
+      apiKey: "AIzaSyBMWoVUUrj2R5FywcCl34z9ooFTI9ZMAE4",
+      authDomain: "skin-match-c7189.firebaseapp.com",
+      projectId: "skin-match-c7189",
+      storageBucket: "skin-match-c7189.firebasestorage.app",
+      messagingSenderId: "1033609385398",
+      appId: "1:1033609385398:web:4b08eef7db24e6470ddd17"
+    };
 
-  const firebaseConfig = {
-    apiKey: "AIzaSyBMWoVUUrj2R5FywcCl34z9ooFTI9ZMAE4",
-    authDomain: "skin-match-c7189.firebaseapp.com",
-    projectId: "skin-match-c7189",
-    storageBucket: "skin-match-c7189.firebasestorage.app",
-    messagingSenderId: "1033609385398",
-    appId: "1:1033609385398:web:4b08eef7db24e6470ddd17",
-    measurementId: "G-DBH333L5FB"
-  };
+    firebase.initializeApp(firebaseConfig);
+    var auth = firebase.auth();
+    var db = firebase.firestore();
 
-  const app = initializeApp(firebaseConfig);
-  const auth = getAuth(app);
-  const db = getFirestore(app);
-  const googleProvider = new GoogleAuthProvider();
+    window._auth = auth;
+    window._db = db;
+    window._googleProvider = new firebase.auth.GoogleAuthProvider();
+    window._createUserWithEmailAndPassword = function(a, e, p) { return auth.createUserWithEmailAndPassword(e, p); };
+    window._signInWithEmailAndPassword = function(a, e, p) { return auth.signInWithEmailAndPassword(e, p); };
+    window._signInWithPopup = function(a, p) { return auth.signInWithPopup(p); };
+    window._signOut = function() { return auth.signOut(); };
+    window._updateProfile = function(user, data) { return user.updateProfile(data); };
+    window._doc = function(db, col, id) { return db.collection(col).doc(id); };
+    window._setDoc = function(ref, data, opts) { return opts && opts.merge ? ref.set(data, {merge:true}) : ref.set(data); };
+    window._getDoc = function(ref) {
+      return ref.get().then(function(snap) {
+        return { exists: function(){ return snap.exists; }, data: function(){ return snap.data(); } };
+      });
+    };
+    window._updateDoc = function(ref, data) { return ref.update(data); };
+    window._firebaseReady = true;
 
-  // Exposer globalement pour les fonctions existantes
-  window._auth = auth;
-  window._db = db;
-  window._googleProvider = googleProvider;
-  window._createUserWithEmailAndPassword = createUserWithEmailAndPassword;
-  window._signInWithEmailAndPassword = signInWithEmailAndPassword;
-  window._signInWithPopup = signInWithPopup;
-  window._signOut = signOut;
-  window._updateProfile = updateProfile;
-  window._doc = doc;
-  window._setDoc = setDoc;
-  window._getDoc = getDoc;
-  window._updateDoc = updateDoc;
-  window._firebaseReady = true;
-
-  // Observer état connexion
-  onAuthStateChanged(auth, (user) => {
-    try {
-      window._currentUser = user;
-      if (user) {
-        getDoc(doc(db, 'users', user.uid)).then(snap => {
-          if (snap.exists()) {
-            window._userProfile = snap.data();
-          }
-        }).catch(function(){});
-        if (typeof window._onAuthResolved === 'function') window._onAuthResolved(user);
-        if (typeof window.onFirebaseUserReady === 'function') window.onFirebaseUserReady(user);
-      } else {
-        window._userProfile = null;
+    auth.onAuthStateChanged(function(user) {
+      try {
+        window._currentUser = user;
+        if (user) {
+          db.collection('users').doc(user.uid).get().then(function(snap) {
+            if (snap.exists) window._userProfile = snap.data();
+          }).catch(function(){});
+          if (typeof window._onAuthResolved === 'function') window._onAuthResolved(user);
+          if (typeof window.onFirebaseUserReady === 'function') window.onFirebaseUserReady(user);
+        } else {
+          window._userProfile = null;
+          if (typeof window._onAuthResolved === 'function') window._onAuthResolved(null);
+          if (typeof window.onFirebaseUserReady === 'function') window.onFirebaseUserReady(null);
+        }
+      } catch(e) {
         if (typeof window._onAuthResolved === 'function') window._onAuthResolved(null);
-        if (typeof window.onFirebaseUserReady === 'function') window.onFirebaseUserReady(null);
       }
-    } catch(e) {
-      if (typeof window._onAuthResolved === 'function') window._onAuthResolved(null);
-    }
-  });
+    });
+  } catch(e) {
+    console.log('Firebase init error:', e);
+    if (typeof window._onAuthResolved === 'function') window._onAuthResolved(null);
+  }
+})();
 </script>
 <script>
 // Global error handler - prevents silent crashes on Safari
