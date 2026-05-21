@@ -567,7 +567,7 @@ body{background:var(--bg);font-family:var(--sans);color:var(--pri);min-height:10
     </div>
 
     <!-- Bouton analyser -->
-    <button id="scan-btn" class="btn-p" disabled onclick="analyzeSkin()" style="margin-bottom:12px" id="scan-btn">
+    <button id="scan-btn" class="btn-p" disabled onclick="analyzeSkin()" style="margin-bottom:12px">
       <span id="scan-btn-text">Analyser ma peau</span>
     </button>
 
@@ -1951,7 +1951,7 @@ function getRegionProducts() {
   return available;
 }
 
-const SCREENS=["lang","welcome","register","login","scan","q1","diag","q2","q3","q4","q5","result","compare","suivi","dashboard","scan-product","profile","articles","settings","community","subscription","history","shopping"];
+const SCREENS=["lang","welcome","register","login","scan","q1","diag","q2","q3","q4","q5","result","compare","suivi","dashboard","scan-product","profile","articles","settings","community","subscription","history","shopping","privacy","cgu"];
 
 const ST={
   screen:'lang',user:null,
@@ -4370,6 +4370,47 @@ function resetBarcodeScanner() {
   if (guide) guide.textContent = "📷 Pointez le code-barres vers la caméra";
   barcodeScanning = true;
   startBarcodeCamera();
+}
+
+async function submitBarcodeContrib(code, prefillName, prefillBrand) {
+  var nameEl = document.getElementById("contrib-name");
+  var brandEl = document.getElementById("contrib-brand");
+  var name = prefillName || (nameEl ? nameEl.value.trim() : "");
+  var brand = prefillBrand || (brandEl ? brandEl.value.trim() : "");
+
+  if (!name) {
+    if (nameEl) nameEl.style.borderColor = "#C62828";
+    return;
+  }
+
+  if (window._firebaseReady) {
+    try {
+      await window._setDoc(window._doc(window._db, "community_eans", code), {
+        ean: code, nom: name, marque: brand,
+        addedBy: window._currentUser ? window._currentUser.uid : "anonymous",
+        addedAt: new Date().toISOString(), validated: false
+      });
+    } catch(e) { console.log("Firestore contrib error:", e); }
+  }
+
+  var localEans = JSON.parse(localStorage.getItem("skinmatch_community_eans") || "{}");
+  localEans[code] = { nom: name, marque: brand, date: new Date().toISOString() };
+  localStorage.setItem("skinmatch_community_eans", JSON.stringify(localEans));
+
+  var resultDiv = document.getElementById("scan-product-result");
+  if (resultDiv) {
+    resultDiv.innerHTML =
+      "<div style=\"background:#E8F5E9;border:1px solid #A5D6A7;border-radius:16px;padding:24px;text-align:center\">" +
+        "<div style=\"font-size:40px;margin-bottom:10px\">🙌</div>" +
+        "<div style=\"font-size:14px;font-weight:700;color:#2E7D32;margin-bottom:6px\">" + (LANG === "en" ? "Thank you!" : "Merci !") + "</div>" +
+        "<div style=\"font-size:12px;color:#388E3C;margin-bottom:16px\">" +
+          (LANG === "en" ? name + " has been added!" : name + " a été ajouté !") +
+        "</div>" +
+        "<button onclick=\"resetBarcodeScanner()\" style=\"padding:12px 24px;border-radius:50px;border:none;background:#2E7D32;color:#fff;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit\">" +
+          (LANG === "en" ? "Scan another product" : "Scanner un autre produit") +
+        "</button>" +
+      "</div>";
+  }
 }
 
 function searchProductScan(query) {
@@ -7319,7 +7360,7 @@ initQuestions();
     </div>
     <div id="why-loading" style="text-align:center;padding:32px;display:none">
       <div style="width:40px;height:40px;border:3px solid #F2C4BC;border-top-color:#C4726A;border-radius:50%;animation:spin 1s linear infinite;margin:0 auto 14px"></div>
-      <div style="font-size:13px;color:#B0958F"><span id="scan-analyzing-text">Analyse en cours...</span></div>
+      <div style="font-size:13px;color:#B0958F"><span id="why-analyzing-text">Analyse en cours...</span></div>
     </div>
     <div id="why-content" style="font-size:14px;line-height:1.75;color:#3D2B1F"></div>
     <button onclick="closeWhyModal()" style="width:100%;margin-top:20px;padding:13px;border-radius:50px;border:none;background:#C4726A;color:#fff;font-size:14px;font-weight:700;cursor:pointer;font-family:'Outfit',sans-serif">Fermer</button>
