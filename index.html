@@ -101,51 +101,156 @@ html{color-scheme:light only;-webkit-color-scheme:light}
 body{background:var(--bg);font-family:var(--sans);color:var(--pri);min-height:100vh;color-scheme:light only;-webkit-color-scheme:light}
 .app{max-width:460px;margin:0 auto;min-height:100vh;display:flex;flex-direction:column}
 .hidden{display:none!important}
-.app > div:not(.hidden){position:fixed;top:0;left:0;right:0;bottom:0;overflow-y:scroll;-webkit-overflow-scrolling:touch;overscroll-behavior:none}
-#sc-scan-product{display:flex;flex-direction:column;overflow:hidden}
-#sc-scan-product .content{flex:1;overflow-y:scroll;-webkit-overflow-scrolling:touch;padding:16px;padding-bottom:100px}
-#reader{width:100%;height:calc(45vh);border-radius:20px;overflow:hidden;background:#111;margin-bottom:12px}
-#reader video{width:100%!important;height:100%!important;object-fit:cover!important}
-#reader__scan_region{height:100%!important;min-height:unset!important}
-#reader__dashboard{display:none!important}
-#reader__camera_permission_button{display:none!important}
 #reader video{object-fit:cover!important}
 #reader__dashboard{display:none!important}
+.app > div:not(.hidden){position:fixed;top:0;left:0;right:0;bottom:0;overflow-y:scroll;-webkit-overflow-scrolling:touch;overscroll-behavior:none}
 
-/* ── PAGE ABONNEMENT ── */
-.sub-card {
-  border-radius:20px;padding:20px;margin-bottom:14px;
-  border:1.5px solid rgba(196,114,106,.15);
-  background:#fff;position:relative;overflow:hidden;
+/* NAV */
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:20px 18px 0}
+.nav-btn{color:#B0958F;transition:color .2s}
+.nav-btn.active{color:#C4726A}
+.nav-btn svg{display:block}
+.has-nav .content{padding-bottom:90px !important}
+#sc-welcome,#sc-q1,#sc-q2,#sc-q3,#sc-q4,#sc-q5,#sc-result,#sc-scan,#sc-scan-product,#sc-dashboard,#sc-articles,#sc-article-detail,#sc-login,#sc-register,#sc-profile,#sc-settings,#sc-compare,#sc-lang,#sc-region{scroll-margin-top:0}
+.logo{font-family:var(--serif);font-size:24px;font-weight:700;letter-spacing:.5px;color:#3D2B1F;display:flex;align-items:center;gap:10px}
+.logo-icon{width:34px;height:34px;border-radius:9px;background:#C4726A;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#fff;font-family:var(--serif);flex-shrink:0;box-shadow:0 2px 8px rgba(196,114,106,.35)}
+.logo span{color:#C4726A}
+.btn-back{background:linear-gradient(135deg,#C4726A,#A85A52);border:none;border-radius:50px;padding:10px 20px;cursor:pointer;display:flex;align-items:center;gap:6px;color:#fff;font-size:13px;font-family:var(--sans);font-weight:700;box-shadow:0 3px 12px rgba(196,114,106,.35)}
+
+/* CONTENT */
+.content{padding:18px 18px 48px;flex:1}
+.step-lbl{font-size:10px;font-weight:600;color:var(--acc);text-transform:uppercase;letter-spacing:.6px;margin-bottom:5px}
+h2{font-family:var(--serif);font-size:20px;font-weight:700;margin-bottom:3px}
+.sub{font-size:13px;color:var(--mut);margin-bottom:18px;line-height:1.5}
+.err-msg{color:var(--err);font-size:12px;margin-bottom:10px}
+
+/* PROGRESS */
+.progress{margin-bottom:20px}
+.progress-track{height:5px;border-radius:50px;background:var(--bdr);overflow:hidden;margin-bottom:6px}
+.progress-fill{height:100%;border-radius:50px;background:linear-gradient(90deg,#C4726A,#E8906A);transition:width .4s ease}
+.progress-info{display:flex;justify-content:space-between;align-items:center;margin-bottom:5px}
+.progress-pct{font-size:11px;font-weight:700;color:#C4726A}
+.progress-step-txt{font-size:10px;color:var(--mut)}
+.progress-dots{display:flex;gap:4px}
+
+/* ── MODALE CARTE PARTAGE ── */
+#share-card-modal {
+  display:none;position:fixed;inset:0;
+  background:rgba(61,43,31,.65);
+  backdrop-filter:blur(6px);
+  z-index:9999;
+  align-items:flex-end;
+  justify-content:center;
+  padding:0;
 }
-.sub-card.featured {
-  border-color:#C4726A;
-  background:linear-gradient(135deg,#FBF0ED,#F5E1DC);
+#share-card-modal.open { display:flex; }
+#share-card-inner {
+  width:100%;max-width:460px;
+  background:#F8F2ED;
+  border-radius:28px 28px 0 0;
+  padding:20px 20px 40px;
+  animation:slideUp .3s ease;
 }
-.sub-badge {
-  position:absolute;top:14px;right:14px;
-  background:#C4726A;color:#fff;
-  font-size:9px;font-weight:700;letter-spacing:1px;
-  text-transform:uppercase;padding:3px 10px;border-radius:20px;
+@keyframes slideUp {
+  from{transform:translateY(100%)}
+  to{transform:translateY(0)}
 }
-.sub-tier { font-size:10px;font-weight:700;color:var(--rose);text-transform:uppercase;letter-spacing:2px;margin-bottom:6px; }
-.sub-price { font-family:Georgia,serif;font-size:32px;font-weight:700;color:#3D2B1F;line-height:1; }
-.sub-price span { font-size:14px;font-weight:400;color:var(--mut); }
-.sub-year { font-size:11px;color:var(--mut);margin-bottom:14px; }
-.sub-features { list-style:none;display:flex;flex-direction:column;gap:7px;margin-bottom:16px; }
-.sub-features li { font-size:12px;color:#3D2B1F;display:flex;align-items:center;gap:8px; }
-.sub-features li::before { content:"✓";color:#C4726A;font-weight:700;flex-shrink:0; }
-.sub-features li.no { color:var(--mut); }
-.sub-features li.no::before { content:"—";color:var(--mut); }
-.sub-btn {
-  width:100%;padding:12px;border-radius:50px;
+.share-modal-handle {
+  width:36px;height:4px;border-radius:2px;
+  background:rgba(196,114,106,.25);
+  margin:0 auto 16px;
+}
+.share-modal-title {
+  font-family:Georgia,serif;font-size:16px;
+  font-weight:700;color:#3D2B1F;
+  text-align:center;margin-bottom:16px;
+}
+
+/* Carte dans la modale */
+.share-card-wrap {
+  background:#F8F2ED;
+  border-radius:16px;
+  overflow:hidden;
+  border:0.5px solid rgba(196,114,106,.15);
+  box-shadow:0 4px 24px rgba(61,43,31,.1);
+  margin-bottom:16px;
+}
+.sc-topbar-stripe {
+  height:3px;
+  background:linear-gradient(90deg,#B8635A,#D4856A,#C4726A);
+}
+.sc-body {
+  padding:16px;
+  display:grid;
+  grid-template-columns:1fr 0.5px 1fr;
+  gap:0;
+  overflow:hidden;
+}
+.sc-vsep { background:rgba(196,114,106,.12); margin:0; }
+.sc-left { padding-right:12px; display:flex; flex-direction:column; gap:8px; }
+.sc-right { padding-left:12px; display:flex; flex-direction:column; }
+.sc-logo {
+  font-family:Georgia,serif;font-size:11px;color:rgba(61,43,31,.35);letter-spacing:1px;
+}
+.sc-logo em { color:#C4726A;font-style:normal; }
+.sc-name {
+  font-family:Georgia,serif;font-size:32px;font-weight:400;font-style:italic;
+  color:#3D2B1F;line-height:.92;letter-spacing:-1px;
+}
+.sc-skintype { font-size:9px;color:rgba(61,43,31,.4);margin-top:2px; }
+.sc-score-row {
+  display:flex;align-items:center;gap:8px;
+  padding:8px 0;border-top:.5px solid rgba(196,114,106,.12);
+}
+.sc-score-label { font-size:10px;font-weight:600;color:#C4726A; }
+.sc-score-sub { font-size:8px;color:rgba(61,43,31,.35);letter-spacing:.5px; }
+.sc-stats {
+  display:flex;gap:0;
+  border-top:.5px solid rgba(196,114,106,.12);
+  padding-top:10px;margin-top:auto;
+}
+.sc-st { flex:1;text-align:center; }
+.sc-st+.sc-st { border-left:.5px solid rgba(196,114,106,.12); }
+.sc-st-val { font-family:Georgia,serif;font-size:18px;font-weight:600;color:#C4726A;line-height:1; }
+.sc-st-lbl { font-size:7px;font-weight:500;letter-spacing:1.5px;text-transform:uppercase;color:rgba(61,43,31,.3); }
+.sc-prod-lbl { font-size:7px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:rgba(61,43,31,.28);margin-bottom:8px; }
+.sc-prod { display:flex;align-items:center;gap:7px;padding:6px 0;border-bottom:.5px solid rgba(196,114,106,.07); }
+.sc-prod:last-child { border:none; }
+.sc-prod-n { font-family:Georgia,serif;font-size:9px;color:rgba(196,114,106,.4);width:12px;flex-shrink:0; }
+.sc-prod-name { font-size:9.5px;font-weight:500;color:#3D2B1F;flex:1;overflow:hidden;white-space:nowrap;text-overflow:ellipsis; }
+.sc-prod-price { font-family:Georgia,serif;font-size:11px;font-weight:600;color:#C4726A;flex-shrink:0; }
+.sc-footer {
+  display:flex;justify-content:space-between;align-items:center;
+  padding:10px 20px;
+  border-top:.5px solid rgba(196,114,106,.1);
+  background:rgba(248,242,237,.95);
+}
+.sc-footer-brand { font-family:Georgia,serif;font-size:9px;color:rgba(61,43,31,.3);letter-spacing:1.5px; }
+.sc-footer-brand em { color:#C4726A;font-style:normal; }
+.sc-footer-url { font-size:7px;font-weight:500;letter-spacing:1px;text-transform:uppercase;color:rgba(61,43,31,.25); }
+
+/* Boutons de partage */
+.share-btns { display:flex;gap:10px; }
+.share-btn {
+  flex:1;padding:13px;border-radius:50px;
   font-size:13px;font-weight:700;cursor:pointer;
-  font-family:inherit;border:none;transition:opacity .15s;
+  font-family:inherit;border:none;
+  display:flex;align-items:center;justify-content:center;gap:8px;
+  transition:opacity .15s;
 }
-.sub-btn:active { opacity:.8; }
-.sub-btn-main { background:linear-gradient(135deg,#3D2B1F,#5A3D2B);color:#fff; }
-.sub-btn-outline { background:transparent;border:1.5px solid #C4726A;color:#C4726A; }
-.sub-btn-ghost { background:transparent;color:var(--mut);font-weight:500; }
+.share-btn:active { opacity:.8; }
+.share-btn-dl {
+  background:rgba(196,114,106,.12);
+  border:1.5px solid rgba(196,114,106,.25);
+  color:#C4726A;
+}
+.share-btn-share {
+  background:linear-gradient(135deg,#3D2B1F,#5A3D2B);
+  color:#fff;
+}
+.pd{flex:1;height:3px;border-radius:2px;background:var(--bdr);transition:all .3s}
+.pd.on{background:#C4726A}
+.pd.done{background:rgba(196,114,106,.35)}
 
 /* BUTTONS */
 .btn-p{width:100%;padding:14px;border-radius:50px;border:none;background:linear-gradient(135deg,#D4A5A0,#C4887F);color:#fff;font-size:13px;font-weight:600;cursor:pointer;font-family:var(--sans);margin-top:4px;letter-spacing:.3px;box-shadow:0 4px 15px rgba(212,165,160,.4)}
@@ -567,7 +672,7 @@ body{background:var(--bg);font-family:var(--sans);color:var(--pri);min-height:10
     </div>
 
     <!-- Bouton analyser -->
-    <button id="scan-btn" class="btn-p" disabled onclick="analyzeSkin()" style="margin-bottom:12px">
+    <button id="scan-btn" class="btn-p" disabled onclick="analyzeSkin()" style="margin-bottom:12px" id="scan-btn">
       <span id="scan-btn-text">Analyser ma peau</span>
     </button>
 
@@ -835,33 +940,201 @@ body{background:var(--bg);font-family:var(--sans);color:var(--pri);min-height:10
 <!-- ══ SCAN PRODUCT ══ -->
 <div id="sc-scan-product" class="hidden">
   <div class="topbar">
-    <button class="btn-back" onclick="navTo('result')">← Retour</button>
+    <button class="btn-back" onclick="go('result')">← Retour</button>
     <div class="logo"><div class="logo-icon">SM</div>Skin<span>Match</span></div>
-    <div></div>
   </div>
-  <div class="content">
-    <div style="text-align:center;margin-bottom:16px">
-      <div style="font-size:10px;font-weight:700;color:#C4726A;text-transform:uppercase;letter-spacing:2px;margin-bottom:6px">📷 Scanner un produit</div>
-      <p style="font-size:13px;color:#8B6F5E">Pointe la caméra vers le code-barres du produit</p>
+  <div class="content" style="padding-bottom:80px">
+    
+    <!-- Header -->
+    <div style="text-align:center;margin-bottom:24px">
+      <div style="font-size:10px;font-weight:700;color:#C4726A;text-transform:uppercase;letter-spacing:3px;margin-bottom:8px">📷 Scanner un produit</div>
+      <h2 style="font-family:Georgia,serif;font-size:22px;font-weight:700;color:#3D2B1F;margin-bottom:6px">Analyse instantanée</h2>
+      <p style="font-size:13px;color:#8B6F5E">Scanne le code-barres d\'un produit pour savoir s'il est adapté à ta peau</p>
     </div>
-    <div id="reader"></div>
-    <div id="scan-guide" style="text-align:center;font-size:13px;color:#8B6F5E;margin-bottom:12px">Initialisation caméra...</div>
-    <div id="scan-loading" style="display:none;text-align:center;padding:20px">
-      <div style="font-size:28px;margin-bottom:8px">🔍</div>
-      <div style="font-size:14px;font-weight:600;color:#3D2B1F">Analyse en cours...</div>
-    </div>
-    <div style="margin-top:8px">
-      <div style="font-size:11px;font-weight:700;color:rgba(61,43,31,.4);text-transform:uppercase;letter-spacing:1px;text-align:center;margin-bottom:10px">Ou recherche manuelle</div>
-      <div style="display:flex;gap:8px">
-        <input id="manual-search-input" type="text" placeholder="Nom du produit ou marque..." style="flex:1;padding:10px 14px;border:1.5px solid rgba(196,114,106,.25);border-radius:50px;font-size:13px;font-family:inherit;outline:none;color:#3D2B1F"/>
-        <button onclick="runManualSearch()" style="padding:10px 16px;border-radius:50px;border:none;background:#C4726A;color:#fff;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">OK</button>
+
+    <!-- Zone de scan caméra code-barres -->
+    <div id="barcode-camera-zone" style="margin-bottom:16px">
+      <div style="position:relative;width:100%;height:260px;background:#111;border-radius:20px;overflow:hidden">
+        
+        <!-- Flux vidéo -->
+        <video id="barcode-video" autoplay playsinline muted style="width:100%;height:100%;object-fit:cover;display:block"></video>
+        
+        <!-- Canvas de scan -->
+        <canvas id="barcode-canvas" style="display:none"></canvas>
+        
+        <!-- Overlay viseur -->
+        <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none">
+          <!-- Zone de scan rectangulaire -->
+          <div style="width:75%;height:110px;position:relative">
+            <!-- Coins du viseur -->
+            <div style="position:absolute;top:0;left:0;width:24px;height:24px;border-top:3px solid #C4726A;border-left:3px solid #C4726A;border-radius:3px 0 0 0"></div>
+            <div style="position:absolute;top:0;right:0;width:24px;height:24px;border-top:3px solid #C4726A;border-right:3px solid #C4726A;border-radius:0 3px 0 0"></div>
+            <div style="position:absolute;bottom:0;left:0;width:24px;height:24px;border-bottom:3px solid #C4726A;border-left:3px solid #C4726A;border-radius:0 0 0 3px"></div>
+            <div style="position:absolute;bottom:0;right:0;width:24px;height:24px;border-bottom:3px solid #C4726A;border-right:3px solid #C4726A;border-radius:0 0 3px 0"></div>
+            <!-- Ligne de scan animée -->
+            <div id="scan-line" style="position:absolute;left:4px;right:4px;height:2px;background:linear-gradient(90deg,transparent,#C4726A,transparent);animation:scanLine 2s ease-in-out infinite"></div>
+          </div>
+        </div>
+
+        <!-- Overlay sombre haut/bas -->
+        <div style="position:absolute;top:0;left:0;right:0;height:30%;background:rgba(0,0,0,0.5);pointer-events:none"></div>
+        <div style="position:absolute;bottom:0;left:0;right:0;height:30%;background:rgba(0,0,0,0.5);pointer-events:none"></div>
+
+        <!-- Message guidage -->
+        <div style="position:absolute;top:12px;left:0;right:0;text-align:center;pointer-events:none">
+          <span id="barcode-guide" style="background:rgba(0,0,0,.65);color:#fff;border-radius:20px;padding:5px 14px;font-size:12px;font-weight:600">📷 Pointez le code-barres vers la caméra</span>
+        </div>
+
+        <!-- Bouton flip + galerie -->
+        <div style="position:absolute;bottom:12px;left:0;right:0;display:flex;justify-content:center;gap:16px">
+          <button onclick="flipBarcodeCamera()" style="width:40px;height:40px;border-radius:50%;background:rgba(255,255,255,.2);border:2px solid rgba(255,255,255,.3);color:#fff;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center">🔄</button>
+          <button onclick="document.getElementById('barcode-file-input').click()" style="width:40px;height:40px;border-radius:50%;background:rgba(255,255,255,.2);border:2px solid rgba(255,255,255,.3);color:#fff;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center">🖼️</button>
+        </div>
+
+        <!-- Pas de caméra -->
+        <div id="barcode-no-camera" style="display:none;position:absolute;inset:0;background:#111;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding:20px">
+          <div style="font-size:36px">📷</div>
+          <div style="font-size:13px;font-weight:600;color:#fff">Caméra non disponible</div>
+          <div style="font-size:11px;color:rgba(255,255,255,.6);text-align:center">Recherche le produit par son nom</div>
+        </div>
       </div>
-      <div id="manual-search-results" style="margin-top:10px"></div>
+      <input type="file" id="barcode-file-input" accept="image/*" style="display:none" onchange="scanBarcodeFromFile(this)">
     </div>
-    <div id="scan-product-result" style="margin-top:16px"></div>
+
+    <!-- Recherche manuelle -->
+    <div style="margin-bottom:16px">
+      <div style="display:flex;gap:8px">
+        <input id="product-search-input" type="text" placeholder="Ou cherche un produit par nom..." autocomplete="off" autocorrect="off" autocapitalize="off" style="flex:1;padding:12px 16px;border-radius:50px;border:1.5px solid var(--bdr);font-size:15px;font-family:inherit;outline:none;background:#fff;-webkit-appearance:none" oninput="searchProductScan(this.value)">
+        <button onclick="simulateScan()" style="padding:12px 16px;border-radius:50px;background:#C4726A;border:none;color:#fff;font-weight:700;cursor:pointer;font-size:13px;font-family:inherit;white-space:nowrap">🔍</button>
+      </div>
+    </div>
+
+    <style>
+      @keyframes scanLine {
+        0% { top: 4px; opacity: 1; }
+        50% { top: calc(100% - 6px); opacity: 0.8; }
+        100% { top: 4px; opacity: 1; }
+      }
+    </style>
+
+    <!-- Suggestions de recherche -->
+    <div id="scan-suggestions" style="display:none;margin-bottom:16px">
+      <p style="font-size:11px;color:#B0958F;font-weight:600;margin-bottom:8px;text-transform:uppercase;letter-spacing:.5px">Suggestions</p>
+      <div id="scan-suggestions-list" style="display:flex;flex-direction:column;gap:6px"></div>
+    </div>
+
+    <!-- Résultat du scan -->
+    <div id="scan-product-result" style="display:none">
+      
+      <!-- Produit header -->
+      <div id="scan-product-header" style="background:#fff;border-radius:16px;padding:16px;display:flex;align-items:center;gap:14px;margin-bottom:16px;box-shadow:0 2px 12px rgba(0,0,0,.06)">
+        <div id="scan-product-img" style="width:60px;height:60px;border-radius:12px;background:#F5E8E6;display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:700;color:#C4726A;flex-shrink:0"></div>
+        <div>
+          <div id="scan-product-name" style="font-size:16px;font-weight:700;color:#3D2B1F;font-family:Georgia,serif"></div>
+          <div id="scan-product-brand" style="font-size:13px;color:#8B6F5E;margin-top:2px"></div>
+          <div id="scan-product-cat" style="font-size:11px;color:#C4726A;font-weight:600;margin-top:4px;text-transform:uppercase;letter-spacing:.5px"></div>
+        </div>
+      </div>
+
+      <!-- Score principal -->
+      <div style="background:linear-gradient(135deg,#1F3864,#2E5496);border-radius:20px;padding:24px;text-align:center;margin-bottom:16px;position:relative;overflow:hidden">
+        <div style="position:absolute;top:-20px;right:-20px;width:100px;height:100px;border-radius:50%;background:rgba(255,255,255,.05)"></div>
+        <p style="font-size:11px;font-weight:700;color:rgba(255,255,255,.7);text-transform:uppercase;letter-spacing:3px;margin-bottom:12px">Score d'adaptation</p>
+        
+        <!-- Cercle de score -->
+        <div style="position:relative;width:120px;height:120px;margin:0 auto 12px">
+          <svg width="120" height="120" viewBox="0 0 120 120">
+            <circle cx="60" cy="60" r="50" fill="none" stroke="rgba(255,255,255,.15)" stroke-width="10"/>
+            <circle id="score-circle" cx="60" cy="60" r="50" fill="none" stroke="#C4726A" stroke-width="10" stroke-linecap="round" stroke-dasharray="314" stroke-dashoffset="314" transform="rotate(-90 60 60)" style="transition:stroke-dashoffset 1s ease"/>
+          </svg>
+          <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center">
+            <div id="score-number" style="font-size:32px;font-weight:700;color:#fff;font-family:Georgia,serif;line-height:1">0</div>
+            <div style="font-size:12px;color:rgba(255,255,255,.7)">/100</div>
+          </div>
+        </div>
+        
+        <div id="score-label" style="font-size:16px;font-weight:700;color:#fff;margin-bottom:4px"></div>
+        <div id="score-sublabel" style="font-size:13px;color:rgba(255,255,255,.7)"></div>
+      </div>
+
+      <!-- 4 dimensions -->
+      <div style="background:#fff;border-radius:16px;padding:16px;margin-bottom:16px;box-shadow:0 2px 12px rgba(0,0,0,.06)">
+        <p style="font-size:12px;font-weight:700;color:#3D2B1F;text-transform:uppercase;letter-spacing:.5px;margin-bottom:14px">Détail du score</p>
+        <div id="score-dimensions" style="display:flex;flex-direction:column;gap:12px"></div>
+      </div>
+
+      <!-- Stats communauté -->
+      <div style="background:linear-gradient(135deg,#FDF0E6,#FAE5D8);border-radius:16px;padding:16px;margin-bottom:16px;border:1px solid rgba(196,114,106,.15)">
+        <p style="font-size:12px;font-weight:700;color:#C4726A;text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px">📊 Stats communauté SkinMatch</p>
+        <div id="scan-stats" style="display:flex;flex-direction:column;gap:6px"></div>
+      </div>
+
+      <!-- Ce qui convient -->
+      <div id="pros-section" style="margin-bottom:12px"></div>
+
+      <!-- Ce qui convient moins -->
+      <div id="cons-section" style="margin-bottom:12px"></div>
+
+      <!-- Alternatives -->
+      <div id="alternatives-section" style="margin-bottom:16px"></div>
+
+      <!-- Actions -->
+      <div style="display:flex;gap:10px;margin-bottom:8px">
+        <button onclick="saveScan()" style="flex:1;padding:13px;border-radius:50px;border:1.5px solid #C4726A;background:#fff;color:#C4726A;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">❤️ Sauvegarder</button>
+        <button onclick="shareScan()" style="flex:1;padding:13px;border-radius:50px;border:none;background:linear-gradient(135deg,#C4726A,#A85A52);color:#fff;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">📤 Partager</button>
+      </div>
+      <button id="scan-easypara-btn" onclick="" style="width:100%;padding:13px;border-radius:50px;border:none;background:#1F3864;color:#fff;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;margin-top:4px">🛒 Commander sur Easypara</button>
+    </div>
+
+    <!-- Historique des scans -->
+    <div id="scan-history" style="margin-top:20px">
+      <p style="font-size:12px;font-weight:700;color:#3D2B1F;text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px">Scans récents</p>
+      <div id="scan-history-list" style="display:flex;flex-direction:column;gap:8px"></div>
+    </div>
+
   </div>
 </div>
 
+<!-- ══ COMPARE ══ -->
+<div id="sc-compare" class="hidden">
+  <div class="topbar">
+    <button class="btn-back" onclick="go('result')">← Retour</button>
+    <div class="logo"><div class="logo-icon">SM</div>Skin<span>Match</span></div>
+  </div>
+  <div class="content">
+    <div style="margin:8px 0 12px">
+      <div class="step-lbl">Mode comparaison</div>
+      <h2 style="margin-bottom:4px">Comparer 2 produits</h2>
+      <p class="sub" id="compare-sub">Touchez 2 produits pour les comparer.</p>
+    </div>
+    <!-- Barre de recherche -->
+    <div style="position:relative;margin-bottom:12px">
+      <input id="compare-search" placeholder="🔍 Rechercher un produit..." oninput="filterCompareCards()" style="width:100%;padding:11px 16px;border:1.5px solid var(--bdr);border-radius:50px;font-size:13px;font-family:var(--sans);outline:none;box-sizing:border-box;background:var(--surf)">
+    </div>
+    <!-- Grille de cartes -->
+    <div id="compare-cards" style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px"></div>
+    <!-- Résultat -->
+    <div id="compare-result"></div>
+  </div>
+</div>
+
+<!-- ══ SUIVI DANS LE TEMPS ══ -->
+<div id="sc-suivi" class="hidden">
+  <div class="topbar">
+    <button class="btn-back" onclick="go('result')">← Retour</button>
+    <div class="logo"><div class="logo-icon">SM</div>Skin<span>Match</span></div>
+  </div>
+  <div class="content">
+    <div style="margin:16px 0 20px">
+      <div class="step-lbl">Suivi · 4 semaines</div>
+      <h2 style="margin-bottom:4px">Votre progression</h2>
+      <p class="sub">Notez votre peau chaque semaine pour suivre l'evolution de votre routine.</p>
+    </div>
+    <div id="suivi-content"></div>
+  </div>
+</div>
+
+<!-- ══ DASHBOARD ══ -->
 <div id="sc-dashboard" class="hidden">
   <div class="topbar">
     <button class="btn-back" onclick="go('result')">← Retour</button>
@@ -935,9 +1208,10 @@ body{background:var(--bg);font-family:var(--sans);color:var(--pri);min-height:10
       <span style="font-size:10px;font-weight:600" id="nav-routine-lbl">Routine</span>
     </button>
     <button onclick="navTo('scan-product')" id="nav-scan" class="nav-btn" style="flex:1;background:none;border:none;cursor:pointer;padding:6px 4px;display:flex;flex-direction:column;align-items:center;gap:3px;font-family:'Outfit',sans-serif">
-      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="5" height="5"/><rect x="16" y="3" width="5" height="5"/><rect x="3" y="16" width="5" height="5"/><path d="M21 16h-3a2 2 0 0 0-2 2v3"/><path d="M21 21v.01"/></svg>
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="5" height="5"/><rect x="16" y="3" width="5" height="5"/><rect x="3" y="16" width="5" height="5"/><path d="M21 16h-3a2 2 0 0 0-2 2v3"/><path d="M21 21v.01"/><path d="M12 7v3a2 2 0 0 1-2 2H7"/><path d="M3 12h.01"/><path d="M12 3h.01"/><path d="M12 16v.01"/><path d="M16 12h1"/><path d="M21 12v.01"/><path d="M12 21v-1"/></svg>
       <span style="font-size:10px;font-weight:600" id="nav-scan-lbl">Scanner</span>
     </button>
+
     <button onclick="navTo('dashboard')" id="nav-space" class="nav-btn" style="flex:1;background:none;border:none;cursor:pointer;padding:6px 4px;display:flex;flex-direction:column;align-items:center;gap:3px;font-family:'Outfit',sans-serif">
       <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
       <span style="font-size:10px;font-weight:600" id="nav-space-lbl">Mon espace</span>
@@ -1012,137 +1286,6 @@ body{background:var(--bg);font-family:var(--sans);color:var(--pri);min-height:10
   </div>
 </div>
 
-<!-- ══ LISTE DE COURSES ══ -->
-<div id="sc-shopping" class="hidden">
-  <div class="topbar">
-    <button class="btn-back" onclick="go('result')">← Retour</button>
-    <div class="logo"><div class="logo-icon">SM</div>Skin<span>Match</span></div>
-    <div></div>
-  </div>
-  <div class="content">
-    <div style="margin-bottom:20px">
-      <div style="font-size:10px;font-weight:700;color:var(--rose);text-transform:uppercase;letter-spacing:2px;margin-bottom:6px">🛒 Ma liste</div>
-      <div style="font-family:Georgia,serif;font-size:22px;font-weight:700;color:#3D2B1F">Liste de courses</div>
-      <div style="font-size:13px;color:var(--mut);margin-top:4px">Tous tes produits avec liens d'achat directs</div>
-    </div>
-    <div id="shopping-list-content"></div>
-  </div>
-</div>
-
-<!-- ══ HISTORIQUE ROUTINES ══ -->
-<div id="sc-history" class="hidden">
-  <div class="topbar">
-    <button class="btn-back" onclick="go('dashboard')">← Retour</button>
-    <div class="logo"><div class="logo-icon">SM</div>Skin<span>Match</span></div>
-    <div></div>
-  </div>
-  <div class="content">
-    <div style="margin-bottom:20px">
-      <div style="font-size:10px;font-weight:700;color:var(--rose);text-transform:uppercase;letter-spacing:2px;margin-bottom:6px">📋 Historique</div>
-      <div style="font-family:Georgia,serif;font-size:22px;font-weight:700;color:#3D2B1F">Mes routines</div>
-      <div style="font-size:13px;color:var(--mut);margin-top:4px">Toutes tes routines générées</div>
-    </div>
-    <div id="history-list"></div>
-  </div>
-</div>
-
-<!-- ══ ABONNEMENT ══ -->
-<div id="sc-subscription" class="hidden">
-  <div class="topbar">
-    <button class="btn-back" onclick="go('dashboard')">← Retour</button>
-    <div class="logo"><div class="logo-icon">SM</div>Skin<span>Match</span></div>
-    <div></div>
-  </div>
-  <div class="content">
-    <div style="text-align:center;margin-bottom:24px">
-      <div style="font-size:10px;font-weight:700;color:var(--rose);text-transform:uppercase;letter-spacing:3px;margin-bottom:8px">SkinMatch Premium</div>
-      <div style="font-family:Georgia,serif;font-size:24px;font-weight:700;color:#3D2B1F;margin-bottom:8px">Choisis ton plan</div>
-      <div style="font-size:13px;color:var(--mut);line-height:1.6">Débloques toutes les fonctionnalités et transforme ta peau.</div>
-    </div>
-
-    <!-- GRATUIT -->
-    <div class="sub-card">
-      <div class="sub-tier">Gratuit</div>
-      <div class="sub-price">0€ <span>pour toujours</span></div>
-      <div class="sub-year"></div>
-      <ul class="sub-features">
-        <li>1 routine personnalisée</li>
-        <li>4 scans produit / mois</li>
-        <li>1 scan visage / mois</li>
-        <li>2 analyses Mon Skin Match</li>
-        <li class="no">Sauvegarde routine</li>
-        <li class="no">Analyses illimitées</li>
-        <li class="no">Promos en temps réel</li>
-      </ul>
-      <button class="sub-btn sub-btn-ghost">Plan actuel</button>
-    </div>
-
-    <!-- ESSENTIEL -->
-    <div class="sub-card featured">
-      <div class="sub-badge">⭐ Populaire</div>
-      <div class="sub-tier">Essentiel</div>
-      <div class="sub-price">4,99€ <span>/ mois</span></div>
-      <div class="sub-year">ou 39€ / an — économisez 21%</div>
-      <ul class="sub-features">
-        <li>Tout le niveau Gratuit</li>
-        <li>Analyses Mon Skin Match illimitées</li>
-        <li>Sauvegarde de routine</li>
-        <li>Promos en temps réel</li>
-        <li>Scores Yuka détaillés</li>
-        <li>Comparaison produits</li>
-        <li>Export PDF de la routine</li>
-      </ul>
-      <button class="sub-btn sub-btn-main" onclick="showSubscribeModal('essentiel')">Commencer — Bientôt disponible</button>
-    </div>
-
-    <!-- PREMIUM -->
-    <div class="sub-card">
-      <div class="sub-tier">Premium</div>
-      <div class="sub-price">9,99€ <span>/ mois</span></div>
-      <div class="sub-year">ou 79€ / an — économisez 34%</div>
-      <ul class="sub-features">
-        <li>Tout le niveau Essentiel</li>
-        <li>Profils multiples (5 max)</li>
-        <li>Journal de peau + photos</li>
-        <li>Diagnostic photo IA</li>
-        <li>Scanner d'ingrédients</li>
-        <li>Consultation Skin Coach illimitée</li>
-        <li>Accès marques en avant-première</li>
-      </ul>
-      <button class="sub-btn sub-btn-outline" onclick="showSubscribeModal('premium')">Bientôt disponible</button>
-    </div>
-
-    <div style="text-align:center;font-size:11px;color:var(--mut);margin-top:8px;padding-bottom:20px">
-      Paiement sécurisé · Annulation à tout moment · Sans engagement
-    </div>
-  </div>
-</div>
-
-<!-- ══ COMMUNAUTÉ ══ -->
-<div id="sc-community" class="hidden">
-  <div style="background:#FAF4F2;min-height:100vh;display:flex;flex-direction:column;padding-bottom:80px">
-    <div style="background:rgba(250,244,242,.97);backdrop-filter:blur(12px);padding:16px 20px 0;border-bottom:1px solid #EFE6E3;position:sticky;top:0;z-index:10">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
-        <div>
-          <div style="font-family:Georgia,serif;font-size:20px;color:#3D2B1F">Skin<span style="color:#C4726A">Match</span></div>
-          <div style="font-size:11px;color:#A08880;margin-top:1px">Communauté</div>
-        </div>
-        <button onclick="openPostModal()" style="width:36px;height:36px;border-radius:50%;background:#C4726A;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 12px rgba(196,114,106,.35)">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-        </button>
-      </div>
-      <div id="community-filters" style="display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;padding-bottom:14px"></div>
-    </div>
-    <div id="community-feed" style="padding:14px 16px;display:flex;flex-direction:column;gap:14px"></div>
-  </div>
-</div>
-<div id="post-modal-overlay" style="display:none;position:fixed;inset:0;background:rgba(61,43,31,.5);z-index:200;align-items:flex-end;justify-content:center" onclick="if(event.target===this)closePostModal()">
-  <div style="background:#fff;border-radius:28px 28px 0 0;width:100%;max-width:430px;padding:16px 20px 40px">
-    <div style="width:32px;height:4px;background:#E0D5D2;border-radius:2px;margin:0 auto 18px"></div>
-    <div style="font-size:16px;font-weight:700;color:#3D2B1F;margin-bottom:16px">Partager avec la communauté</div>
-    <div id="post-modal-content"></div>
-  </div>
-</div>
 </div><!-- /app -->
 
 <script>
@@ -1704,6 +1847,31 @@ function getCompat(key,skin,concern,age,allergies){
 
 
 
+async function normalizeAutreWithAI(autreTexte, type) {
+  // Appel à Claude pour analyser le texte libre
+  var systemPrompt = type === 'concern'
+    ? "Tu es un expert skincare. L'utilisateur décrit un problème de peau en texte libre. Retourne UNIQUEMENT une liste JSON des clés correspondantes parmi : acne, taches, rides, pores, rougeurs, cernes, eclat, deshydratation, imperfections, sensibilite. Exemple: [\"rougeurs\",\"sensibilite\"]. Si aucune correspondance, retourne []."
+    : "Tu es un expert cosmétique. L'utilisateur décrit une allergie en texte libre. Retourne UNIQUEMENT une liste JSON des catégories correspondantes parmi : Parfums / Fragrances, Parabènes, Alcool, Sulfates (SLS/SLES), Silicones, Huiles essentielles, Acide salicylique, Rétinol, Vitamine C, Acides (AHA/BHA). Exemple: [\"Parfums / Fragrances\"]. Si aucune correspondance, retourne [].";
+
+  try {
+    var GEMINI_KEY = "AIzaSyAcnK0dToixkPc6jgteaDK5w3XD4XKuU_Y"; // Restreindre sur console.cloud.google.com
+    var response = await fetch("https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=" + GEMINI_KEY, {
+      method: "POST",
+      headers: {"Content-Type": "application/json"},
+      body: JSON.stringify({
+        contents: [{ parts: [{ text: systemPrompt + "\n\nTexte utilisateur: " + autreTexte }] }],
+        generationConfig: { maxOutputTokens: 200, temperature: 0.1 }
+      })
+    });
+    var data = await response.json();
+    var text = data.candidates && data.candidates[0] && data.candidates[0].content && data.candidates[0].content.parts && data.candidates[0].content.parts[0] ? data.candidates[0].content.parts[0].text : "[]";
+    text = text.replace(/```json|```/g, "").trim();
+    return JSON.parse(text);
+  } catch(e) {
+    return [];
+  }
+}
+
 function normalizeAutreConcerns(concerns) {
   // Mapping mots-clés basique comme fallback
   var CONCERN_MAP = [
@@ -1728,7 +1896,10 @@ function normalizeAutreConcerns(concerns) {
         matched = true;
       }
     });
-    if (!matched) { console.log('Allergie non reconnue ignorée:', autre); }
+    if (!matched) {
+      // Allergie non cosmétique (ex: "crevette") → ignorée
+      console.log('Allergie non reconnue ignorée:', autre);
+    }
   });
   return normalized;
 }
@@ -1757,7 +1928,7 @@ function normalizeAutreAllergies(allergies) {
         matched = true;
       }
     });
-    if (!matched) { console.log('Allergie non reconnue ignorée:', autre); }
+    if (!matched) normalized.push(autre);
   });
   return normalized;
 }
@@ -1935,9 +2106,6 @@ var REGIONS = [
 
 
 
-
-
-
 function getRegionProducts() {
   // Retourne les clés de produits disponibles pour la région courante
   var available = [];
@@ -1951,7 +2119,7 @@ function getRegionProducts() {
   return available;
 }
 
-const SCREENS=["lang","welcome","register","login","scan","q1","diag","q2","q3","q4","q5","result","compare","suivi","dashboard","scan-product","profile","articles","settings","community","subscription","history","shopping","privacy","cgu"];
+const SCREENS=["lang","welcome","register","login","scan","q1","diag","q2","q3","q4","q5","result","compare","suivi","dashboard","scan-product","profile","articles","settings"];
 
 const ST={
   screen:'lang',user:null,
@@ -2212,7 +2380,7 @@ function applyWelcomeLang(){
 }
 
 
-
+// ─── QUESTIONS INIT ───────────────────────────────────────────────────────────
 function initQuestions(){
   const l = T[LANG]||T.fr;
   // Q1 - type de peau avec illustrations SVG
@@ -3976,8 +4144,18 @@ function startBarcodeCamera() {
     try { window._html5Scanner.stop().catch(function(){}); } catch(e) {}
     window._html5Scanner = null;
   }
-  var guide = document.getElementById('scan-guide');
+  var guide = document.getElementById('scan-guide') || document.getElementById('barcode-guide');
   if (guide) guide.textContent = isEN ? 'Initializing...' : 'Initialisation...';
+  var readerId = document.getElementById('reader') ? 'reader' : 'barcode-video-container';
+  if (!document.getElementById('reader')) {
+    // Créer le conteneur reader si absent
+    var container = document.getElementById('barcode-camera-zone') || document.body;
+    var readerDiv = document.createElement('div');
+    readerDiv.id = 'reader';
+    readerDiv.style.cssText = 'width:100%;border-radius:20px;overflow:hidden;background:#111;min-height:240px;margin-bottom:12px';
+    if (container.firstChild) container.insertBefore(readerDiv, container.firstChild);
+    else container.appendChild(readerDiv);
+  }
   try {
     window._html5Scanner = new Html5Qrcode("reader");
     window._html5Scanner.start(
@@ -3996,8 +4174,9 @@ function startBarcodeCamera() {
       function() {}
     ).then(function() {
       if (guide) guide.textContent = isEN ? 'Point at barcode' : 'Pointe vers le code-barres';
-    }).catch(function() {
+    }).catch(function(err) {
       if (guide) guide.textContent = isEN ? 'Camera denied' : 'Caméra refusée — autorise dans les réglages';
+      console.warn('Scanner:', err);
     });
   } catch(e) {
     if (guide) guide.textContent = 'Erreur: ' + e.message;
@@ -4010,6 +4189,7 @@ function stopBarcodeCamera() {
     window._html5Scanner = null;
   }
 }
+
 
 
 async function onBarcodeDetected(code) {
@@ -4370,47 +4550,6 @@ function resetBarcodeScanner() {
   if (guide) guide.textContent = "📷 Pointez le code-barres vers la caméra";
   barcodeScanning = true;
   startBarcodeCamera();
-}
-
-async function submitBarcodeContrib(code, prefillName, prefillBrand) {
-  var nameEl = document.getElementById("contrib-name");
-  var brandEl = document.getElementById("contrib-brand");
-  var name = prefillName || (nameEl ? nameEl.value.trim() : "");
-  var brand = prefillBrand || (brandEl ? brandEl.value.trim() : "");
-
-  if (!name) {
-    if (nameEl) nameEl.style.borderColor = "#C62828";
-    return;
-  }
-
-  if (window._firebaseReady) {
-    try {
-      await window._setDoc(window._doc(window._db, "community_eans", code), {
-        ean: code, nom: name, marque: brand,
-        addedBy: window._currentUser ? window._currentUser.uid : "anonymous",
-        addedAt: new Date().toISOString(), validated: false
-      });
-    } catch(e) { console.log("Firestore contrib error:", e); }
-  }
-
-  var localEans = JSON.parse(localStorage.getItem("skinmatch_community_eans") || "{}");
-  localEans[code] = { nom: name, marque: brand, date: new Date().toISOString() };
-  localStorage.setItem("skinmatch_community_eans", JSON.stringify(localEans));
-
-  var resultDiv = document.getElementById("scan-product-result");
-  if (resultDiv) {
-    resultDiv.innerHTML =
-      "<div style=\"background:#E8F5E9;border:1px solid #A5D6A7;border-radius:16px;padding:24px;text-align:center\">" +
-        "<div style=\"font-size:40px;margin-bottom:10px\">🙌</div>" +
-        "<div style=\"font-size:14px;font-weight:700;color:#2E7D32;margin-bottom:6px\">" + (LANG === "en" ? "Thank you!" : "Merci !") + "</div>" +
-        "<div style=\"font-size:12px;color:#388E3C;margin-bottom:16px\">" +
-          (LANG === "en" ? name + " has been added!" : name + " a été ajouté !") +
-        "</div>" +
-        "<button onclick=\"resetBarcodeScanner()\" style=\"padding:12px 24px;border-radius:50px;border:none;background:#2E7D32;color:#fff;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit\">" +
-          (LANG === "en" ? "Scan another product" : "Scanner un autre produit") +
-        "</button>" +
-      "</div>";
-  }
 }
 
 function searchProductScan(query) {
@@ -5909,72 +6048,6 @@ function renderDashboard() {
     badgesEl.appendChild(badgesGrid);
     wrap.appendChild(badgesEl);
 
-
-    
-    // ── TUILE COMMUNAUTÉ ──
-    var commTile = document.createElement('div');
-    commTile.onclick = function() { navTo('community'); };
-    commTile.style.cssText = 'background:linear-gradient(135deg,#FBF0ED,#F5E1DC);border-radius:18px;padding:16px;margin-bottom:14px;border:1px solid rgba(196,114,106,.15);cursor:pointer;display:flex;align-items:center;gap:14px';
-    commTile.innerHTML = '<div style="width:48px;height:48px;border-radius:14px;background:#C4726A;display:flex;align-items:center;justify-content:center;flex-shrink:0">' +
-      '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>' +
-      '</div>' +
-      '<div><div style="font-size:14px;font-weight:700;color:#3D2B1F;margin-bottom:2px">' + (isEN ? 'Community' : 'Communauté') + '</div>' +
-      '<div style="font-size:12px;color:var(--mut)">' + (isEN ? 'Share your routine, discover others' : 'Partage ta routine, découvre celles des autres') + '</div></div>' +
-      '<div style="margin-left:auto;color:var(--rose)">→</div>';
-    wrap.appendChild(commTile);
-
-// ── GRAPHIQUE ÉVOLUTION SCORE 4 SEMAINES ──
-    var scoreHistory = data.scoreHistory || [];
-    var graphEl = document.createElement("div");
-    graphEl.style.cssText = "background:#fff;border-radius:18px;padding:16px;margin-bottom:14px;border:1px solid rgba(196,114,106,.1)";
-    
-    // Générer 4 semaines de données (réelles ou exemples)
-    var weeks = ["Sem 1","Sem 2","Sem 3","Sem 4"];
-    var scores = scoreHistory.length >= 4
-      ? scoreHistory.slice(-4)
-      : [0,0,0,0].map(function(_, i) {
-          return scoreHistory[i] || Math.floor(60 + Math.random()*30);
-        });
-    
-    var maxScore = Math.max.apply(null, scores.concat([100]));
-    var minScore = Math.min.apply(null, scores.concat([0]));
-    var range = maxScore - minScore || 40;
-    
-    // SVG du graphique
-    var svgW = 260, svgH = 80;
-    var pts = scores.map(function(s, i) {
-      var x = 20 + (i / 3) * (svgW - 40);
-      var y = svgH - 10 - ((s - minScore) / range) * (svgH - 20);
-      return {x:x, y:y, s:s};
-    });
-    
-    var polyline = pts.map(function(p){ return p.x+","+p.y; }).join(" ");
-    var area = "M"+pts[0].x+","+svgH+" " + pts.map(function(p){ return "L"+p.x+","+p.y; }).join(" ") + " L"+pts[pts.length-1].x+","+svgH+" Z";
-    
-    var dots = pts.map(function(p,i) {
-      return "<circle cx='"+p.x+"' cy='"+p.y+"' r='4' fill='#C4726A'/>" +
-             "<text x='"+p.x+"' y='"+(p.y-10)+"' text-anchor='middle' font-size='9' fill='#3D2B1F' font-family='Georgia,serif' font-weight='600'>"+p.s+"%</text>";
-    }).join("");
-    
-    var labels = pts.map(function(p, i) {
-      return "<text x='"+p.x+"' y='"+(svgH+14)+"' text-anchor='middle' font-size='8' fill='rgba(61,43,31,.4)' font-family='DM Sans,sans-serif'>"+weeks[i]+"</text>";
-    }).join("");
-    
-    var trend = scores[3] > scores[0] ? "📈 En progression" : scores[3] < scores[0] ? "📉 À surveiller" : "➡️ Stable";
-    var trendColor = scores[3] > scores[0] ? "#2E7D32" : scores[3] < scores[0] ? "#C62828" : "#8B6F5E";
-    
-    graphEl.innerHTML = "<div style='display:flex;justify-content:space-between;align-items:center;margin-bottom:10px'>" +
-      "<div style='font-size:10px;font-weight:700;color:var(--mut);text-transform:uppercase;letter-spacing:.5px'>📊 Évolution du score</div>" +
-      "<div style='font-size:11px;font-weight:700;color:"+trendColor+"'>"+trend+"</div></div>" +
-      "<svg width='100%' viewBox='0 0 "+svgW+" "+(svgH+20)+"' preserveAspectRatio='xMidYMid meet'>" +
-      "<defs><linearGradient id='sg' x1='0' y1='0' x2='0' y2='1'><stop offset='0%' stop-color='#C4726A' stop-opacity='.15'/><stop offset='100%' stop-color='#C4726A' stop-opacity='0'/></linearGradient></defs>" +
-      "<path d='"+area+"' fill='url(#sg)'/>" +
-      "<polyline points='"+polyline+"' fill='none' stroke='#C4726A' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/>" +
-      dots + labels + "</svg>" +
-      "<div style='margin-top:8px;text-align:center;font-size:10px;color:var(--mut)'>Score basé sur le journal de peau</div>";
-    
-    wrap.appendChild(graphEl);
-
 challHeader.textContent = isEN ? "🎯 30-DAY CHALLENGES" : "🎯 DÉFIS 30 JOURS";
     challengeEl.appendChild(challHeader);
     CHALLENGES.forEach(function(ch) {
@@ -6642,7 +6715,7 @@ async function saveAndConfirm() {
 }
 
 async function saveRoutineToFirestore(routineData) {
-  // Sauvegarder aussi dans l'historique
+  // Sauvegarder dans l'historique
   try {
     if (window._firebaseReady && window._currentUser) {
       var histEntry = {
@@ -6650,14 +6723,14 @@ async function saveRoutineToFirestore(routineData) {
         skinType: routineData.skinType,
         budget: routineData.budget,
         products: (routineData.products||[]).map(function(p){ return {key:p.key||p, nom:p.nom||p.key||p}; }),
-        totalPrix: (routineData.products||[]).reduce(function(s,p){ return s+(p.prix||0); },0)
+        totalPrix: (routineData.products||[]).reduce(function(s,p){ return s+(parseFloat(String(p.prix||0).replace(/[^0-9.]/g,''))||0); },0)
       };
-      var histRef = window._doc(window._db, 'users', window._currentUser.uid);
-      var snap = await window._getDoc(histRef);
-      var hist = snap.exists() && snap.data().routineHistory ? snap.data().routineHistory : [];
-      hist.unshift(histEntry);
-      if (hist.length > 10) hist = hist.slice(0,10); // garder 10 max
-      await window._setDoc(histRef, {routineHistory: hist}, {merge:true});
+      window._getDoc(window._doc(window._db,'users',window._currentUser.uid)).then(function(snap){
+        var hist = snap.exists()&&snap.data().routineHistory ? snap.data().routineHistory : [];
+        hist.unshift(histEntry);
+        if(hist.length>10) hist=hist.slice(0,10);
+        window._setDoc(window._doc(window._db,'users',window._currentUser.uid),{routineHistory:hist},{merge:true});
+      });
     }
   } catch(e) {}
   if (!window._currentUser || !window._firebaseReady) return;
@@ -6768,75 +6841,39 @@ function startDiagFromProfile() {
 }
 
 // ══ NAVIGATION BAS ══
-var NAV_SCREENS = ['welcome','result','scan-product','articles','dashboard','community'];
+var NAV_SCREENS = ['welcome','result','scan-product','articles','dashboard'];
 
 function navTo(screen) {
+  // Arrêter caméras si on quitte
   if (typeof stopCamera === 'function') stopCamera();
   if (typeof stopBarcodeCamera === 'function') stopBarcodeCamera();
-
-  // ── Routine ──
+  
   if (screen === 'result') {
-    if (ST.result) {
-      renderResult();
-      go('result');
-      updateNav('result');
-      return;
-    } else if (window._savedRoutine) {
+    if (!ST.result && window._savedRoutine) {
+      // Routine sauvegardée en mémoire — la recharger
       reloadSavedRoutine();
-      go('result');
       updateNav('result');
       return;
-    } else if (window._currentUser) {
-      // Firestore pas encore chargé — attendre max 3s
-      var _ov = document.createElement('div');
-      _ov.style.cssText = 'position:fixed;inset:0;background:rgba(248,242,237,.97);display:flex;align-items:center;justify-content:center;z-index:9999;flex-direction:column;gap:12px';
-      _ov.innerHTML = '<div style="font-size:40px">🌸</div><div style="font-family:Georgia,serif;font-size:16px;font-weight:700;color:#3D2B1F">Chargement de ta routine...</div><div style="font-size:13px;color:#8B6F5E;margin-top:4px">Quelques secondes...</div>';
-      document.body.appendChild(_ov);
-      var _n = 0;
-      var _waitRoutine = setInterval(function() {
-        _n++;
-        if (window._savedRoutine || ST.result) {
-          clearInterval(_waitRoutine);
-          _ov.remove();
-          if (window._savedRoutine) reloadSavedRoutine();
-          renderResult();
-          go('result');
-          updateNav('result');
-        } else if (_n >= 15) {
-          clearInterval(_waitRoutine);
-          _ov.remove();
-          // Pas de routine — lancer le diagnostic
-          go('q1');
-          updateNav(null);
-        }
-      }, 200);
-      return;
-    } else {
+    } else if (!ST.result) {
+      // Pas de routine → diagnostic
       go('q1');
       updateNav(null);
       return;
     }
   }
-
-  // ── Autres écrans ──
-  if (screen === 'articles') { renderArticlesScreen(); }
-  if (screen === 'community') { go('community'); updateNav('community'); renderCommunity(); return; }
-  if (screen === 'history') { renderHistory(); }
-  if (screen === 'shopping') { renderShoppingList(); }
-  if (screen === 'subscription') { /* statique */ }
+  if (screen === 'articles') {
+    renderArticlesScreen();
+  }
   if (screen === 'dashboard') {
     if (!window._currentUser) { _showLoginRequired('dashboard'); return; }
     renderDashboard();
   }
   if (screen === 'scan-product') {
-    if (!window._currentUser) { _showLoginRequired('scan-product'); return; }
     setTimeout(function() { startBarcodeCamera(); }, 100);
   }
-
   go(screen);
   updateNav(screen);
 }
-
 
 function updateNav(screen) {
   var isEN = LANG === 'en';
@@ -7360,7 +7397,7 @@ initQuestions();
     </div>
     <div id="why-loading" style="text-align:center;padding:32px;display:none">
       <div style="width:40px;height:40px;border:3px solid #F2C4BC;border-top-color:#C4726A;border-radius:50%;animation:spin 1s linear infinite;margin:0 auto 14px"></div>
-      <div style="font-size:13px;color:#B0958F"><span id="why-analyzing-text">Analyse en cours...</span></div>
+      <div style="font-size:13px;color:#B0958F"><span id="scan-analyzing-text">Analyse en cours...</span></div>
     </div>
     <div id="why-content" style="font-size:14px;line-height:1.75;color:#3D2B1F"></div>
     <button onclick="closeWhyModal()" style="width:100%;margin-top:20px;padding:13px;border-radius:50px;border:none;background:#C4726A;color:#fff;font-size:14px;font-weight:700;cursor:pointer;font-family:'Outfit',sans-serif">Fermer</button>
@@ -7548,245 +7585,14 @@ function cancelChallenge(id) {
   renderDashboard();
 }
 
-// ══════════════════════════════════════════════
-// COMMUNAUTÉ
-// ══════════════════════════════════════════════
 var COMM_POSTS = [
-  {id:'p1',skin:'mixte',type:'routine',author:'Sarah M.',city:'Paris',av:'linear-gradient(135deg,#C4726A,#8B4A42)',time:'2h',likes:24,comments:8,liked:false,text:'Ma routine soir peau mixte après 3 mois de test. Enfin un équilibre.',routine:[{n:1,name:'Gel Moussant Effaclar',brand:'La Roche-Posay',price:'12€'},{n:2,name:'Niacinamide 10%',brand:'The Ordinary',price:'6€'},{n:3,name:'Hyalu B5 Sérum',brand:'La Roche-Posay',price:'28€'}],tags:['#peaumixte','#routinesoir']},
-  {id:'p2',skin:'seche',type:'progression',author:'Marie T.',city:'Lyon',av:'linear-gradient(135deg,#4A6FA5,#2C4A7A)',time:'5h',likes:62,comments:21,liked:true,text:'4 semaines avec SkinMatch. Les tiraillements ont disparu.',prodIcon:'💧',prodName:'Cicaplast Baume B5',prodBrand:'La Roche-Posay · 14€',score:'94%',tags:['#peausèche','#avant-après']},
-  {id:'p3',skin:'sensible',type:'bonplan',author:'Amina K.',city:'Marseille',av:'linear-gradient(135deg,#C4726A,#8B3030)',time:'1j',likes:89,comments:33,liked:false,text:"Cicaplast Baume B5 à 8,90€ chez Pharmavie. Pour peaux sensibles, une pépite.",prodIcon:'🌿',prodName:'Cicaplast Baume B5',prodBrand:'La Roche-Posay',price:'8,90€',oldPrice:'14€',promo:'-36%',tags:['#peausensible','#bonplan']},
+  {id:'p1',skin:'mixte',type:'routine',author:'Sarah M.',city:'Paris',av:'linear-gradient(135deg,#C4726A,#8B4A42)',time:'2h',likes:24,comments:8,liked:false,text:'Ma routine soir peau mixte après 3 mois de test. Enfin un équilibre !',routine:[{n:1,name:'Gel Moussant Effaclar',brand:'La Roche-Posay',price:'12€'},{n:2,name:'Niacinamide 10%',brand:'The Ordinary',price:'6€'},{n:3,name:'Hyalu B5 Sérum',brand:'La Roche-Posay',price:'28€'}],tags:['#peaumixte','#routinesoir']},
+  {id:'p2',skin:'seche',type:'progression',author:'Marie T.',city:'Lyon',av:'linear-gradient(135deg,#4A6FA5,#2C4A7A)',time:'5h',likes:62,comments:21,liked:true,text:'4 semaines avec SkinMatch. Les tiraillements ont disparu !',prodIcon:'💧',prodName:'Cicaplast Baume B5',prodBrand:'La Roche-Posay · 14€',score:'94%',tags:['#peausèche','#avant-après']},
+  {id:'p3',skin:'sensible',type:'bonplan',author:'Amina K.',city:'Marseille',av:'linear-gradient(135deg,#C4726A,#8B3030)',time:'1j',likes:89,comments:33,liked:false,text:'Cicaplast Baume B5 à 8,90€ chez Pharmavie. Pour peaux sensibles, une pépite.',prodIcon:'🌿',prodName:'Cicaplast Baume B5',prodBrand:'La Roche-Posay',price:'8,90€',oldPrice:'14€',promo:'-36%',tags:['#peausensible','#bonplan']},
   {id:'p4',skin:'grasse',type:'question',author:'Clara B.',city:'Bordeaux',av:'linear-gradient(135deg,#2E7D32,#1B5E20)',time:'2j',likes:14,comments:12,liked:false,text:"Quelqu'un a testé le SPF Altruist pour peau grasse ?",replies:[{i:'S',c:'linear-gradient(135deg,#C4726A,#8B4A42)',t:"Je l'utilise depuis 1 an !"},{i:'L',c:'linear-gradient(135deg,#4A6FA5,#2C4A7A)',t:'Pas de film blanc, fonce !'}],tags:['#peaugrasse','#SPF']},
 ];
-var SKIN_FILTERS=[{key:null,lbl:'Tous'},{key:'mixte',lbl:'Mixte',dot:'#C4726A'},{key:'grasse',lbl:'Grasse',dot:'#2E7D32'},{key:'seche',lbl:'Sèche',dot:'#4A6FA5'},{key:'sensible',lbl:'Sensible',dot:'#C62828'},{key:'normale',lbl:'Normale',dot:'#6A4FA5'}];
-var TYPE_META={routine:{lbl:'📋 Routine',bg:'#FBF0ED',c:'#C4726A'},progression:{lbl:'📸 Progression',bg:'#EEF2FB',c:'#4A6FA5'},bonplan:{lbl:'💡 Bon plan',bg:'#FFF8E8',c:'#C47A00'},question:{lbl:'❓ Question',bg:'#EEF7EE',c:'#2E7D32'}};
+var SKIN_FILTERS=[{key:null,lbl:'Tous'},{key:'mixte',lbl:'Mixte'},{key:'grasse',lbl:'Grasse'},{key:'seche',lbl:'Sèche'},{key:'sensible',lbl:'Sensible'},{key:'normale',lbl:'Normale'}];
 var _skinFilter=null;
-
-function renderCommunity(){_renderFilters();_renderFeed();}
-function _renderFilters(){
-  var el=document.getElementById('community-filters');
-  if(!el)return;
-  el.innerHTML=SKIN_FILTERS.map(function(f){
-    var a=_skinFilter===f.key;
-    return '<button onclick="_setFilter('+JSON.stringify(f.key)+')" style="flex-shrink:0;padding:7px 16px;border-radius:50px;font-size:12px;font-weight:600;cursor:pointer;border:'+(a?'none':'1.5px solid #EFE6E3')+';background:'+(a?'#3D2B1F':'#fff')+';color:'+(a?'#fff':'#A08880')+';font-family:inherit">'+(f.dot?'<span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:'+f.dot+';margin-right:5px;vertical-align:middle"></span>':'')+f.lbl+'</button>';
-  }).join('');
-}
-function _setFilter(s){_skinFilter=s;_renderFilters();_renderFeed();}
-function _renderFeed(){
-  var feed=document.getElementById('community-feed');
-  if(!feed)return;
-  var posts=COMM_POSTS.filter(function(p){return !_skinFilter||p.skin===_skinFilter;});
-  if(!posts.length){feed.innerHTML='<div style="text-align:center;padding:60px 20px;color:#A08880"><div style="font-size:40px;margin-bottom:12px">🔍</div><div>Pas encore de publication</div></div>';return;}
-  feed.innerHTML=posts.map(_buildPost).join('');
-}
-function _buildPost(p){
-  var tm=TYPE_META[p.type]||TYPE_META.routine;
-  var skinL={mixte:'Peau mixte',seche:'Peau sèche',grasse:'Peau grasse',sensible:'Peau sensible',normale:'Peau normale'};
-  var skinD={mixte:'#C4726A',seche:'#4A6FA5',grasse:'#2E7D32',sensible:'#C62828',normale:'#6A4FA5'};
-  var h='<div style="background:#fff;border-radius:20px;overflow:hidden;box-shadow:0 2px 12px rgba(61,43,31,.06);border:1px solid #EFE6E3">';
-  h+='<div style="display:flex;align-items:center;gap:10px;padding:14px 16px 10px"><div style="width:42px;height:42px;border-radius:50%;background:'+p.av+';display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:700;color:#fff;flex-shrink:0">'+p.author.charAt(0)+'</div>';
-  h+='<div style="flex:1"><div style="font-size:14px;font-weight:700;color:#3D2B1F">'+p.author+'</div><div style="display:flex;align-items:center;gap:5px;margin-top:2px"><div style="width:6px;height:6px;border-radius:50%;background:'+(skinD[p.skin]||'#C4726A')+'"></div><span style="font-size:11px;color:#A08880">'+(skinL[p.skin]||p.skin)+' · '+p.city+'</span></div></div>';
-  h+='<span style="font-size:11px;color:#C8B4B0">'+p.time+'</span></div>';
-  h+='<div style="margin:0 16px 10px"><span style="display:inline-block;padding:4px 10px;border-radius:20px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;background:'+tm.bg+';color:'+tm.c+'">'+tm.lbl+'</span></div>';
-  h+='<div style="padding:0 16px 12px;font-size:14px;color:#3D2B1F;line-height:1.7">'+p.text+'</div>';
-  if(p.type==='routine'&&p.routine){h+='<div style="margin:0 16px 12px;background:linear-gradient(135deg,#FBF0ED,#F5E1DC);border-radius:14px;padding:14px"><div style="font-size:10px;font-weight:700;color:#C4726A;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px">Routine · '+p.routine.length+' étapes</div>';p.routine.forEach(function(s){h+='<div style="display:flex;align-items:center;gap:10px;background:rgba(255,255,255,.7);border-radius:10px;padding:8px 12px;margin-bottom:6px"><div style="width:20px;height:20px;border-radius:6px;background:#C4726A;color:#fff;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0">'+s.n+'</div><div style="flex:1;font-size:12px;font-weight:600;color:#3D2B1F">'+s.name+'</div><div style="font-size:11px;font-weight:700;color:#C4726A">'+s.price+'</div></div>';});h+='</div>';}
-  if(p.type==='bonplan'&&p.prodName){h+='<div style="margin:0 16px 12px;display:flex;align-items:center;gap:10px;background:#fff;border-radius:12px;padding:12px 14px;border:1px solid #EFE6E3"><div style="width:38px;height:38px;border-radius:10px;background:#FFF8E8;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0">'+p.prodIcon+'</div><div style="flex:1"><div style="font-size:12px;font-weight:700;color:#3D2B1F">'+p.prodName+'</div><div style="font-size:11px;color:#A08880">'+p.prodBrand+' <span style="color:#2E7D32;font-weight:700">'+p.price+'</span> <span style="text-decoration:line-through;color:#ccc">'+p.oldPrice+'</span></div></div><div style="font-size:11px;font-weight:700;padding:3px 8px;border-radius:20px;background:#FFF3E0;color:#E65100">'+p.promo+'</div></div>';}
-  if(p.type==='progression'&&p.prodName){h+='<div style="margin:0 16px 12px;background:linear-gradient(135deg,#EEF2FB,#D8E4F5);border-radius:14px;height:90px;display:flex;align-items:center;justify-content:center;gap:40px"><div style="text-align:center"><div style="font-size:22px">😕</div><div style="font-size:9px;font-weight:700;color:rgba(255,255,255,.85);margin-top:4px">Sem. 1</div></div><div style="width:1px;height:50px;background:rgba(255,255,255,.3)"></div><div style="text-align:center"><div style="font-size:22px">🌸</div><div style="font-size:9px;font-weight:700;color:rgba(255,255,255,.85);margin-top:4px">Sem. 4</div></div></div><div style="margin:0 16px 12px;display:flex;align-items:center;gap:10px;background:#fff;border-radius:12px;padding:10px 14px;border:1px solid #EFE6E3"><div style="width:34px;height:34px;border-radius:10px;background:#EEF2FB;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0">'+p.prodIcon+'</div><div style="flex:1"><div style="font-size:12px;font-weight:700;color:#3D2B1F">'+p.prodName+'</div><div style="font-size:11px;color:#A08880">'+p.prodBrand+'</div></div><div style="font-size:11px;font-weight:700;padding:3px 8px;border-radius:20px;background:#E8F5E9;color:#2E7D32">'+p.score+'</div></div>';}
-  if(p.type==='question'&&p.replies){h+='<div style="margin:0 16px 12px;background:#fff;border-radius:12px;padding:12px 14px;border:1px solid #EFE6E3"><div style="font-size:11px;font-weight:700;color:#A08880;margin-bottom:10px">'+p.replies.length+' réponses</div>';p.replies.forEach(function(r){h+='<div style="display:flex;gap:8px;align-items:flex-start;margin-bottom:8px"><div style="width:26px;height:26px;border-radius:50%;background:'+r.c+';display:flex;align-items:center;justify-content:center;color:#fff;font-size:10px;font-weight:700;flex-shrink:0">'+r.i+'</div><div style="background:#FAF4F2;border-radius:12px;padding:7px 11px;font-size:12px;color:#3D2B1F;line-height:1.5;flex:1">'+r.t+'</div></div>';});h+='</div>';}
-  if(p.tags)h+='<div style="display:flex;flex-wrap:wrap;gap:6px;padding:0 16px 12px">'+p.tags.map(function(t){return'<span style="font-size:12px;color:#C4726A;font-weight:500">'+t+'</span>';}).join('')+'</div>';
-  var likedC=p.liked?'#C4726A':'#A08880';
-  var likedF=p.liked?'#C4726A':'none';
-  var likedS=p.liked?'none':'currentColor';
-  h+='<div style="display:flex;align-items:center;gap:2px;padding:10px 16px;border-top:1px solid #EFE6E3">';
-  h+='<button data-pid="'+p.id+'" onclick="_likePost(this)" style="display:flex;align-items:center;gap:5px;padding:6px 10px;border-radius:50px;background:none;border:none;cursor:pointer;font-size:12px;font-weight:600;color:'+likedC+';font-family:inherit"><svg width="15" height="15" viewBox="0 0 24 24" fill="'+likedF+'" stroke="'+likedS+'" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>'+p.likes+'</button>';
-  h+='<button style="display:flex;align-items:center;gap:5px;padding:6px 10px;border-radius:50px;background:none;border:none;cursor:pointer;font-size:12px;font-weight:600;color:#A08880;font-family:inherit"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>'+p.comments+'</button>';
-  h+='<div style="flex:1"></div><button style="padding:6px 8px;border-radius:50%;background:none;border:none;cursor:pointer;color:#A08880"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg></button></div></div>';
-  return h;
-}
-function _likePost(btn){var id=btn.getAttribute('data-pid');var post=COMM_POSTS.find(function(p){return p.id===id;});if(!post)return;post.liked=!post.liked;post.likes+=post.liked?1:-1;_renderFeed();}
-function openPostModal(){
-  var overlay=document.getElementById('post-modal-overlay');
-  var mc=document.getElementById('post-modal-content');
-  if(!overlay||!mc)return;
-  var isEN=LANG==='en';
-  var opts=[{icon:'📋',bg:'#FBF0ED',lbl:isEN?'My routine':'Ma routine',desc:isEN?'Share step by step':'Partage tes produits'},{icon:'📸',bg:'#EEF2FB',lbl:'Progression',desc:'Avant / après'},{icon:'💡',bg:'#FFF8E8',lbl:'Bon plan',desc:'Promo, astuce'},{icon:'❓',bg:'#EEF7EE',lbl:'Question',desc:"Demande l'avis"}];
-  mc.innerHTML=opts.map(function(o){return'<button onclick="openPostForm()" style="display:flex;align-items:center;gap:14px;padding:14px;border-radius:16px;background:#FAF4F2;margin-bottom:10px;cursor:pointer;border:none;width:100%;font-family:inherit;text-align:left"><div style="width:44px;height:44px;border-radius:14px;background:'+o.bg+';display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0">'+o.icon+'</div><div><div style="font-size:14px;font-weight:700;color:#3D2B1F">'+o.lbl+'</div><div style="font-size:11px;color:#A08880;margin-top:2px">'+o.desc+'</div></div></button>';}).join('');
-  overlay.style.display='flex';
-}
-function openPostForm(){
-  var mc=document.getElementById('post-modal-content');
-  mc.innerHTML='<textarea id="post-txt" placeholder="Partage ton experience..." style="width:100%;height:100px;border:1.5px solid #EFE6E3;border-radius:12px;padding:12px;font-family:inherit;font-size:14px;resize:none;outline:none;color:#3D2B1F"></textarea><button onclick="submitPost()" style="width:100%;padding:14px;border-radius:50px;border:none;background:linear-gradient(135deg,#3D2B1F,#5A3D2B);color:#fff;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;margin-top:12px">Publier</button>';
-}
-function submitPost(){
-  var input=document.getElementById('post-txt');
-  if(!input||!input.value.trim())return;
-  var uname=window._currentUser?(window._currentUser.displayName||window._currentUser.email.split('@')[0]):'Toi';
-  COMM_POSTS.unshift({id:'p'+Date.now(),skin:ST.skinType||'mixte',type:'routine',author:uname,city:'',av:'linear-gradient(135deg,#C4726A,#A85A52)',time:'maintenant',likes:0,comments:0,liked:false,text:input.value.trim(),tags:[]});
-  closePostModal();_renderFeed();
-  var t=document.createElement('div');t.style.cssText='position:fixed;top:70px;left:50%;transform:translateX(-50%);background:#2E7D32;color:#fff;padding:12px 20px;border-radius:50px;font-size:13px;font-weight:600;z-index:9999';t.textContent='Publié !';document.body.appendChild(t);setTimeout(function(){t.remove();},2500);
-}
-function closePostModal(){var o=document.getElementById('post-modal-overlay');if(o)o.style.display='none';}
-
-// ══════════════════════════════════════════════
-// ABONNEMENT
-// ══════════════════════════════════════════════
-function showSubscribeModal(tier) {
-  var t = document.createElement('div');
-  t.style.cssText = 'position:fixed;top:70px;left:50%;transform:translateX(-50%);background:#3D2B1F;color:#fff;padding:12px 20px;border-radius:50px;font-size:13px;font-weight:600;z-index:9999;text-align:center';
-  t.textContent = '🚀 Abonnement ' + tier + ' — Bientôt disponible !';
-  document.body.appendChild(t);
-  setTimeout(function(){t.remove();}, 3000);
-}
-
-// ══════════════════════════════════════════════
-// HISTORIQUE DES ROUTINES
-// ══════════════════════════════════════════════
-function renderHistory() {
-  var el = document.getElementById('history-list');
-  if (!el) return;
-  var isEN = LANG === 'en';
-  
-  // Charger depuis Firestore si connecté
-  if (window._currentUser && window._firebaseReady) {
-    window._getDoc(window._doc(window._db, 'users', window._currentUser.uid)).then(function(snap) {
-      var hist = snap.exists() && snap.data().routineHistory ? snap.data().routineHistory : [];
-      _renderHistoryList(el, hist, isEN);
-    }).catch(function() { _renderHistoryList(el, [], isEN); });
-  } else {
-    _renderHistoryList(el, [], isEN);
-  }
-}
-
-function _renderHistoryList(el, hist, isEN) {
-  if (!hist.length) {
-    el.innerHTML = '<div style="text-align:center;padding:60px 20px;color:#A08880"><div style="font-size:48px;margin-bottom:12px">📋</div><div style="font-size:15px;font-weight:700;color:#3D2B1F;margin-bottom:8px">' + (isEN ? 'No routines yet' : 'Pas encore de routines') + '</div><div style="font-size:13px;">' + (isEN ? 'Generate your first routine to see it here.' : 'Génère ta première routine pour la voir ici.') + '</div></div>';
-    return;
-  }
-  var skinLabels = {grasse:'Peau grasse',seche:'Peau sèche',mixte:'Peau mixte',sensible:'Peau sensible',normale:'Peau normale'};
-  el.innerHTML = hist.map(function(h, i) {
-    var d = new Date(h.date);
-    var dateStr = d.toLocaleDateString('fr-FR', {day:'numeric',month:'long',year:'numeric'});
-    var prodList = (h.products||[]).slice(0,3).map(function(p){ return p.nom||p.key||p; }).join(', ');
-    return '<div style="background:#fff;border-radius:16px;padding:16px;margin-bottom:12px;border:1px solid rgba(196,114,106,.1);cursor:pointer" onclick="loadHistoryRoutine('+i+')">' +
-      '<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px">' +
-      '<div><div style="font-size:12px;font-weight:700;color:#C4726A;text-transform:uppercase;letter-spacing:.5px;margin-bottom:3px">' + (skinLabels[h.skinType]||h.skinType||'Mixte') + '</div>' +
-      '<div style="font-size:11px;color:rgba(61,43,31,.4)">' + dateStr + '</div></div>' +
-      '<div style="font-family:Georgia,serif;font-size:18px;font-weight:700;color:#3D2B1F">' + (h.totalPrix ? Math.round(h.totalPrix)+'€' : '') + '</div></div>' +
-      '<div style="font-size:12px;color:rgba(61,43,31,.5);line-height:1.5">' + prodList + (h.products&&h.products.length>3?' +'+( h.products.length-3)+' autres':'') + '</div>' +
-      '<div style="margin-top:10px;font-size:11px;font-weight:600;color:#C4726A">Voir cette routine →</div>' +
-      '</div>';
-  }).join('');
-}
-
-function loadHistoryRoutine(idx) {
-  if (window._currentUser && window._firebaseReady) {
-    window._getDoc(window._doc(window._db, 'users', window._currentUser.uid)).then(function(snap) {
-      var hist = snap.exists() && snap.data().routineHistory ? snap.data().routineHistory : [];
-      var h = hist[idx];
-      if (!h) return;
-      var keys = (h.products||[]).map(function(p){ return p.key||p; });
-      var result = buildFromKeys(keys);
-      if (!result) return;
-      ST.skinType = h.skinType; ST.budget = h.budget;
-      ST.result = result;
-      renderResult();
-      go('result');
-      updateNav('result');
-    });
-  }
-}
-
-// ══════════════════════════════════════════════
-// LISTE DE COURSES INTELLIGENTE
-// ══════════════════════════════════════════════
-function renderShoppingList() {
-  var el = document.getElementById('shopping-list-content');
-  if (!el) return;
-  var isEN = LANG === 'en';
-  var r = ST.result;
-  if (!r || !r.steps || !r.steps.length) {
-    el.innerHTML = '<div style="text-align:center;padding:60px 20px;color:#A08880"><div style="font-size:48px;margin-bottom:12px">🛒</div><div style="font-size:15px;font-weight:700;color:#3D2B1F;margin-bottom:8px">Pas encore de routine</div></div>';
-    return;
-  }
-  var total = r.steps.reduce(function(s,p){ return s+(parseFloat(String(p.prix||0).replace(/[^0-9.]/g,""))||0); }, 0);
-  var checked = {};
-  var allUniq = r.steps.filter(function(s,i,a){ return a.findIndex(function(x){ return x.key===s.key; })===i; });
-
-  function renderList() {
-    var html = '<div style="background:linear-gradient(135deg,#FBF0ED,#F5E1DC);border-radius:16px;padding:14px;margin-bottom:16px;display:flex;justify-content:space-between;align-items:center">';
-    html += '<div><div style="font-size:10px;font-weight:700;color:var(--rose);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px">'+allUniq.length+' produits</div>';
-    html += '<div style="font-family:Georgia,serif;font-size:24px;font-weight:700;color:#3D2B1F">~'+Math.round(total)+'€</div></div>';
-    html += '<button id="share-shopping-btn" style="background:#C4726A;color:#fff;border:none;border-radius:50px;padding:8px 16px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit">Partager</button></div>';
-
-    allUniq.forEach(function(s) {
-      var prix = Math.round(parseFloat(String(s.prix||0).replace(/[^0-9.]/g,""))||0);
-      var isChecked = !!checked[s.key];
-      var momentTxt = s.moment==="AM"?"Matin":s.moment==="PM"?"Soir":"Matin & Soir";
-
-      var item = document.createElement('div');
-      item.style.cssText = 'background:#fff;border-radius:14px;padding:14px;margin-bottom:10px;border:1px solid rgba(196,114,106,.1);display:flex;align-items:center;gap:12px';
-
-      var chk = document.createElement('div');
-      chk.className = 'shop-check';
-      chk.setAttribute('data-key', s.key);
-      chk.style.cssText = 'width:22px;height:22px;border-radius:6px;border:2px solid '+(isChecked?'#C4726A':'rgba(196,114,106,.3)')+';background:'+(isChecked?'#C4726A':'transparent')+';display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0';
-      if (isChecked) chk.innerHTML = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>';
-
-      var info = document.createElement('div');
-      info.style.cssText = 'flex:1'+(isChecked?';opacity:.5;text-decoration:line-through':'');
-      info.innerHTML = '<div style="font-size:13px;font-weight:600;color:#3D2B1F">'+s.nom+'</div><div style="font-size:11px;color:rgba(61,43,31,.4);margin-top:2px">'+s.marque+' · '+momentTxt+'</div>';
-
-      var right = document.createElement('div');
-      right.style.cssText = 'display:flex;flex-direction:column;align-items:flex-end;gap:6px';
-      right.innerHTML = '<div style="font-family:Georgia,serif;font-size:16px;font-weight:700;color:#C4726A">~'+prix+'€</div>';
-      if (s.lien || s.link) {
-        var a = document.createElement('a');
-        a.href = s.lien || s.link;
-        a.target = '_blank';
-        a.textContent = 'Acheter';
-        a.style.cssText = 'font-size:10px;font-weight:700;color:#fff;background:#C4726A;border-radius:20px;padding:3px 10px;text-decoration:none';
-        right.appendChild(a);
-      }
-      item.appendChild(chk);
-      item.appendChild(info);
-      item.appendChild(right);
-      el.innerHTML = html;
-      el.appendChild(item);
-    });
-
-    // Event listeners
-    el.querySelectorAll('.shop-check').forEach(function(c) {
-      c.addEventListener('click', function() {
-        checked[this.getAttribute('data-key')] = !checked[this.getAttribute('data-key')];
-        renderList();
-      });
-    });
-    var shareBtn = document.getElementById('share-shopping-btn');
-    if (shareBtn) shareBtn.onclick = function() {
-    if (shareBtn) shareBtn.onclick = function() {
-
-      var parts = allUniq.map(function(s){ return s.nom+" ("+s.marque+")"; });
-
-      var txt = "Ma liste de courses SkinMatch : " + parts.join(", ") + " | Total: ~"+Math.round(total)+"euros";
-
-      if (navigator.share) { navigator.share({title:"Liste SkinMatch",text:txt}).catch(function(){}); }
-
-      else { try { navigator.clipboard.writeText(txt); } catch(e) {} }
-
-    };
-
-
-
-
-
-      else { try { navigator.clipboard.writeText(txt); } catch(e) {} }
-    };
-  }
-  renderList();
-}
-
-
-// Bouton liste de courses dans le résultat — injecté dans renderResult
-var _origRenderResult = typeof renderResult === 'function' ? renderResult : null;
 </script>
 
 <!-- ══ MODALE CGU OVERLAY ══ -->
@@ -7837,149 +7643,5 @@ var _origRenderResult = typeof renderResult === 'function' ? renderResult : null
   </div>
 </div>
 
-<script>
-// ── Fonctions complémentaires ──
-
-function _launchApp(lang, region) {
-  LANG = lang || 'fr';
-  REGION = region || 'fr';
-  localStorage.setItem('skinmatch_lang', LANG);
-  localStorage.setItem('skinmatch_region', REGION);
-  initQuestions();
-  go('welcome');
-  updateNav('welcome');
-  setTimeout(applyWelcomeLang, 50);
-}
-
-function _scrollScanToTop() {
-  var sc = document.getElementById('sc-scan-product');
-  if (sc) sc.scrollTop = 0;
-}
-
-function _searchDBByEAN(code) {
-  for (var key in DB) {
-    var p = DB[key];
-    if (p && (p.ean === code || p.barcode === code || p.code === code)) return key;
-  }
-  return null;
-}
-
-function flipBarcodeCamera() {
-  stopBarcodeCamera();
-  window._barcodeFacing = window._barcodeFacing === 'environment' ? 'user' : 'environment';
-  startBarcodeCamera();
-}
-
-function renderArticlesFilter(filter) {
-  if (typeof renderArticlesScreen === 'function') renderArticlesScreen(filter);
-}
-
-function runManualSearch() {
-  var isEN = LANG === 'en';
-  var input = document.getElementById('manual-search-input');
-  var resultsDiv = document.getElementById('manual-search-results');
-  if (!input || !resultsDiv) return;
-  var query = input.value.trim().toLowerCase();
-  if (query.length < 2) {
-    resultsDiv.innerHTML = '<div style="text-align:center;padding:8px;font-size:12px;color:#8B6F5E">' + (isEN ? 'Type at least 2 characters.' : 'Saisis au moins 2 caractères.') + '</div>';
-    return;
-  }
-  var matches = [];
-  Object.keys(DB).forEach(function(key) {
-    var p = DB[key];
-    if (!p) return;
-    if ((p.nom||'').toLowerCase().includes(query) || (p.marque||'').toLowerCase().includes(query)) {
-      matches.push({ key: key, p: p });
-    }
-  });
-  if (!matches.length) {
-    resultsDiv.innerHTML = '<div style="text-align:center;padding:16px;color:#8B6F5E;font-size:13px">Aucun résultat trouvé.</div>';
-    return;
-  }
-  var frag = document.createDocumentFragment();
-  matches.slice(0, 6).forEach(function(m) {
-    var prix = Math.round(parseFloat(String(m.p.prix||0).replace(/[^0-9.]/g,''))||0);
-    var item = document.createElement('div');
-    item.style.cssText = 'background:#FAF4F2;border-radius:12px;padding:12px 14px;cursor:pointer;border:1px solid rgba(196,114,106,.12);display:flex;align-items:center;gap:12px;margin-bottom:8px';
-    item.innerHTML = '<div style="flex:1"><div style="font-size:13px;font-weight:700;color:#3D2B1F">' + m.p.nom + '</div><div style="font-size:11px;color:#8B6F5E;margin-top:2px">' + m.p.marque + '</div></div><div style="font-family:Georgia,serif;font-size:15px;font-weight:700;color:#C4726A">' + (prix?'~'+prix+'€':'') + '</div><div style="color:#C4726A;font-size:11px;font-weight:700">→</div>';
-    item.addEventListener('click', (function(k){ return function(){ simulateScanWithKey(k); }; })(m.key));
-    frag.appendChild(item);
-  });
-  resultsDiv.innerHTML = '';
-  resultsDiv.appendChild(frag);
-  if (matches.length > 6) {
-    var more = document.createElement('div');
-    more.style.cssText = 'text-align:center;font-size:11px;color:#8B6F5E;margin-top:4px';
-    more.textContent = '+' + (matches.length-6) + ' autres résultats';
-    resultsDiv.appendChild(more);
-  }
-}
-
-function replaceProduct(key) {
-  var isEN = LANG === 'en';
-  var r = ST.result;
-  if (!r) return;
-  var cur = null;
-  r.steps.forEach(function(s) { if (s.key === key) cur = s; });
-  if (!cur) return;
-  var alts = [];
-  Object.keys(DB).forEach(function(k) {
-    if (k === key) return;
-    var p = DB[k];
-    if (!p || p.cat !== cur.cat) return;
-    if (r.steps.some(function(s){ return s.key===k; })) return;
-    alts.push(k);
-  });
-  alts = alts.sort(function(){ return Math.random()-0.5; }).slice(0,3);
-  var overlay = document.createElement('div');
-  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(61,43,31,.6);z-index:9999;display:flex;align-items:flex-end;justify-content:center';
-  overlay.onclick = function(e){ if(e.target===overlay) overlay.remove(); };
-  var modal = document.createElement('div');
-  modal.style.cssText = 'background:#fff;border-radius:28px 28px 0 0;width:100%;max-width:460px;padding:20px 20px 40px;max-height:85vh;overflow-y:auto';
-  modal.innerHTML = '<div style="width:36px;height:4px;border-radius:2px;background:#E0D5D2;margin:0 auto 16px"></div><div style="font-family:Georgia,serif;font-size:18px;font-weight:700;color:#3D2B1F;margin-bottom:8px">Remplacer ce produit</div><div style="font-size:13px;color:#8B6F5E;padding:10px;background:#FAF4F2;border-radius:10px;margin-bottom:14px"><b style="color:#C4726A">Actuel :</b> ' + cur.nom + ' — ' + cur.marque + '</div>';
-  if (!alts.length) {
-    modal.innerHTML += "<div style='text-align:center;padding:20px;color:#8B6F5E'>Pas d'alternative trouvée.</div>";
-
-  } else {
-    var altTitle = document.createElement('div');
-    altTitle.style.cssText = 'font-size:12px;font-weight:700;color:#3D2B1F;margin-bottom:10px';
-    altTitle.textContent = 'Alternatives suggérées :';
-    modal.appendChild(altTitle);
-    alts.forEach(function(altKey) {
-      var p = DB[altKey];
-      if (!p) return;
-      var prix = Math.round(parseFloat(String(p.prix||0).replace(/[^0-9.]/g,''))||0);
-      var card = document.createElement('div');
-      card.style.cssText = 'background:#FAF4F2;border-radius:16px;padding:14px;margin-bottom:10px;border:1px solid rgba(196,114,106,.12)';
-      card.innerHTML = '<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px"><div><div style="font-size:13px;font-weight:700;color:#3D2B1F">' + p.nom + '</div><div style="font-size:11px;color:#8B6F5E">' + p.marque + '</div></div><div style="font-family:Georgia,serif;font-size:16px;font-weight:700;color:#C4726A">' + (prix?'~'+prix+'€':'') + '</div></div>';
-      var btn = document.createElement('button');
-      btn.textContent = 'Choisir ce produit';
-      btn.style.cssText = 'width:100%;padding:10px;border-radius:50px;border:none;background:linear-gradient(135deg,#3D2B1F,#5A3D2B);color:#fff;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit';
-      btn.onclick = (function(aKey,aP){ return function(){
-        var idx2 = r.steps.findIndex(function(s){ return s.key===key; });
-        if (idx2!==-1) r.steps[idx2] = Object.assign({}, r.steps[idx2], {key:aKey, nom:aP.nom, marque:aP.marque, prix:aP.prix, cat:aP.cat});
-        overlay.remove();
-        renderResult();
-        var t = document.createElement('div');
-        t.style.cssText = 'position:fixed;top:70px;left:50%;transform:translateX(-50%);background:#2E7D32;color:#fff;padding:12px 20px;border-radius:50px;font-size:13px;font-weight:600;z-index:9999';
-        t.textContent = 'Remplacé : ' + aP.nom;
-        document.body.appendChild(t);
-        setTimeout(function(){ t.remove(); }, 3000);
-      }; })(altKey,p);
-      card.appendChild(btn);
-      modal.appendChild(card);
-    });
-  }
-  overlay.appendChild(modal);
-  document.body.appendChild(overlay);
-}
-
-// Enter dans recherche manuelle
-document.addEventListener('keydown', function(e) {
-  if (e.key==='Enter' && document.getElementById('manual-search-input')===document.activeElement) {
-    runManualSearch();
-  }
-});
-</script>
 </body>
 </html>
