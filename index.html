@@ -552,6 +552,10 @@ h2{font-family:var(--serif);font-size:20px;font-weight:700;margin-bottom:3px}
           <span id="btn-start-text">Commencer mon diagnostic</span> &#8594;
         </button>
 
+        <button onclick="startExpressDiag()" id="btn-express" style="width:100%;padding:10px 16px;margin-top:8px;border-radius:50px;border:1.5px solid rgba(196,114,106,.3);background:#fff;color:#C4726A;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit">
+          <span id="btn-express-text">⚡ Diagnostic rapide</span> <span style="color:#8B6F5E;font-weight:400">(30 sec)</span>
+        </button>
+
         <div style="display:flex;align-items:center;gap:10px">
           <div style="flex:1;height:1px;background:rgba(196,114,106,.2)"></div>
           <span style="font-size:11px;color:#B0958F;font-weight:500">ou</span>
@@ -3330,6 +3334,7 @@ function renderResult(){
           </button>
           <button onclick="submitFeedback('${s.key}','like',this)" style="width:42px;height:42px;border-radius:50%;border:1.5px solid #E8E0DC;background:#fff;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0">👍</button>
           <button onclick="submitFeedback('${s.key}','dislike',this)" style="width:42px;height:42px;border-radius:50%;border:1.5px solid #E8E0DC;background:#fff;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0">👎</button>
+          <button onclick="replaceProduct('${s.key}')" style="padding:0 14px;height:38px;border-radius:50px;border:1.5px solid rgba(196,114,106,.3);background:#fff;font-size:12px;font-weight:700;color:#C4726A;cursor:pointer;font-family:var(--sans);white-space:nowrap;display:flex;align-items:center;gap:6px;flex-shrink:0"><span>🔄</span><span>${isEN?'Replace':'Ne me convient pas'}</span></button>
         </div>
         <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:4px">
           ${s.yuka>=75
@@ -5928,7 +5933,7 @@ function renderDashboard() {
     // ── 1. HEADER PERSONNALISÉ ──
     var userName = window._currentUser ? (window._currentUser.displayName || window._currentUser.email.split("@")[0]) : "";
     var hour = new Date().getHours();
-    var greeting = hour < 12 ? (isEN ? "Good morning" : "Bonjour") : hour < 18 ? (isEN ? "Good afternoon" : "Bonsoir") : (isEN ? "Good evening" : "Bonsoir");
+    var greeting = hour < 18 ? (isEN ? "Good morning" : "Bonjour") : (isEN ? "Good evening" : "Bonsoir");
     var headerEl = document.createElement("div");
     headerEl.style.cssText = "margin-bottom:16px;display:flex;align-items:flex-start;justify-content:space-between";
     headerEl.innerHTML = "<div>" +
@@ -7689,6 +7694,1065 @@ var _skinFilter=null;
     </button>
   </div>
 </div>
+
+
+<script>
+
+// ══════════════════════════════════════════════════════════════
+// SUIVI PHOTO AVANT/APRÈS
+// ══════════════════════════════════════════════════════════════
+
+function openPhotoTracker() {
+  var isEN = LANG === 'en';
+  var overlay = document.createElement('div');
+  overlay.id = 'photo-tracker-overlay';
+  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(61,43,31,.85);z-index:9999;display:flex;align-items:center;justify-content:center;padding:16px';
+  overlay.onclick = function(e) { if (e.target === overlay) overlay.remove(); };
+
+  var modal = document.createElement('div');
+  modal.style.cssText = 'background:#fff;border-radius:24px;padding:24px;max-width:460px;width:100%;max-height:90vh;overflow-y:auto';
+
+  modal.innerHTML =
+    '<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:16px">' +
+      '<div>' +
+        '<div style="font-family:Georgia,serif;font-size:20px;font-weight:700;color:#3D2B1F">📸 ' + (isEN?'Photo tracker':'Suivi photo') + '</div>' +
+        '<div style="font-size:12px;color:#8B6F5E;margin-top:2px">' + (isEN?'See your progress':'Visualise tes progrès') + '</div>' +
+      '</div>' +
+      '<button onclick="document.getElementById(\'photo-tracker-overlay\').remove()" style="background:none;border:none;font-size:24px;cursor:pointer;color:#8B6F5E;padding:0;width:32px;height:32px;display:flex;align-items:center;justify-content:center">×</button>' +
+    '</div>';
+
+  // Charger les photos sauvegardées
+  var photos = _getPhotos();
+
+  var photosDiv = document.createElement('div');
+  photosDiv.id = 'photos-grid';
+
+  if (!photos.length) {
+    photosDiv.innerHTML =
+      '<div style="text-align:center;padding:32px 20px;background:#FAF4F2;border-radius:16px;margin-bottom:16px">' +
+        '<div style="font-size:48px;margin-bottom:12px">📷</div>' +
+        '<div style="font-size:14px;font-weight:600;color:#3D2B1F;margin-bottom:6px">' + (isEN?'No photos yet':'Aucune photo pour le moment') + '</div>' +
+        '<div style="font-size:12px;color:#8B6F5E;line-height:1.5">' + (isEN?'Take your first photo to start tracking your progress.':'Prends ta première photo pour commencer le suivi.') + '</div>' +
+      '</div>';
+  } else {
+    // Afficher les photos en mosaïque, plus récente en premier
+    photos.sort(function(a, b) { return b.date - a.date; });
+    var gridHTML = '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px">';
+    photos.forEach(function(p, i) {
+      var dateStr = new Date(p.date).toLocaleDateString(isEN?'en-US':'fr-FR', {day:'numeric', month:'short'});
+      var label = i === photos.length - 1 ? (isEN?'Start':'Début') : (i === 0 ? (isEN?'Now':'Aujourd\'hui') : (isEN?'Step ' + (photos.length - i):'Étape ' + (photos.length - i)));
+      gridHTML +=
+        '<div style="position:relative;border-radius:14px;overflow:hidden;border:2px solid #F0E8E5">' +
+          '<img src="' + p.data + '" style="width:100%;aspect-ratio:1;object-fit:cover;display:block" />' +
+          '<div style="position:absolute;top:0;left:0;right:0;background:linear-gradient(180deg,rgba(0,0,0,.5),transparent);padding:6px 10px">' +
+            '<div style="color:#fff;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px">' + label + '</div>' +
+          '</div>' +
+          '<div style="position:absolute;bottom:0;left:0;right:0;background:linear-gradient(0deg,rgba(0,0,0,.6),transparent);padding:6px 10px">' +
+            '<div style="color:#fff;font-size:11px;font-weight:600">' + dateStr + '</div>' +
+          '</div>' +
+        '</div>';
+    });
+    gridHTML += '</div>';
+
+    if (photos.length >= 2) {
+      // Stats
+      var daysDiff = Math.round((photos[0].date - photos[photos.length-1].date) / (1000*60*60*24));
+      gridHTML += '<div style="background:linear-gradient(135deg,#FBF0ED,#F5E1DC);border-radius:14px;padding:14px;margin-bottom:16px;text-align:center">' +
+        '<div style="font-family:Georgia,serif;font-size:24px;font-weight:700;color:#C4726A">' + daysDiff + ' ' + (isEN?'days':'jours') + '</div>' +
+        '<div style="font-size:11px;color:#8B6F5E;margin-top:2px">' + (isEN?'of progress tracked':'de suivi') + '</div>' +
+      '</div>';
+    }
+
+    photosDiv.innerHTML = gridHTML;
+  }
+
+  modal.appendChild(photosDiv);
+
+  // Bouton "Prendre une photo"
+  var addBtn = document.createElement('button');
+  addBtn.style.cssText = 'width:100%;padding:14px;border-radius:50px;border:none;background:linear-gradient(135deg,#3D2B1F,#5A3D2B);color:#fff;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;margin-bottom:8px';
+  addBtn.innerHTML = '📷 ' + (isEN?'Add a new photo':'Ajouter une nouvelle photo');
+  addBtn.onclick = function() { _captureNewPhoto(); };
+  modal.appendChild(addBtn);
+
+  // Note privacy
+  var note = document.createElement('div');
+  note.style.cssText = 'font-size:11px;color:#8B6F5E;text-align:center;line-height:1.5';
+  note.innerHTML = '🔒 ' + (isEN?'Photos stored locally on your device only':'Photos stockées uniquement sur ton appareil');
+  modal.appendChild(note);
+
+  overlay.appendChild(modal);
+  document.body.appendChild(overlay);
+}
+
+function _captureNewPhoto() {
+  // Input file caché
+  var input = document.createElement('input');
+  input.type = 'file';
+  input.accept = 'image/*';
+  input.capture = 'user'; // caméra frontale par défaut
+  input.onchange = function(e) {
+    var file = e.target.files && e.target.files[0];
+    if (!file) return;
+    var reader = new FileReader();
+    reader.onload = function(ev) {
+      // Compresser l'image avant de la stocker
+      _compressAndSavePhoto(ev.target.result);
+    };
+    reader.readAsDataURL(file);
+  };
+  input.click();
+}
+
+function _compressAndSavePhoto(dataUrl) {
+  var img = new Image();
+  img.onload = function() {
+    var canvas = document.createElement('canvas');
+    // Redimensionner à max 600px
+    var maxDim = 600;
+    var ratio = Math.min(maxDim / img.width, maxDim / img.height, 1);
+    canvas.width = Math.round(img.width * ratio);
+    canvas.height = Math.round(img.height * ratio);
+    var ctx = canvas.getContext('2d');
+    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+    var compressed = canvas.toDataURL('image/jpeg', 0.7);
+    _savePhoto(compressed);
+  };
+  img.src = dataUrl;
+}
+
+function _savePhoto(dataUrl) {
+  var photos = _getPhotos();
+  // Limiter à 6 photos max (les plus anciennes sont gardées)
+  photos.push({ date: Date.now(), data: dataUrl });
+  if (photos.length > 6) {
+    // Garder la première (point de départ) + les 5 plus récentes
+    photos = [photos[0]].concat(photos.slice(-5));
+  }
+  try {
+    localStorage.setItem('skinmatch_photos', JSON.stringify(photos));
+  } catch(e) {
+    alert('Stockage plein. Supprime quelques photos.');
+    return;
+  }
+  // Recharger la modale
+  var overlay = document.getElementById('photo-tracker-overlay');
+  if (overlay) overlay.remove();
+  setTimeout(openPhotoTracker, 100);
+}
+
+function _getPhotos() {
+  try {
+    var raw = localStorage.getItem('skinmatch_photos');
+    return raw ? JSON.parse(raw) : [];
+  } catch(e) { return []; }
+}
+
+// Ajouter la tuile "Suivi photo" dans le dashboard
+(function() {
+  var _addPhotoTile = function() {
+    // Attendre que le dashboard soit rendu
+    setTimeout(function() {
+      var dash = document.getElementById('sc-dashboard');
+      if (!dash || dash.classList.contains('hidden')) return;
+      if (document.getElementById('photo-tracker-tile')) return; // déjà ajouté
+
+      var isEN = LANG === 'en';
+      var nb = _getPhotos().length;
+      var tile = document.createElement('div');
+      tile.id = 'photo-tracker-tile';
+      tile.style.cssText = 'background:linear-gradient(135deg,#FBF0ED,#F5E1DC);border-radius:18px;padding:16px;cursor:pointer;border:1px solid rgba(196,114,106,.15);margin-bottom:14px;display:flex;align-items:center;gap:14px';
+      tile.innerHTML =
+        '<div style="width:48px;height:48px;border-radius:14px;background:#fff;display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0">📸</div>' +
+        '<div style="flex:1">' +
+          '<div style="font-size:14px;font-weight:700;color:#3D2B1F">' + (isEN?'Photo tracker':'Suivi photo') + '</div>' +
+          '<div style="font-size:11px;color:#8B6F5E;margin-top:2px">' +
+            (nb === 0 ? (isEN?'Take your first photo':'Prends ta première photo') :
+              (nb + ' ' + (isEN?(nb>1?'photos saved':'photo saved'):(nb>1?'photos enregistrées':'photo enregistrée')))) +
+          '</div>' +
+        '</div>' +
+        '<div style="color:#C4726A;font-size:18px;font-weight:700">→</div>';
+      tile.onclick = openPhotoTracker;
+
+      // Insérer après le bouton "Valider routine du jour" ou en haut du contenu dashboard
+      var dashContent = dash.querySelector('.content');
+      if (dashContent && dashContent.firstChild) {
+        // Insérer après le premier enfant
+        var firstChild = dashContent.firstChild;
+        if (firstChild.nextSibling) {
+          dashContent.insertBefore(tile, firstChild.nextSibling);
+        } else {
+          dashContent.appendChild(tile);
+        }
+      }
+    }, 300);
+  };
+
+  // Hook sur renderDashboard
+  if (typeof window.renderDashboard === 'function') {
+    var _origRender = window.renderDashboard;
+    window.renderDashboard = function() {
+      _origRender.apply(this, arguments);
+      _addPhotoTile();
+    };
+  }
+})();
+
+
+
+// ══════════════════════════════════════════════════════════════
+// RAPPELS ROUTINE — Notification programmée à 21h
+// ══════════════════════════════════════════════════════════════
+
+function setupEveningReminder() {
+  // Vérifier permission notifications
+  if (!('Notification' in window)) return;
+  if (Notification.permission === 'denied') return;
+
+  // Si déjà demandé aujourd'hui, ne pas redemander
+  var lastAsk = localStorage.getItem('skinmatch_notif_ask');
+  var today = new Date().toISOString().slice(0,10);
+  if (lastAsk === today) return;
+
+  // Demander la permission de manière douce, après 2 visites
+  var visits = parseInt(localStorage.getItem('skinmatch_visits') || '0') + 1;
+  localStorage.setItem('skinmatch_visits', visits);
+
+  if (visits >= 2 && Notification.permission === 'default') {
+    setTimeout(function() {
+      _askNotifPermission();
+      localStorage.setItem('skinmatch_notif_ask', today);
+    }, 5000);
+  }
+
+  // Programmer la notification du soir si permission accordée
+  if (Notification.permission === 'granted') {
+    _scheduleEveningNotif();
+  }
+}
+
+function _askNotifPermission() {
+  var isEN = LANG === 'en';
+  var overlay = document.createElement('div');
+  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(61,43,31,.6);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px';
+
+  var modal = document.createElement('div');
+  modal.style.cssText = 'background:#fff;border-radius:24px;padding:24px;max-width:360px;width:100%;text-align:center';
+
+  modal.innerHTML =
+    '<div style="font-size:48px;margin-bottom:12px">🔔</div>' +
+    '<div style="font-family:Georgia,serif;font-size:18px;font-weight:700;color:#3D2B1F;margin-bottom:8px">' +
+      (isEN?'Stay on track':'Reste régulière') +
+    '</div>' +
+    '<div style="font-size:13px;color:#8B6F5E;line-height:1.6;margin-bottom:20px">' +
+      (isEN?'A gentle reminder at 9pm so you never miss your evening routine.':'Un rappel à 21h pour ne plus jamais oublier ta routine du soir.') +
+    '</div>';
+
+  var allowBtn = document.createElement('button');
+  allowBtn.textContent = isEN ? 'Activate reminders' : 'Activer les rappels';
+  allowBtn.style.cssText = 'width:100%;padding:14px;border-radius:50px;border:none;background:linear-gradient(135deg,#3D2B1F,#5A3D2B);color:#fff;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;margin-bottom:8px';
+  allowBtn.onclick = function() {
+    Notification.requestPermission().then(function(perm) {
+      if (perm === 'granted') _scheduleEveningNotif();
+      overlay.remove();
+    });
+  };
+  modal.appendChild(allowBtn);
+
+  var skipBtn = document.createElement('button');
+  skipBtn.textContent = isEN ? 'Maybe later' : 'Plus tard';
+  skipBtn.style.cssText = 'width:100%;padding:12px;border-radius:50px;border:none;background:transparent;color:#8B6F5E;font-size:13px;font-weight:500;cursor:pointer;font-family:inherit';
+  skipBtn.onclick = function() { overlay.remove(); };
+  modal.appendChild(skipBtn);
+
+  overlay.appendChild(modal);
+  document.body.appendChild(overlay);
+}
+
+function _scheduleEveningNotif() {
+  // Vérifier si déjà programmée aujourd'hui
+  var scheduled = localStorage.getItem('skinmatch_notif_today');
+  var today = new Date().toISOString().slice(0,10);
+  if (scheduled === today) return;
+
+  var now = new Date();
+  var target = new Date();
+  target.setHours(21, 0, 0, 0);
+  if (target < now) {
+    // Trop tard pour ce soir, programmer pour demain
+    target.setDate(target.getDate() + 1);
+  }
+  var delay = target - now;
+  if (delay > 0 && delay < 24*60*60*1000) {
+    setTimeout(function() {
+      _showRoutineReminder();
+      localStorage.setItem('skinmatch_notif_today', today);
+    }, delay);
+  }
+}
+
+function _showRoutineReminder() {
+  if (Notification.permission !== 'granted') return;
+  var isEN = LANG === 'en';
+  var name = window._currentUser && window._currentUser.displayName
+    ? window._currentUser.displayName.split(' ')[0] : '';
+  var title = isEN ? '🌙 Evening routine time' : '🌙 C\'est l\'heure de ta routine';
+  var body = name
+    ? (isEN ? name + ', take 5 min for your skin tonight 💆‍♀️' : name + ', prends 5 min pour ta peau ce soir 💆‍♀️')
+    : (isEN ? 'Take 5 min for your skin tonight 💆‍♀️' : 'Prends 5 min pour ta peau ce soir 💆‍♀️');
+  try {
+    new Notification(title, { body: body, icon: '/icon-192.png' });
+  } catch(e) {}
+}
+
+// Lancer le setup après le chargement
+window.addEventListener('load', function() {
+  setTimeout(setupEveningReminder, 6000);
+});
+
+
+// ══════════════════════════════════════════════════════════════
+// PAGE INGRÉDIENTS À ÉVITER
+// ══════════════════════════════════════════════════════════════
+
+function openAvoidIngredients() {
+  var isEN = LANG === 'en';
+
+  // Construire la liste à partir des allergies et du type de peau
+  var avoid = [];
+  if (ST.allergies && ST.allergies.length) {
+    ST.allergies.forEach(function(a) {
+      if (a === 'parfum') avoid.push({name:'Parfum / Fragrance', why: isEN?'Common irritant for sensitive skin':'Irritant fréquent pour peau sensible', icon:'🌸'});
+      else if (a === 'alcool') avoid.push({name:'Alcool dénaturé', why: isEN?'Dries out and weakens skin barrier':'Dessèche et fragilise la barrière cutanée', icon:'🥃'});
+      else if (a === 'parabens') avoid.push({name:'Parabens', why: isEN?'Hormone disruptors':'Suspectés perturbateurs endocriniens', icon:'⚠️'});
+      else if (a === 'silicones') avoid.push({name:'Silicones', why: isEN?'Can clog pores':'Peuvent boucher les pores', icon:'💧'});
+      else if (a === 'sulfates') avoid.push({name:'Sulfates (SLS, SLES)', why: isEN?'Aggressive cleansers':'Tensioactifs trop agressifs', icon:'🧼'});
+      else if (a === 'huile-essentielle') avoid.push({name:'Huiles essentielles', why: isEN?'Potential allergen':'Allergène potentiel', icon:'🌿'});
+    });
+  }
+
+  // Selon le type de peau
+  if (ST.skinType === 'grasse') {
+    avoid.push({name: isEN?'Heavy oils':'Huiles comédogènes', why: isEN?'Coconut oil, mineral oil can clog pores':'Huile de coco, huile minérale bouchent les pores', icon:'🛢️'});
+  }
+  if (ST.skinType === 'sensible') {
+    avoid.push({name: isEN?'Strong acids':'Acides forts', why: isEN?'Glycolic >10%, retinol >0.5%':'Acide glycolique >10%, rétinol >0.5%', icon:'🧪'});
+    avoid.push({name: isEN?'Menthol/Camphor':'Menthol / Camphre', why: isEN?'Tingling sensation, irritation':'Effet picotant, irritation', icon:'❄️'});
+  }
+
+  var overlay = document.createElement('div');
+  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(61,43,31,.85);z-index:9999;display:flex;align-items:flex-end;justify-content:center';
+  overlay.onclick = function(e) { if (e.target === overlay) overlay.remove(); };
+
+  var modal = document.createElement('div');
+  modal.style.cssText = 'background:#fff;border-radius:28px 28px 0 0;max-width:460px;width:100%;padding:24px 20px 32px;max-height:85vh;overflow-y:auto';
+
+  var html =
+    '<div style="width:36px;height:4px;border-radius:2px;background:#E0D5D2;margin:0 auto 16px"></div>' +
+    '<div style="font-family:Georgia,serif;font-size:20px;font-weight:700;color:#3D2B1F;margin-bottom:6px">⚠️ ' + (isEN?'Ingredients to avoid':'Ingrédients à éviter') + '</div>' +
+    '<div style="font-size:13px;color:#8B6F5E;line-height:1.5;margin-bottom:18px">' + (isEN?'Based on your skin type and allergies':'Selon ton type de peau et tes allergies') + '</div>';
+
+  if (!avoid.length) {
+    html += '<div style="text-align:center;padding:32px;background:#FAF4F2;border-radius:16px">' +
+      '<div style="font-size:40px;margin-bottom:10px">✨</div>' +
+      '<div style="font-size:14px;color:#3D2B1F;font-weight:600">' + (isEN?'No specific restrictions':'Aucune restriction spécifique') + '</div>' +
+      '<div style="font-size:12px;color:#8B6F5E;margin-top:4px">' + (isEN?'You can complete your allergies in your profile':'Tu peux compléter tes allergies dans ton profil') + '</div>' +
+    '</div>';
+  } else {
+    avoid.forEach(function(a) {
+      html += '<div style="background:#FFF8F5;border:1px solid #F0E0D8;border-radius:14px;padding:14px;margin-bottom:10px;display:flex;align-items:flex-start;gap:12px">' +
+        '<div style="font-size:24px;flex-shrink:0">' + a.icon + '</div>' +
+        '<div style="flex:1">' +
+          '<div style="font-size:14px;font-weight:700;color:#3D2B1F;margin-bottom:2px">' + a.name + '</div>' +
+          '<div style="font-size:12px;color:#8B6F5E;line-height:1.5">' + a.why + '</div>' +
+        '</div>' +
+      '</div>';
+    });
+  }
+
+  modal.innerHTML = html;
+  overlay.appendChild(modal);
+  document.body.appendChild(overlay);
+}
+
+// Tuile dans dashboard pour ingrédients à éviter
+(function() {
+  var _addAvoidTile = function() {
+    setTimeout(function() {
+      var dash = document.getElementById('sc-dashboard');
+      if (!dash || dash.classList.contains('hidden')) return;
+      if (document.getElementById('avoid-ing-tile')) return;
+
+      var isEN = LANG === 'en';
+      var tile = document.createElement('div');
+      tile.id = 'avoid-ing-tile';
+      tile.style.cssText = 'background:#fff;border-radius:18px;padding:14px;cursor:pointer;border:1px solid rgba(196,114,106,.15);margin-bottom:14px;display:flex;align-items:center;gap:14px';
+      tile.innerHTML =
+        '<div style="width:44px;height:44px;border-radius:12px;background:#FFF8F5;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0">⚠️</div>' +
+        '<div style="flex:1">' +
+          '<div style="font-size:13px;font-weight:700;color:#3D2B1F">' + (isEN?'Ingredients to avoid':'Ingrédients à éviter') + '</div>' +
+          '<div style="font-size:11px;color:#8B6F5E;margin-top:2px">' + (isEN?'For your skin type':'Pour ton type de peau') + '</div>' +
+        '</div>' +
+        '<div style="color:#C4726A;font-size:16px;font-weight:700">→</div>';
+      tile.onclick = openAvoidIngredients;
+
+      var photoTile = document.getElementById('photo-tracker-tile');
+      if (photoTile && photoTile.parentNode) {
+        photoTile.parentNode.insertBefore(tile, photoTile.nextSibling);
+      }
+    }, 400);
+  };
+
+  if (typeof window.renderDashboard === 'function') {
+    var _origRender2 = window.renderDashboard;
+    window.renderDashboard = function() {
+      _origRender2.apply(this, arguments);
+      _addAvoidTile();
+    };
+  }
+})();
+
+
+// ══════════════════════════════════════════════════════════════
+// PAGE "POURQUOI CES PRODUITS ?" — explication détaillée
+// ══════════════════════════════════════════════════════════════
+
+function showProductReasoning(key) {
+  var isEN = LANG === 'en';
+  var r = ST.result;
+  if (!r) return;
+  var step = null;
+  r.steps.forEach(function(s) { if (s.key === key) step = s; });
+  if (!step) return;
+  var p = DB[key] || step;
+
+  var overlay = document.createElement('div');
+  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(61,43,31,.85);z-index:9999;display:flex;align-items:flex-end;justify-content:center';
+  overlay.onclick = function(e) { if (e.target === overlay) overlay.remove(); };
+
+  var modal = document.createElement('div');
+  modal.style.cssText = 'background:#fff;border-radius:28px 28px 0 0;max-width:460px;width:100%;padding:24px 20px 32px;max-height:85vh;overflow-y:auto';
+
+  // Construire l'explication personnalisée
+  var skinLabels = {grasse:isEN?'oily':'grasse', seche:isEN?'dry':'sèche', mixte:isEN?'combination':'mixte', sensible:isEN?'sensitive':'sensible', normale:isEN?'normal':'normale'};
+  var skinTxt = skinLabels[ST.skinType] || (isEN?'your':'ta');
+  var actifs = (p.ak && p.ak.length) ? p.ak.slice(0,3) : [];
+
+  var html =
+    '<div style="width:36px;height:4px;border-radius:2px;background:#E0D5D2;margin:0 auto 16px"></div>' +
+    '<div style="display:flex;align-items:center;gap:14px;margin-bottom:18px">' +
+      '<div style="width:56px;height:56px;border-radius:14px;background:linear-gradient(135deg,#FBF0ED,#F5E1DC);display:flex;align-items:center;justify-content:center;font-size:28px;flex-shrink:0">💡</div>' +
+      '<div style="flex:1">' +
+        '<div style="font-family:Georgia,serif;font-size:18px;font-weight:700;color:#3D2B1F;line-height:1.2">' + p.nom + '</div>' +
+        '<div style="font-size:12px;color:#8B6F5E;margin-top:2px">' + p.marque + '</div>' +
+      '</div>' +
+    '</div>';
+
+  // Pourquoi ce produit
+  html +=
+    '<div style="background:#FAF4F2;border-radius:16px;padding:16px;margin-bottom:12px">' +
+      '<div style="font-size:11px;font-weight:700;color:#C4726A;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px">' + (isEN?'Why this product':'Pourquoi ce produit') + '</div>' +
+      '<div style="font-size:13px;color:#3D2B1F;line-height:1.7">' +
+        (isEN?'Selected for your ' + skinTxt + ' skin' : 'Sélectionné pour ta peau ' + skinTxt) +
+        (ST.concerns && ST.concerns.length ? (isEN?' and your priorities (' + ST.concerns.slice(0,2).join(', ') + ')':' et tes priorités (' + ST.concerns.slice(0,2).join(', ') + ')') : '') +
+        '. ' + (p.pq || p.pourquoi || (isEN?'It addresses your specific needs.':'Il répond à tes besoins spécifiques.')) +
+      '</div>' +
+    '</div>';
+
+  // Actifs principaux
+  if (actifs.length) {
+    html += '<div style="background:#fff;border:1px solid #F0E8E5;border-radius:16px;padding:16px;margin-bottom:12px">' +
+      '<div style="font-size:11px;font-weight:700;color:#C4726A;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px">' + (isEN?'Key actives':'Actifs principaux') + '</div>';
+    actifs.forEach(function(a) {
+      html += '<div style="display:flex;align-items:center;gap:10px;padding:6px 0">' +
+        '<div style="width:6px;height:6px;border-radius:50%;background:#C4726A;flex-shrink:0"></div>' +
+        '<div style="font-size:13px;color:#3D2B1F;font-weight:500">' + a + '</div>' +
+      '</div>';
+    });
+    html += '</div>';
+  }
+
+  // Bénéfices attendus
+  if (p.ben || p.pq) {
+    html += '<div style="background:#fff;border:1px solid #F0E8E5;border-radius:16px;padding:16px;margin-bottom:14px">' +
+      '<div style="font-size:11px;font-weight:700;color:#C4726A;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px">' + (isEN?'Expected benefits':'Bénéfices attendus') + '</div>' +
+      '<div style="font-size:13px;color:#3D2B1F;line-height:1.7">' + (p.ben || p.pq) + '</div>' +
+    '</div>';
+  }
+
+  // Application
+  if (p.app) {
+    html += '<div style="background:#FFF8F5;border-radius:16px;padding:14px">' +
+      '<div style="font-size:11px;font-weight:700;color:#C4726A;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">' + (isEN?'How to apply':'Comment l\'appliquer') + '</div>' +
+      '<div style="font-size:12px;color:#5A3D2B;line-height:1.6">' + p.app + '</div>' +
+    '</div>';
+  }
+
+  modal.innerHTML = html;
+  overlay.appendChild(modal);
+  document.body.appendChild(overlay);
+}
+
+
+// ══════════════════════════════════════════════════════════════
+// DIAGNOSTIC EXPRESS — 3 questions au lieu de 5
+// ══════════════════════════════════════════════════════════════
+
+window._expressMode = false;
+
+function startExpressDiag() {
+  window._expressMode = true;
+  // Préremplir les défauts pour les questions skippées
+  ST.ageGroup = '25-35';   // âge moyen
+  ST.budget = 'equilibre'; // budget équilibré
+  ST.routineType = 'complete'; // routine complète
+
+  // Lancer le diagnostic
+  if (typeof showTermsModal === 'function') {
+    showTermsModal();
+  } else {
+    go('q1');
+    updateNav(null);
+  }
+}
+
+// Intercepter les transitions q1→q2, q3→q4, q4→q5 en mode express
+(function() {
+  var _origGo = window.go;
+  window.go = function(screen) {
+    if (window._expressMode) {
+      // En mode express : q1 → q3 (skip q2), q3 → result (skip q4, q5)
+      if (screen === 'q2') {
+        // Skip âge — déjà prérempli
+        screen = 'q3';
+      } else if (screen === 'q4') {
+        // Skip budget + routine — déjà préremplis → générer routine
+        ST.result = (typeof build === 'function') ? build() : null;
+        if (ST.result) {
+          renderResult();
+          window._expressMode = false;
+          screen = 'result';
+        }
+      }
+    }
+    return _origGo.apply(this, [screen]);
+  };
+})();
+
+// Adapter le label de progression en mode express
+(function() {
+  var _origInit = window.initQuestions;
+  if (typeof _origInit === 'function') {
+    window.initQuestions = function() {
+      _origInit.apply(this, arguments);
+      if (window._expressMode) {
+        // Modifier les labels pour montrer 3 étapes au lieu de 5
+        var p1 = document.querySelector('#sc-q1 .progress-pct');
+        var s1 = document.querySelector('#sc-q1 .progress-step-txt');
+        if (p1) p1.textContent = '33%';
+        if (s1) s1.textContent = 'Étape 1 / 3';
+        var fill1 = document.querySelector('#sc-q1 .progress-fill');
+        if (fill1) fill1.style.width = '33%';
+
+        var p3 = document.querySelector('#sc-q3 .progress-pct');
+        var s3 = document.querySelector('#sc-q3 .progress-step-txt');
+        if (p3) p3.textContent = '66%';
+        if (s3) s3.textContent = 'Étape 2 / 3';
+        var fill3 = document.querySelector('#sc-q3 .progress-fill');
+        if (fill3) fill3.style.width = '66%';
+      }
+    };
+  }
+})();
+
+
+// ══════════════════════════════════════════════════════════════
+// COUCHE COMPLÉMENTAIRE — Fonctionnalités ajoutées sans toucher au reste
+// ══════════════════════════════════════════════════════════════
+
+// ── REMPLACEMENT DE PRODUIT ──
+function replaceProduct(key) {
+  var isEN = LANG === 'en';
+  var r = ST.result;
+  if (!r) return;
+  var cur = null;
+  r.steps.forEach(function(s) { if (s.key === key) cur = s; });
+  if (!cur) return;
+
+  // Trouver des alternatives : même catégorie, marque différente
+  var alts = [];
+  Object.keys(DB).forEach(function(k) {
+    if (k === key) return;
+    var p = DB[k];
+    if (!p || p.cat !== cur.cat) return;
+    if (r.steps.some(function(s) { return s.key === k; })) return;
+    alts.push(k);
+  });
+  alts = alts.sort(function() { return Math.random() - 0.5; }).slice(0, 3);
+
+  // Modale
+  var overlay = document.createElement('div');
+  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(61,43,31,.6);z-index:9999;display:flex;align-items:flex-end;justify-content:center';
+  overlay.onclick = function(e) { if (e.target === overlay) overlay.remove(); };
+
+  var modal = document.createElement('div');
+  modal.style.cssText = 'background:#fff;border-radius:28px 28px 0 0;width:100%;max-width:460px;padding:20px 20px 40px;max-height:90vh;overflow-y:auto';
+
+  var handle = document.createElement('div');
+  handle.style.cssText = 'width:36px;height:4px;border-radius:2px;background:#E0D5D2;margin:0 auto 16px';
+  modal.appendChild(handle);
+
+  var title = document.createElement('div');
+  title.style.cssText = 'font-family:Georgia,serif;font-size:18px;font-weight:700;color:#3D2B1F;margin-bottom:6px';
+  title.textContent = isEN ? 'Replace this product' : 'Ce produit ne me convient pas';
+  modal.appendChild(title);
+
+  var curDiv = document.createElement('div');
+  curDiv.style.cssText = 'font-size:13px;color:#8B6F5E;padding:10px 14px;background:#FAF4F2;border-radius:12px;margin-bottom:16px';
+  curDiv.innerHTML = '<b style="color:#C4726A">' + (isEN?'Current':'Actuel') + ' :</b> ' + cur.nom + ' — ' + cur.marque;
+  modal.appendChild(curDiv);
+
+  var reasonTitle = document.createElement('div');
+  reasonTitle.style.cssText = 'font-size:13px;font-weight:700;color:#3D2B1F;margin-bottom:10px';
+  reasonTitle.textContent = isEN ? 'Why do you want to replace it?' : 'Pourquoi tu veux le remplacer ?';
+  modal.appendChild(reasonTitle);
+
+  var reasonsContainer = document.createElement('div');
+  reasonsContainer.style.cssText = 'display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px';
+  modal.appendChild(reasonsContainer);
+
+  var altsContainer = document.createElement('div');
+  modal.appendChild(altsContainer);
+
+  var reasons = [
+    {id:'brand', label: isEN ? "I don't like the brand" : "Je n'aime pas la marque", icon:'🏷️'},
+    {id:'price', label: isEN ? 'Too expensive' : 'Trop cher', icon:'💰'},
+    {id:'tried', label: isEN ? "Already tried" : 'Déjà testé', icon:'😕'},
+    {id:'allergy', label: isEN ? 'Allergic ingredient' : 'Allergie', icon:'⚠️'},
+    {id:'find', label: isEN ? 'Hard to find' : 'Difficile à trouver', icon:'🔍'},
+    {id:'smell', label: isEN ? "Texture/smell" : 'Texture / odeur', icon:'👃'},
+  ];
+
+  reasons.forEach(function(reason) {
+    var btn = document.createElement('button');
+    btn.style.cssText = 'padding:8px 14px;border-radius:50px;border:1.5px solid rgba(196,114,106,.25);background:#fff;font-size:12px;font-weight:500;color:#3D2B1F;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:6px';
+    btn.textContent = reason.icon + ' ' + reason.label;
+    btn.addEventListener('click', (function(r2) { return function() {
+      reasonsContainer.querySelectorAll('button').forEach(function(b) {
+        b.style.background='#fff'; b.style.color='#3D2B1F'; b.style.borderColor='rgba(196,114,106,.25)';
+      });
+      btn.style.background='#C4726A'; btn.style.color='#fff'; btn.style.borderColor='#C4726A';
+      _showReplaceAlts(altsContainer, alts, key, r2.id, isEN, overlay);
+    }; })(reason));
+    reasonsContainer.appendChild(btn);
+  });
+
+  overlay.appendChild(modal);
+  document.body.appendChild(overlay);
+}
+
+function _showReplaceAlts(container, alts, oldKey, reasonId, isEN, overlay) {
+  var explanations = {
+    brand: isEN ? 'Different brand, same benefits.' : 'Marque différente, mêmes bénéfices pour ta peau.',
+    price: isEN ? 'More affordable option.' : 'Option plus accessible avec des résultats similaires.',
+    tried: isEN ? 'Different formula.' : 'Formule différente qui pourrait mieux te convenir.',
+    allergy: isEN ? 'Gentler formula.' : 'Formule plus douce, moins susceptible de provoquer des réactions.',
+    find: isEN ? 'Easier to find.' : 'Plus facile à trouver en pharmacie ou en ligne.',
+    smell: isEN ? 'Different texture/scent.' : 'Texture et parfum différents.',
+  };
+  var explain = explanations[reasonId] || '';
+
+  container.innerHTML = '';
+  if (!alts.length) {
+    var none = document.createElement('div');
+    none.style.cssText = 'text-align:center;padding:20px;color:#8B6F5E;font-size:13px';
+    none.textContent = isEN ? 'No alternatives found for this category.' : "Pas d'alternative trouvée pour cette catégorie.";
+    container.appendChild(none);
+    return;
+  }
+
+  var altsTitle = document.createElement('div');
+  altsTitle.style.cssText = 'font-size:13px;font-weight:700;color:#3D2B1F;margin-bottom:10px';
+  altsTitle.textContent = isEN ? 'Suggested alternatives:' : 'Alternatives suggérées :';
+  container.appendChild(altsTitle);
+
+  alts.forEach(function(altKey) {
+    var p = DB[altKey];
+    if (!p) return;
+    var prix = Math.round(parseFloat(String(p.prix||0).replace(/[^0-9.]/g,''))||0);
+    var card = document.createElement('div');
+    card.style.cssText = 'background:#FAF4F2;border-radius:16px;padding:14px;margin-bottom:12px;border:1px solid rgba(196,114,106,.12)';
+    card.innerHTML =
+      '<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px">' +
+        '<div><div style="font-size:14px;font-weight:700;color:#3D2B1F">' + p.nom + '</div>' +
+        '<div style="font-size:12px;color:#8B6F5E;margin-top:2px">' + p.marque + '</div></div>' +
+        '<div style="font-family:Georgia,serif;font-size:18px;font-weight:700;color:#C4726A">' + (prix?'~'+prix+'€':'') + '</div>' +
+      '</div>' +
+      '<div style="font-size:12px;color:#5A3D2B;line-height:1.6;margin-bottom:12px;font-style:italic;background:rgba(196,114,106,.06);padding:8px 12px;border-radius:8px">💡 ' + explain + '</div>';
+
+    var chooseBtn = document.createElement('button');
+    chooseBtn.textContent = isEN ? 'Choose this product' : 'Choisir ce produit';
+    chooseBtn.style.cssText = 'width:100%;padding:11px;border-radius:50px;border:none;background:linear-gradient(135deg,#3D2B1F,#5A3D2B);color:#fff;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit';
+    chooseBtn.addEventListener('click', (function(ak, ap) { return function() {
+      var r = ST.result;
+      var idx = r.steps.findIndex(function(s){ return s.key === oldKey; });
+      if (idx !== -1) {
+        r.steps[idx] = Object.assign({}, r.steps[idx], {
+          key:ak, nom:ap.nom, marque:ap.marque, prix:ap.prix, cat:ap.cat,
+          inci:ap.inci||[], yuka:ap.yuka||0, pourquoi:ap.pourquoi||'',
+          lien:ap.lien||'', ak:ap.ak||[]
+        });
+      }
+      if (overlay) overlay.remove();
+      renderResult();
+      var t = document.createElement('div');
+      t.style.cssText = 'position:fixed;top:70px;left:50%;transform:translateX(-50%);background:#2E7D32;color:#fff;padding:12px 24px;border-radius:50px;font-size:13px;font-weight:600;z-index:9999';
+      t.textContent = (isEN?'Replaced by: ':'Remplacé par : ') + ap.nom;
+      document.body.appendChild(t);
+      setTimeout(function(){ t.remove(); }, 3000);
+    }; })(altKey, p));
+    card.appendChild(chooseBtn);
+    container.appendChild(card);
+  });
+}
+
+
+// ── RECHERCHE MANUELLE (scanner) ──
+function runManualSearch() {
+  var isEN = LANG === 'en';
+  var input = document.getElementById('manual-search-input');
+  var resultsDiv = document.getElementById('manual-search-results');
+  if (!input || !resultsDiv) return;
+  var query = input.value.trim().toLowerCase();
+  if (query.length < 2) {
+    resultsDiv.innerHTML = '<div style="text-align:center;padding:8px;font-size:12px;color:#8B6F5E">' +
+      (isEN ? 'Type at least 2 characters.' : 'Saisis au moins 2 caractères.') + '</div>';
+    return;
+  }
+  var matches = [];
+  Object.keys(DB).forEach(function(key) {
+    var p = DB[key];
+    if (!p) return;
+    if ((p.nom||'').toLowerCase().includes(query) || (p.marque||'').toLowerCase().includes(query)) {
+      matches.push({key:key, p:p});
+    }
+  });
+  if (!matches.length) {
+    resultsDiv.innerHTML = '<div style="text-align:center;padding:16px;color:#8B6F5E;font-size:13px">' +
+      (isEN ? 'No results found.' : 'Aucun résultat trouvé.') + '</div>';
+    return;
+  }
+  var frag = document.createDocumentFragment();
+  matches.slice(0, 6).forEach(function(m) {
+    var prix = Math.round(parseFloat(String(m.p.prix||0).replace(/[^0-9.]/g,''))||0);
+    var item = document.createElement('div');
+    item.style.cssText = 'background:#FAF4F2;border-radius:12px;padding:12px 14px;cursor:pointer;border:1px solid rgba(196,114,106,.12);display:flex;align-items:center;gap:12px;margin-bottom:8px';
+    item.innerHTML = '<div style="flex:1"><div style="font-size:13px;font-weight:700;color:#3D2B1F">' + m.p.nom +
+      '</div><div style="font-size:11px;color:#8B6F5E;margin-top:2px">' + m.p.marque + '</div></div>' +
+      '<div style="font-family:Georgia,serif;font-size:15px;font-weight:700;color:#C4726A">' + (prix?'~'+prix+'€':'') + '</div>' +
+      '<span style="color:#C4726A;font-size:11px;font-weight:700">→</span>';
+    item.addEventListener('click', (function(k){ return function(){ if(typeof simulateScanWithKey==='function') simulateScanWithKey(k); }; })(m.key));
+    frag.appendChild(item);
+  });
+  resultsDiv.innerHTML = '';
+  resultsDiv.appendChild(frag);
+}
+
+// Enter dans recherche manuelle
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Enter' && document.getElementById('manual-search-input') === document.activeElement) {
+    runManualSearch();
+  }
+});
+
+
+// ── RECHERCHE DB PAR EAN ──
+function _searchDBByEAN(code) {
+  for (var key in DB) {
+    var p = DB[key];
+    if (p && (p.ean === code || p.barcode === code || p.code === code)) return key;
+  }
+  return null;
+}
+
+// ── SCROLL SCAN ──
+function _scrollScanToTop() {
+  var sc = document.getElementById('sc-scan-product');
+  if (sc) sc.scrollTop = 0;
+}
+
+
+// ══════════════════════════════════════════════════════════════
+// RÉÉVALUATION MENSUELLE
+// ══════════════════════════════════════════════════════════════
+
+function checkMonthlyReview() {
+  if (!window._currentUser || !ST.result) return;
+  try {
+    var lastRoutine = localStorage.getItem('skinmatch_routine_date');
+    var lastReview = localStorage.getItem('skinmatch_last_review');
+    var now = Date.now();
+    var startDate = lastRoutine ? parseInt(lastRoutine) : now;
+    if (!lastRoutine) localStorage.setItem('skinmatch_routine_date', now);
+    var daysSinceStart = (now - startDate) / (1000*60*60*24);
+    var daysSinceReview = lastReview ? (now - parseInt(lastReview)) / (1000*60*60*24) : 999;
+    // Proposer la réévaluation après 30 jours, et pas plus d'1x / 7 jours
+    if (daysSinceStart >= 28 && daysSinceReview >= 7) {
+      setTimeout(function() { showMonthlyReviewModal(); }, 1500);
+    }
+  } catch(e) {}
+}
+
+function showMonthlyReviewModal() {
+  var isEN = LANG === 'en';
+  var userName = window._currentUser && window._currentUser.displayName
+    ? window._currentUser.displayName.split(' ')[0] : '';
+
+  var overlay = document.createElement('div');
+  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(61,43,31,.6);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px';
+
+  var modal = document.createElement('div');
+  modal.style.cssText = 'background:#fff;border-radius:24px;padding:24px;max-width:380px;width:100%;text-align:center';
+
+  modal.innerHTML =
+    '<div style="font-size:48px;margin-bottom:12px">🌸</div>' +
+    '<div style="font-family:Georgia,serif;font-size:20px;font-weight:700;color:#3D2B1F;margin-bottom:8px">' +
+      (userName ? (isEN ? userName + ', it\'s been a month!' : userName + ', ça fait un mois !') : (isEN ? "It's been a month!" : 'Ça fait un mois !')) +
+    '</div>' +
+    '<div style="font-size:14px;color:#8B6F5E;line-height:1.6;margin-bottom:24px">' +
+      (isEN ? 'How has your skin evolved? A 30-second check-in to adjust your routine.' : "Comment ta peau a-t-elle évolué ? Un mini check-in de 30 secondes pour ajuster ta routine.") +
+    '</div>';
+
+  var startBtn = document.createElement('button');
+  startBtn.textContent = isEN ? 'Start review' : 'Commencer';
+  startBtn.style.cssText = 'width:100%;padding:14px;border-radius:50px;border:none;background:linear-gradient(135deg,#3D2B1F,#5A3D2B);color:#fff;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;margin-bottom:8px';
+  startBtn.onclick = function() {
+    overlay.remove();
+    localStorage.setItem('skinmatch_last_review', Date.now());
+    _showMonthlyQuestion1();
+  };
+  modal.appendChild(startBtn);
+
+  var laterBtn = document.createElement('button');
+  laterBtn.textContent = isEN ? 'Later' : 'Plus tard';
+  laterBtn.style.cssText = 'width:100%;padding:12px;border-radius:50px;border:none;background:transparent;color:#8B6F5E;font-size:13px;font-weight:500;cursor:pointer;font-family:inherit';
+  laterBtn.onclick = function() {
+    overlay.remove();
+    localStorage.setItem('skinmatch_last_review', Date.now() - (6*24*60*60*1000)); // Re-propose dans 1 jour
+  };
+  modal.appendChild(laterBtn);
+
+  overlay.appendChild(modal);
+  document.body.appendChild(overlay);
+}
+
+function _showMonthlyQuestion1() {
+  var isEN = LANG === 'en';
+  var answers = { evolution: null, satisfaction: null, newGoal: null };
+
+  function showQ(n) {
+    var overlay = document.createElement('div');
+    overlay.style.cssText = 'position:fixed;inset:0;background:rgba(61,43,31,.6);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px';
+    var modal = document.createElement('div');
+    modal.style.cssText = 'background:#fff;border-radius:24px;padding:24px;max-width:380px;width:100%';
+
+    var progress = '<div style="display:flex;gap:4px;margin-bottom:16px">';
+    for (var i = 1; i <= 3; i++) {
+      progress += '<div style="flex:1;height:4px;border-radius:2px;background:' + (i <= n ? '#C4726A' : '#F0E8E5') + '"></div>';
+    }
+    progress += '</div>';
+
+    var qData;
+    if (n === 1) {
+      qData = {
+        title: isEN ? 'How has your skin evolved?' : 'Comment ta peau a-t-elle évolué ?',
+        options: [
+          {v:'better', l: isEN ? '✨ Better than before' : '✨ Mieux qu\'avant'},
+          {v:'same', l: isEN ? '😐 About the same' : '😐 Pareil'},
+          {v:'worse', l: isEN ? '😕 Worse' : '😕 Moins bien'},
+        ],
+        save: 'evolution'
+      };
+    } else if (n === 2) {
+      qData = {
+        title: isEN ? 'Are you happy with your routine?' : 'Es-tu satisfaite de ta routine ?',
+        options: [
+          {v:'love', l: isEN ? '😍 I love it' : '😍 J\'adore'},
+          {v:'ok', l: isEN ? '🙂 It\'s OK' : '🙂 Ça va'},
+          {v:'change', l: isEN ? '😬 I want to change' : '😬 Je veux changer'},
+        ],
+        save: 'satisfaction'
+      };
+    } else {
+      qData = {
+        title: isEN ? 'What\'s your priority now?' : 'Ta priorité maintenant ?',
+        options: [
+          {v:'hydration', l: isEN ? '💧 More hydration' : '💧 Plus d\'hydratation'},
+          {v:'spots', l: isEN ? '✨ Fade dark spots' : '✨ Atténuer les taches'},
+          {v:'aging', l: isEN ? '🌸 Anti-aging' : '🌸 Anti-âge'},
+          {v:'acne', l: isEN ? '🎯 Less imperfections' : '🎯 Moins d\'imperfections'},
+          {v:'same', l: isEN ? '👍 Keep same goals' : '👍 Garder mes objectifs'},
+        ],
+        save: 'newGoal'
+      };
+    }
+
+    modal.innerHTML = progress +
+      '<div style="font-family:Georgia,serif;font-size:18px;font-weight:700;color:#3D2B1F;margin-bottom:16px;line-height:1.3">' + qData.title + '</div>';
+
+    qData.options.forEach(function(opt) {
+      var btn = document.createElement('button');
+      btn.textContent = opt.l;
+      btn.style.cssText = 'width:100%;padding:14px;border-radius:14px;border:1.5px solid rgba(196,114,106,.2);background:#fff;color:#3D2B1F;font-size:14px;font-weight:500;cursor:pointer;font-family:inherit;margin-bottom:8px;text-align:left';
+      btn.onclick = (function(v) { return function() {
+        answers[qData.save] = v;
+        overlay.remove();
+        if (n < 3) showQ(n+1);
+        else _showMonthlyResult(answers);
+      }; })(opt.v);
+      modal.appendChild(btn);
+    });
+
+    overlay.appendChild(modal);
+    document.body.appendChild(overlay);
+  }
+
+  showQ(1);
+}
+
+function _showMonthlyResult(answers) {
+  var isEN = LANG === 'en';
+  var overlay = document.createElement('div');
+  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(61,43,31,.6);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px';
+  var modal = document.createElement('div');
+  modal.style.cssText = 'background:#fff;border-radius:24px;padding:24px;max-width:380px;width:100%;text-align:center';
+
+  var icon = '🌸', msg = '';
+  if (answers.evolution === 'better') {
+    icon = '🎉';
+    msg = isEN ? "Amazing! Your skin is glowing. Keep your routine!" : 'Bravo ! Ta peau s\'épanouit. On garde ta routine !';
+  } else if (answers.evolution === 'worse' || answers.satisfaction === 'change') {
+    icon = '🔄';
+    msg = isEN ? 'No worries — let\'s adjust your routine together.' : 'Pas de souci — on ajuste ta routine ensemble.';
+  } else {
+    icon = '💫';
+    msg = isEN ? 'Steady progress. A few tweaks to push further?' : 'Bonne progression. Quelques ajustements pour aller plus loin ?';
+  }
+
+  modal.innerHTML = '<div style="font-size:48px;margin-bottom:12px">' + icon + '</div>' +
+    '<div style="font-family:Georgia,serif;font-size:18px;font-weight:700;color:#3D2B1F;margin-bottom:12px">' + msg + '</div>' +
+    '<div style="font-size:13px;color:#8B6F5E;line-height:1.6;margin-bottom:24px">' +
+      (isEN ? 'Your answers are saved. Your next check-in in 30 days.' : 'Tes réponses sont enregistrées. Prochain check-in dans 30 jours.') +
+    '</div>';
+
+  var closeBtn = document.createElement('button');
+  closeBtn.textContent = isEN ? 'Continue' : 'Continuer';
+  closeBtn.style.cssText = 'width:100%;padding:14px;border-radius:50px;border:none;background:linear-gradient(135deg,#3D2B1F,#5A3D2B);color:#fff;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit';
+  closeBtn.onclick = function() {
+    overlay.remove();
+    // Si veut changer → relancer le diagnostic avec le nouvel objectif
+    if (answers.satisfaction === 'change' || answers.evolution === 'worse') {
+      if (answers.newGoal && answers.newGoal !== 'same') {
+        // Ajouter le nouvel objectif aux concerns
+        if (!ST.concerns) ST.concerns = [];
+        if (ST.concerns.indexOf(answers.newGoal) === -1) ST.concerns.push(answers.newGoal);
+      }
+      go('q1'); updateNav(null);
+    }
+    // Sauvegarder dans Firestore si dispo
+    try {
+      if (window._firebaseReady && window._currentUser && window._setDoc) {
+        window._setDoc(window._doc(window._db, 'users', window._currentUser.uid),
+          { lastReview: { date: Date.now(), answers: answers } }, { merge: true });
+      }
+    } catch(e) {}
+  };
+  modal.appendChild(closeBtn);
+
+  overlay.appendChild(modal);
+  document.body.appendChild(overlay);
+}
+
+// Appeler check après le chargement de la routine
+if (typeof window._onAuthResolved === 'function') {
+  var _oldAuthResolved = window._onAuthResolved;
+  window._onAuthResolved = function(user) {
+    _oldAuthResolved(user);
+    setTimeout(checkMonthlyReview, 3000);
+  };
+}
+
+
+// ══════════════════════════════════════════════════════════════
+// MÉTÉO → notifications intelligentes
+// ══════════════════════════════════════════════════════════════
+
+async function fetchWeatherAndNotify() {
+  if (!navigator.geolocation) return;
+  // Pas plus d'1x / jour
+  var lastCheck = localStorage.getItem('skinmatch_weather_check');
+  var today = new Date().toISOString().slice(0, 10);
+  if (lastCheck === today) return;
+
+  navigator.geolocation.getCurrentPosition(async function(pos) {
+    try {
+      var lat = pos.coords.latitude;
+      var lon = pos.coords.longitude;
+      var url = 'https://api.open-meteo.com/v1/forecast?latitude=' + lat + '&longitude=' + lon +
+        '&current=temperature_2m,relative_humidity_2m,uv_index&timezone=auto';
+      var res = await fetch(url);
+      var data = await res.json();
+      var cur = data.current;
+      if (!cur) return;
+      localStorage.setItem('skinmatch_weather_check', today);
+
+      // Construire le message le plus pertinent
+      var isEN = LANG === 'en';
+      var name = window._currentUser && window._currentUser.displayName
+        ? window._currentUser.displayName.split(' ')[0] : '';
+      var greet = name ? name + ', ' : '';
+      var msg = null;
+
+      if (cur.uv_index && cur.uv_index >= 6) {
+        msg = isEN ? "☀️ " + greet + "high UV today (" + Math.round(cur.uv_index) + "). Don't forget SPF!"
+                   : "☀️ " + greet + "indice UV élevé aujourd'hui (" + Math.round(cur.uv_index) + "). N'oublie pas ton SPF !";
+      } else if (cur.temperature_2m && cur.temperature_2m >= 30) {
+        msg = isEN ? "🔥 " + greet + Math.round(cur.temperature_2m) + "°C today. Thermal water spray in your bag!"
+                   : "🔥 " + greet + Math.round(cur.temperature_2m) + "°C aujourd'hui. Pense au spray d'eau thermale !";
+      } else if (cur.temperature_2m && cur.temperature_2m <= 5) {
+        msg = isEN ? "❄️ " + greet + Math.round(cur.temperature_2m) + "°C. Protective balm is your best friend."
+                   : "❄️ " + greet + Math.round(cur.temperature_2m) + "°C. Ton baume protecteur sera ton meilleur ami.";
+      } else if (cur.relative_humidity_2m && cur.relative_humidity_2m < 35) {
+        msg = isEN ? "💨 " + greet + "dry air (" + Math.round(cur.relative_humidity_2m) + "%). Extra hydration tonight!"
+                   : "💨 " + greet + "air sec (" + Math.round(cur.relative_humidity_2m) + "%). Double couche d'hydratation ce soir !";
+      }
+
+      if (msg) _showWeatherToast(msg);
+    } catch(e) {}
+  }, function() {}, { timeout: 5000, enableHighAccuracy: false });
+}
+
+function _showWeatherToast(msg) {
+  var toast = document.createElement('div');
+  toast.style.cssText = 'position:fixed;top:16px;left:50%;transform:translateX(-50%);background:#fff;border:1.5px solid rgba(196,114,106,.3);color:#3D2B1F;padding:12px 18px;border-radius:16px;font-size:13px;font-weight:500;z-index:9998;box-shadow:0 8px 30px rgba(0,0,0,.12);max-width:380px;width:calc(100% - 32px);line-height:1.4;cursor:pointer';
+  toast.textContent = msg;
+  toast.onclick = function() { toast.remove(); };
+  document.body.appendChild(toast);
+  setTimeout(function() {
+    if (toast.parentNode) {
+      toast.style.transition = 'opacity .3s';
+      toast.style.opacity = '0';
+      setTimeout(function(){ toast.remove(); }, 300);
+    }
+  }, 10000);
+}
+
+// Lancer la météo après le chargement
+window.addEventListener('load', function() {
+  setTimeout(fetchWeatherAndNotify, 4000);
+});
+
+</script>
 
 </body>
 </html>
