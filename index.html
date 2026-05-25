@@ -103,10 +103,39 @@ body{background:var(--bg);font-family:var(--sans);color:var(--pri);min-height:10
 .hidden{display:none!important}
 #reader video{object-fit:cover!important}
 #reader__dashboard{display:none!important}
-.app > div:not(.hidden){position:fixed;top:0;left:0;right:0;bottom:0;overflow-y:scroll;-webkit-overflow-scrolling:touch;overscroll-behavior:none}
+/* Tous les écrans plein-écran de l'app, qu'ils soient sous .app ou directement sous body */
+.app > div:not(.hidden),
+body > div[id^="sc-"]:not(.hidden){
+  position:fixed;top:0;left:0;right:0;bottom:0;
+  overflow-y:scroll;-webkit-overflow-scrolling:touch;overscroll-behavior:none;
+  background:var(--bg);
+}
+
+/* Cadrage mobile-first sur grand écran (tablette / desktop) */
+@media (min-width:520px){
+  body{background:#E8DFD8}
+  .app > div:not(.hidden),
+  body > div[id^="sc-"]:not(.hidden){
+    left:50%;right:auto;
+    transform:translateX(-50%);
+    max-width:460px;width:100%;
+    box-shadow:0 8px 40px rgba(0,0,0,.12);
+    background:#FBF7F4;
+  }
+}
 
 /* NAV */
-.topbar{display:flex;align-items:center;justify-content:space-between;padding:20px 18px 0}
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:20px 14px 0;gap:8px;flex-wrap:nowrap}
+.topbar .logo{font-size:20px;min-width:0;flex-shrink:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.topbar .btn-back{flex-shrink:0;padding:8px 14px;font-size:12px}
+.topbar #btn-compare-top{flex-shrink:0}
+@media (max-width:380px){
+  .topbar{padding:18px 10px 0;gap:6px}
+  .topbar .logo{font-size:17px;gap:6px}
+  .topbar .logo-icon{width:28px;height:28px;font-size:11px}
+  .topbar .btn-back{padding:7px 11px;font-size:11px}
+  .topbar #btn-compare-top{padding:5px 9px;font-size:10px}
+}
 .nav-btn{color:#B0958F;transition:color .2s}
 .nav-btn.active{color:#C4726A}
 .nav-btn svg{display:block}
@@ -919,7 +948,7 @@ h2{font-family:var(--serif);font-size:20px;font-weight:700;margin-bottom:3px}
     <p style="font-size:14px;line-height:1.7;color:#5A4A42;margin-bottom:16px">Les présentes Conditions Générales d'Utilisation (CGU) régissent l'accès et l'utilisation de l'application SkinMatch, disponible à l'adresse skinmatch.app. En utilisant SkinMatch, vous acceptez sans réserve les présentes CGU.</p>
 
     <h2 style="font-size:16px;font-weight:700;color:#3D2B1F;margin:20px 0 8px">2. Description du service</h2>
-    <p style="font-size:14px;line-height:1.7;color:#5A4A42;margin-bottom:16px">SkinMatch est un service de conseil skincare personnalisé basé sur un algorithme de recommandation. Les conseils fournis sont à titre informatif et ne remplacent pas l'avis d\'un dermatologue ou d\'un professionnel de santé.</p>
+    <p style="font-size:14px;line-height:1.7;color:#5A4A42;margin-bottom:16px">SkinMatch est un service de conseil skincare personnalisé basé sur un algorithme de recommandation. Les conseils fournis sont à titre informatif et ne remplacent pas l'avis d'un dermatologue ou d'un professionnel de santé.</p>
 
     <h2 style="font-size:16px;font-weight:700;color:#3D2B1F;margin:20px 0 8px">3. Responsabilité</h2>
     <p style="font-size:14px;line-height:1.7;color:#5A4A42;margin-bottom:16px">SkinMatch ne peut être tenu responsable des réactions cutanées liées à l'utilisation des produits recommandés. Nous vous conseillons de toujours tester un nouveau produit sur une petite zone de peau avant utilisation complète.</p>
@@ -953,50 +982,40 @@ h2{font-family:var(--serif);font-size:20px;font-weight:700;margin-bottom:3px}
     <div style="text-align:center;margin-bottom:24px">
       <div style="font-size:10px;font-weight:700;color:#C4726A;text-transform:uppercase;letter-spacing:3px;margin-bottom:8px">📷 Scanner un produit</div>
       <h2 style="font-family:Georgia,serif;font-size:22px;font-weight:700;color:#3D2B1F;margin-bottom:6px">Analyse instantanée</h2>
-      <p style="font-size:13px;color:#8B6F5E">Scanne le code-barres d\'un produit pour savoir s'il est adapté à ta peau</p>
+      <p style="font-size:13px;color:#8B6F5E">Scanne le code-barres d'un produit pour savoir s'il est adapté à ta peau</p>
     </div>
 
-    <!-- Zone de scan caméra code-barres -->
+    <!-- Zone de scan caméra code-barres : Html5Qrcode injecte son propre <video> dans #reader -->
     <div id="barcode-camera-zone" style="margin-bottom:16px">
       <div style="position:relative;width:100%;height:260px;background:#111;border-radius:20px;overflow:hidden">
-        
-        <!-- Flux vidéo -->
-        <video id="barcode-video" autoplay playsinline muted style="width:100%;height:100%;object-fit:cover;display:block"></video>
-        
-        <!-- Canvas de scan -->
-        <canvas id="barcode-canvas" style="display:none"></canvas>
-        
-        <!-- Overlay viseur -->
+
+        <!-- Conteneur que Html5Qrcode va remplir -->
+        <div id="reader" style="width:100%;height:100%;background:#111"></div>
+
+        <!-- Overlay viseur (purement visuel) -->
         <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none">
-          <!-- Zone de scan rectangulaire -->
           <div style="width:75%;height:110px;position:relative">
-            <!-- Coins du viseur -->
             <div style="position:absolute;top:0;left:0;width:24px;height:24px;border-top:3px solid #C4726A;border-left:3px solid #C4726A;border-radius:3px 0 0 0"></div>
             <div style="position:absolute;top:0;right:0;width:24px;height:24px;border-top:3px solid #C4726A;border-right:3px solid #C4726A;border-radius:0 3px 0 0"></div>
             <div style="position:absolute;bottom:0;left:0;width:24px;height:24px;border-bottom:3px solid #C4726A;border-left:3px solid #C4726A;border-radius:0 0 0 3px"></div>
             <div style="position:absolute;bottom:0;right:0;width:24px;height:24px;border-bottom:3px solid #C4726A;border-right:3px solid #C4726A;border-radius:0 0 3px 0"></div>
-            <!-- Ligne de scan animée -->
             <div id="scan-line" style="position:absolute;left:4px;right:4px;height:2px;background:linear-gradient(90deg,transparent,#C4726A,transparent);animation:scanLine 2s ease-in-out infinite"></div>
           </div>
         </div>
 
-        <!-- Overlay sombre haut/bas -->
-        <div style="position:absolute;top:0;left:0;right:0;height:30%;background:rgba(0,0,0,0.5);pointer-events:none"></div>
-        <div style="position:absolute;bottom:0;left:0;right:0;height:30%;background:rgba(0,0,0,0.5);pointer-events:none"></div>
-
         <!-- Message guidage -->
-        <div style="position:absolute;top:12px;left:0;right:0;text-align:center;pointer-events:none">
-          <span id="barcode-guide" style="background:rgba(0,0,0,.65);color:#fff;border-radius:20px;padding:5px 14px;font-size:12px;font-weight:600">📷 Pointez le code-barres vers la caméra</span>
+        <div style="position:absolute;top:12px;left:0;right:0;text-align:center;pointer-events:none;z-index:5">
+          <span id="barcode-guide" style="background:rgba(0,0,0,.65);color:#fff;border-radius:20px;padding:5px 14px;font-size:12px;font-weight:600">📷 Pointe vers le code-barres</span>
         </div>
 
-        <!-- Bouton flip + galerie -->
-        <div style="position:absolute;bottom:12px;left:0;right:0;display:flex;justify-content:center;gap:16px">
+        <!-- Boutons galerie -->
+        <div style="position:absolute;bottom:12px;left:0;right:0;display:flex;justify-content:center;gap:16px;z-index:5">
           <button onclick="flipBarcodeCamera()" style="width:40px;height:40px;border-radius:50%;background:rgba(255,255,255,.2);border:2px solid rgba(255,255,255,.3);color:#fff;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center">🔄</button>
           <button onclick="document.getElementById('barcode-file-input').click()" style="width:40px;height:40px;border-radius:50%;background:rgba(255,255,255,.2);border:2px solid rgba(255,255,255,.3);color:#fff;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center">🖼️</button>
         </div>
 
-        <!-- Pas de caméra -->
-        <div id="barcode-no-camera" style="display:none;position:absolute;inset:0;background:#111;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding:20px">
+        <!-- Fallback pas de caméra -->
+        <div id="barcode-no-camera" style="display:none;position:absolute;inset:0;background:#111;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding:20px;z-index:6">
           <div style="font-size:36px">📷</div>
           <div style="font-size:13px;font-weight:600;color:#fff">Caméra non disponible</div>
           <div style="font-size:11px;color:rgba(255,255,255,.6);text-align:center">Recherche le produit par son nom</div>
@@ -1201,7 +1220,7 @@ h2{font-family:var(--serif);font-size:20px;font-weight:700;margin-bottom:3px}
 </div>
 
 <!-- ══ BARRE DE NAVIGATION BAS ══ -->
-<div id="bottom-nav" style="display:none;position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px solid #F0E8E5;padding:8px 0 max(8px, env(safe-area-inset-bottom));z-index:1000;max-width:430px;margin:0 auto">
+<div id="bottom-nav" style="display:none;position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:460px;background:#fff;border-top:1px solid #F0E8E5;padding:8px 0 max(8px, env(safe-area-inset-bottom));z-index:1000">
   <div style="display:flex;justify-content:space-around;align-items:center">
     <button onclick="navTo('welcome')" id="nav-home" class="nav-btn" style="flex:1;background:none;border:none;cursor:pointer;padding:6px 4px;display:flex;flex-direction:column;align-items:center;gap:3px;font-family:'Outfit',sans-serif">
       <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
@@ -3304,6 +3323,18 @@ function doGenerate(){
 
 function renderResult(){
   const r=ST.result;
+  if(!r || !r.steps){
+    // Pas de résultat encore généré : on évite une page blanche
+    var rc=document.getElementById("result-content");
+    if(rc){
+      var isENg=(typeof LANG!=='undefined'&&LANG==='en');
+      rc.innerHTML='<div style="padding:32px 18px;text-align:center"><div style="font-size:42px;margin-bottom:12px">🌸</div>'
+        +'<h2 style="font-family:Georgia,serif;color:#3D2B1F;margin-bottom:8px">'+(isENg?'No routine yet':'Aucune routine générée')+'</h2>'
+        +'<p style="font-size:13px;color:#8B6F5E;line-height:1.6;margin-bottom:20px">'+(isENg?'Complete the diagnosis to discover your personalized Skin Match routine.':'Complète le diagnostic pour découvrir ta routine Skin Match personnalisée.')+'</p>'
+        +'<button onclick="go(\'q1\')" style="padding:12px 24px;border-radius:50px;background:#C4726A;color:#fff;border:none;font-weight:700;font-size:14px;cursor:pointer;font-family:inherit">'+(isENg?'Start the diagnosis':'Démarrer le diagnostic')+'</button></div>';
+    }
+    return;
+  }
   const hasA=ST.allergies.length>0&&!ST.allergies.includes("Aucune allergie connue");
   const amSteps=r.steps.filter(s=>s.moment==="AM"||s.moment==="AM+PM");
   const pmSteps=r.steps.filter(s=>s.moment==="PM"||s.moment==="AM+PM");
@@ -6090,11 +6121,11 @@ function renderDashboard() {
     badgesEl.style.cssText = "margin-bottom:14px";
     badgesEl.innerHTML = "<div style='font-size:10px;font-weight:700;color:var(--mut);text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px'>🏆 Badges</div>";
     var badgesGrid = document.createElement("div");
-    badgesGrid.style.cssText = "display:grid;grid-template-columns:repeat(5,1fr);gap:8px";
+    badgesGrid.style.cssText = "display:grid;grid-template-columns:repeat(5,1fr);gap:10px;align-items:start";
     _allBadges.forEach(function(b){
       var d = document.createElement("div");
-      d.style.cssText = "display:flex;flex-direction:column;align-items:center;gap:4px";
-      d.innerHTML = "<div style='width:44px;height:44px;border-radius:50%;background:"+(b.earned?"linear-gradient(135deg,#C4726A,#A85A52)":"rgba(196,114,106,.08)")+";display:flex;align-items:center;justify-content:center;font-size:18px;border:1.5px solid "+(b.earned?"rgba(196,114,106,.3)":"rgba(196,114,106,.08)")+";"+(b.earned?"":"filter:grayscale(1);opacity:.4")+">"+b.icon+"</div><div style='font-size:8px;font-weight:600;color:"+(b.earned?"#C4726A":"var(--mut)")+";text-align:center;line-height:1.3'>"+b.name+"</div>";
+      d.style.cssText = "display:flex;flex-direction:column;align-items:center;gap:4px;min-width:0;overflow:hidden";
+      d.innerHTML = "<div style='width:44px;height:44px;border-radius:50%;background:"+(b.earned?"linear-gradient(135deg,#C4726A,#A85A52)":"rgba(196,114,106,.08)")+";display:flex;align-items:center;justify-content:center;font-size:18px;border:1.5px solid "+(b.earned?"rgba(196,114,106,.3)":"rgba(196,114,106,.08)")+";"+(b.earned?"":"filter:grayscale(1);opacity:.4")+"'>"+b.icon+"</div><div style='font-size:9px;font-weight:600;color:"+(b.earned?"#C4726A":"var(--mut)")+";text-align:center;line-height:1.3;word-break:break-word;hyphens:auto'>"+b.name+"</div>";
       badgesGrid.appendChild(d);
     });
     badgesEl.appendChild(badgesGrid);
