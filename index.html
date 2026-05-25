@@ -607,9 +607,6 @@ h2{font-family:var(--serif);font-size:20px;font-weight:700;margin-bottom:3px}
   </div>
 </div>
 
-  </div>
-</div>
-
 <!-- ══ SCAN DE PEAU ══ -->
 <div id="sc-scan" class="hidden">
   <div class="topbar">
@@ -3336,6 +3333,7 @@ function renderResult(){
     return;
   }
   const hasA=ST.allergies.length>0&&!ST.allergies.includes("Aucune allergie connue");
+  const isEN=(typeof LANG!=='undefined'&&LANG==='en');
   const amSteps=r.steps.filter(s=>s.moment==="AM"||s.moment==="AM+PM");
   const pmSteps=r.steps.filter(s=>s.moment==="PM"||s.moment==="AM+PM");
 
