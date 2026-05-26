@@ -1149,9 +1149,9 @@ h2{font-family:var(--serif);font-size:20px;font-weight:700;margin-bottom:3px}
   </div>
   <div class="content" style="padding-bottom:80px">
     <div style="margin:8px 0 20px">
-      <div class="step-lbl" id="articles-eyebrow">Bibliothèque</div>
-      <h2 style="margin-bottom:4px" id="articles-title">Tous les articles</h2>
-      <p class="sub" id="articles-sub">Conseils, actifs, routines — tout ce qu'il faut savoir</p>
+      <div class="step-lbl" id="articles-eyebrow">Conseils</div>
+      <h2 style="margin-bottom:4px" id="articles-title">Tous les conseils</h2>
+      <p class="sub" id="articles-sub">Actifs, routines, science — tout ce qu'il faut savoir</p>
     </div>
     <div id="articles-list"></div>
   </div>
@@ -3602,16 +3602,30 @@ function renderCommunityReviews(s, isEN){
 
   return ''
     +'<div style="margin-top:12px;padding-top:12px;border-top:1px solid #F0E8E5">'
-      +'<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">'
-        +'<div style="font-size:10px;font-weight:700;color:#9A8B7C;text-transform:uppercase;letter-spacing:.5px">💬 '+title+'</div>'
-        +'<div style="display:flex;align-items:center;gap:4px">'
-          +stars(Math.round(parseFloat(avg)))
-          +'<span style="font-size:11px;font-weight:700;color:#3D2B1F;margin-left:4px">'+avg+'</span>'
-          +'<span style="font-size:10px;color:#8B6F5E">('+totalReviews+')</span>'
+      +'<button type="button" onclick="toggleReviews(\''+s.key+'\')" id="reviews-toggle-'+s.key+'" '
+        +'style="width:100%;background:none;border:none;padding:0;cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:space-between;gap:8px">'
+        +'<div style="display:flex;align-items:center;gap:8px">'
+          +'<div style="font-size:10px;font-weight:700;color:#9A8B7C;text-transform:uppercase;letter-spacing:.5px">💬 '+title+'</div>'
+          +'<div style="display:flex;align-items:center;gap:4px">'
+            +stars(Math.round(parseFloat(avg)))
+            +'<span style="font-size:11px;font-weight:700;color:#3D2B1F;margin-left:4px">'+avg+'</span>'
+            +'<span style="font-size:10px;color:#8B6F5E">('+totalReviews+')</span>'
+          +'</div>'
         +'</div>'
-      +'</div>'
-      +items
+        +'<span id="reviews-chevron-'+s.key+'" style="font-size:14px;color:#C4726A;transition:transform .2s ease;display:inline-block">▾</span>'
+      +'</button>'
+      +'<div id="reviews-body-'+s.key+'" style="display:none;margin-top:8px">'+items+'</div>'
     +'</div>';
+}
+
+// Replier / déplier la liste des avis pour un produit
+function toggleReviews(key){
+  var body = document.getElementById('reviews-body-' + key);
+  var chevron = document.getElementById('reviews-chevron-' + key);
+  if (!body) return;
+  var isOpen = body.style.display !== 'none';
+  body.style.display = isOpen ? 'none' : 'block';
+  if (chevron) chevron.style.transform = isOpen ? 'rotate(0deg)' : 'rotate(180deg)';
 }
 
 function renderResult(){
@@ -6294,11 +6308,11 @@ var AFFIRMATIONS_FR = [
   "Prendre soin de soi n'est pas un luxe, c'est une nécessité.",
   "Ta peau reflète ta santé intérieure. Nourris-la bien.",
   "Un jour à la fois. Une routine à la fois.",
-  "La patience est le secret de toute belle peau.",
+  "La patience est le secret d'une peau qui rayonne.",
   "Ton teint s'améliore chaque jour, même si tu ne le vois pas encore.",
-  "Sois douce avec toi-même — ta peau aussi a besoin de douceur.",
+  "Sois doux·ce avec toi-même — ta peau aussi a besoin de douceur.",
   "Les petits gestes quotidiens font les grandes transformations.",
-  "Tu es plus belle que tu ne le crois.",
+  "Ta peau te le rendra, à toi de lui faire confiance.",
   "Ta routine skincare est ton moment rien qu'à toi.",
   "La régularité bat toujours l'intensité.",
   "Prendre soin de ta peau, c'est prendre soin de toi.",
@@ -6312,11 +6326,11 @@ var AFFIRMATIONS_EN = [
   "Self-care is not a luxury, it's a necessity.",
   "Your skin reflects your inner health. Nourish it well.",
   "One day at a time. One routine at a time.",
-  "Patience is the secret to beautiful skin.",
+  "Patience is the secret to radiant skin.",
   "Your complexion improves every day, even if you can't see it yet.",
   "Be gentle with yourself — your skin needs gentleness too.",
   "Small daily gestures create great transformations.",
-  "You are more beautiful than you think.",
+  "Your skin will reward your consistency.",
   "Your skincare routine is your time just for you.",
   "Consistency always beats intensity.",
   "Taking care of your skin is taking care of yourself.",
@@ -6455,11 +6469,11 @@ function renderDashboard() {
     artEl.style.cssText = "background:var(--surf);border-radius:18px;border:1px solid var(--bdr);overflow:hidden;margin-bottom:14px;cursor:pointer";
     artEl.onclick = function() { showArticle(artIdx, isEN); };
     artEl.innerHTML = "<div style='background:var(--blush);padding:14px 16px;border-bottom:1px solid var(--rose)'>" +
-      "<div style='font-size:10px;font-weight:700;color:var(--acc2);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px'>📰 " + (isEN ? "ARTICLE OF THE DAY" : "ARTICLE DU JOUR") + " · " + art.read + "</div>" +
+      "<div style='font-size:10px;font-weight:700;color:var(--acc2);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px'>📰 " + (isEN ? "TIP OF THE DAY" : "CONSEIL DU JOUR") + " · " + art.read + "</div>" +
       "<div style='font-size:15px;font-weight:700;color:var(--pri);line-height:1.4'>" + art.emoji + " " + art.title + "</div></div>" +
       "<div style='padding:14px 16px'>" +
       "<div style='font-size:12px;color:var(--mut);line-height:1.6;margin-bottom:10px'>" + art.intro + "</div>" +
-      "<div style='color:#C4726A;font-size:12px;font-weight:700'>" + (isEN ? "Read the full article →" : "Lire l'article complet →") + "</div></div>";
+      "<div style='color:#C4726A;font-size:12px;font-weight:700'>" + (isEN ? "Read full tip →" : "Lire le conseil complet →") + "</div></div>";
     wrap.appendChild(artEl);
 
     // ── 6. CONSEIL DU JOUR ──
@@ -6598,7 +6612,7 @@ challHeader.textContent = isEN ? "🎯 30-DAY CHALLENGES" : "🎯 DÉFIS 30 JOUR
     var otherArticles = isEN ? ARTICLES_EN : ARTICLES_FR;
     var otherEl = document.createElement("div");
     otherEl.style.cssText = "margin-bottom:14px";
-    otherEl.innerHTML = "<div style='font-size:11px;font-weight:700;color:var(--mut);text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px'>📚 " + (isEN ? "MORE ARTICLES" : "PLUS D'ARTICLES") + "</div>";
+    otherEl.innerHTML = "<div style='font-size:11px;font-weight:700;color:var(--mut);text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px'>📚 " + (isEN ? "MORE TIPS" : "PLUS DE CONSEILS") + "</div>";
     var artGrid = document.createElement("div");
     artGrid.style.cssText = "display:flex;flex-direction:column;gap:8px";
     otherArticles.forEach(function(a, i) {
@@ -6633,12 +6647,11 @@ challHeader.textContent = isEN ? "🎯 30-DAY CHALLENGES" : "🎯 DÉFIS 30 JOUR
     badgeEl.appendChild(badgeGrid);
     wrap.appendChild(badgeEl);
 
-    // ── 11. ARTICLES DANS MON ESPACE ──
+    // ── 11. CONSEILS DANS MON ESPACE ──
     var allArticlesEl = document.createElement("div");
     allArticlesEl.style.cssText = "margin-bottom:14px";
     allArticlesEl.innerHTML = "<div style='display:flex;align-items:center;justify-content:space-between;margin-bottom:10px'>" +
-      "<div style='font-size:11px;font-weight:700;color:var(--mut);text-transform:uppercase;letter-spacing:.5px'>📚 " + (isEN ? "ARTICLES" : "ARTICLES") + "</div>" +
-      "<div style='font-size:11px;font-weight:700;color:var(--mut);text-transform:uppercase;letter-spacing:.5px'>\uD83D\uDCDA " + (isEN ? "ARTICLES" : "ARTICLES") + "</div>" +
+      "<div style='font-size:11px;font-weight:700;color:var(--mut);text-transform:uppercase;letter-spacing:.5px'>📚 " + (isEN ? "TIPS" : "CONSEILS") + "</div>" +
       "</div>";
     var artPreviewGrid = document.createElement("div");
     artPreviewGrid.style.cssText = "display:flex;flex-direction:column;gap:8px";
