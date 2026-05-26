@@ -2,7 +2,45 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
+<!-- ═══ EN-TÊTES DE SÉCURITÉ ═══ -->
+<!-- CSP : restreint les sources autorisées pour script, style, img, frame, etc. -->
+<meta http-equiv="Content-Security-Policy" content="
+  default-src 'self';
+  script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.gstatic.com https://cdnjs.cloudflare.com https://unpkg.com https://apis.google.com https://www.googleapis.com https://generativelanguage.googleapis.com;
+  style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
+  img-src 'self' data: blob: https:;
+  font-src 'self' data: https://fonts.gstatic.com;
+  connect-src 'self' https://*.googleapis.com https://*.firebaseio.com https://*.firebaseapp.com https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://firestore.googleapis.com https://api.openweathermap.org https://api.open-meteo.com https://geocoding-api.open-meteo.com https://world.openfoodfacts.org;
+  media-src 'self' blob:;
+  frame-src https://www.youtube.com https://www.tiktok.com https://*.firebaseapp.com;
+  object-src 'none';
+  base-uri 'self';
+  form-action 'self';
+  frame-ancestors 'none';
+  upgrade-insecure-requests
+">
+<!-- Empêche le clickjacking : l'app ne peut pas être chargée dans un iframe externe -->
+<meta http-equiv="X-Frame-Options" content="DENY">
+<!-- Empêche les navigateurs de deviner le type de contenu (MIME sniffing) -->
+<meta http-equiv="X-Content-Type-Options" content="nosniff">
+<!-- Politique de référent : ne pas exposer l'URL complète aux sites tiers -->
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<!-- Politique de permissions navigateur : géoloc/caméra autorisées uniquement sur l'origine -->
+<meta http-equiv="Permissions-Policy" content="camera=(self), geolocation=(self), microphone=(), payment=(), usb=(), interest-cohort=()">
   <script>
+
+// ── Debug guard : désactive console.log en production ──
+// Pour activer les logs, ajouter ?debug=1 à l'URL
+(function(){
+  var DEBUG = /[?&]debug=1/.test(window.location.search) || localStorage.getItem('sm_debug') === '1';
+  if (!DEBUG) {
+    var noop = function(){};
+    // Garder console.error et console.warn (utiles pour les vrais problèmes)
+    window.console.log = noop;
+    window.console.info = noop;
+    window.console.debug = noop;
+  }
+})();
     // Forcer le bon URL pour la PWA
     if (window.location.pathname === '/skinnmatch' || window.location.pathname === '/skinnmatch/index.html') {
       window.location.replace('/skinnmatch/');
@@ -32,8 +70,8 @@
 <!-- Firebase SDK -->
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-  import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut, updateProfile } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-  import { getFirestore, doc, setDoc, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+  import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut, updateProfile, sendEmailVerification, sendPasswordResetEmail, deleteUser, reauthenticateWithCredential, EmailAuthProvider } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+  import { getFirestore, doc, setDoc, getDoc, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
   const firebaseConfig = {
     apiKey: "AIzaSyBMWoVUUrj2R5FywcCl34z9ooFTI9ZMAE4",
@@ -59,10 +97,16 @@
   window._signInWithPopup = signInWithPopup;
   window._signOut = signOut;
   window._updateProfile = updateProfile;
+  window._sendEmailVerification = sendEmailVerification;
+  window._sendPasswordResetEmail = sendPasswordResetEmail;
+  window._deleteUser = deleteUser;
+  window._reauthenticateWithCredential = reauthenticateWithCredential;
+  window._EmailAuthProvider = EmailAuthProvider;
   window._doc = doc;
   window._setDoc = setDoc;
   window._getDoc = getDoc;
   window._updateDoc = updateDoc;
+  window._deleteDoc = deleteDoc;
   window._firebaseReady = true;
 
   // Observer état connexion
@@ -761,7 +805,13 @@ h2{font-family:var(--serif);font-size:20px;font-weight:700;margin-bottom:3px}
     </div>
     <div class="inp-wrap"><svg width="15" height="15" viewBox="0 0 24 24" fill="#9A8B7C"><path d="M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12zm0 2.4c-3.2 0-9.6 1.6-9.6 4.8v2.4h19.2v-2.4c0-3.2-6.4-4.8-9.6-4.8z"/></svg><input id="inp-name" type="text" placeholder="Prénom" id="inp-name-placeholder"></div>
     <div class="inp-wrap"><svg width="15" height="15" viewBox="0 0 24 24" fill="#9A8B7C"><path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg><input id="inp-email-r" type="email" placeholder="Adresse email"></div>
-    <div class="inp-wrap"><svg width="15" height="15" viewBox="0 0 24 24" fill="#9A8B7C"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/></svg><input id="inp-pw-r" type="password" placeholder="Mot de passe (6 min.)"></div>
+    <div class="inp-wrap"><svg width="15" height="15" viewBox="0 0 24 24" fill="#9A8B7C"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/></svg><input id="inp-pw-r" type="password" placeholder="Mot de passe (8 car. min, 1 maj, 1 chiffre)"></div>
+    <div style="background:#FBF7F4;border-radius:12px;padding:12px 14px;margin:8px 0">
+      <label style="display:flex;align-items:flex-start;gap:8px;cursor:pointer;font-size:12px;color:#5A4A42;line-height:1.5">
+        <input type="checkbox" id="inp-consent-r" style="margin-top:2px;flex-shrink:0;accent-color:#C4726A">
+        <span>J'accepte la <a href="javascript:void(0)" onclick="event.stopPropagation();go('privacy')" style="color:#C4726A;font-weight:600">Politique de confidentialité</a> et les <a href="javascript:void(0)" onclick="event.stopPropagation();go('cgu')" style="color:#C4726A;font-weight:600">Conditions d'utilisation</a>.</span>
+      </label>
+    </div>
     <div id="err-r" class="err-msg hidden"></div>
     <button class="btn-p" onclick="doRegister()">Continuer</button>
     <div class="divider"><hr><span>ou</span><hr></div>
@@ -782,6 +832,7 @@ h2{font-family:var(--serif);font-size:20px;font-weight:700;margin-bottom:3px}
     <div class="inp-wrap"><svg width="15" height="15" viewBox="0 0 24 24" fill="#9A8B7C"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/></svg><input id="inp-pw-l" type="password" placeholder="Mot de passe"></div>
     <div id="err-l" class="err-msg hidden"></div>
     <button class="btn-p" onclick="doLogin()">Se connecter</button>
+    <button onclick="doForgotPassword()" style="width:100%;padding:8px;background:none;border:none;color:#C4726A;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;margin-top:4px;text-decoration:underline">Mot de passe oublié ?</button>
     <div class="divider"><hr><span>ou</span><hr></div>
     <button class="btn-o" onclick="doGoogleLogin()" style="margin-bottom:8px">
       <svg width="18" height="18" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.5 0 6.6 1.2 9 3.2l6.7-6.7C35.8 2.5 30.3 0 24 0 14.7 0 6.8 5.5 3 13.5l7.8 6C12.7 13.5 17.9 9.5 24 9.5z"/><path fill="#4285F4" d="M46.5 24.5c0-1.6-.1-3.1-.4-4.5H24v8.5h12.7c-.6 3-2.3 5.5-4.8 7.2l7.5 5.8C43.7 37 46.5 31.3 46.5 24.5z"/><path fill="#FBBC05" d="M10.8 28.5c-.5-1.5-.8-3-.8-4.5s.3-3 .8-4.5L3 13.5C1.1 17.1 0 21.1 0 25.3c0 4.2 1.1 8.2 3 11.7l7.8-8.5z"/><path fill="#34A853" d="M24 48c6.5 0 11.9-2.1 15.9-5.8l-7.5-5.8c-2.1 1.4-4.8 2.2-8.4 2.2-6.1 0-11.3-4.1-13.2-9.6l-7.8 6C6.8 42.5 14.7 48 24 48z"/></svg>
@@ -886,85 +937,6 @@ h2{font-family:var(--serif);font-size:20px;font-weight:700;margin-bottom:3px}
 <!-- ══ MODAL ══ -->
 <div id="modal-overlay" class="modal-overlay hidden" onclick="closeModal()">
   <div class="modal" onclick="event.stopPropagation()" id="modal-content"></div>
-</div>
-
-<!-- ══ PRIVACY ══ -->
-<div id="sc-privacy" class="hidden">
-  <div class="topbar">
-    <button class="btn-back" onclick="history.back()||go('welcome')">← Retour</button>
-    <div class="logo"><div class="logo-icon">SM</div>Skin<span>Match</span></div>
-  </div>
-  <div class="content" style="padding-bottom:60px">
-    <h1 style="font-family:Georgia,serif;font-size:24px;color:#3D2B1F;margin-bottom:8px">Politique de confidentialité</h1>
-    <p style="font-size:12px;color:#B0958F;margin-bottom:24px">Dernière mise à jour : Mai 2025</p>
-    
-    <h2 style="font-size:16px;font-weight:700;color:#3D2B1F;margin:20px 0 8px">1. Qui sommes-nous ?</h2>
-    <p style="font-size:14px;line-height:1.7;color:#5A4A42;margin-bottom:16px">SkinMatch est une application web de conseil skincare personnalisé. Notre mission est d'aider chaque utilisateur à trouver les produits de soin les mieux adaptés à son profil de peau.</p>
-    
-    <h2 style="font-size:16px;font-weight:700;color:#3D2B1F;margin:20px 0 8px">2. Données collectées</h2>
-    <p style="font-size:14px;line-height:1.7;color:#5A4A42;margin-bottom:8px">Dans le cadre de votre utilisation de SkinMatch, nous pouvons collecter les données suivantes :</p>
-    <p style="font-size:14px;line-height:1.7;color:#5A4A42;margin-bottom:4px">• Votre type de peau, âge, problèmes cutanés et budget (données de diagnostic)</p>
-    <p style="font-size:14px;line-height:1.7;color:#5A4A42;margin-bottom:4px">• Votre région géographique (pour adapter les recommandations)</p>
-    <p style="font-size:14px;line-height:1.7;color:#5A4A42;margin-bottom:16px">• Les produits consultés et comparés dans l'application</p>
-    
-    <h2 style="font-size:16px;font-weight:700;color:#3D2B1F;margin:20px 0 8px">3. Utilisation des données</h2>
-    <p style="font-size:14px;line-height:1.7;color:#5A4A42;margin-bottom:4px">Vos données sont utilisées exclusivement pour :</p>
-    <p style="font-size:14px;line-height:1.7;color:#5A4A42;margin-bottom:4px">• Générer votre routine skincare personnalisée</p>
-    <p style="font-size:14px;line-height:1.7;color:#5A4A42;margin-bottom:4px">• Améliorer la qualité de nos recommandations</p>
-    <p style="font-size:14px;line-height:1.7;color:#5A4A42;margin-bottom:16px">• Vous proposer des produits adaptés à votre profil</p>
-    
-    <h2 style="font-size:16px;font-weight:700;color:#3D2B1F;margin:20px 0 8px">4. Partage des données</h2>
-    <p style="font-size:14px;line-height:1.7;color:#5A4A42;margin-bottom:16px">Vos données personnelles ne sont jamais vendues à des tiers. Les données agrégées et anonymisées peuvent être partagées avec nos partenaires marques à des fins statistiques uniquement.</p>
-    
-    <h2 style="font-size:16px;font-weight:700;color:#3D2B1F;margin:20px 0 8px">5. Stockage local</h2>
-    <p style="font-size:14px;line-height:1.7;color:#5A4A42;margin-bottom:16px">SkinMatch utilise le stockage local de votre navigateur (localStorage) pour mémoriser vos préférences et votre suivi de routine. Ces données restent sur votre appareil et ne sont pas transmises à nos serveurs.</p>
-    
-    <h2 style="font-size:16px;font-weight:700;color:#3D2B1F;margin:20px 0 8px">6. Vos droits (RGPD)</h2>
-    <p style="font-size:14px;line-height:1.7;color:#5A4A42;margin-bottom:4px">Conformément au Règlement Général sur la Protection des Données (RGPD), vous disposez des droits suivants :</p>
-    <p style="font-size:14px;line-height:1.7;color:#5A4A42;margin-bottom:4px">• Droit d'accès à vos données</p>
-    <p style="font-size:14px;line-height:1.7;color:#5A4A42;margin-bottom:4px">• Droit de rectification</p>
-    <p style="font-size:14px;line-height:1.7;color:#5A4A42;margin-bottom:4px">• Droit à l'effacement</p>
-    <p style="font-size:14px;line-height:1.7;color:#5A4A42;margin-bottom:16px">• Droit à la portabilité</p>
-    
-    <h2 style="font-size:16px;font-weight:700;color:#3D2B1F;margin:20px 0 8px">7. Contact</h2>
-    <p style="font-size:14px;line-height:1.7;color:#5A4A42;margin-bottom:16px">Pour toute question relative à vos données personnelles, contactez-nous à : <strong>contact@skinmatch.app</strong></p>
-  </div>
-</div>
-
-<!-- ══ CGU ══ -->
-<div id="sc-cgu" class="hidden">
-  <div class="topbar">
-    <button class="btn-back" onclick="history.back()||go('welcome')">← Retour</button>
-    <div class="logo"><div class="logo-icon">SM</div>Skin<span>Match</span></div>
-  </div>
-  <div class="content" style="padding-bottom:60px">
-    <h1 style="font-family:Georgia,serif;font-size:24px;color:#3D2B1F;margin-bottom:8px">Conditions Générales d'Utilisation</h1>
-    <p style="font-size:12px;color:#B0958F;margin-bottom:24px">Dernière mise à jour : Mai 2025</p>
-
-    <h2 style="font-size:16px;font-weight:700;color:#3D2B1F;margin:20px 0 8px">1. Objet</h2>
-    <p style="font-size:14px;line-height:1.7;color:#5A4A42;margin-bottom:16px">Les présentes Conditions Générales d'Utilisation (CGU) régissent l'accès et l'utilisation de l'application SkinMatch, disponible à l'adresse skinmatch.app. En utilisant SkinMatch, vous acceptez sans réserve les présentes CGU.</p>
-
-    <h2 style="font-size:16px;font-weight:700;color:#3D2B1F;margin:20px 0 8px">2. Description du service</h2>
-    <p style="font-size:14px;line-height:1.7;color:#5A4A42;margin-bottom:16px">SkinMatch est un service de conseil skincare personnalisé basé sur un algorithme de recommandation. Les conseils fournis sont à titre informatif et ne remplacent pas l'avis d'un dermatologue ou d'un professionnel de santé.</p>
-
-    <h2 style="font-size:16px;font-weight:700;color:#3D2B1F;margin:20px 0 8px">3. Responsabilité</h2>
-    <p style="font-size:14px;line-height:1.7;color:#5A4A42;margin-bottom:16px">SkinMatch ne peut être tenu responsable des réactions cutanées liées à l'utilisation des produits recommandés. Nous vous conseillons de toujours tester un nouveau produit sur une petite zone de peau avant utilisation complète.</p>
-
-    <h2 style="font-size:16px;font-weight:700;color:#3D2B1F;margin:20px 0 8px">4. Propriété intellectuelle</h2>
-    <p style="font-size:14px;line-height:1.7;color:#5A4A42;margin-bottom:16px">L'ensemble du contenu de SkinMatch (algorithme, design, textes, base de données produits) est la propriété exclusive de SkinMatch et est protégé par les lois sur la propriété intellectuelle.</p>
-
-    <h2 style="font-size:16px;font-weight:700;color:#3D2B1F;margin:20px 0 8px">5. Liens externes</h2>
-    <p style="font-size:14px;line-height:1.7;color:#5A4A42;margin-bottom:16px">SkinMatch contient des liens vers des sites tiers (Easypara, YouTube, TikTok). Nous ne sommes pas responsables du contenu de ces sites ni de leurs pratiques en matière de données personnelles.</p>
-
-    <h2 style="font-size:16px;font-weight:700;color:#3D2B1F;margin:20px 0 8px">6. Modification des CGU</h2>
-    <p style="font-size:14px;line-height:1.7;color:#5A4A42;margin-bottom:16px">SkinMatch se réserve le droit de modifier les présentes CGU à tout moment. Les utilisateurs seront informés de toute modification substantielle.</p>
-
-    <h2 style="font-size:16px;font-weight:700;color:#3D2B1F;margin:20px 0 8px">7. Droit applicable</h2>
-    <p style="font-size:14px;line-height:1.7;color:#5A4A42;margin-bottom:16px">Les présentes CGU sont soumises au droit français. Tout litige sera soumis aux tribunaux compétents de Paris.</p>
-
-    <h2 style="font-size:16px;font-weight:700;color:#3D2B1F;margin:20px 0 8px">8. Contact</h2>
-    <p style="font-size:14px;line-height:1.7;color:#5A4A42;margin-bottom:16px">Pour toute question : <strong>contact@skinmatch.app</strong></p>
-  </div>
 </div>
 
 <!-- ══ SCAN PRODUCT ══ -->
@@ -1213,6 +1185,169 @@ h2{font-family:var(--serif);font-size:20px;font-weight:700;margin-bottom:3px}
       <h2 id="settings-title">Réglages</h2>
     </div>
     <div id="settings-content"></div>
+  </div>
+</div>
+
+<!-- ══ PAGE POLITIQUE DE CONFIDENTIALITÉ (RGPD) ══ -->
+<div id="sc-privacy" class="hidden">
+  <div class="topbar">
+    <button class="btn-back" onclick="history.length>1?history.back():go('welcome')">← Retour</button>
+    <div class="logo"><div class="logo-icon">SM</div>Skin<span>Match</span></div>
+  </div>
+  <div class="content" style="padding-bottom:90px">
+    <div class="step-lbl">📜 Conformité RGPD</div>
+    <h2 style="margin-bottom:6px">Politique de confidentialité</h2>
+    <p class="sub">Dernière mise à jour : mai 2026</p>
+
+    <h3 style="margin-top:20px;font-family:Georgia,serif;font-size:18px;color:#3D2B1F">1. Qui sommes-nous ?</h3>
+    <p style="font-size:13px;line-height:1.7;color:#5A4A42">SkinMatch est une application web de conseil skincare personnalisé. L'éditeur du service est responsable du traitement de vos données personnelles au sens du Règlement Général sur la Protection des Données (RGPD).</p>
+
+    <h3 style="margin-top:20px;font-family:Georgia,serif;font-size:18px;color:#3D2B1F">2. Données collectées</h3>
+    <p style="font-size:13px;line-height:1.7;color:#5A4A42">Nous collectons les données suivantes lorsque vous utilisez SkinMatch :</p>
+    <ul style="font-size:13px;line-height:1.7;color:#5A4A42;padding-left:20px">
+      <li><strong>Compte :</strong> prénom, email, mot de passe chiffré</li>
+      <li><strong>Profil peau :</strong> type de peau, âge, problématiques, allergies, budget</li>
+      <li><strong>Suivi :</strong> photos de votre peau (stockées localement), journal, scores, routines validées</li>
+      <li><strong>Préférences :</strong> langue, région, paramètres de notifications</li>
+      <li><strong>Localisation :</strong> uniquement pour la fonction météo (avec votre accord explicite)</li>
+      <li><strong>Données techniques :</strong> type d'appareil, navigateur, langue système (anonymes)</li>
+    </ul>
+
+    <h3 style="margin-top:20px;font-family:Georgia,serif;font-size:18px;color:#3D2B1F">3. Finalités du traitement</h3>
+    <p style="font-size:13px;line-height:1.7;color:#5A4A42">Vos données sont utilisées pour :</p>
+    <ul style="font-size:13px;line-height:1.7;color:#5A4A42;padding-left:20px">
+      <li>Générer votre routine skincare personnalisée</li>
+      <li>Adapter les notifications météo (UV, hydratation)</li>
+      <li>Sauvegarder votre progression entre les sessions</li>
+      <li>Améliorer notre algorithme de recommandation (données anonymisées)</li>
+    </ul>
+
+    <h3 style="margin-top:20px;font-family:Georgia,serif;font-size:18px;color:#3D2B1F">4. Hébergement et transferts</h3>
+    <p style="font-size:13px;line-height:1.7;color:#5A4A42">Vos données sont hébergées par Google Firebase (Google LLC, USA) dans des serveurs européens lorsque possible. Le transfert vers les États-Unis est encadré par les Clauses Contractuelles Types de la Commission européenne.</p>
+    <p style="font-size:13px;line-height:1.7;color:#5A4A42">Les requêtes d'IA (Skin Coach, analyse de scan) sont transmises à Google Gemini pour traitement, sans stockage permanent côté Google.</p>
+
+    <h3 style="margin-top:20px;font-family:Georgia,serif;font-size:18px;color:#3D2B1F">5. Durée de conservation</h3>
+    <p style="font-size:13px;line-height:1.7;color:#5A4A42">Vos données sont conservées tant que votre compte est actif. Après suppression de votre compte, toutes vos données personnelles sont effacées sous 30 jours, sauf obligations légales (facturation, contentieux).</p>
+
+    <h3 style="margin-top:20px;font-family:Georgia,serif;font-size:18px;color:#3D2B1F">6. Vos droits (RGPD)</h3>
+    <p style="font-size:13px;line-height:1.7;color:#5A4A42">Vous disposez des droits suivants :</p>
+    <ul style="font-size:13px;line-height:1.7;color:#5A4A42;padding-left:20px">
+      <li><strong>Accès</strong> à vos données</li>
+      <li><strong>Rectification</strong> en cas d'erreur</li>
+      <li><strong>Effacement</strong> (« droit à l'oubli ») — disponible dans les Paramètres</li>
+      <li><strong>Portabilité</strong> (export de vos données)</li>
+      <li><strong>Opposition</strong> au traitement</li>
+      <li><strong>Limitation</strong> du traitement</li>
+    </ul>
+    <p style="font-size:13px;line-height:1.7;color:#5A4A42">Pour exercer ces droits ou poser une question : <a href="mailto:contact@skinmatch.app" style="color:#C4726A">contact@skinmatch.app</a></p>
+    <p style="font-size:13px;line-height:1.7;color:#5A4A42">En cas de désaccord, vous pouvez saisir la <strong>CNIL</strong> (Commission Nationale de l'Informatique et des Libertés) : <a href="https://www.cnil.fr" target="_blank" rel="noopener" style="color:#C4726A">cnil.fr</a></p>
+
+    <h3 style="margin-top:20px;font-family:Georgia,serif;font-size:18px;color:#3D2B1F">7. Cookies et traceurs</h3>
+    <p style="font-size:13px;line-height:1.7;color:#5A4A42">SkinMatch utilise uniquement des cookies techniques (essentiels au fonctionnement) et un stockage local (pour conserver votre routine hors-ligne). Aucun cookie publicitaire ou de pistage n'est utilisé.</p>
+
+    <h3 style="margin-top:20px;font-family:Georgia,serif;font-size:18px;color:#3D2B1F">8. Sécurité</h3>
+    <p style="font-size:13px;line-height:1.7;color:#5A4A42">Les mots de passe sont chiffrés. Les communications utilisent HTTPS. L'accès à vos données est restreint et surveillé.</p>
+
+    <h3 style="margin-top:20px;font-family:Georgia,serif;font-size:18px;color:#3D2B1F">9. Mineurs</h3>
+    <p style="font-size:13px;line-height:1.7;color:#5A4A42">SkinMatch est destiné aux personnes de 15 ans et plus. Les mineurs de moins de 15 ans doivent obtenir le consentement de leur représentant légal pour s'inscrire.</p>
+
+    <h3 style="margin-top:20px;font-family:Georgia,serif;font-size:18px;color:#3D2B1F">10. Modifications</h3>
+    <p style="font-size:13px;line-height:1.7;color:#5A4A42">Cette politique peut évoluer. En cas de changement majeur, vous serez notifié dans l'application.</p>
+
+    <div style="margin-top:24px;padding:16px;background:#FBF7F4;border-radius:12px;border:1px solid #F0E8E5">
+      <p style="font-size:12px;color:#8B6F5E;margin:0">Cette politique respecte le RGPD (Règlement UE 2016/679), la loi Informatique et Libertés (modifiée), et les recommandations de la CNIL.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ══ PAGE CONDITIONS GÉNÉRALES D'UTILISATION ══ -->
+<div id="sc-cgu" class="hidden">
+  <div class="topbar">
+    <button class="btn-back" onclick="history.length>1?history.back():go('welcome')">← Retour</button>
+    <div class="logo"><div class="logo-icon">SM</div>Skin<span>Match</span></div>
+  </div>
+  <div class="content" style="padding-bottom:90px">
+    <div class="step-lbl">📋 Conditions</div>
+    <h2 style="margin-bottom:6px">Conditions générales d'utilisation</h2>
+    <p class="sub">En vigueur depuis mai 2026</p>
+
+    <h3 style="margin-top:20px;font-family:Georgia,serif;font-size:18px;color:#3D2B1F">1. Objet</h3>
+    <p style="font-size:13px;line-height:1.7;color:#5A4A42">Les présentes CGU régissent l'utilisation de SkinMatch, application web de conseil skincare personnalisé. En créant un compte ou en utilisant le service, vous acceptez ces conditions sans réserve.</p>
+
+    <h3 style="margin-top:20px;font-family:Georgia,serif;font-size:18px;color:#3D2B1F">2. Accès au service</h3>
+    <p style="font-size:13px;line-height:1.7;color:#5A4A42">SkinMatch est accessible gratuitement. Certaines fonctionnalités avancées (scans illimités, suivi premium) peuvent nécessiter un abonnement payant. Les conditions tarifaires sont indiquées dans l'application.</p>
+
+    <h3 style="margin-top:20px;font-family:Georgia,serif;font-size:18px;color:#3D2B1F">3. Compte utilisateur</h3>
+    <p style="font-size:13px;line-height:1.7;color:#5A4A42">Vous êtes responsable de la confidentialité de votre mot de passe et de toute activité sur votre compte. Vous vous engagez à fournir des informations exactes.</p>
+
+    <h3 style="margin-top:20px;font-family:Georgia,serif;font-size:18px;color:#3D2B1F">4. Recommandations skincare — Avertissement médical</h3>
+    <div style="padding:14px;background:#FFF4E5;border-left:3px solid #D9822B;border-radius:8px;margin:10px 0">
+      <p style="font-size:13px;line-height:1.7;color:#5A4A42;margin:0"><strong>⚠️ Important :</strong> SkinMatch fournit des recommandations informatives basées sur un algorithme. <strong>Elles ne constituent en aucun cas un avis médical</strong> et ne remplacent pas la consultation d'un dermatologue ou d'un professionnel de santé.</p>
+      <p style="font-size:13px;line-height:1.7;color:#5A4A42;margin:8px 0 0">En cas de problème de peau persistant, sévère, ou de doute, <strong>consultez un médecin</strong>. SkinMatch n'est pas adapté pour traiter des pathologies cutanées (eczéma sévère, psoriasis, mélanome, etc.).</p>
+      <p style="font-size:13px;line-height:1.7;color:#5A4A42;margin:8px 0 0">Pendant la grossesse, l'allaitement, ou pour les adolescents, certains actifs (rétinol, acide salicylique fort) sont déconseillés. Demandez l'avis de votre médecin avant utilisation.</p>
+    </div>
+
+    <h3 style="margin-top:20px;font-family:Georgia,serif;font-size:18px;color:#3D2B1F">5. Responsabilité</h3>
+    <p style="font-size:13px;line-height:1.7;color:#5A4A42">SkinMatch ne saurait être tenu responsable :</p>
+    <ul style="font-size:13px;line-height:1.7;color:#5A4A42;padding-left:20px">
+      <li>Des réactions cutanées suite à l'utilisation de produits recommandés</li>
+      <li>Des interruptions de service pour maintenance ou cas de force majeure</li>
+      <li>Des pertes de données en cas de désinstallation ou problème technique</li>
+      <li>De l'utilisation détournée du service</li>
+    </ul>
+
+    <h3 style="margin-top:20px;font-family:Georgia,serif;font-size:18px;color:#3D2B1F">6. Propriété intellectuelle</h3>
+    <p style="font-size:13px;line-height:1.7;color:#5A4A42">Tous les contenus (textes, logo, code, algorithme) sont la propriété exclusive de SkinMatch. Toute reproduction non autorisée est interdite.</p>
+
+    <h3 style="margin-top:20px;font-family:Georgia,serif;font-size:18px;color:#3D2B1F">7. Liens d'affiliation</h3>
+    <p style="font-size:13px;line-height:1.7;color:#5A4A42">SkinMatch peut percevoir une commission sur les achats effectués via les liens de recommandation. Cela n'influence pas l'algorithme de recommandation, qui sélectionne les produits selon votre profil uniquement.</p>
+
+    <h3 style="margin-top:20px;font-family:Georgia,serif;font-size:18px;color:#3D2B1F">8. Comportement de l'utilisateur</h3>
+    <p style="font-size:13px;line-height:1.7;color:#5A4A42">Vous vous engagez à ne pas :</p>
+    <ul style="font-size:13px;line-height:1.7;color:#5A4A42;padding-left:20px">
+      <li>Détourner le service à des fins illicites</li>
+      <li>Tenter de contourner les mesures de sécurité</li>
+      <li>Publier des avis faux, diffamatoires ou injurieux</li>
+      <li>Spammer le service ou abuser des fonctions d'IA</li>
+    </ul>
+
+    <h3 style="margin-top:20px;font-family:Georgia,serif;font-size:18px;color:#3D2B1F">9. Résiliation</h3>
+    <p style="font-size:13px;line-height:1.7;color:#5A4A42">Vous pouvez supprimer votre compte à tout moment depuis les Paramètres. Nous nous réservons le droit de suspendre tout compte en cas de violation des CGU.</p>
+
+    <h3 style="margin-top:20px;font-family:Georgia,serif;font-size:18px;color:#3D2B1F">10. Droit applicable</h3>
+    <p style="font-size:13px;line-height:1.7;color:#5A4A42">Les présentes CGU sont régies par le droit français. Tout litige relève de la compétence des tribunaux français, après tentative de résolution amiable.</p>
+  </div>
+</div>
+
+<!-- ══ PAGE MENTIONS LÉGALES ══ -->
+<div id="sc-mentions" class="hidden">
+  <div class="topbar">
+    <button class="btn-back" onclick="history.length>1?history.back():go('welcome')">← Retour</button>
+    <div class="logo"><div class="logo-icon">SM</div>Skin<span>Match</span></div>
+  </div>
+  <div class="content" style="padding-bottom:90px">
+    <div class="step-lbl">ℹ️ Informations</div>
+    <h2 style="margin-bottom:6px">Mentions légales</h2>
+
+    <h3 style="margin-top:20px;font-family:Georgia,serif;font-size:18px;color:#3D2B1F">Éditeur</h3>
+    <p style="font-size:13px;line-height:1.7;color:#5A4A42"><strong>SkinMatch</strong><br>Application web de conseil skincare personnalisé<br>Contact : <a href="mailto:contact@skinmatch.app" style="color:#C4726A">contact@skinmatch.app</a></p>
+    <p style="font-size:12px;color:#8B6F5E;margin-top:8px;font-style:italic">Note : à compléter avec votre raison sociale, numéro SIREN, adresse, et nom du directeur de la publication selon l'article 6 III de la loi 2004-575.</p>
+
+    <h3 style="margin-top:20px;font-family:Georgia,serif;font-size:18px;color:#3D2B1F">Hébergeur</h3>
+    <p style="font-size:13px;line-height:1.7;color:#5A4A42"><strong>GitHub Pages</strong> (GitHub Inc., 88 Colin P Kelly Jr Street, San Francisco, CA 94107, USA)</p>
+    <p style="font-size:13px;line-height:1.7;color:#5A4A42">Services backend : <strong>Google Firebase</strong> (Google Ireland Ltd, Gordon House, Barrow Street, Dublin 4, Irlande)</p>
+
+    <h3 style="margin-top:20px;font-family:Georgia,serif;font-size:18px;color:#3D2B1F">Propriété intellectuelle</h3>
+    <p style="font-size:13px;line-height:1.7;color:#5A4A42">L'ensemble du site (textes, design, algorithme, logo « SkinMatch ») est protégé par le droit d'auteur. Toute reproduction est interdite sans autorisation écrite.</p>
+
+    <h3 style="margin-top:20px;font-family:Georgia,serif;font-size:18px;color:#3D2B1F">Crédits</h3>
+    <p style="font-size:13px;line-height:1.7;color:#5A4A42">Marques citées (CeraVe, La Roche-Posay, SkinCeuticals, etc.) : propriété de leurs détenteurs respectifs.<br>Données météo : Open-Meteo (open-meteo.com).<br>Authentification : Firebase Auth.</p>
+
+    <h3 style="margin-top:20px;font-family:Georgia,serif;font-size:18px;color:#3D2B1F">Médiation à la consommation</h3>
+    <p style="font-size:13px;line-height:1.7;color:#5A4A42">En cas de litige non résolu à l'amiable, vous pouvez recourir gratuitement à un médiateur de la consommation, conformément à l'article L612-1 du Code de la consommation.</p>
+
+    <h3 style="margin-top:20px;font-family:Georgia,serif;font-size:18px;color:#3D2B1F">Signaler un contenu</h3>
+    <p style="font-size:13px;line-height:1.7;color:#5A4A42">Pour signaler un contenu illicite (article 6 de la LCEN) : <a href="mailto:contact@skinmatch.app" style="color:#C4726A">contact@skinmatch.app</a></p>
   </div>
 </div>
 
@@ -2186,7 +2321,7 @@ function getRegionProducts() {
   return available;
 }
 
-const SCREENS=["lang","welcome","register","login","scan","q1","diag","q2","q3","q4","q5","result","compare","suivi","dashboard","scan-product","profile","articles","settings"];
+const SCREENS=["lang","welcome","register","login","scan","q1","diag","q2","q3","q4","q5","result","compare","suivi","dashboard","scan-product","profile","articles","settings","privacy","cgu","mentions"];
 
 const ST={
   screen:'lang',user:null,
@@ -3579,6 +3714,16 @@ function renderResult(){
       <div class="rsub">${ST.ageGroup?ST.ageGroup+(LANG==='fr'?' ans · ':' · '):''}${t('budget_total')} <strong>~${Math.round(r.totalPrix)}€</strong></div>
     </div>
     <div class="intro"><p class="intro-txt">${r.intro}</p></div>
+    <div style="background:#FFF4E5;border-left:3px solid #D9822B;border-radius:8px;padding:12px 14px;margin:0 0 14px;display:flex;gap:10px;align-items:flex-start">
+      <span style="font-size:18px;flex-shrink:0">⚕️</span>
+      <div style="font-size:11px;color:#5A4A42;line-height:1.5">
+        <strong style="color:#3D2B1F">${isEN?'Informational only':'Information uniquement'}</strong> — 
+        ${isEN
+          ? 'These recommendations do not replace a dermatologist’s advice. For persistent or severe skin issues, pregnancy, or for minors, consult a healthcare professional.'
+          : 'Ces recommandations ne remplacent pas l’avis d’un dermatologue. En cas de problème persistant ou sévère, pendant la grossesse, ou pour les mineurs, consulte un professionnel de santé.'}
+        <a href="javascript:void(0)" onclick="go('cgu')" style="color:#C4726A;font-weight:600">${isEN?'Read more':'En savoir plus'}</a>
+      </div>
+    </div>
     <button class="share-btn" onclick="toggleShare()">
       <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92 1.61 0 2.92-1.31 2.92-2.92s-1.31-2.92-2.92-2.92z"/></svg>
       ${t('share_btn')}
@@ -4096,9 +4241,9 @@ function toggleStartBtn() {
 function startDiagnostic() {
   var cb = document.getElementById('accept-terms');
   if (!cb || !cb.checked) {
-    alert(LANG === 'en' 
+    showToast(LANG === 'en' 
       ? 'Please accept the Terms of Use and Privacy Policy to continue.' 
-      : 'Veuillez accepter les Conditions d\'utilisation et la Politique de confidentialité pour continuer.');
+      : 'Veuillez accepter les Conditions d\'utilisation et la Politique de confidentialité pour continuer.', {type:'warning', duration:4000});
     return;
   }
   ST.user = {name:'', email:''};
@@ -4437,11 +4582,106 @@ function startBarcodeCamera() {
   }
 }
 
+// ── Système de toasts global (remplace alert) ──
+function showToast(message, options) {
+  options = options || {};
+  var type = options.type || 'info'; // info | success | error | warning
+  var duration = options.duration || 3000;
+  // Supprimer toast existant
+  var existing = document.getElementById('global-toast');
+  if (existing) existing.remove();
+  var colors = {
+    info:    { bg:'#3D2B1F', icon:'💬' },
+    success: { bg:'#2E7D32', icon:'✓' },
+    error:   { bg:'#C9302C', icon:'⚠' },
+    warning: { bg:'#D9822B', icon:'⚠' }
+  };
+  var c = colors[type] || colors.info;
+  var t = document.createElement('div');
+  t.id = 'global-toast';
+  t.style.cssText = 'position:fixed;top:24px;left:50%;transform:translateX(-50%) translateY(-20px);background:'+c.bg+';color:#fff;padding:12px 20px;border-radius:50px;font-size:13px;font-weight:600;z-index:100000;box-shadow:0 6px 24px rgba(0,0,0,.25);font-family:inherit;display:flex;align-items:center;gap:8px;max-width:90%;opacity:0;transition:opacity .25s ease, transform .25s ease';
+  t.innerHTML = '<span>'+c.icon+'</span><span>'+message+'</span>';
+  document.body.appendChild(t);
+  requestAnimationFrame(function(){
+    t.style.opacity = '1';
+    t.style.transform = 'translateX(-50%) translateY(0)';
+  });
+  setTimeout(function(){
+    t.style.opacity = '0';
+    t.style.transform = 'translateX(-50%) translateY(-20px)';
+    setTimeout(function(){ if(t.parentNode) t.remove(); }, 250);
+  }, duration);
+}
+
+// ── Confirmation native modale (remplace confirm) ──
+function showConfirm(message, onConfirm, options) {
+  options = options || {};
+  var isEN = (typeof LANG !== 'undefined' && LANG === 'en');
+  var okLabel = options.okLabel || (isEN ? 'Confirm' : 'Confirmer');
+  var cancelLabel = options.cancelLabel || (isEN ? 'Cancel' : 'Annuler');
+  var danger = options.danger === true;
+  var ov = document.createElement('div');
+  ov.style.cssText = 'position:fixed;inset:0;background:rgba(61,43,31,.7);z-index:99998;display:flex;align-items:center;justify-content:center;padding:24px';
+  var box = document.createElement('div');
+  box.style.cssText = 'background:#fff;border-radius:20px;padding:24px;max-width:340px;width:100%;text-align:center;box-shadow:0 16px 48px rgba(0,0,0,.3)';
+  box.innerHTML = '<div style="font-size:14px;color:#3D2B1F;line-height:1.5;margin-bottom:20px;font-family:inherit">'+message+'</div>';
+  var btnRow = document.createElement('div');
+  btnRow.style.cssText = 'display:flex;gap:10px';
+  var bCancel = document.createElement('button');
+  bCancel.textContent = cancelLabel;
+  bCancel.style.cssText = 'flex:1;padding:11px;border-radius:50px;border:1.5px solid #E8E0DC;background:#fff;color:#3D2B1F;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit';
+  bCancel.onclick = function(){ ov.remove(); };
+  var bOk = document.createElement('button');
+  bOk.textContent = okLabel;
+  bOk.style.cssText = 'flex:1;padding:11px;border-radius:50px;border:none;background:'+(danger?'#C9302C':'#C4726A')+';color:#fff;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit';
+  bOk.onclick = function(){ ov.remove(); if (typeof onConfirm === 'function') onConfirm(); };
+  btnRow.appendChild(bCancel); btnRow.appendChild(bOk);
+  box.appendChild(btnRow);
+  ov.appendChild(box);
+  document.body.appendChild(ov);
+}
+
 function stopBarcodeCamera() {
   if (window._html5Scanner) {
     try { window._html5Scanner.stop().catch(function(){}); } catch(e) {}
     window._html5Scanner = null;
   }
+}
+
+// Basculer entre caméra avant et arrière
+function flipBarcodeCamera() {
+  var isEN = LANG === 'en';
+  if (!window._html5Scanner || !Html5Qrcode.getCameras) {
+    showToast(isEN ? 'Camera switch unavailable' : 'Bascule caméra indisponible');
+    return;
+  }
+  // Toggle entre user (front) et environment (back)
+  window._currentFacing = (window._currentFacing === 'user') ? 'environment' : 'user';
+  var newFacing = window._currentFacing;
+  try {
+    window._html5Scanner.stop().then(function() {
+      window._html5Scanner = new Html5Qrcode("reader");
+      window._html5Scanner.start(
+        { facingMode: newFacing },
+        {
+          fps: 10,
+          qrbox: function(w, h) { return { width: Math.min(260, w*0.8), height: Math.min(110, h*0.4) }; },
+          aspectRatio: 1.2,
+          formatsToSupport: [
+            Html5QrcodeSupportedFormats.EAN_13, Html5QrcodeSupportedFormats.EAN_8,
+            Html5QrcodeSupportedFormats.UPC_A, Html5QrcodeSupportedFormats.UPC_E,
+            Html5QrcodeSupportedFormats.CODE_128, Html5QrcodeSupportedFormats.CODE_39
+          ]
+        },
+        function(code) { onBarcodeDetected(code); },
+        function() {}
+      ).catch(function(err) {
+        // Fallback : si la caméra avant n'existe pas, revenir à l'arrière
+        window._currentFacing = 'environment';
+        showToast(isEN ? 'Could not switch camera' : 'Impossible de changer de caméra');
+      });
+    }).catch(function(){});
+  } catch(e) {}
 }
 
 
@@ -4785,12 +5025,12 @@ function scanBarcodeFromFile(input) {
         if (codes && codes.length > 0) {
           onBarcodeDetected(codes[0].rawValue);
         } else {
-          alert("Aucun code-barres détecté dans cette image.");
+          showToast("Aucun code-barres détecté dans cette image.", {type:"warning"});
         }
       });
     } else {
       URL.revokeObjectURL(url);
-      alert("BarcodeDetector non disponible sur cet appareil.");
+      showToast("BarcodeDetector non disponible sur cet appareil.", {type:"error"});
     }
   };
   img.src = url;
@@ -5882,7 +6122,7 @@ function renderSuivi() {
     saveBtn.textContent = weekEntry ? "Modifier la note" : "Enregistrer la semaine " + currentWeek;
     saveBtn.onclick = function() {
         if (selectedRating === 0) {
-            alert("Choisissez une note de 1 a 5 etoiles.");
+            showToast("Choisissez une note de 1 à 5 étoiles.", {type:"warning"});
             return;
         }
         var d = getSuiviData();
@@ -6884,26 +7124,66 @@ function doReset(){
 
 // ══ FIREBASE AUTH FUNCTIONS ══
 
+// ── Validation mot de passe forte ──
+function validatePasswordStrength(pw) {
+  var isEN = LANG === 'en';
+  if (!pw || pw.length < 8) {
+    return isEN ? 'Password must be at least 8 characters.' : 'Le mot de passe doit faire au moins 8 caractères.';
+  }
+  if (!/[A-Z]/.test(pw)) {
+    return isEN ? 'Password must contain at least one uppercase letter.' : 'Le mot de passe doit contenir au moins une majuscule.';
+  }
+  if (!/[0-9]/.test(pw)) {
+    return isEN ? 'Password must contain at least one number.' : 'Le mot de passe doit contenir au moins un chiffre.';
+  }
+  return null; // OK
+}
+
+function validateEmailFormat(email) {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+}
+
 async function doRegister() {
-  if (!window._firebaseReady) { alert("Firebase pas encore chargé, réessaie dans 1s."); return; }
+  if (!window._firebaseReady) { showToast("Service indisponible, réessaie dans 1s.", {type:"error"}); return; }
   var name = document.getElementById('inp-name').value.trim();
   var email = document.getElementById('inp-email-r').value.trim();
   var pw = document.getElementById('inp-pw-r').value;
   var errEl = document.getElementById('err-r');
+  var isEN = LANG === 'en';
   errEl.classList.add('hidden');
-  if (!name) { errEl.textContent = "Veuillez entrer votre prénom."; errEl.classList.remove('hidden'); return; }
-  if (!email) { errEl.textContent = "Veuillez entrer votre email."; errEl.classList.remove('hidden'); return; }
-  if (pw.length < 6) { errEl.textContent = "Le mot de passe doit faire au moins 6 caractères."; errEl.classList.remove('hidden'); return; }
+  if (!name) { errEl.textContent = isEN ? "Please enter your first name." : "Veuillez entrer votre prénom."; errEl.classList.remove('hidden'); return; }
+  if (!email || !validateEmailFormat(email)) { errEl.textContent = isEN ? "Please enter a valid email." : "Veuillez entrer un email valide."; errEl.classList.remove('hidden'); return; }
+  var pwErr = validatePasswordStrength(pw);
+  if (pwErr) { errEl.textContent = pwErr; errEl.classList.remove('hidden'); return; }
+  // Vérifier le consentement RGPD si la case est présente
+  var consentCb = document.getElementById('inp-consent-r');
+  if (consentCb && !consentCb.checked) {
+    errEl.textContent = isEN ? "Please accept the Privacy Policy and Terms to continue." : "Veuillez accepter la Politique de confidentialité et les CGU.";
+    errEl.classList.remove('hidden');
+    return;
+  }
   try {
     var cred = await window._createUserWithEmailAndPassword(window._auth, email, pw);
     await window._updateProfile(cred.user, { displayName: name });
     await window._setDoc(window._doc(window._db, 'users', cred.user.uid), {
-      name: name, email: email, createdAt: new Date().toISOString(), skinProfile: null, lastRoutine: null
+      name: name, email: email, createdAt: new Date().toISOString(),
+      skinProfile: null, lastRoutine: null,
+      // Conformité RGPD : on garde une trace du consentement
+      consentVersion: '1.0',
+      consentAcceptedAt: new Date().toISOString(),
+      cguAcceptedAt: new Date().toISOString()
     });
+    // Envoi de l'email de vérification
+    try {
+      await window._sendEmailVerification(cred.user);
+      showToast(isEN ? 'Account created! Check your email to verify.' : 'Compte créé ! Vérifie ton email pour confirmer.', {type:'success', duration:5000});
+    } catch(verifErr) {
+      // Email verification échouée mais compte créé : on continue quand même
+      console.warn('Email verification not sent:', verifErr);
+    }
     window._currentUser = cred.user;
     go('welcome');
   } catch(e) {
-    var isEN = LANG === 'en';
     var msg = e.code === 'auth/email-already-in-use' ? (isEN ? 'This email is already in use.' : 'Cet email est déjà utilisé.') :
               e.code === 'auth/invalid-email' ? (isEN ? 'Invalid email.' : 'Email invalide.') :
               e.code === 'auth/weak-password' ? (isEN ? 'Password too weak.' : 'Mot de passe trop faible.') : (isEN ? 'Error: ' : 'Erreur : ') + e.message;
@@ -6911,8 +7191,49 @@ async function doRegister() {
   }
 }
 
+// ── Mot de passe oublié ──
+async function doForgotPassword() {
+  if (!window._firebaseReady) { showToast("Service indisponible, réessaie dans 1s.", {type:"error"}); return; }
+  var isEN = LANG === 'en';
+  // Récupérer l'email depuis le champ login si présent
+  var emailField = document.getElementById('inp-email-l');
+  var prefilledEmail = emailField ? emailField.value.trim() : '';
+  // Demander l'email à l'utilisateur via prompt natif (mais simple pour l'instant)
+  var email = prompt(isEN ? 'Enter your email to receive a reset link:' : 'Entre ton email pour recevoir un lien de réinitialisation :', prefilledEmail);
+  if (!email) return;
+  email = email.trim();
+  if (!validateEmailFormat(email)) {
+    showToast(isEN ? 'Invalid email.' : 'Email invalide.', {type:'error'});
+    return;
+  }
+  try {
+    await window._sendPasswordResetEmail(window._auth, email);
+    showToast(isEN ? 'Reset link sent! Check your inbox.' : 'Lien envoyé ! Vérifie ta boîte mail.', {type:'success', duration:5000});
+  } catch(e) {
+    var msg = e.code === 'auth/user-not-found' ? (isEN ? 'No account found for this email.' : 'Aucun compte trouvé pour cet email.') :
+              e.code === 'auth/invalid-email' ? (isEN ? 'Invalid email.' : 'Email invalide.') :
+              e.code === 'auth/too-many-requests' ? (isEN ? 'Too many attempts. Try again later.' : 'Trop de tentatives. Réessaie plus tard.') : (isEN ? 'Error: ' : 'Erreur : ') + e.message;
+    showToast(msg, {type:'error'});
+  }
+}
+
+// ── Renvoyer email de vérification ──
+async function resendEmailVerification() {
+  var isEN = LANG === 'en';
+  if (!window._currentUser) {
+    showToast(isEN ? 'You must be logged in.' : 'Tu dois être connecté.', {type:'error'});
+    return;
+  }
+  try {
+    await window._sendEmailVerification(window._currentUser);
+    showToast(isEN ? 'Verification email sent!' : 'Email de vérification envoyé !', {type:'success'});
+  } catch(e) {
+    showToast(isEN ? 'Error sending verification.' : 'Erreur d\'envoi.', {type:'error'});
+  }
+}
+
 async function doLogin() {
-  if (!window._firebaseReady) { alert("Firebase pas encore chargé, réessaie dans 1s."); return; }
+  if (!window._firebaseReady) { showToast("Service indisponible, réessaie dans 1s.", {type:"error"}); return; }
   var email = document.getElementById('inp-email-l').value.trim();
   var pw = document.getElementById('inp-pw-l').value;
   var errEl = document.getElementById('err-l');
@@ -6933,7 +7254,7 @@ async function doLogin() {
 }
 
 async function doGoogleLogin() {
-  if (!window._firebaseReady) { alert("Firebase pas encore chargé, réessaie dans 1s."); return; }
+  if (!window._firebaseReady) { showToast("Service indisponible, réessaie dans 1s.", {type:"error"}); return; }
   try {
     var result = await window._signInWithPopup(window._auth, window._googleProvider);
     var user = result.user;
@@ -6957,6 +7278,85 @@ async function doLogout() {
   var cb=document.getElementById("auth-connected-badge"); if(cb) cb.style.display="none";
   go('welcome');
 }
+
+// ── SUPPRESSION DE COMPTE (RGPD — Droit à l'oubli) ──
+// Supprime totalement le compte utilisateur + toutes ses données Firestore.
+function deleteMyAccount() {
+  var isEN = LANG === 'en';
+  if (!window._currentUser) {
+    showToast(isEN ? 'You must be logged in.' : 'Tu dois être connecté.', {type:'error'});
+    return;
+  }
+  // Confirmation en 2 étapes pour éviter les suppressions accidentelles
+  showConfirm(
+    isEN
+      ? '<strong>Delete your account?</strong><br><br>This will permanently delete:<br>• Your profile and routine<br>• Your photo journal<br>• Your streaks and badges<br>• Your reviews<br><br>This action <strong>cannot be undone</strong>.'
+      : '<strong>Supprimer ton compte ?</strong><br><br>Cela supprimera définitivement :<br>• Ton profil et ta routine<br>• Ton journal photo<br>• Tes séries et badges<br>• Tes avis<br><br>Cette action est <strong>irréversible</strong>.',
+    function() { _confirmAccountDeletion(); },
+    { okLabel: isEN ? 'Yes, delete' : 'Oui, supprimer', danger: true }
+  );
+}
+
+async function _confirmAccountDeletion() {
+  var isEN = LANG === 'en';
+  var user = window._currentUser;
+  if (!user) return;
+  
+  // Demander mot de passe pour ré-authentification (sécurité Firebase exige)
+  var providers = (user.providerData || []).map(function(p){ return p.providerId; });
+  var hasPassword = providers.indexOf('password') !== -1;
+  
+  if (hasPassword) {
+    var pw = prompt(isEN ? 'For security, please re-enter your password:' : 'Pour ta sécurité, retape ton mot de passe :');
+    if (!pw) return;
+    try {
+      var credential = window._EmailAuthProvider.credential(user.email, pw);
+      await window._reauthenticateWithCredential(user, credential);
+    } catch(e) {
+      showToast(isEN ? 'Incorrect password.' : 'Mot de passe incorrect.', {type:'error'});
+      return;
+    }
+  }
+  
+  try {
+    // 1) Supprimer le document Firestore et toutes les sous-collections connues
+    var uid = user.uid;
+    try { await window._deleteDoc(window._doc(window._db, 'users', uid)); } catch(e){}
+    try { await window._deleteDoc(window._doc(window._db, 'routines', uid)); } catch(e){}
+    try { await window._deleteDoc(window._doc(window._db, 'feedbacks', uid)); } catch(e){}
+    
+    // 2) Nettoyer le stockage local
+    try {
+      Object.keys(localStorage).forEach(function(k){
+        if (k.indexOf('skinmatch') === 0 || k.indexOf('sm_') === 0) localStorage.removeItem(k);
+      });
+    } catch(e){}
+    
+    // 3) Supprimer le compte Firebase Auth
+    await window._deleteUser(user);
+    
+    // 4) Reset état local
+    window._currentUser = null;
+    window._userProfile = null;
+    window._savedRoutine = null;
+    if (typeof ST !== 'undefined') {
+      ST.result = null;
+      ST.skinType = null;
+      ST.ageGroup = null;
+      ST.concerns = [];
+      ST.allergies = [];
+    }
+    
+    showToast(isEN ? 'Account deleted. Goodbye!' : 'Compte supprimé. À bientôt !', {type:'success', duration:4000});
+    setTimeout(function(){ go('welcome'); }, 1500);
+  } catch(e) {
+    var msg = e.code === 'auth/requires-recent-login' 
+      ? (isEN ? 'Please log out and log back in, then retry.' : 'Reconnecte-toi puis réessaie.')
+      : (isEN ? 'Error: ' : 'Erreur : ') + (e.message || e);
+    showToast(msg, {type:'error', duration:5000});
+  }
+}
+
 async function saveAndConfirm() {
   if (!window._currentUser) { _showLoginRequired('save'); return; }
   var btn = document.getElementById('btn-save-routine');
@@ -7258,7 +7658,19 @@ function renderSettings() {
       title: isEN ? '👤 Account' : '👤 Compte',
       items: [
         { label: isEN ? 'Email' : 'Email', value: window._currentUser ? window._currentUser.email : '-' },
+        { label: isEN ? 'Verify my email' : 'Vérifier mon email', value: window._currentUser && !window._currentUser.emailVerified ? (isEN?'Pending':'En attente') : (isEN?'Verified':'Vérifié'), action: window._currentUser && !window._currentUser.emailVerified ? 'resendEmailVerification()' : null },
+        { label: isEN ? 'Change password' : 'Changer mon mot de passe', value: '', action: 'doForgotPassword()' },
         { label: isEN ? 'Logout' : 'Se déconnecter', value: '', action: 'doLogout()', danger: true },
+        { label: isEN ? 'Delete my account' : 'Supprimer mon compte', value: '', action: 'deleteMyAccount()', danger: true },
+      ]
+    },
+    {
+      title: isEN ? '📜 Legal' : '📜 Mentions légales',
+      items: [
+        { label: isEN ? 'Privacy Policy' : 'Politique de confidentialité', value: '', action: "go('privacy')" },
+        { label: isEN ? 'Terms of Use' : "Conditions d'utilisation", value: '', action: "go('cgu')" },
+        { label: isEN ? 'Legal notice' : 'Mentions légales', value: '', action: "go('mentions')" },
+        { label: isEN ? 'Cookie preferences' : 'Préférences cookies', value: '', action: "localStorage.removeItem('sm_cookie_consent'); showCookieBanner();" },
       ]
     },
     {
@@ -7266,7 +7678,6 @@ function renderSettings() {
       items: [
         { label: isEN ? 'Reset skin data' : 'Réinitialiser mes données peau', value: '', action: 'resetAllData()', danger: true },
         { label: isEN ? 'Version' : 'Version', value: 'SkinMatch v1.0' },
-        { label: isEN ? 'CGU' : 'CGU', value: '', action: "go('cgu')" },
       ]
     },
   ];
@@ -7361,11 +7772,11 @@ function reloadSavedRoutine() {
 // ══ NOTIFICATIONS ══
 function toggleNotifications() {
   if (!("Notification" in window)) {
-    alert(LANG==="en" ? "Notifications not supported." : "Notifications non supportees sur ce navigateur.");
+    showToast(LANG==="en" ? "Notifications not supported." : "Notifications non supportées sur ce navigateur.", {type:"error"});
     return;
   }
   if (Notification.permission === "granted") {
-    alert(LANG==="en" ? "To disable: Safari Settings > Notifications." : "Pour desactiver : Reglages Safari > Notifications.");
+    showToast(LANG==="en" ? "To disable: Safari Settings > Notifications." : "Pour désactiver : Réglages Safari > Notifications.", {type:"info", duration:5000});
     return;
   }
   requestNotifPermission();
@@ -8120,7 +8531,7 @@ function _savePhoto(dataUrl) {
   try {
     localStorage.setItem('skinmatch_photos', JSON.stringify(photos));
   } catch(e) {
-    alert('Stockage plein. Supprime quelques photos.');
+    showToast('Stockage plein. Supprime quelques photos.', {type:'warning'});
     return;
   }
   // Recharger la modale
@@ -9038,6 +9449,59 @@ function _showWeatherToast(msg) {
 // Lancer la météo après le chargement
 window.addEventListener('load', function() {
   setTimeout(fetchWeatherAndNotify, 4000);
+});
+
+// ── BANNIÈRE CONSENTEMENT COOKIES (RGPD/CNIL) ──
+// La CNIL impose : refus aussi simple que l'acceptation, infos claires sur l'usage,
+// pas de consentement par défaut. On stocke le choix pour ne pas redemander.
+function showCookieBanner() {
+  if (localStorage.getItem('sm_cookie_consent')) return; // déjà choisi
+  var isEN = (typeof LANG !== 'undefined' && LANG === 'en');
+  var banner = document.createElement('div');
+  banner.id = 'cookie-banner';
+  banner.style.cssText = 'position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:2px solid #C4726A;box-shadow:0 -8px 24px rgba(0,0,0,.15);padding:18px 20px;z-index:99996;font-family:inherit';
+  banner.innerHTML =
+    '<div style="max-width:520px;margin:0 auto">' +
+      '<div style="display:flex;align-items:flex-start;gap:10px;margin-bottom:12px">' +
+        '<span style="font-size:24px">🍪</span>' +
+        '<div style="flex:1">' +
+          '<div style="font-weight:700;font-size:14px;color:#3D2B1F;margin-bottom:4px">' + (isEN ? 'Cookies & privacy' : 'Cookies et confidentialité') + '</div>' +
+          '<div style="font-size:12px;color:#5A4A42;line-height:1.5">' +
+            (isEN
+              ? 'We use only essential cookies for the app to work and to remember your routine. No tracking, no advertising. '
+              : 'Nous utilisons uniquement des cookies techniques nécessaires au fonctionnement de l\'app et à la sauvegarde de ta routine. Aucun pistage, aucune publicité. ') +
+            '<a href="javascript:void(0)" onclick="go(\'privacy\')" style="color:#C4726A;text-decoration:underline">' + (isEN ? 'Learn more' : 'En savoir plus') + '</a>' +
+          '</div>' +
+        '</div>' +
+      '</div>' +
+      '<div style="display:flex;gap:10px">' +
+        '<button onclick="cookieChoice(\'refuse\')" style="flex:1;padding:11px;border-radius:50px;border:1.5px solid #C4726A;background:#fff;color:#C4726A;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit">' + (isEN ? 'Refuse non-essential' : 'Refuser non-essentiels') + '</button>' +
+        '<button onclick="cookieChoice(\'accept\')" style="flex:1;padding:11px;border-radius:50px;border:none;background:#C4726A;color:#fff;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">' + (isEN ? 'Accept all' : 'Tout accepter') + '</button>' +
+      '</div>' +
+    '</div>';
+  document.body.appendChild(banner);
+}
+
+function cookieChoice(choice) {
+  try {
+    localStorage.setItem('sm_cookie_consent', JSON.stringify({
+      choice: choice,
+      date: new Date().toISOString(),
+      version: '1.0'
+    }));
+  } catch(e) {}
+  var b = document.getElementById('cookie-banner');
+  if (b) {
+    b.style.transition = 'opacity .3s, transform .3s';
+    b.style.opacity = '0';
+    b.style.transform = 'translateY(20px)';
+    setTimeout(function(){ if (b.parentNode) b.remove(); }, 300);
+  }
+}
+
+window.addEventListener('load', function() {
+  // Délai léger pour ne pas concurrencer le chargement initial
+  setTimeout(showCookieBanner, 1500);
 });
 
 </script>
