@@ -186,8 +186,8 @@ body > div[id^="sc-"]:not(.hidden){
 }
 
 /* NAV */
-.topbar{display:flex;align-items:center;justify-content:space-between;padding:20px 14px 0;gap:8px;flex-wrap:nowrap;position:relative}
-.topbar .logo{font-size:20px;min-width:0;flex-shrink:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;position:absolute;left:50%;transform:translateX(-50%);justify-content:center}
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:20px 14px 0;gap:8px;flex-wrap:nowrap}
+.topbar .logo{font-size:20px;min-width:0;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;justify-content:center;text-align:center}
 .logo .logo-icon{display:none!important}
 .logo{font-weight:800!important}
 .topbar .btn-back{flex-shrink:0;padding:8px 14px;font-size:12px}
@@ -195,7 +195,6 @@ body > div[id^="sc-"]:not(.hidden){
 @media (max-width:380px){
   .topbar{padding:18px 10px 0;gap:6px}
   .topbar .logo{font-size:17px;gap:6px}
-  .topbar .logo-icon{width:28px;height:28px;font-size:11px}
   .topbar .btn-back{padding:7px 11px;font-size:11px}
   .topbar #btn-compare-top{padding:5px 9px;font-size:10px}
 }
@@ -605,8 +604,8 @@ h2{font-family:var(--serif);font-size:20px;font-weight:700;margin-bottom:3px}
     </div>
 
     <!-- 3bis. BOUTON DIAGNOSTIC (mis en avant, au-dessus des avis) -->
-    <button onclick="showTermsModal()" id="btn-start-top" style="width:100%;padding:14px 20px;border-radius:50px;border:2px solid #C4726A;background:#fff;color:#C4726A;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;margin-bottom:22px;display:flex;align-items:center;justify-content:center;gap:8px">
-      <span style="font-size:16px">&#10024;</span><span id="btn-start-top-text">Faire le diagnostic sans compte</span> &#8594;
+    <button onclick="showTermsModal()" id="btn-start-top" style="width:100%;box-sizing:border-box;padding:14px 20px;border-radius:50px;border:2px solid #C4726A;background:#fff;color:#C4726A;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;margin-bottom:22px;display:flex;align-items:center;justify-content:center;gap:8px">
+      <span id="btn-start-top-text">Faire le diagnostic sans compte</span> &#8594;
     </button>
 
     <!-- 3. AVIS / TÉMOIGNAGES -->
@@ -1122,7 +1121,7 @@ h2{font-family:var(--serif);font-size:20px;font-weight:700;margin-bottom:3px}
 <!-- ══ DASHBOARD ══ -->
 <div id="sc-dashboard" class="hidden">
   <div class="topbar">
-    <button class="btn-back" onclick="go('result')">← Retour</button>
+    <button class="btn-back" onclick="go('welcome')">← Retour</button>
     <div class="logo"><div class="logo-icon">SM</div>Skin<span>Match</span></div>
   </div>
   <div class="content">
