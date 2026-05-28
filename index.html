@@ -1330,9 +1330,9 @@ h2{font-family:var(--serif);font-size:20px;font-weight:700;margin-bottom:3px}
       <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
       <span style="font-size:10px;font-weight:600" id="nav-home-lbl">Accueil</span>
     </button>
-    <button onclick="navTo('result')" id="nav-routine" class="nav-btn" style="flex:1;background:none;border:none;cursor:pointer;padding:6px 4px;display:flex;flex-direction:column;align-items:center;gap:3px;font-family:'Outfit',sans-serif">
-      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a10 10 0 1 0 0 20A10 10 0 0 0 12 2z"/><path d="M12 6v6l4 2"/></svg>
-      <span style="font-size:10px;font-weight:600" id="nav-routine-lbl">Routine</span>
+    <button onclick="navTo('settings')" id="nav-settings" class="nav-btn" style="flex:1;background:none;border:none;cursor:pointer;padding:6px 4px;display:flex;flex-direction:column;align-items:center;gap:3px;font-family:'Outfit',sans-serif">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+      <span style="font-size:10px;font-weight:600" id="nav-settings-lbl">Réglages</span>
     </button>
     <button onclick="navTo('scan-product')" id="nav-scan" class="nav-btn" style="flex:1;background:none;border:none;cursor:pointer;padding:6px 4px;display:flex;flex-direction:column;align-items:center;gap:3px;font-family:'Outfit',sans-serif">
       <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="5" height="5"/><rect x="16" y="3" width="5" height="5"/><rect x="3" y="16" width="5" height="5"/><path d="M21 16h-3a2 2 0 0 0-2 2v3"/><path d="M21 21v.01"/><path d="M12 7v3a2 2 0 0 1-2 2H7"/><path d="M3 12h.01"/><path d="M12 3h.01"/><path d="M12 16v.01"/><path d="M16 12h1"/><path d="M21 12v.01"/><path d="M12 21v-1"/></svg>
@@ -2327,7 +2327,7 @@ function go(screen){
     setTimeout(function(){ startBarcodeCamera(); }, 100);
   }
   // Afficher/cacher la nav
-  var navScreens = ['welcome','result','scan-product','articles','dashboard','profile'];
+  var navScreens = ['welcome','settings','scan-product','articles','dashboard','profile'];
   var nav = document.getElementById('bottom-nav');
   if (nav) nav.style.display = navScreens.indexOf(screen) !== -1 ? 'block' : 'none';
   // Activer le bon onglet
@@ -6386,11 +6386,12 @@ function renderDashboard() {
       "<button onclick='openSettings()' style='background:var(--surf);border:1px solid var(--bdr);border-radius:50%;width:38px;height:38px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:18px;flex-shrink:0'>⚙️</button>";
     wrap.appendChild(headerEl);
 
-    // ── ONGLETS (Suivi / Motivation / Conseils) ──
-    if (typeof window._espaceTab === "undefined") window._espaceTab = "suivi";
+    // ── ONGLETS (Routine / Suivi / Motivation / Conseils) ──
+    if (typeof window._espaceTab === "undefined") window._espaceTab = "routine";
     var tabsEl = document.createElement("div");
-    tabsEl.style.cssText = "display:flex;gap:6px;margin-bottom:18px";
+    tabsEl.style.cssText = "display:flex;gap:5px;margin-bottom:18px";
     var _tabDefs = [
+      { id:"routine", label: isEN?"Routine":"Routine" },
       { id:"suivi", label: isEN?"Tracking":"Suivi" },
       { id:"motiv", label: isEN?"Motivation":"Motivation" },
       { id:"conseils", label: isEN?"Tips":"Conseils" }
@@ -6398,7 +6399,7 @@ function renderDashboard() {
     _tabDefs.forEach(function(td){
       var b = document.createElement("button");
       var active = window._espaceTab === td.id;
-      b.style.cssText = "flex:1;text-align:center;padding:10px 4px;border-radius:50px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;border:none;transition:all .2s;" +
+      b.style.cssText = "flex:1;text-align:center;padding:10px 2px;border-radius:50px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;border:none;transition:all .2s;white-space:nowrap;" +
         (active
           ? "background:linear-gradient(135deg,#C4726A,#A85A52);color:#fff;box-shadow:0 4px 10px rgba(196,114,106,.25)"
           : "background:transparent;color:var(--mut)");
@@ -6408,19 +6409,63 @@ function renderDashboard() {
     });
     wrap.appendChild(tabsEl);
 
-    // 3 conteneurs d'onglets — chaque section s'ajoute dans le bon
+    // 4 conteneurs d'onglets — chaque section s'ajoute dans le bon
+    var tabRoutine = document.createElement("div");
     var tabSuivi = document.createElement("div");
     var tabMotiv = document.createElement("div");
     var tabConseils = document.createElement("div");
+    tabRoutine.id = "espace-tab-routine";
     tabSuivi.id = "espace-tab-suivi";
     tabMotiv.id = "espace-tab-motiv";
     tabConseils.id = "espace-tab-conseils";
+    tabRoutine.style.display  = (window._espaceTab === "routine")  ? "block" : "none";
     tabSuivi.style.display    = (window._espaceTab === "suivi")    ? "block" : "none";
     tabMotiv.style.display    = (window._espaceTab === "motiv")    ? "block" : "none";
     tabConseils.style.display = (window._espaceTab === "conseils") ? "block" : "none";
+    wrap.appendChild(tabRoutine);
     wrap.appendChild(tabSuivi);
     wrap.appendChild(tabMotiv);
     wrap.appendChild(tabConseils);
+
+    // ════════════ ONGLET ROUTINE ════════════
+    if (ST.result && ST.result.steps && ST.result.steps.length > 0) {
+      var _amSteps = ST.result.steps.filter(function(s){ return s.moment === "AM" || s.moment === "AM+PM"; });
+      var _pmSteps = ST.result.steps.filter(function(s){ return s.moment === "PM" || s.moment === "AM+PM"; });
+
+      function _buildRoutineCard(title, emoji, steps) {
+        if (!steps.length) return "";
+        var rows = steps.map(function(s, i){
+          return "<div style='padding:12px 16px;border-bottom:1px solid var(--bdr);display:flex;align-items:center;gap:10px'>" +
+            "<div style='width:26px;height:26px;border-radius:50%;background:var(--blush);border:1.5px solid var(--rose);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#C4726A;flex-shrink:0'>" + (i+1) + "</div>" +
+            "<div style='flex:1;min-width:0'><div style='font-size:13px;font-weight:700;color:var(--pri)'>" + s.nom + "</div>" +
+            "<div style='font-size:11px;color:var(--mut)'>" + translateEtape(s.etape) + " · " + s.marque + "</div></div>" +
+            "<div style='font-size:13px;font-family:Georgia,serif;font-weight:700;color:#C4726A;flex-shrink:0'>" + s.prix + "</div></div>";
+        }).join("");
+        return "<div style='background:var(--surf);border-radius:18px;border:1px solid var(--bdr);overflow:hidden;margin-bottom:14px'>" +
+          "<div style='padding:14px 16px;border-bottom:1px solid var(--bdr);display:flex;align-items:center;gap:8px'>" +
+          "<span style='font-size:18px'>" + emoji + "</span>" +
+          "<div style='font-size:11px;font-weight:700;color:var(--mut);text-transform:uppercase;letter-spacing:.5px'>" + title + "</div></div>" +
+          rows + "</div>";
+      }
+
+      var routineWrap = document.createElement("div");
+      var introHtml = "<div style='background:linear-gradient(135deg,#C4726A,#A85A52);border-radius:18px;padding:16px 18px;margin-bottom:14px;color:#fff'>" +
+        "<div style='font-size:10px;font-weight:700;color:rgba(255,255,255,.75);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px'>✨ " + (isEN?"YOUR PERSONALIZED ROUTINE":"TA ROUTINE PERSONNALISÉE") + "</div>" +
+        "<div style='font-size:14px;line-height:1.5'>" + (ST.result.intro || (isEN?"Your products selected by Skin Match.":"Tes produits sélectionnés par Skin Match.")) + "</div></div>";
+      routineWrap.innerHTML = introHtml +
+        _buildRoutineCard(isEN?"MORNING ROUTINE":"ROUTINE DU MATIN", "🌅", _amSteps) +
+        _buildRoutineCard(isEN?"EVENING ROUTINE":"ROUTINE DU SOIR", "🌙", _pmSteps) +
+        "<button onclick=\"go('result')\" style='width:100%;padding:14px;border-radius:50px;border:none;background:#C4726A;color:#fff;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;margin-bottom:8px'>" + (isEN?"View full routine (details, reviews, buy) →":"Voir ma routine complète (détails, avis, achat) →") + "</button>";
+      tabRoutine.appendChild(routineWrap);
+    } else {
+      var emptyRoutine = document.createElement("div");
+      emptyRoutine.style.cssText = "text-align:center;padding:40px 20px;background:var(--surf);border-radius:18px;border:1px solid var(--bdr)";
+      emptyRoutine.innerHTML = "<div style='font-size:42px;margin-bottom:12px'>🌸</div>" +
+        "<div style='font-family:Georgia,serif;font-size:18px;font-weight:700;color:var(--pri);margin-bottom:8px'>" + (isEN?"No routine yet":"Pas encore de routine") + "</div>" +
+        "<div style='font-size:13px;color:var(--mut);line-height:1.6;margin-bottom:20px'>" + (isEN?"Complete the diagnosis to get your personalized routine.":"Complète le diagnostic pour obtenir ta routine personnalisée.") + "</div>" +
+        "<button onclick=\"go('q1')\" style='padding:12px 24px;border-radius:50px;background:#C4726A;color:#fff;border:none;font-weight:700;font-size:14px;cursor:pointer;font-family:inherit'>" + (isEN?"Start the diagnosis →":"Démarrer le diagnostic →") + "</button>";
+      tabRoutine.appendChild(emptyRoutine);
+    }
 
     // ── 2. AFFIRMATION DU JOUR ── (en haut de Suivi)
     var affirmations = isEN ? AFFIRMATIONS_EN : AFFIRMATIONS_FR;
@@ -6431,29 +6476,6 @@ function renderDashboard() {
       "<div style='font-size:10px;font-weight:700;color:rgba(255,255,255,.75);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px'>✨ " + (isEN ? "AFFIRMATION OF THE DAY" : "AFFIRMATION DU JOUR") + "</div>" +
       "<div style='font-size:15px;font-style:italic;color:#fff;line-height:1.6;font-family:Georgia,serif'>" + affirmations[affIdx] + "</div>";
     tabSuivi.appendChild(affEl);
-
-    // ── 7. ROUTINE DU MOMENT ── (en haut de Suivi, après affirmation)
-    if (ST.result && ST.result.steps && ST.result.steps.length > 0) {
-      var isAM = new Date().getHours() < 14;
-      var routineSteps = ST.result.steps.filter(function(s) {
-        return isAM ? (s.moment === "AM" || s.moment === "AM+PM") : (s.moment === "PM" || s.moment === "AM+PM");
-      });
-      if (routineSteps.length > 0) {
-        var routineEl = document.createElement("div");
-        routineEl.style.cssText = "background:var(--surf);border-radius:18px;border:1px solid var(--bdr);overflow:hidden;margin-bottom:14px";
-        routineEl.innerHTML = "<div style='padding:12px 16px;border-bottom:1px solid var(--bdr);display:flex;align-items:center;gap:8px'>" +
-          "<span style='font-size:16px'>" + (isAM ? "🌅" : "🌙") + "</span>" +
-          "<div style='font-size:11px;font-weight:700;color:var(--mut);text-transform:uppercase;letter-spacing:.5px'>" + (isAM ? (isEN ? "MORNING ROUTINE" : "ROUTINE DU MATIN") : (isEN ? "EVENING ROUTINE" : "ROUTINE DU SOIR")) + "</div></div>" +
-          routineSteps.map(function(s, i) {
-            return "<div style='padding:12px 16px;border-bottom:1px solid var(--bdr);display:flex;align-items:center;gap:10px'>" +
-              "<div style='width:24px;height:24px;border-radius:50%;background:" + (s.checked ? "#E8F5E9" : "var(--blush)") + ";border:1.5px solid " + (s.checked ? "#4CAF50" : "var(--rose)") + ";display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0'>" + (s.checked ? "✓" : (i+1)) + "</div>" +
-              "<div><div style='font-size:12px;font-weight:700;color:var(--pri)'>" + s.nom + "</div>" +
-              "<div style='font-size:10px;color:var(--mut)'>" + s.etape + " · " + s.marque + "</div></div></div>";
-          }).join("") +
-          "<div style=\"padding:12px 16px\"><button onclick=\"go('result')\" style=\"width:100%;padding:11px;border-radius:50px;border:none;background:#C4726A;color:#fff;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit\">" + (isEN ? "View full routine \u2192" : "Voir ma routine compl\u00e8te \u2192") + "</button></div>";
-        tabSuivi.appendChild(routineEl);
-      }
-    }
 
     // ── 3. SCORE DE PEAU ──
     var scoreEl = document.createElement("div");
@@ -7491,7 +7513,7 @@ function startDiagFromProfile() {
 }
 
 // ══ NAVIGATION BAS ══
-var NAV_SCREENS = ['welcome','result','scan-product','articles','dashboard'];
+var NAV_SCREENS = ['welcome','settings','scan-product','articles','dashboard'];
 
 function navTo(screen) {
   // Arrêter caméras si on quitte
@@ -7524,6 +7546,9 @@ function navTo(screen) {
   if (screen === 'dashboard') {
     renderDashboard();
   }
+  if (screen === 'settings') {
+    if (typeof renderSettings === 'function') renderSettings();
+  }
   if (screen === 'scan-product') {
     setTimeout(function() { startBarcodeCamera(); }, 100);
   }
@@ -7540,7 +7565,7 @@ function updateNav(screen) {
   // Mettre à jour les labels
   var labels = {
     'nav-home-lbl': isEN ? 'Home' : 'Accueil',
-    'nav-routine-lbl': isEN ? 'Routine' : 'Routine',
+    'nav-settings-lbl': isEN ? 'Settings' : 'Réglages',
     'nav-scan-lbl': isEN ? 'Scan' : 'Scanner',
     'nav-space-lbl': isEN ? 'My space' : 'Mon espace',
     'nav-chat-lbl': 'Skin Coach',
@@ -7551,7 +7576,7 @@ function updateNav(screen) {
   });
   
   // Activer le bon bouton
-  var map = { 'welcome':'nav-home', 'result':'nav-routine', 'scan-product':'nav-scan', 'dashboard':'nav-space' };
+  var map = { 'welcome':'nav-home', 'settings':'nav-settings', 'scan-product':'nav-scan', 'dashboard':'nav-space' };
   document.querySelectorAll('.nav-btn').forEach(function(b) { b.classList.remove('active'); });
   if (map[screen]) {
     var activeBtn = document.getElementById(map[screen]);
