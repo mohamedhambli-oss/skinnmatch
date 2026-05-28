@@ -4242,14 +4242,26 @@ function toggleChatbot() {
   if (chatbotOpen) {
     var input = document.getElementById('chatbot-input');
     if (input) input.focus();
-    var msgs = document.getElementById('chatbot-messages');
-    if (msgs && msgs.children.length === 0) {
-      var prenom = window._currentUser ? (window._currentUser.displayName ? window._currentUser.displayName.split(' ')[0] : window._currentUser.email.split('@')[0]) : '';
-      var isEN = LANG === 'en';
-      var greeting = prenom
-        ? (isEN ? "Hello " + prenom + "! I'm Skin Coach. How can I help?" : "Bonjour " + prenom + " ! Je suis Skin Coach, ta conseillere skincare. Comment puis-je t'aider ?")
-        : (isEN ? "Hello! I'm Skin Coach. How can I help?" : "Bonjour ! Je suis Skin Coach. Comment puis-je t'aider ?");
-      addChatMessage(greeting, false);
+    // Personnaliser le message d'accueil avec le prénom de l'utilisateur connecté
+    var prenom = '';
+    if (window._currentUser) {
+      var raw = window._currentUser.displayName || (window._currentUser.email || '').split('@')[0] || '';
+      prenom = raw.split(' ')[0];
+      if (prenom) prenom = prenom.charAt(0).toUpperCase() + prenom.slice(1);
+    }
+    var isEN = LANG === 'en';
+    var welcomeText = prenom
+      ? (isEN
+          ? "👋 Hi " + prenom + " ! I'm your Skin Coach. Ask me anything about your skin, products, ingredients or routine. I'm here 24/7!"
+          : "👋 Salut " + prenom + " ! Je suis ton Skin Coach. Pose-moi toutes tes questions sur ta peau, les produits, les actifs ou ta routine. Je suis là 24h/24 !")
+      : (isEN
+          ? "👋 Hi! I'm your Skin Coach. Ask me anything about your skin, products, ingredients or routine. I'm here 24/7!"
+          : "👋 Bonjour ! Je suis ton Skin Coach. Pose-moi toutes tes questions sur ta peau, les produits, les actifs ou ta routine. Je suis là 24h/24 !");
+    // Remplacer le contenu du message d'accueil statique
+    var welcomeMsg = document.getElementById('chatbot-welcome-msg');
+    if (welcomeMsg) {
+      var p = welcomeMsg.querySelector('p');
+      if (p) p.textContent = welcomeText;
     }
   }
 }
@@ -4364,7 +4376,17 @@ function getChatbotResponse(msg) {
   // Bonjour / salut
   if (m.includes('bonjour') || m.includes('salut') || m.includes('hello') || m.includes('bonsoir') || m.includes('hi')) {
     var skin = ST.skinType ? ' Je vois que tu as une peau ' + ST.skinType + '.' : '';
-    var isEN = LANG==='en'; return isEN ? '👋 Hello! I am the SkinMatch assistant. Ask me anything about skincare!' : '👋 Bonjour !' + skin + ' Je suis l\'assistant SkinMatch, expert en soins de peau. Tu peux me poser toutes tes questions sur ta routine, les actifs, les produits ou les problèmes de peau. Je suis là pour t\'aider !';
+    var prenom = '';
+    if (window._currentUser) {
+      var raw = window._currentUser.displayName || (window._currentUser.email || '').split('@')[0] || '';
+      prenom = raw.split(' ')[0];
+      if (prenom) prenom = prenom.charAt(0).toUpperCase() + prenom.slice(1);
+    }
+    var isEN = LANG==='en';
+    if (isEN) {
+      return '👋 Hi' + (prenom ? ' ' + prenom : '') + '! I am your Skin Coach. Ask me anything about skincare!';
+    }
+    return '👋 Salut' + (prenom ? ' ' + prenom : '') + ' !' + skin + ' Je suis ton Skin Coach, expert en soins de peau. Tu peux me poser toutes tes questions sur ta routine, les actifs, les produits ou les problèmes de peau. Je suis là pour t\'aider !';
   }
   // Merci
   if (m.includes('merci') || m.includes('thanks') || m.includes('super') || m.includes('parfait')) {
@@ -8094,16 +8116,16 @@ initQuestions();
     <div style="display:flex;align-items:center;gap:10px">
       <div style="width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;font-size:18px">✨</div>
       <div>
-        <div style="font-size:14px;font-weight:700;color:#fff;font-family:Georgia,serif">SkinMatch IA</div>
-        <div style="font-size:11px;color:rgba(255,255,255,.8)">Répond en quelques secondes</div>
+        <div id="chatbot-title" style="font-size:14px;font-weight:700;color:#fff;font-family:Georgia,serif">Skin Coach</div>
+        <div id="chatbot-subtitle" style="font-size:11px;color:rgba(255,255,255,.8)">Répond en quelques secondes</div>
       </div>
     </div>
     <button onclick="toggleChatbot()" style="background:none;border:none;color:#fff;font-size:20px;cursor:pointer;padding:4px">×</button>
   </div>
   <!-- Messages -->
   <div id="chatbot-messages" style="flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:10px">
-    <div style="background:#fff;border-radius:14px 14px 14px 4px;padding:12px 14px;max-width:85%;box-shadow:0 1px 4px rgba(0,0,0,.08)">
-      <p style="font-size:13px;color:#3D2B1F;margin:0;line-height:1.5">👋 Bonjour ! Je suis l'assistant SkinMatch. Pose-moi toutes tes questions sur ta peau, les produits, les actifs ou ta routine. Je suis là 24h/24 !</p>
+    <div id="chatbot-welcome-msg" style="background:#fff;border-radius:14px 14px 14px 4px;padding:12px 14px;max-width:85%;box-shadow:0 1px 4px rgba(0,0,0,.08)">
+      <p style="font-size:13px;color:#3D2B1F;margin:0;line-height:1.5">👋 Bonjour ! Je suis ton Skin Coach. Pose-moi toutes tes questions sur ta peau, les produits, les actifs ou ta routine. Je suis là 24h/24 !</p>
     </div>
   </div>
   <!-- Input -->
