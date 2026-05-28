@@ -5608,6 +5608,33 @@ function shareScan() {
 // Initialiser l'historique au chargement
 document.addEventListener('DOMContentLoaded', function() {
   updateScanHistory();
+  // ── Sécurité au chargement : forcer un écran de démarrage valide ──
+  // Empêche d'arriver sur une page protégée (profile, dashboard, scan-product) vide
+  // si l'utilisateur n'est pas connecté (cas : lien partagé, cache restauré, etc.)
+  try {
+    var allScreens = document.querySelectorAll('[id^="sc-"]');
+    var visibleScreens = [];
+    allScreens.forEach(function(s){ if (!s.classList.contains('hidden')) visibleScreens.push(s.id); });
+    // Si plusieurs écrans visibles, ou si un écran protégé est visible sans user connecté
+    var PROTECTED = ['sc-profile','sc-dashboard','sc-scan-product','sc-settings'];
+    var hasProtectedVisible = visibleScreens.some(function(id){ return PROTECTED.indexOf(id) !== -1; });
+    var noUser = !window._currentUser;
+    if (visibleScreens.length === 0 || (hasProtectedVisible && noUser) || visibleScreens.length > 1) {
+      // Tout masquer et afficher l'écran de langue (premier écran)
+      allScreens.forEach(function(s){ s.classList.add('hidden'); });
+      var lang = document.getElementById('sc-lang');
+      if (lang) {
+        lang.classList.remove('hidden');
+        if (typeof ST !== 'undefined') ST.screen = 'lang';
+      } else {
+        var welcome = document.getElementById('sc-welcome');
+        if (welcome) {
+          welcome.classList.remove('hidden');
+          if (typeof ST !== 'undefined') ST.screen = 'welcome';
+        }
+      }
+    }
+  } catch(e) { /* silencieux */ }
 });
 
 
@@ -7528,6 +7555,8 @@ window.onFirebaseUserReady = function(user) {
   var btnReg = document.getElementById('btn-reg');
   var connBadge = document.getElementById('auth-connected-badge');
   var connLabel = document.getElementById('auth-connected-label');
+  var btnStartTopText = document.getElementById('btn-start-top-text');
+  var isEN = LANG === 'en';
   if (user) {
     var shortName = user.displayName ? user.displayName.split(' ')[0] : user.email.split('@')[0];
     // Masquer les boutons login/register
@@ -7535,12 +7564,17 @@ window.onFirebaseUserReady = function(user) {
     if (btnReg) btnReg.style.display = 'none';
     // Afficher le badge connecté
     if (connBadge) connBadge.style.display = 'flex';
-    if (connLabel) connLabel.textContent = (LANG === 'en' ? 'Connected as ' : 'Connecté en tant que ') + shortName;
+    if (connLabel) connLabel.textContent = (isEN ? 'Connected as ' : 'Connecté en tant que ') + shortName;
+    // Adapter le texte du bouton diagnostic (plus "sans compte" puisque déjà connecté)
+    if (btnStartTopText) btnStartTopText.textContent = isEN ? 'Start my diagnosis' : 'Faire mon diagnostic';
     // Charger routine sauvegardée
     loadSavedRoutine(user);
   } else {
-    if (btnLog) { btnLog.textContent = 'Se connecter'; btnLog.onclick = function(){ go('login'); }; }
-    if (btnReg) { btnReg.style.display = ''; btnReg.textContent = 'Créer un compte'; }
+    if (btnLog) { btnLog.style.display = ''; btnLog.textContent = isEN ? 'I already have an account' : "J'ai déjà un compte"; btnLog.onclick = function(){ go('login'); }; }
+    if (btnReg) { btnReg.style.display = ''; btnReg.textContent = isEN ? 'Create a free account' : 'Créer un compte gratuit'; }
+    if (connBadge) connBadge.style.display = 'none';
+    // Texte par défaut quand pas connecté
+    if (btnStartTopText) btnStartTopText.textContent = isEN ? 'Take the diagnosis, no account' : 'Faire le diagnostic sans compte';
   }
 };
 
@@ -8280,7 +8314,7 @@ if ('serviceWorker' in navigator) {
   window.addEventListener('load', function() {
     // 1) Essayer d'enregistrer un sw.js classique (si fichier présent à la racine)
     var scope = window.location.pathname.replace(/[^\/]*$/, '');
-    var SW_VERSION = 'sm-v3';
+    var SW_VERSION = 'sm-v4';
     var swCode = [
       "const CACHE = '" + SW_VERSION + "';",
       "const ASSETS = [",
@@ -8305,7 +8339,21 @@ if ('serviceWorker' in navigator) {
       // Ne JAMAIS mettre en cache Firebase / Auth / API dynamiques
       "  if (/(firebaseio|firestore|googleapis|gstatic|identitytoolkit|securetoken|firebase\\.com)/.test(url.hostname)) return;",
       "  if (/api\\.openweathermap|open-meteo/.test(url.hostname)) return;",
-      // Stratégie : cache d'abord pour HTML/CSS/JS/images, réseau sinon
+      // HTML / navigation : network-first (toujours essayer la dernière version, fallback cache si offline)
+      "  var isHTML = req.mode === 'navigate' || (req.headers.get('accept')||'').indexOf('text/html') !== -1;",
+      "  if (isHTML) {",
+      "    e.respondWith(",
+      "      fetch(req).then(function(res){",
+      "        if (res && res.status === 200) {",
+      "          var clone = res.clone();",
+      "          caches.open(CACHE).then(function(c){ c.put(req, clone); }).catch(function(){});",
+      "        }",
+      "        return res;",
+      "      }).catch(function(){ return caches.match(req).then(function(c){ return c || caches.match('" + scope + "'); }); })",
+      "    );",
+      "    return;",
+      "  }",
+      // Autres ressources (CSS, JS, images) : cache d'abord, réseau si pas en cache
       "  e.respondWith(",
       "    caches.match(req).then(function(cached) {",
       "      var fetchProm = fetch(req).then(function(res) {",
