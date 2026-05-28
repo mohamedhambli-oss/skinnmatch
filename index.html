@@ -532,85 +532,78 @@ h2{font-family:var(--serif);font-size:20px;font-weight:700;margin-bottom:3px}
     <div style="position:absolute;bottom:120px;left:-40px;width:160px;height:160px;border-radius:50%;background:radial-gradient(circle,#D4857A 0%,transparent 70%);opacity:.25;pointer-events:none"></div>
 
     <div style="padding:28px 24px 0;display:flex;align-items:center;justify-content:space-between">
-      <div style="font-family:Georgia,serif;font-size:20px;font-weight:700;color:#3D2B1F;letter-spacing:.3px">Skin<span style="color:#C4726A">Match</span></div>
+      <div style="display:flex;align-items:center;gap:10px">
+        <div style="width:34px;height:34px;border-radius:10px;background:linear-gradient(135deg,#C4726A,#A85A52);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:12px">SM</div>
+        <div style="font-family:Georgia,serif;font-size:20px;font-weight:700;color:#3D2B1F;letter-spacing:.3px">Skin<span style="color:#C4726A">Match</span></div>
+      </div>
       <div id="region-badge" style="font-size:16px;cursor:pointer" onclick="showRegionModal()">&#127757;</div>
     </div>
 
-    <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;padding:20px 28px 32px;text-align:center">
+    <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;padding:24px 22px 32px;text-align:center">
 
-      <!-- BULLES 3 ÉTAPES -->
-      <div style="width:100%;max-width:300px;margin-bottom:26px">
-        <div style="font-size:9px;font-weight:700;color:rgba(196,114,106,.7);text-transform:uppercase;letter-spacing:3px;text-align:center;margin-bottom:14px">Comment &#231;a marche</div>
+      <!-- 1. COMMENT ÇA MARCHE — 3 ÉTAPES -->
+      <div style="width:100%;max-width:340px;margin-bottom:22px">
+        <div style="font-size:10px;font-weight:700;color:rgba(196,114,106,.85);text-transform:uppercase;letter-spacing:3px;text-align:center;margin-bottom:16px">Comment &#231;a marche</div>
         <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:4px">
           <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:7px">
-            <div style="width:52px;height:52px;border-radius:50%;background:linear-gradient(135deg,#C4726A,#A85A52);display:flex;align-items:center;justify-content:center;font-size:20px;box-shadow:0 6px 18px rgba(196,114,106,.35);position:relative">&#10024;<div style="position:absolute;bottom:-2px;right:-2px;width:18px;height:18px;border-radius:50%;background:#3D2B1F;color:#fff;font-size:9px;font-weight:700;display:flex;align-items:center;justify-content:center;border:2px solid #FBF0ED">1</div></div>
-            <div style="font-size:11px;font-weight:700;color:#3D2B1F;text-align:center;line-height:1.3">5 questions</div>
-            <div style="font-size:10px;color:#B0958F;text-align:center;line-height:1.4">Peau, &#226;ge, budget</div>
+            <div style="width:56px;height:56px;border-radius:50%;background:linear-gradient(135deg,#C4726A,#A85A52);display:flex;align-items:center;justify-content:center;font-size:22px;box-shadow:0 6px 18px rgba(196,114,106,.35);position:relative">&#10024;<div style="position:absolute;bottom:-2px;right:-2px;width:20px;height:20px;border-radius:50%;background:#3D2B1F;color:#fff;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;border:2px solid #FBF0ED">1</div></div>
+            <div style="font-size:12px;font-weight:700;color:#3D2B1F;text-align:center;line-height:1.2">5 questions</div>
+            <div style="font-size:10px;color:#B0958F;text-align:center;line-height:1.3">Peau, &#226;ge, budget</div>
           </div>
-          <div style="color:rgba(196,114,106,.35);font-size:14px;padding-top:16px;flex-shrink:0">&#8594;</div>
+          <div style="color:rgba(196,114,106,.4);font-size:14px;padding-top:18px;flex-shrink:0">&#8594;</div>
           <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:7px">
-            <div style="width:52px;height:52px;border-radius:50%;background:linear-gradient(135deg,#C4726A,#A85A52);display:flex;align-items:center;justify-content:center;font-size:20px;box-shadow:0 6px 18px rgba(196,114,106,.35);position:relative">&#128300;<div style="position:absolute;bottom:-2px;right:-2px;width:18px;height:18px;border-radius:50%;background:#3D2B1F;color:#fff;font-size:9px;font-weight:700;display:flex;align-items:center;justify-content:center;border:2px solid #FBF0ED">2</div></div>
-            <div style="font-size:11px;font-weight:700;color:#3D2B1F;text-align:center;line-height:1.3">Analyse SkinMatch</div>
-            <div style="font-size:10px;color:#B0958F;text-align:center;line-height:1.4">160+ produits analys&#233;s</div>
+            <div style="width:56px;height:56px;border-radius:50%;background:linear-gradient(135deg,#C4726A,#A85A52);display:flex;align-items:center;justify-content:center;font-size:22px;box-shadow:0 6px 18px rgba(196,114,106,.35);position:relative">&#128300;<div style="position:absolute;bottom:-2px;right:-2px;width:20px;height:20px;border-radius:50%;background:#3D2B1F;color:#fff;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;border:2px solid #FBF0ED">2</div></div>
+            <div style="font-size:12px;font-weight:700;color:#3D2B1F;text-align:center;line-height:1.2">Analyse SkinMatch</div>
+            <div style="font-size:10px;color:#B0958F;text-align:center;line-height:1.3">160+ produits analys&#233;s</div>
           </div>
-          <div style="color:rgba(196,114,106,.35);font-size:14px;padding-top:16px;flex-shrink:0">&#8594;</div>
+          <div style="color:rgba(196,114,106,.4);font-size:14px;padding-top:18px;flex-shrink:0">&#8594;</div>
           <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:7px">
-            <div style="width:52px;height:52px;border-radius:50%;background:linear-gradient(135deg,#C4726A,#A85A52);display:flex;align-items:center;justify-content:center;font-size:20px;box-shadow:0 6px 18px rgba(196,114,106,.35);position:relative">&#127800;<div style="position:absolute;bottom:-2px;right:-2px;width:18px;height:18px;border-radius:50%;background:#3D2B1F;color:#fff;font-size:9px;font-weight:700;display:flex;align-items:center;justify-content:center;border:2px solid #FBF0ED">3</div></div>
-            <div style="font-size:11px;font-weight:700;color:#3D2B1F;text-align:center;line-height:1.3">Ta routine</div>
-            <div style="font-size:10px;color:#B0958F;text-align:center;line-height:1.4">Produits adapt&#233;s, liens directs</div>
+            <div style="width:56px;height:56px;border-radius:50%;background:linear-gradient(135deg,#C4726A,#A85A52);display:flex;align-items:center;justify-content:center;font-size:22px;box-shadow:0 6px 18px rgba(196,114,106,.35);position:relative">&#127800;<div style="position:absolute;bottom:-2px;right:-2px;width:20px;height:20px;border-radius:50%;background:#3D2B1F;color:#fff;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;border:2px solid #FBF0ED">3</div></div>
+            <div style="font-size:12px;font-weight:700;color:#3D2B1F;text-align:center;line-height:1.2">Ta routine</div>
+            <div style="font-size:10px;color:#B0958F;text-align:center;line-height:1.3">Produits adapt&#233;s, liens directs</div>
           </div>
         </div>
       </div>
 
-      <div style="width:76px;height:76px;border-radius:22px;background:linear-gradient(135deg,#C4726A,#A85A52);display:flex;align-items:center;justify-content:center;margin-bottom:26px;box-shadow:0 10px 28px rgba(196,114,106,.28)">
-        <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+      <!-- 1bis. BANDEAU SCAN DE PEAU -->
+      <div onclick="go('scan')" style="width:100%;max-width:340px;background:#fff;border-radius:14px;padding:12px 14px;margin-bottom:22px;border:1px dashed rgba(196,114,106,.35);display:flex;align-items:center;gap:10px;cursor:pointer;transition:all .2s" onmouseover="this.style.background='#FFF8F5';this.style.borderColor='#C4726A'" onmouseout="this.style.background='#fff';this.style.borderColor='rgba(196,114,106,.35)'">
+        <div style="width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,#C4726A,#A85A52);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0">&#128247;</div>
+        <div style="flex:1;font-size:12px;color:#3D2B1F;line-height:1.3;text-align:left">
+          <strong style="color:#C4726A;font-weight:700" id="scan-banner-text">Tu peux aussi scanner ta peau</strong>
+          <span style="font-size:9px;background:#C4726A;color:#fff;border-radius:20px;padding:2px 7px;font-weight:700;letter-spacing:.5px;margin-left:4px;display:inline-block;vertical-align:1px">NEW</span>
+        </div>
+        <div style="color:#C4726A;font-size:16px;font-weight:700;flex-shrink:0">&#8594;</div>
       </div>
 
-      <div style="font-size:10px;font-weight:700;color:#C4726A;text-transform:uppercase;letter-spacing:3px;margin-bottom:14px" id="welcome-badge">Skincare Intelligence</div>
-
-      <h1 style="font-family:Georgia,serif;font-size:30px;font-weight:700;color:#3D2B1F;line-height:1.25;margin-bottom:14px" id="welcome-headline">Ta routine peau,<br>en 60 secondes</h1>
-
-      <p style="font-size:14px;color:#8B6F5E;line-height:1.75;margin-bottom:28px;max-width:280px" id="welcome-tagline">160+ produits analys&#233;s. Recommandations personnalis&#233;es selon ton profil. Gratuit.</p>
-
-      <div style="display:flex;gap:20px;margin-bottom:32px;justify-content:center">
-        <div style="text-align:center">
-          <div style="font-family:Georgia,serif;font-size:22px;font-weight:700;color:#3D2B1F">160+</div>
-          <div style="font-size:9px;color:#B0958F;font-weight:600;text-transform:uppercase;letter-spacing:.5px" id="stat1-lbl">Produits</div>
+      <!-- 2. CHIFFRES CLÉS -->
+      <div style="background:#fff;border-radius:18px;padding:14px 8px;margin-bottom:22px;border:1px solid rgba(196,114,106,.15);box-shadow:0 2px 8px rgba(196,114,106,.06);display:flex;width:100%;max-width:340px">
+        <div style="flex:1;text-align:center;position:relative">
+          <div style="font-family:Georgia,serif;font-size:22px;font-weight:700;color:#3D2B1F;line-height:1">160+</div>
+          <div style="font-size:9px;color:#8B6F5E;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-top:4px" id="stat1-lbl">Produits</div>
         </div>
-        <div style="width:1px;background:rgba(196,114,106,.25)"></div>
-        <div style="text-align:center">
-          <div style="font-family:Georgia,serif;font-size:22px;font-weight:700;color:#3D2B1F">60s</div>
-          <div style="font-size:9px;color:#B0958F;font-weight:600;text-transform:uppercase;letter-spacing:.5px" id="stat2-lbl">Pour ta routine</div>
+        <div style="width:1px;background:rgba(196,114,106,.15);margin:6px 0"></div>
+        <div style="flex:1;text-align:center">
+          <div style="font-family:Georgia,serif;font-size:22px;font-weight:700;color:#3D2B1F;line-height:1">60s</div>
+          <div style="font-size:9px;color:#8B6F5E;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-top:4px" id="stat2-lbl">Pour ta routine</div>
         </div>
-        <div style="width:1px;background:rgba(196,114,106,.25)"></div>
-        <div style="text-align:center">
-          <div style="font-family:Georgia,serif;font-size:22px;font-weight:700;color:#3D2B1F">100%</div>
-          <div style="font-size:9px;color:#B0958F;font-weight:600;text-transform:uppercase;letter-spacing:.5px" id="stat3-lbl">Gratuit</div>
+        <div style="width:1px;background:rgba(196,114,106,.15);margin:6px 0"></div>
+        <div style="flex:1;text-align:center">
+          <div style="font-family:Georgia,serif;font-size:22px;font-weight:700;color:#3D2B1F;line-height:1">100%</div>
+          <div style="font-size:9px;color:#8B6F5E;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-top:4px" id="stat3-lbl">Gratuit</div>
         </div>
       </div>
 
-      <div id="auth-btns" style="display:flex;flex-direction:column;align-items:center;gap:10px;width:100%;max-width:300px;margin-bottom:14px">
-        <div id="auth-connected-badge" style="display:none;align-items:center;gap:8px;background:#E8F5E9;border-radius:50px;padding:10px 18px;width:100%;justify-content:center">
-          <div style="width:7px;height:7px;border-radius:50%;background:#2E7D32;flex-shrink:0"></div>
-          <span id="auth-connected-label" style="font-size:13px;font-weight:600;color:#2E7D32;flex:1;text-align:left"></span>
-          <button onclick="go('profile')" style="font-size:11px;color:#2E7D32;font-weight:700;background:none;border:none;cursor:pointer;font-family:inherit">Mon compte &#8594;</button>
-        </div>
-        <button onclick="go('login')" style="width:100%;padding:11px 20px;border-radius:50px;border:1.5px solid #C4726A;background:transparent;color:#C4726A;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit" id="btn-log">Se connecter</button>
-        <button onclick="go('register')" style="width:100%;padding:11px 20px;border-radius:50px;border:none;background:#C4726A;color:#fff;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit" id="btn-reg">Cr&#233;er un compte</button>
-      </div>
-
-      <div style="width:100%;max-width:300px;display:flex;flex-direction:column;gap:10px">
-      <!-- TÉMOIGNAGES -->
-      <div style="width:100%;max-width:300px;margin-bottom:20px">
-        <div style="font-size:9px;font-weight:700;color:rgba(196,114,106,.7);text-transform:uppercase;letter-spacing:3px;text-align:center;margin-bottom:12px">Elles ont teste SkinMatch</div>
-        <div style="background:rgba(255,255,255,.75);border-radius:16px;padding:14px 16px;border:1px solid rgba(196,114,106,.12)">
-          <div style="display:flex;gap:2px;margin-bottom:8px"><span style="color:#C4726A;font-size:12px">&#9733;&#9733;&#9733;&#9733;&#9733;</span></div>
-          <div id="test-text" style="font-size:13px;color:#3D2B1F;line-height:1.6;font-style:italic;margin-bottom:10px;transition:opacity .3s">"Ma peau n'a jamais ete aussi equilibree. SkinMatch a tout change."</div>
+      <!-- 3. AVIS / TÉMOIGNAGES -->
+      <div style="width:100%;max-width:340px;margin-bottom:22px">
+        <div style="font-size:9px;font-weight:700;color:rgba(196,114,106,.85);text-transform:uppercase;letter-spacing:2px;text-align:center;margin-bottom:12px">&#9733; Ils ont test&#233; SkinMatch</div>
+        <div style="background:rgba(255,255,255,.85);border-radius:16px;padding:14px 16px;border:1px solid rgba(196,114,106,.12)">
+          <div style="display:flex;gap:2px;margin-bottom:8px"><span style="color:#F5A623;font-size:12px">&#9733;&#9733;&#9733;&#9733;&#9733;</span></div>
+          <div id="test-text" style="font-size:13px;color:#3D2B1F;line-height:1.6;font-style:italic;margin-bottom:10px;transition:opacity .3s">"Ma peau n'a jamais &#233;t&#233; aussi &#233;quilibr&#233;e. SkinMatch a tout chang&#233;."</div>
           <div style="display:flex;align-items:center;gap:8px">
             <div id="test-av" style="width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,#C4726A,#A85A52);display:flex;align-items:center;justify-content:center;color:#fff;font-size:11px;font-weight:700">S</div>
-            <div>
+            <div style="text-align:left">
               <div id="test-name" style="font-size:11px;font-weight:700;color:#3D2B1F">Sarah M.</div>
-              <div id="test-skin" style="font-size:10px;color:#B0958F">Peau mixte · Paris</div>
+              <div id="test-skin" style="font-size:10px;color:#B0958F">Peau mixte &#183; Paris</div>
             </div>
           </div>
         </div>
@@ -621,33 +614,22 @@ h2{font-family:var(--serif);font-size:20px;font-weight:700;margin-bottom:3px}
         </div>
       </div>
 
-        <button onclick="showTermsModal()" id="btn-start" style="width:100%;padding:14px 20px;border-radius:50px;border:none;background:linear-gradient(135deg,#3D2B1F,#5A3D2B);color:#fff;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;letter-spacing:.2px">
-          <span id="btn-start-text">Commencer mon diagnostic</span> &#8594;
-        </button>
-
-        <button onclick="startExpressDiag()" id="btn-express" style="width:100%;padding:10px 16px;margin-top:8px;border-radius:50px;border:1.5px solid rgba(196,114,106,.3);background:#fff;color:#C4726A;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit">
-          <span id="btn-express-text">⚡ Diagnostic rapide</span> <span style="color:#8B6F5E;font-weight:400">(30 sec)</span>
-        </button>
-
-        <div style="display:flex;align-items:center;gap:10px">
-          <div style="flex:1;height:1px;background:rgba(196,114,106,.2)"></div>
-          <span style="font-size:11px;color:#B0958F;font-weight:500">ou</span>
-          <div style="flex:1;height:1px;background:rgba(196,114,106,.2)"></div>
+      <!-- 4. BOUTONS D'ACTION -->
+      <div id="auth-btns" style="display:flex;flex-direction:column;align-items:center;gap:10px;width:100%;max-width:340px">
+        <div id="auth-connected-badge" style="display:none;align-items:center;gap:8px;background:#E8F5E9;border-radius:50px;padding:10px 18px;width:100%;justify-content:center">
+          <div style="width:7px;height:7px;border-radius:50%;background:#2E7D32;flex-shrink:0"></div>
+          <span id="auth-connected-label" style="font-size:13px;font-weight:600;color:#2E7D32;flex:1;text-align:left"></span>
+          <button onclick="go('profile')" style="font-size:11px;color:#2E7D32;font-weight:700;background:none;border:none;cursor:pointer;font-family:inherit">Mon compte &#8594;</button>
         </div>
-
-        <button onclick="go('scan')" style="width:100%;padding:13px 20px;border-radius:50px;border:1.5px solid rgba(196,114,106,.35);background:rgba(255,255,255,.7);backdrop-filter:blur(8px);cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:10px">
-          <div style="width:28px;height:28px;border-radius:8px;background:linear-gradient(135deg,#C4726A,#A85A52);display:flex;align-items:center;justify-content:center;flex-shrink:0">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7z"/></svg>
-          </div>
-          <span style="font-size:13px;font-weight:600;color:#3D2B1F" id="btn-scan-text">Scanner ma peau</span>
-          <span style="font-size:10px;background:#C4726A;color:#fff;border-radius:20px;padding:2px 8px;font-weight:700;letter-spacing:.3px;flex-shrink:0" id="scan-badge-new">NEW</span>
+        <button onclick="go('register')" id="btn-reg" style="width:100%;padding:15px 20px;border-radius:50px;border:none;background:linear-gradient(135deg,#C4726A,#A85A52);color:#fff;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;box-shadow:0 6px 16px rgba(196,114,106,.25)">Cr&#233;er un compte gratuit</button>
+        <button onclick="go('login')" id="btn-log" style="width:100%;padding:13px 20px;border-radius:50px;border:1.5px solid #C4726A;background:transparent;color:#C4726A;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit">J'ai d&#233;j&#224; un compte</button>
+        <button onclick="showTermsModal()" id="btn-start" style="width:100%;padding:11px 16px;background:none;border:none;color:#8B6F5E;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;text-decoration:underline;text-underline-offset:4px;margin-top:4px">
+          <span id="btn-start-text">Faire le diagnostic sans compte</span> &#8594;
         </button>
       </div>
 
     </div>
 
-    
-    </div>
   </div>
 </div>
 
@@ -3663,38 +3645,32 @@ function renderResult(){
       <div class="pb">
         <div class="pu">${s.pourquoi}</div>
         <div class="tags">${(s.ak||[]).slice(0,3).map(a=>`<span class="tag">${a}</span>`).join("")}</div>
-        <div class="btns" style="flex-wrap:wrap;gap:6px">
 
-        </div>
-        
-        <div style="display:flex;gap:6px;margin-top:10px;align-items:center">
-          <button onclick="showWhyAI('${s.key}','${s.nom}','${s.marque}')" style="flex:1;padding:12px 16px;border-radius:50px;border:none;background:#C4726A;color:#fff;font-size:13px;font-weight:700;cursor:pointer;font-family:var(--sans);display:flex;align-items:center;justify-content:center;gap:8px">
-            <span>${LANG==="en"?"Why this product?":"Mon Skin Match"}</span>
-          </button>
-          <button onclick="submitFeedback('${s.key}','like',this)" style="width:42px;height:42px;border-radius:50%;border:1.5px solid #E8E0DC;background:#fff;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0">👍</button>
-          <button onclick="submitFeedback('${s.key}','dislike',this)" style="width:42px;height:42px;border-radius:50%;border:1.5px solid #E8E0DC;background:#fff;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0">👎</button>
-          <button onclick="replaceProduct('${s.key}')" style="padding:0 14px;height:38px;border-radius:50px;border:1.5px solid rgba(196,114,106,.3);background:#fff;font-size:12px;font-weight:700;color:#C4726A;cursor:pointer;font-family:var(--sans);white-space:nowrap;display:flex;align-items:center;gap:6px;flex-shrink:0"><span>🔄</span><span>${isEN?'Replace':'Ne me convient pas'}</span></button>
-        </div>
-        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:4px">
-          ${s.yuka>=75
-            ? `<span style="background:#E8F5E9;color:#2E7D32;border-radius:20px;padding:5px 10px;font-size:11px;font-weight:700;display:inline-flex;align-items:center;gap:4px">🥕 ${s.yuka}/100 · ${s.yl}</span>`
-            : `<button class="btn-fiche" onclick="toggleYuka('yuka-${s.key}')"><span>${t("note_yuka")}</span></button>`
-          }
-          <a href="${s.link}" target="_blank" class="btn-buy"><span>${buyLabel}</span></a>
-          <button onclick="showVideo('${s.video||''}','${s.nom}','${s.marque}','yt')" title="YouTube" style="display:inline-flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:50%;background:#FF0000;color:#fff;font-size:13px;flex-shrink:0;border:none;cursor:pointer;margin-left:4px;font-weight:700">▶</button>
-          <button onclick="showVideo('${s.video||''}','${s.nom}','${s.marque}','tk')" title="TikTok" style="display:inline-flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:50%;background:#010101;flex-shrink:0;border:none;cursor:pointer;margin-left:4px;overflow:hidden"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-2.88 2.5 2.89 2.89 0 01-2.89-2.89 2.89 2.89 0 012.89-2.89c.28 0 .54.04.79.1V9.01a6.33 6.33 0 00-.79-.05 6.34 6.34 0 00-6.34 6.34 6.34 6.34 0 006.34 6.34 6.34 6.34 0 006.33-6.34V8.75a8.18 8.18 0 004.78 1.52V6.82a4.85 4.85 0 01-1.01-.13z" fill="#ffffff"/><path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-2.88 2.5 2.89 2.89 0 01-2.89-2.89 2.89 2.89 0 012.89-2.89c.28 0 .54.04.79.1V9.01a6.33 6.33 0 00-.79-.05 6.34 6.34 0 00-6.34 6.34 6.34 6.34 0 006.34 6.34 6.34 6.34 0 006.33-6.34V8.75a8.18 8.18 0 004.78 1.52V6.82a4.85 4.85 0 01-1.01-.13z" fill="#EE1D52" opacity="0.5"/><path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-2.88 2.5 2.89 2.89 0 01-2.89-2.89 2.89 2.89 0 012.89-2.89c.28 0 .54.04.79.1V9.01a6.33 6.33 0 00-.79-.05 6.34 6.34 0 00-6.34 6.34 6.34 6.34 0 006.34 6.34 6.34 6.34 0 006.33-6.34V8.75a8.18 8.18 0 004.78 1.52V6.82a4.85 4.85 0 01-1.01-.13z" fill="#69C9D0" opacity="0.5"/></svg></button>
-        </div>
-        <div id="yuka-${s.key}" style="display:none;margin-top:8px;padding:10px 12px;border-radius:8px;background:#F7F3EF;border:1px solid #E8E0D6">
-          <div style="font-size:10px;font-weight:700;color:#9A8B7C;text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px">${t('note_yuka')||'Yuka score'}</div>
-          <div style="display:flex;align-items:center;gap:10px">
-            <div style="flex:1;height:6px;border-radius:3px;background:#E8E0D6;overflow:hidden">
-              <div style="height:100%;border-radius:3px" class="yuka-bar-${s.key}"></div>
-            </div>
-            <span style="font-family:var(--serif);font-size:16px;font-weight:700" class="yuka-score-${s.key}">${s.yuka}/100</span>
-          </div>
-          <div style="font-size:11px;font-weight:600;margin-top:4px" class="yuka-label-${s.key}">${s.yl}</div>
-        </div>
+        <!-- 1. MON SKIN MATCH (seul, gros, action principale) -->
+        <button onclick="showWhyAI('${s.key}','${s.nom}','${s.marque}')" style="width:100%;padding:14px;border-radius:50px;border:none;background:linear-gradient(135deg,#C4726A,#A85A52);color:#fff;font-size:14px;font-weight:700;cursor:pointer;font-family:var(--sans);box-shadow:0 4px 12px rgba(196,114,106,.25);margin-top:10px">
+          ${LANG==="en"?"Why this product?":"Mon Skin Match"}
+        </button>
+
+        <!-- 2. SCORE YUKA (badge uniquement si bon score, sinon rien — l'analyse est déjà dans Mon Skin Match) -->
+        ${s.yuka>=75
+          ? `<div style="margin-top:10px"><span style="background:#E8F5E9;color:#2E7D32;border-radius:20px;padding:5px 10px;font-size:11px;font-weight:700;display:inline-flex;align-items:center;gap:4px">🥕 ${s.yuka}/100 · ${s.yl}</span></div>`
+          : ``
+        }
+
+        <!-- 3. AVIS COMMUNAUTÉ (juste après Mon Skin Match + Yuka) -->
         ${renderCommunityReviews(s, isEN)}
+
+        <!-- 4. SÉPARATION + ACTIONS SECONDAIRES -->
+        <div style="border-top:1px solid #F0E8E5;margin-top:14px;padding-top:12px;display:flex;gap:6px;align-items:center;flex-wrap:wrap">
+          <button onclick="submitFeedback('${s.key}','like',this)" style="width:38px;height:38px;border-radius:50%;border:1.5px solid #E8E0DC;background:#fff;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0">👍</button>
+          <button onclick="submitFeedback('${s.key}','dislike',this)" style="width:38px;height:38px;border-radius:50%;border:1.5px solid #E8E0DC;background:#fff;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0">👎</button>
+          <button onclick="replaceProduct('${s.key}')" style="flex:1;min-width:140px;padding:8px 12px;height:38px;border-radius:50px;border:1.5px solid rgba(196,114,106,.3);background:#fff;font-size:12px;font-weight:700;color:#C4726A;cursor:pointer;font-family:var(--sans);display:flex;align-items:center;justify-content:center;gap:6px"><span>🔄</span><span>${isEN?'Replace':'Ne me convient pas'}</span></button>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;margin-top:8px">
+          <a href="${s.link}" target="_blank" class="btn-buy" style="flex:1;text-align:center"><span>${buyLabel}</span></a>
+          <button onclick="showVideo('${s.video||''}','${s.nom}','${s.marque}','yt')" title="YouTube" style="display:inline-flex;align-items:center;justify-content:center;width:38px;height:38px;border-radius:50%;background:#FF0000;color:#fff;font-size:13px;flex-shrink:0;border:none;cursor:pointer;font-weight:700">▶</button>
+          <button onclick="showVideo('${s.video||''}','${s.nom}','${s.marque}','tk')" title="TikTok" style="display:inline-flex;align-items:center;justify-content:center;width:38px;height:38px;border-radius:50%;background:#010101;flex-shrink:0;border:none;cursor:pointer;overflow:hidden"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-2.88 2.5 2.89 2.89 0 01-2.89-2.89 2.89 2.89 0 012.89-2.89c.28 0 .54.04.79.1V9.01a6.33 6.33 0 00-.79-.05 6.34 6.34 0 00-6.34 6.34 6.34 6.34 0 006.34 6.34 6.34 6.34 0 006.33-6.34V8.75a8.18 8.18 0 004.78 1.52V6.82a4.85 4.85 0 01-1.01-.13z" fill="#ffffff"/></svg></button>
+        </div>
       </div>
     </div>`;
   }).join("");
@@ -6519,7 +6495,7 @@ function renderDashboard() {
     var _streakN = data.streak && typeof data.streak === "object" ? (data.streak.current||0) : (data.streak||0);
     var _streakBest = data.streakBest || 0;
     var _streakLast = data.streakLastDate || null;
-    var _streakFire = _streakN >= 7 ? "🔥" : _streakN >= 3 ? "✨" : "💧";
+    var _streakFire = _streakN >= 7 ? "🔥" : _streakN >= 3 ? "✨" : _streakN >= 1 ? "🌿" : "🌱";
     var _circles = "";
     for (var _ci=0; _ci<7; _ci++) {
       var _act = _ci < Math.min(_streakN,7);
