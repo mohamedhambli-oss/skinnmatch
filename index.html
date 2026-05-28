@@ -186,15 +186,15 @@ body > div[id^="sc-"]:not(.hidden){
 }
 
 /* NAV */
-.topbar{display:flex;align-items:center;justify-content:space-between;padding:20px 14px 0;gap:8px;flex-wrap:nowrap}
-.topbar .logo{font-size:20px;min-width:0;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;justify-content:center;text-align:center}
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:20px 14px 0;gap:8px;flex-wrap:nowrap;position:relative;min-height:44px}
+.topbar .logo{font-size:22px;font-family:Georgia,'Times New Roman',serif;font-weight:800;letter-spacing:.3px;position:absolute;left:50%;top:50%;transform:translate(-50%,calc(-50% + 10px));display:flex;align-items:center;gap:2px;pointer-events:none;white-space:nowrap}
 .logo .logo-icon{display:none!important}
-.logo{font-weight:800!important}
-.topbar .btn-back{flex-shrink:0;padding:8px 14px;font-size:12px}
-.topbar #btn-compare-top{flex-shrink:0}
+.topbar .btn-back{flex-shrink:0;padding:8px 14px;font-size:12px;position:relative;z-index:2}
+.topbar #btn-compare-top{flex-shrink:0;position:relative;z-index:2}
+.topbar > *:not(.logo){position:relative;z-index:2}
 @media (max-width:380px){
   .topbar{padding:18px 10px 0;gap:6px}
-  .topbar .logo{font-size:17px;gap:6px}
+  .topbar .logo{font-size:19px}
   .topbar .btn-back{padding:7px 11px;font-size:11px}
   .topbar #btn-compare-top{padding:5px 9px;font-size:10px}
 }
@@ -6439,11 +6439,10 @@ function renderDashboard() {
     var hour = new Date().getHours();
     var greeting = hour < 18 ? (isEN ? "Good morning" : "Bonjour") : (isEN ? "Good evening" : "Bonsoir");
     var headerEl = document.createElement("div");
-    headerEl.style.cssText = "margin-bottom:16px;display:flex;align-items:flex-start;justify-content:space-between";
-    headerEl.innerHTML = "<div>" +
+    headerEl.style.cssText = "margin-bottom:16px";
+    headerEl.innerHTML =
       "<div style='font-size:22px;font-family:Georgia,serif;font-weight:700;color:var(--pri)'>" + greeting + (userName ? " " + userName.split(" ")[0] : "") + " 👋</div>" +
-      "<div style='font-size:13px;color:var(--mut);margin-top:2px'>" + (isEN ? "Your personalized skincare space" : "Ton espace skincare personnalisé") + "</div></div>" +
-      "<button onclick='openSettings()' style='background:var(--surf);border:1px solid var(--bdr);border-radius:50%;width:38px;height:38px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:18px;flex-shrink:0'>⚙️</button>";
+      "<div style='font-size:13px;color:var(--mut);margin-top:2px'>" + (isEN ? "Your personalized skincare space" : "Ton espace skincare personnalisé") + "</div>";
     wrap.appendChild(headerEl);
 
     // ── ONGLETS (Routine / Suivi / Motivation / Conseils) ──
