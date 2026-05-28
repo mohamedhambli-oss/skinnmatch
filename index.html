@@ -502,6 +502,24 @@ h2{font-family:var(--serif);font-size:20px;font-weight:700;margin-bottom:3px}
 <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
 </head>
 <body>
+<script>
+// ── PROTECTION CRITIQUE : exécutée immédiatement, AVANT tout autre script ──
+// Force l'écran de langue à être le seul visible au démarrage.
+// Empêche les bugs de cache où une vieille version laissait une page interne visible.
+(function _forceStartScreen(){
+  try {
+    // Attendre que le DOM ait au moins les éléments principaux disponibles
+    var run = function(){
+      var allScreens = document.querySelectorAll('[id^="sc-"]');
+      if (allScreens.length === 0) { setTimeout(run, 50); return; }
+      allScreens.forEach(function(s){ s.classList.add('hidden'); });
+      var lang = document.getElementById('sc-lang');
+      if (lang) lang.classList.remove('hidden');
+    };
+    run();
+  } catch(e) {}
+})();
+</script>
 <div class="app" id="app">
 
 <!-- ══ LANG ══ -->
@@ -2363,7 +2381,15 @@ function go(screen){
     var activeEl = document.getElementById("sc-"+screen);
     if (activeEl) { activeEl.scrollTop = 0; activeEl.scrollIntoView({block:'start'}); }
   }, 0);
-  if(screen==='welcome') setTimeout(applyWelcomeLang,10);
+  if(screen==='welcome') {
+    setTimeout(applyWelcomeLang,10);
+    // Rafraîchir l'état du bouton selon l'utilisateur actuel (connecté ou non)
+    setTimeout(function(){
+      if (typeof window.onFirebaseUserReady === 'function') {
+        window.onFirebaseUserReady(window._currentUser || null);
+      }
+    }, 15);
+  }
   if(screen==='scan') setTimeout(function(){ startCamera(); }, 100);
   if(screen==='scan-product') {
     setTimeout(function(){ startBarcodeCamera(); }, 100);
@@ -8309,6 +8335,34 @@ initQuestions();
 // Le SW est injecté inline via Blob URL pour fonctionner sur GitHub Pages
 // (où on ne peut pas servir facilement un /sw.js séparé selon le sous-chemin).
 // Il met en cache index.html, les routines générées et les images de produits.
+
+// ── NETTOYAGE AGRESSIF DES ANCIENS SERVICE WORKERS ET CACHES ──
+// Si l'utilisateur avait une vieille version cachée (ex: page "Mon profil" vide),
+// on nettoie tout pour qu'il reçoive la version actuelle au prochain chargement.
+(function _cleanupOldSW(){
+  if (!('serviceWorker' in navigator)) return;
+  var CURRENT_SW = 'sm-v4';
+  // 1) Vérifier la version actuelle stockée et désenregistrer si ancienne
+  try {
+    var lastSeen = localStorage.getItem('sm_sw_version');
+    if (lastSeen !== CURRENT_SW) {
+      // Nouvelle version → désenregistrer tous les SW + vider tous les caches
+      navigator.serviceWorker.getRegistrations().then(function(regs){
+        regs.forEach(function(r){
+          try { r.unregister(); } catch(e){}
+        });
+      }).catch(function(){});
+      if ('caches' in window) {
+        caches.keys().then(function(keys){
+          keys.forEach(function(k){
+            try { caches.delete(k); } catch(e){}
+          });
+        }).catch(function(){});
+      }
+      localStorage.setItem('sm_sw_version', CURRENT_SW);
+    }
+  } catch(e) {}
+})();
 
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', function() {
