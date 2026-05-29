@@ -185,6 +185,150 @@ body > div[id^="sc-"]:not(.hidden){
   }
 }
 
+/* ════ ARTICLES PREMIUM (3 formats) ════ */
+.art-modal-overlay {
+  position:fixed; inset:0; background:rgba(0,0,0,.5); z-index:9999;
+  display:flex; flex-direction:column; justify-content:flex-end;
+}
+.art-modal {
+  background:#FBF7F4; border-radius:24px 24px 0 0; max-height:90vh;
+  overflow:hidden; display:flex; flex-direction:column; position:relative;
+}
+.art-top {
+  display:flex; justify-content:space-between; align-items:center;
+  padding:16px 14px 8px; flex-shrink:0; background:#FBF7F4; z-index:5;
+}
+.art-btn-close, .art-btn-icon {
+  width:36px; height:36px; border-radius:50%; background:#fff;
+  border:1px solid #F0E8E5; display:flex; align-items:center; justify-content:center;
+  cursor:pointer; box-shadow:0 2px 6px rgba(0,0,0,.04); padding:0;
+}
+.art-body { overflow-y:auto; -webkit-overflow-scrolling:touch; padding-bottom:30px; }
+
+/* Méta row */
+.art-meta-row { display:flex; align-items:center; gap:8px; padding:6px 22px; }
+.art-meta-tag {
+  display:inline-flex; align-items:center; gap:6px;
+  font-size:10px; font-weight:700; letter-spacing:1px;
+  text-transform:uppercase; color:#C4726A;
+}
+.art-meta-dot { width:14px; height:14px; border-radius:50%; background:#FDEBE5; display:inline-block; }
+.art-meta-sep { font-size:10px; color:#B0958F; }
+.art-meta-time {
+  font-size:10px; font-weight:700; color:#8B6F5E;
+  background:#F5EEE8; padding:3px 10px; border-radius:50px; letter-spacing:.5px;
+}
+
+/* Hero */
+.art-hero { padding:8px 22px 12px; display:flex; align-items:flex-start; gap:14px; }
+.art-hero-illu {
+  width:80px; height:80px; border-radius:50%; flex-shrink:0;
+  display:flex; align-items:center; justify-content:center;
+}
+.art-title {
+  font-family:Georgia,"Times New Roman",serif; font-size:22px;
+  line-height:1.15; margin:0; font-weight:700; letter-spacing:-.5px; color:#3D2B1F;
+}
+
+/* Intro */
+.art-intro { padding:0 22px 18px; }
+.art-intro-bar { width:30px; height:2px; background:#C4726A; opacity:.6; margin-bottom:12px; }
+.art-intro p { font-size:14px; line-height:1.55; color:#5A4A42; margin:0; font-weight:400; }
+
+/* Bloc Why (didactic) */
+.art-why {
+  margin:0 18px 16px; background:#FBF1EC; border-radius:18px;
+  padding:18px 16px; border:1px solid rgba(196,114,106,.10);
+}
+.art-why-title { font-size:13px; font-weight:700; color:#3D2B1F; margin:0 0 14px; }
+.art-why-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; }
+.art-why-item { text-align:center; padding:4px 2px; }
+.art-why-icon {
+  width:34px; height:34px; margin:0 auto 8px; opacity:.8;
+  display:flex; align-items:center; justify-content:center; color:#A85A52;
+}
+.art-why-icon svg { width:34px; height:34px; }
+.art-why-text { font-size:10.5px; color:#5A4A42; line-height:1.4; font-weight:500; }
+
+/* Bloc Reflex (didactic) */
+.art-reflex {
+  margin:0 18px 16px; background:#fff; border-radius:18px;
+  padding:16px; border:1px solid #F0E8E5;
+}
+.art-reflex-header { display:flex; align-items:flex-start; gap:12px; margin-bottom:14px; }
+.art-reflex-icon {
+  width:38px; height:38px; border-radius:12px; background:#EEF6F0;
+  display:flex; align-items:center; justify-content:center; flex-shrink:0; color:#5A8A6E;
+}
+.art-reflex-icon svg { width:20px; height:20px; }
+.art-reflex-eyebrow { font-size:11px; font-weight:600; color:#5A8A6E; margin-bottom:2px; }
+.art-reflex-main { font-size:16px; font-weight:700; color:#3D2B1F; line-height:1.3; }
+.art-reflex-stats { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+.art-stat-item {
+  background:#FBF7F4; border-radius:12px; padding:10px;
+  display:flex; align-items:center; gap:10px;
+}
+.art-stat-ic {
+  width:30px; height:30px; border-radius:50%; background:#fff;
+  display:flex; align-items:center; justify-content:center; flex-shrink:0; color:#5A8A6E;
+}
+.art-stat-ic svg { width:16px; height:16px; }
+.art-stat-val { font-size:12px; font-weight:700; color:#3D2B1F; line-height:1.2; }
+.art-stat-lbl { font-size:10px; color:#8B6F5E; margin-top:2px; }
+
+/* Punchline */
+.art-punch {
+  margin:0 18px 20px; background:#FBF1EC; border-radius:18px;
+  padding:16px; display:flex; align-items:center; gap:12px;
+  border:1px solid rgba(196,114,106,.12);
+}
+.art-punch-ic {
+  width:38px; height:38px; border-radius:50%; background:#F8DCD2;
+  display:flex; align-items:center; justify-content:center; flex-shrink:0; font-size:20px;
+}
+.art-punch-text { font-size:13px; line-height:1.5; color:#5A4338; font-weight:500; }
+.art-punch-text strong { color:#C4726A; }
+
+/* Format LISTE */
+.art-list { margin:0 18px 16px; }
+.art-tip-card {
+  background:#fff; border-radius:14px; padding:14px;
+  border:1px solid #F0E8E5; margin-bottom:8px;
+  display:flex; gap:12px; align-items:flex-start;
+}
+.art-tip-num {
+  width:28px; height:28px; border-radius:8px; background:#FDEBE5;
+  display:flex; align-items:center; justify-content:center;
+  font-family:Georgia,serif; font-size:14px; font-weight:700; color:#C4726A;
+  flex-shrink:0;
+}
+.art-tip-content h5 { font-size:13px; margin:0 0 4px; font-weight:700; line-height:1.3; color:#3D2B1F; }
+.art-tip-content p { font-size:12px; margin:0; color:#8B6F5E; line-height:1.5; }
+
+/* Format DUALITÉ */
+.art-combo-sec { margin:0 18px 14px; }
+.art-combo-title {
+  font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:1.5px;
+  margin:0 0 4px; color:#8B6F5E;
+}
+.art-combo-sub { font-size:11px; color:#8B6F5E; margin:0 0 10px; line-height:1.4; }
+.art-combo-card {
+  border-radius:14px; padding:12px 14px;
+  margin-bottom:8px; display:flex; align-items:center; gap:10px;
+}
+.art-combo-card.bad { background:#FDF0EC; border:1px solid #F5D5CC; }
+.art-combo-card.good { background:#EEF6F0; border:1px solid #C9E0CE; }
+.art-combo-ic {
+  width:30px; height:30px; border-radius:50%; flex-shrink:0;
+  display:flex; align-items:center; justify-content:center;
+  font-size:14px; font-weight:700;
+}
+.art-combo-card.bad .art-combo-ic { background:#F5D5CC; color:#C4726A; }
+.art-combo-card.good .art-combo-ic { background:#C9E0CE; color:#5A8A6E; }
+.art-combo-info { flex:1; min-width:0; }
+.art-combo-pair { font-size:13px; font-weight:700; color:#3D2B1F; line-height:1.3; }
+.art-combo-reason { font-size:11px; color:#8B6F5E; margin-top:2px; }
+
 /* NAV */
 .topbar{display:flex;align-items:center;justify-content:space-between;padding:20px 14px 0;gap:8px;flex-wrap:nowrap;position:relative;min-height:44px}
 .topbar .logo{font-size:22px;font-family:Georgia,'Times New Roman',serif;font-weight:800;letter-spacing:.3px;position:absolute;left:50%;top:50%;transform:translate(-50%,calc(-50% + 10px));display:flex;align-items:center;gap:2px;pointer-events:none;white-space:nowrap}
@@ -6363,18 +6507,277 @@ var CHALLENGES = [
 
 // ══ ARTICLES ══
 var ARTICLES_FR = [
-  { id:"a1", emoji:"☀️", tag:"Protection", title:"Le SPF, indispensable même en hiver", intro:"Les UV ne s'arrêtent pas en décembre. En hiver, les UVA pénètrent toujours autant dans la peau — et sont responsables du vieillissement prématuré.", content:"Les UVB (coups de soleil) diminuent en hiver, mais les UVA restent présents toute l'année, même par temps nuageux. Ils pénètrent jusqu'au derme et accélèrent le vieillissement, les taches et le relâchement cutané. Un SPF 30 ou 50 le matin prend 10 secondes et protège ta peau pour la journée entière. C'est l'anti-âge le moins cher du marché.", read:"3 min" },
-  { id:"a2", emoji:"🌙", tag:"Routine du soir", title:"5 erreurs qui abîment ta peau la nuit", intro:"La nuit, ta peau se répare. Mais certaines habitudes sabotent ce processus sans que tu le saches.", content:"1. Dormir avec du maquillage — les résidus obstruent les pores et génèrent des imperfections. 2. Utiliser une taie d'oreiller en coton — il absorbe le sébum et les produits. Essaie la soie ou le satin. 3. Toucher ton visage avec tes mains — chaque contact transfère des bactéries. 4. Sauter l'hydratant parce que ta peau est grasse — la peau grasse peut aussi être déshydratée. 5. Ne pas nettoyer ton téléphone — c'est l'objet le plus bactérien que tu approches de ton visage.", read:"4 min" },
-  { id:"a3", emoji:"💧", tag:"Hydratation", title:"Peau grasse et hydratation : un duo mal compris", intro:"Beaucoup de peaux grasses évitent les hydratants par peur d'aggraver les brillances. C'est souvent l'erreur inverse.", content:"Une peau grasse peut être déshydratée. Quand la peau manque d'eau, elle compense en produisant plus de sébum — créant un cercle vicieux. La solution : un gel hydratant sans huile, à base d'acide hyaluronique. Il apporte de l'eau sans alourdir. Ta peau sera plus équilibrée, moins brillante et moins sujette aux imperfections.", read:"3 min" },
-  { id:"a4", emoji:"🧬", tag:"Actifs", title:"Niacinamide : l'actif qui convient (presque) à tout le monde", intro:"Pores dilatés, taches, rougeurs, imperfections — le niacinamide s'attaque à tout ça. Et il est rarement irritant.", content:"Le niacinamide (vitamine B3) est l'un des actifs les plus polyvalents en skincare. Il régule la production de sébum, réduit l'apparence des pores, uniformise le teint, atténue les rougeurs et renforce la barrière cutanée. Compatible avec presque tous les types de peau et la plupart des autres actifs. La concentration idéale : entre 5% et 10%.", read:"3 min" },
-  { id:"a5", emoji:"🌿", tag:"Naturel", title:"Les huiles végétales : lesquelles pour quel type de peau ?", intro:"Pas toutes les huiles se valent. Certaines conviennent aux peaux grasses, d'autres aux peaux sèches.", content:"Peau sèche : huile d'argan, rosehip, avocat — riches et nourrissantes. Peau mixte : huile de jojoba — proche du sébum naturel, équilibrante. Peau grasse : huile de nigelle, pépins de raisin — légères et régulatrices. Peau sensible : huile de calendula, camomille — apaisantes. Évite l'huile de coco sur le visage si tu as tendance acnéique — elle est comédogène.", read:"4 min" },
-  { id:"a6", emoji:"🔬", tag:"Science", title:"Rétinol : tout ce qu'il faut savoir avant de commencer", intro:"Le rétinol est l'actif anti-âge le plus étudié. Mais mal utilisé, il peut irriter. Voici comment l'intégrer en douceur.", content:"Le rétinol accélère le renouvellement cellulaire et stimule la production de collagène. Résultat : moins de rides, pores affinés, teint uniformisé. Pour commencer : 0,1% à 0,3%, 2 fois par semaine le soir. Augmenter progressivement. Ne jamais utiliser avec du benzoyle de peroxyde. Toujours suivre d'un SPF le matin. Les premières semaines peuvent inclure légère irritation — c'est normal.", read:"5 min" },
-  { id:"a7", emoji:"🧘", tag:"Bien-être", title:"Le lien entre stress et imperfections", intro:"Quand tu stresses, ta peau le ressent. Ce n'est pas dans ta tête — c'est de la biochimie.", content:"Le stress provoque une libération de cortisol. Cette hormone stimule les glandes sébacées et augmente la production de sébum. Plus de sébum = plus d'obstruction = plus d'imperfections. Le stress affecte aussi la barrière cutanée, la rendant plus perméable aux irritants. Gérer son stress (sommeil, exercice, respiration) fait partie intégrante d'une bonne routine skincare.", read:"3 min" },
-  { id:"a8", emoji:"🍎", tag:"Nutrition", title:"Les aliments qui font du bien à ta peau", intro:"Ce que tu manges se lit sur ton visage. Certains aliments sont de véritables boosts pour la peau.", content:"Top aliments peau : avocat (vitamine E et graisses saines), poissons gras (oméga-3 anti-inflammatoires), tomates (lycopène protecteur), noix du Brésil (sélénium), fruits rouges (antioxydants). À limiter : sucre raffiné (accélère le vieillissement par glycation), produits laitiers (lien avec l'acné chez certaines personnes), alcool (déshydratation).", read:"4 min" },
-  { id:"a9", emoji:"💤", tag:"Sommeil", title:"Pourquoi le sommeil est le meilleur soin de nuit", intro:"Aucune crème ne remplace 8 heures de sommeil réparateur. Pendant que tu dors, ta peau travaille.", content:"Entre 22h et 2h du matin, la production de mélatonine et d'hormone de croissance est maximale. Ces hormones stimulent la régénération cellulaire, la synthèse de collagène et la réparation des dommages UV. Le manque de sommeil se lit directement sur le visage : teint terne, cernes, pores dilatés. Dormir sur le dos préserve aussi la peau du visage des frottements.", read:"3 min" },
-  { id:"a10", emoji:"🧪", tag:"Ingrédients", title:"Les ingrédients à ne jamais mélanger", intro:"Certains actifs se neutralisent ou s'irritent mutuellement. Voici les combos à éviter.", content:"À éviter ensemble : Rétinol + AHA/BHA (sur-exfoliation). Vitamine C + Niacinamide à forte dose (peut réduire l'efficacité). Rétinol + Benzoyle de peroxyde (irritation sévère). Acide hyaluronique + alcools dénaturés (contre-productif). Les bons combos : Niacinamide + Zinc (sébum). SPF + Antioxydants (protection maximale). Rétinol + Peptides (anti-âge complet).", read:"4 min" },
-  { id:"a11", emoji:"🌊", tag:"Hydratation", title:"Combien d'eau faut-il vraiment boire pour la peau ?", intro:"L'hydratation interne compte autant que les soins topiques.", content:"1,5 à 2 litres d'eau par jour restent la référence. Mais l'hydratation de la peau dépend aussi de ta barrière cutanée — si elle est altérée, l'eau s'évapore plus vite. Utiliser un hydratant contenant des occlutants (comme la vaseline ou les céramides) aide à retenir l'eau dans les couches superficielles. Thé vert, eau de coco et bouillons de légumes comptent aussi dans ton apport hydrique.", read:"3 min" },
-  { id:"a12", emoji:"✨", tag:"Routine", title:"Comment construire une routine skincare en 3 étapes", intro:"Pas besoin de 15 produits. Une routine efficace peut tenir en 3 étapes.", content:"Matin : 1. Nettoyant doux → 2. Hydratant léger → 3. SPF. C'est tout. Le soir : 1. Double nettoyage (huile puis mousse) → 2. Sérum ciblé (rétinol, niacinamide...) → 3. Crème plus riche. Le secret : la régularité. Une routine simple faite chaque jour dépasse toujours une routine complexe faite de temps en temps.", read:"3 min" },
+  {
+    id:"a1", emoji:"☀️", tag:"Protection", title:"Le SPF, indispensable même en hiver",
+    intro:"Les UVA sont présents toute l'année, même par temps nuageux. Ils sont responsables du vieillissement cutané prématuré.",
+    read:"3 min",
+    format:"didactic",
+    sections: {
+      why: {
+        title: "Pourquoi c'est important",
+        items: [
+          { ic: "wrinkle", text: "Accélère<br>le vieillissement" },
+          { ic: "spots",   text: "Favorise<br>les taches" },
+          { ic: "waves",   text: "Entraîne le<br>relâchement cutané" }
+        ]
+      },
+      reflex: {
+        eyebrow: "Le bon réflexe",
+        main: "SPF 30 ou 50 chaque matin",
+        stats: [
+          { ic: "clock", val: "10 secondes", lbl: "d'application" },
+          { ic: "shield", val: "Protège ta peau", lbl: "toute la journée" }
+        ]
+      },
+      punch: { emoji: "✨", html: "<strong>C'est l'anti-âge</strong><br>le moins cher du marché." }
+    }
+  },
+  {
+    id:"a2", emoji:"🌙", tag:"Routine du soir", title:"5 erreurs qui abîment ta peau la nuit",
+    intro:"La nuit, ta peau se répare. Certaines habitudes sabotent ce processus sans que tu le saches.",
+    read:"4 min",
+    format:"list",
+    sections: {
+      list: [
+        { h:"Dormir avec du maquillage", p:"Les résidus obstruent les pores et génèrent des imperfections." },
+        { h:"Une taie d'oreiller en coton", p:"Elle absorbe le sébum et tes soins. Préfère la soie ou le satin." },
+        { h:"Toucher son visage", p:"Chaque contact transfère bactéries et impuretés." },
+        { h:"Sauter l'hydratant", p:"La peau grasse peut aussi être déshydratée. Hydrate toujours." },
+        { h:"Téléphone non nettoyé", p:"C'est l'objet le plus bactérien que tu approches du visage." }
+      ],
+      punch: { emoji: "🌙", html: "<strong>Une routine simple</strong><br>répétée chaque soir, et tout change." }
+    }
+  },
+  {
+    id:"a3", emoji:"💧", tag:"Hydratation", title:"Peau grasse et hydratation : un duo mal compris",
+    intro:"Beaucoup de peaux grasses évitent les hydratants par peur d'aggraver les brillances. C'est souvent l'erreur inverse.",
+    read:"3 min",
+    format:"didactic",
+    sections: {
+      why: {
+        title: "Le cercle vicieux à briser",
+        items: [
+          { ic: "drop",    text: "Peau manque<br>d'eau" },
+          { ic: "spots",   text: "Sébum compense<br>en excès" },
+          { ic: "wrinkle", text: "Brillance et<br>imperfections" }
+        ]
+      },
+      reflex: {
+        eyebrow: "La solution",
+        main: "Un gel hydratant sans huile",
+        stats: [
+          { ic: "drop", val: "Acide hyaluronique", lbl: "base recommandée" },
+          { ic: "shield", val: "Sans huile", lbl: "ne bouche pas les pores" }
+        ]
+      },
+      punch: { emoji: "💧", html: "<strong>Une peau hydratée</strong><br>est une peau équilibrée." }
+    }
+  },
+  {
+    id:"a4", emoji:"🧬", tag:"Actifs", title:"Niacinamide : l'actif qui convient (presque) à tout le monde",
+    intro:"Pores dilatés, taches, rougeurs, imperfections — le niacinamide s'attaque à tout ça. Et il est rarement irritant.",
+    read:"3 min",
+    format:"didactic",
+    sections: {
+      why: {
+        title: "Ce qu'il fait pour ta peau",
+        items: [
+          { ic: "spots",   text: "Resserre<br>les pores" },
+          { ic: "drop",    text: "Régule<br>le sébum" },
+          { ic: "shield",  text: "Apaise<br>les rougeurs" }
+        ]
+      },
+      reflex: {
+        eyebrow: "Le bon dosage",
+        main: "Entre 5% et 10% d'efficacité",
+        stats: [
+          { ic: "clock", val: "Matin et soir", lbl: "tous les jours" },
+          { ic: "shield", val: "Tous types", lbl: "de peau" }
+        ]
+      },
+      punch: { emoji: "🧬", html: "<strong>L'actif universel.</strong><br>Difficile de se tromper avec." }
+    }
+  },
+  {
+    id:"a5", emoji:"🌿", tag:"Naturel", title:"Les huiles végétales : lesquelles pour quel type de peau ?",
+    intro:"Pas toutes les huiles se valent. Certaines conviennent aux peaux grasses, d'autres aux peaux sèches.",
+    read:"4 min",
+    format:"list",
+    sections: {
+      list: [
+        { h:"Peau sèche", p:"Argan, rosehip, avocat — riches et nourrissantes." },
+        { h:"Peau mixte", p:"Jojoba — proche du sébum naturel, équilibrante." },
+        { h:"Peau grasse", p:"Nigelle, pépins de raisin — légères et régulatrices." },
+        { h:"Peau sensible", p:"Calendula, camomille — apaisantes." },
+        { h:"À éviter si acné", p:"Huile de coco — comédogène sur le visage." }
+      ],
+      punch: { emoji: "🌿", html: "<strong>La bonne huile</strong><br>pour ta peau, ça change tout." }
+    }
+  },
+  {
+    id:"a6", emoji:"🔬", tag:"Actifs", title:"Rétinol : tout ce qu'il faut savoir avant de commencer",
+    intro:"L'actif anti-âge le plus étudié. Mais mal utilisé, il peut irriter. Voici comment l'intégrer en douceur.",
+    read:"5 min",
+    format:"didactic",
+    sections: {
+      why: {
+        title: "Ce que fait le rétinol",
+        items: [
+          { ic: "wrinkle", text: "Réduit<br>les rides" },
+          { ic: "spots",   text: "Affine<br>les pores" },
+          { ic: "drop",    text: "Uniformise<br>le teint" }
+        ]
+      },
+      reflex: {
+        eyebrow: "Comment débuter",
+        main: "0,1% à 0,3%, 2 fois par semaine",
+        stats: [
+          { ic: "clock", val: "Le soir uniquement", lbl: "jamais le matin" },
+          { ic: "shield", val: "SPF obligatoire", lbl: "le lendemain matin" }
+        ]
+      },
+      punch: { emoji: "🔬", html: "<strong>Patience et constance.</strong><br>Résultats visibles après 3 mois." }
+    }
+  },
+  {
+    id:"a7", emoji:"🧘", tag:"Bien-être", title:"Le lien entre stress et imperfections",
+    intro:"Quand tu stresses, ta peau le ressent. Ce n'est pas dans ta tête — c'est de la biochimie.",
+    read:"3 min",
+    format:"didactic",
+    sections: {
+      why: {
+        title: "Ce qui se passe sous ta peau",
+        items: [
+          { ic: "drop",    text: "Cortisol<br>stimule le sébum" },
+          { ic: "spots",   text: "Pores obstrués<br>imperfections" },
+          { ic: "shield",  text: "Barrière<br>fragilisée" }
+        ]
+      },
+      reflex: {
+        eyebrow: "Les bons gestes",
+        main: "Sommeil, respiration, exercice",
+        stats: [
+          { ic: "clock", val: "8h de sommeil", lbl: "minimum" },
+          { ic: "shield", val: "10 min de calme", lbl: "par jour" }
+        ]
+      },
+      punch: { emoji: "🧘", html: "<strong>La gestion du stress,</strong><br>c'est aussi du skincare." }
+    }
+  },
+  {
+    id:"a8", emoji:"🍎", tag:"Nutrition", title:"Les aliments qui font du bien à ta peau",
+    intro:"Ce que tu manges se lit sur ton visage. Certains aliments sont de véritables boosts.",
+    read:"4 min",
+    format:"duality",
+    sections: {
+      bad_title: "À limiter",
+      bad_subtitle: "Ces aliments accélèrent le vieillissement cutané",
+      bad_items: [
+        { h:"Sucre raffiné", p:"Glycation → relâchement et rides précoces" },
+        { h:"Produits laitiers", p:"Liés à l'acné chez certaines personnes" },
+        { h:"Alcool", p:"Déshydratation et inflammation" }
+      ],
+      good_title: "À privilégier",
+      good_subtitle: "Ces aliments boostent ta peau de l'intérieur",
+      good_items: [
+        { h:"Avocat", p:"Vitamine E et bonnes graisses" },
+        { h:"Poissons gras", p:"Oméga-3 anti-inflammatoires" },
+        { h:"Fruits rouges", p:"Antioxydants puissants" },
+        { h:"Noix du Brésil", p:"Sélénium protecteur" }
+      ],
+      punch: { emoji: "🍎", html: "<strong>L'assiette</strong><br>est ton premier soin." }
+    }
+  },
+  {
+    id:"a9", emoji:"💤", tag:"Bien-être", title:"Pourquoi le sommeil est le meilleur soin de nuit",
+    intro:"Aucune crème ne remplace 8 heures de sommeil réparateur. Pendant que tu dors, ta peau travaille.",
+    read:"3 min",
+    format:"didactic",
+    sections: {
+      why: {
+        title: "Ce qui se passe la nuit",
+        items: [
+          { ic: "shield",  text: "Régénération<br>cellulaire" },
+          { ic: "wrinkle", text: "Synthèse<br>de collagène" },
+          { ic: "drop",    text: "Réparation<br>dommages UV" }
+        ]
+      },
+      reflex: {
+        eyebrow: "Le bon timing",
+        main: "Coucher avant 23h, idéalement",
+        stats: [
+          { ic: "clock", val: "22h - 2h", lbl: "pic de régénération" },
+          { ic: "shield", val: "Dormir sur le dos", lbl: "moins de frottements" }
+        ]
+      },
+      punch: { emoji: "💤", html: "<strong>Le sommeil</strong><br>est la crème de nuit la plus efficace." }
+    }
+  },
+  {
+    id:"a10", emoji:"🧪", tag:"Actifs", title:"Les ingrédients à ne jamais mélanger",
+    intro:"Certains actifs se neutralisent ou s'irritent mutuellement. Voici les combos à éviter — et ceux à privilégier.",
+    read:"4 min",
+    format:"duality",
+    sections: {
+      bad_title: "À éviter",
+      bad_subtitle: "Ces combos peuvent irriter ou neutraliser tes actifs",
+      bad_items: [
+        { h:"Rétinol + AHA/BHA", p:"Sur-exfoliation, barrière fragilisée" },
+        { h:"Vitamine C + Niacinamide (forte dose)", p:"Peut réduire l'efficacité des deux" },
+        { h:"Rétinol + Benzoyle de peroxyde", p:"Irritation sévère, rougeurs" }
+      ],
+      good_title: "Les bons duos",
+      good_subtitle: "Ces combos se renforcent mutuellement",
+      good_items: [
+        { h:"Niacinamide + Zinc", p:"Régulation parfaite du sébum" },
+        { h:"SPF + Antioxydants", p:"Protection maximale anti-UV" },
+        { h:"Rétinol + Peptides", p:"Anti-âge complet et apaisant" }
+      ],
+      punch: { emoji: "🧬", html: "<strong>Dans le doute :</strong><br>matin = douceur, soir = actifs forts." }
+    }
+  },
+  {
+    id:"a11", emoji:"🌊", tag:"Hydratation", title:"Combien d'eau faut-il vraiment boire pour la peau ?",
+    intro:"L'hydratation interne compte autant que les soins topiques. Mais boire 3 litres ne suffit pas si la barrière cutanée fuit.",
+    read:"3 min",
+    format:"didactic",
+    sections: {
+      why: {
+        title: "Pourquoi l'eau seule ne suffit pas",
+        items: [
+          { ic: "drop",    text: "Barrière<br>fuit l'eau" },
+          { ic: "spots",   text: "Évaporation<br>en surface" },
+          { ic: "shield",  text: "Besoin<br>d'occlusifs" }
+        ]
+      },
+      reflex: {
+        eyebrow: "Le bon équilibre",
+        main: "1,5 à 2L d'eau + crème hydratante",
+        stats: [
+          { ic: "drop", val: "1,5 - 2 L", lbl: "par jour" },
+          { ic: "shield", val: "Céramides", lbl: "retiennent l'eau" }
+        ]
+      },
+      punch: { emoji: "🌊", html: "<strong>Bois bien,</strong><br>et hydrate ta peau en surface aussi." }
+    }
+  },
+  {
+    id:"a12", emoji:"✨", tag:"Routine", title:"Comment construire une routine skincare en 3 étapes",
+    intro:"Pas besoin de 15 produits. Une routine efficace peut tenir en 3 étapes — et la régularité bat toujours la complexité.",
+    read:"3 min",
+    format:"list",
+    sections: {
+      list: [
+        { h:"Matin : Nettoyant doux", p:"Pour enlever sébum et résidus de nuit." },
+        { h:"Matin : Hydratant léger", p:"Crée la base pour le SPF." },
+        { h:"Matin : SPF 30 ou 50", p:"Toujours, même en hiver." },
+        { h:"Soir : Double nettoyage", p:"Huile puis mousse, pour tout enlever." },
+        { h:"Soir : Sérum ciblé", p:"Rétinol, niacinamide, vitamine C…" },
+        { h:"Soir : Crème nourrissante", p:"Plus riche que le matin." }
+      ],
+      punch: { emoji: "✨", html: "<strong>Simple, régulière, adaptée.</strong><br>C'est ça, une routine qui fonctionne." }
+    }
+  }
 ];
 
 var ARTICLES_EN = [
@@ -7040,20 +7443,224 @@ function saveJournalEntry() {
 }
 
 // ── ARTICLE MODAL ──
+// ── ICÔNES SVG pour les articles premium ──
+var ART_ICONS = {
+  wrinkle: '<svg viewBox="0 0 36 36" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="14" r="6"/><path d="M10 26 Q14 22 18 24 Q22 22 26 26"/><circle cx="14" cy="14" r=".8" fill="currentColor"/><circle cx="22" cy="14" r=".8" fill="currentColor"/><path d="M14 18 Q18 20 22 18"/></svg>',
+  spots: '<svg viewBox="0 0 36 36" fill="currentColor"><circle cx="13" cy="14" r="2"/><circle cx="22" cy="13" r="1.5"/><circle cx="17" cy="20" r="2.5"/><circle cx="24" cy="22" r="1.5"/><circle cx="12" cy="24" r="1.5"/></svg>',
+  waves: '<svg viewBox="0 0 36 36" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M6 14 Q12 10 18 14 Q24 18 30 14"/><path d="M6 20 Q12 16 18 20 Q24 24 30 20"/><path d="M6 26 Q12 22 18 26 Q24 30 30 26"/></svg>',
+  drop: '<svg viewBox="0 0 36 36" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 C14 14 10 18 10 24 A8 8 0 0 0 26 24 C26 18 22 14 18 6 Z"/></svg>',
+  shield: '<svg viewBox="0 0 36 36" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 L8 10 V18 C8 25 12 30 18 32 C24 30 28 25 28 18 V10 Z"/></svg>',
+  clock: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 14"/></svg>'
+};
+// Icônes hero par tag (illustrations grandes circulaires)
+var HERO_ILLUS = {
+  "Protection": { bg: "linear-gradient(135deg,#FDEBE5,#F8D9CE)", color: "#C4726A",
+    svg: '<svg width="50" height="50" viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="24" cy="26" r="9"/><line x1="24" y1="10" x2="24" y2="14"/><line x1="24" y1="38" x2="24" y2="42"/><line x1="8" y1="26" x2="12" y2="26"/><line x1="36" y1="26" x2="40" y2="26"/><line x1="14" y1="16" x2="16" y2="18"/><line x1="32" y1="34" x2="34" y2="36"/><line x1="32" y1="18" x2="34" y2="16"/><path d="M30 46 Q38 42 46 46 Q52 44 56 48 Q54 52 48 52 L34 52 Q30 52 30 46 Z" fill="#FDEBE5"/></svg>' },
+  "Routine du soir": { bg: "linear-gradient(135deg,#E8E0F0,#D4C9E4)", color: "#7B6BA0",
+    svg: '<svg width="50" height="50" viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M40 12 Q30 16 28 26 Q26 38 36 44 Q46 48 54 40 Q44 42 38 36 Q32 28 40 12 Z" fill="#E8E0F0"/><circle cx="18" cy="20" r="1.5" fill="currentColor"/><circle cx="22" cy="32" r="1" fill="currentColor"/><circle cx="14" cy="38" r="1.2" fill="currentColor"/></svg>' },
+  "Hydratation": { bg: "linear-gradient(135deg,#DCEDF5,#B8DDEC)", color: "#5A8AA8",
+    svg: '<svg width="50" height="50" viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M32 10 C24 22 18 30 18 40 A14 14 0 0 0 46 40 C46 30 40 22 32 10 Z" fill="#DCEDF5"/></svg>' },
+  "Actifs": { bg: "linear-gradient(135deg,#F0EBE5,#E0D2C8)", color: "#8B6F5E",
+    svg: '<svg width="50" height="50" viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 14 H30 V30 L36 44 Q34 50 28 50 L24 50 Q18 50 16 44 L22 30 Z" fill="#F0EBE5"/><line x1="22" y1="14" x2="30" y2="14"/><line x1="22" y1="20" x2="30" y2="20"/><circle cx="26" cy="38" r="1.5" fill="currentColor"/><circle cx="22" cy="44" r="1.2" fill="currentColor"/></svg>' },
+  "Naturel": { bg: "linear-gradient(135deg,#E0EFD8,#C2DEB0)", color: "#6B8F4D",
+    svg: '<svg width="50" height="50" viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M32 10 Q22 18 22 32 Q22 42 32 50 Q42 42 42 32 Q42 18 32 10 Z" fill="#E0EFD8"/><path d="M32 14 V46" stroke-dasharray="2,2"/></svg>' },
+  "Bien-être": { bg: "linear-gradient(135deg,#F5E0E5,#E8C8D0)", color: "#A57080",
+    svg: '<svg width="50" height="50" viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="32" cy="22" r="7" fill="#F5E0E5"/><path d="M32 30 Q24 32 22 40 Q22 50 32 52 Q42 50 42 40 Q40 32 32 30 Z" fill="#F5E0E5"/></svg>' },
+  "Nutrition": { bg: "linear-gradient(135deg,#FDEED2,#F5D8A0)", color: "#B8884A",
+    svg: '<svg width="50" height="50" viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="32" cy="34" r="14" fill="#FDEED2"/><path d="M32 20 Q30 14 34 12"/><path d="M32 20 Q34 16 30 14" /></svg>' },
+  "Routine": { bg: "linear-gradient(135deg,#F5EFE5,#E8DCC8)", color: "#9C7E5C",
+    svg: '<svg width="50" height="50" viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="32" cy="32" r="20" fill="#F5EFE5"/><polyline points="32 18 32 32 42 38"/></svg>' }
+};
+
 function showArticle(idx, isEN) {
   var articles = isEN ? ARTICLES_EN : ARTICLES_FR;
   var a = articles[idx];
   if (!a) return;
+
+  // Si l'article n'est pas dans le nouveau format (ex: articles EN simples), fallback à l'ancien rendu basique
+  if (!a.sections || !a.format) {
+    _showArticleSimple(a);
+    return;
+  }
+
+  var hero = HERO_ILLUS[a.tag] || HERO_ILLUS["Routine"];
+  var s = a.sections;
+
+  // ── BLOCS PARTAGÉS ──
+  function _heroBlock() {
+    return "<div class='art-meta-row'>" +
+      "<span class='art-meta-tag'><span class='art-meta-dot'></span>" + a.tag.toUpperCase() + "</span>" +
+      "<span class='art-meta-sep'>·</span>" +
+      "<span class='art-meta-time'>" + a.read.toUpperCase() + "</span>" +
+      "</div>" +
+      "<div class='art-hero'>" +
+        "<div class='art-hero-illu' style='background:" + hero.bg + ";color:" + hero.color + "'>" + hero.svg + "</div>" +
+        "<h1 class='art-title'>" + a.title + "</h1>" +
+      "</div>" +
+      "<div class='art-intro'>" +
+        "<div class='art-intro-bar'></div>" +
+        "<p>" + a.intro + "</p>" +
+      "</div>";
+  }
+
+  function _punchBlock(p) {
+    if (!p) return "";
+    return "<div class='art-punch'>" +
+      "<div class='art-punch-ic'>" + p.emoji + "</div>" +
+      "<div class='art-punch-text'>" + p.html + "</div>" +
+      "</div>";
+  }
+
+  // ── FORMAT "didactic" : Pourquoi c'est important + Le bon réflexe + Stats ──
+  function _renderDidactic() {
+    var html = _heroBlock();
+
+    if (s.why) {
+      html += "<div class='art-why'>" +
+        "<h3 class='art-why-title'>" + s.why.title + "</h3>" +
+        "<div class='art-why-grid'>";
+      s.why.items.forEach(function(it){
+        var icon = ART_ICONS[it.ic] || ART_ICONS.shield;
+        html += "<div class='art-why-item'>" +
+          "<div class='art-why-icon'>" + icon + "</div>" +
+          "<div class='art-why-text'>" + it.text + "</div>" +
+          "</div>";
+      });
+      html += "</div></div>";
+    }
+
+    if (s.reflex) {
+      html += "<div class='art-reflex'>" +
+        "<div class='art-reflex-header'>" +
+          "<div class='art-reflex-icon'>" + ART_ICONS.shield + "</div>" +
+          "<div>" +
+            "<div class='art-reflex-eyebrow'>" + s.reflex.eyebrow + "</div>" +
+            "<div class='art-reflex-main'>" + s.reflex.main + "</div>" +
+          "</div>" +
+        "</div>";
+      if (s.reflex.stats) {
+        html += "<div class='art-reflex-stats'>";
+        s.reflex.stats.forEach(function(st){
+          var icon = ART_ICONS[st.ic] || ART_ICONS.clock;
+          html += "<div class='art-stat-item'>" +
+            "<div class='art-stat-ic'>" + icon + "</div>" +
+            "<div><div class='art-stat-val'>" + st.val + "</div><div class='art-stat-lbl'>" + st.lbl + "</div></div>" +
+            "</div>";
+        });
+        html += "</div>";
+      }
+      html += "</div>";
+    }
+
+    html += _punchBlock(s.punch);
+    return html;
+  }
+
+  // ── FORMAT "list" : cards numérotées ──
+  function _renderList() {
+    var html = _heroBlock();
+    if (s.list) {
+      html += "<div class='art-list'>";
+      s.list.forEach(function(it, i){
+        html += "<div class='art-tip-card'>" +
+          "<div class='art-tip-num'>" + (i+1) + "</div>" +
+          "<div class='art-tip-content'>" +
+            "<h5>" + it.h + "</h5>" +
+            "<p>" + it.p + "</p>" +
+          "</div>" +
+          "</div>";
+      });
+      html += "</div>";
+    }
+    html += _punchBlock(s.punch);
+    return html;
+  }
+
+  // ── FORMAT "duality" : À éviter / À privilégier ──
+  function _renderDuality() {
+    var html = _heroBlock();
+    if (s.bad_items && s.bad_items.length) {
+      html += "<div class='art-combo-sec'>" +
+        "<h4 class='art-combo-title'>⚠️ " + (s.bad_title || "À éviter") + "</h4>";
+      if (s.bad_subtitle) html += "<p class='art-combo-sub'>" + s.bad_subtitle + "</p>";
+      s.bad_items.forEach(function(it){
+        html += "<div class='art-combo-card bad'>" +
+          "<div class='art-combo-ic'>✕</div>" +
+          "<div class='art-combo-info'>" +
+            "<div class='art-combo-pair'>" + it.h + "</div>" +
+            "<div class='art-combo-reason'>" + it.p + "</div>" +
+          "</div>" +
+          "</div>";
+      });
+      html += "</div>";
+    }
+    if (s.good_items && s.good_items.length) {
+      html += "<div class='art-combo-sec'>" +
+        "<h4 class='art-combo-title'>✅ " + (s.good_title || "À privilégier") + "</h4>";
+      if (s.good_subtitle) html += "<p class='art-combo-sub'>" + s.good_subtitle + "</p>";
+      s.good_items.forEach(function(it){
+        html += "<div class='art-combo-card good'>" +
+          "<div class='art-combo-ic'>✓</div>" +
+          "<div class='art-combo-info'>" +
+            "<div class='art-combo-pair'>" + it.h + "</div>" +
+            "<div class='art-combo-reason'>" + it.p + "</div>" +
+          "</div>" +
+          "</div>";
+      });
+      html += "</div>";
+    }
+    html += _punchBlock(s.punch);
+    return html;
+  }
+
+  var bodyHtml;
+  if (a.format === "list") bodyHtml = _renderList();
+  else if (a.format === "duality") bodyHtml = _renderDuality();
+  else bodyHtml = _renderDidactic();
+
+  // ── MODAL CONTAINER ──
+  var modal = document.createElement("div");
+  modal.id = "article-modal";
+  modal.className = "art-modal-overlay";
+  modal.innerHTML =
+    "<div class='art-modal'>" +
+      "<div class='art-top'>" +
+        "<button class='art-btn-close' onclick=\"document.getElementById('article-modal').remove()\">" +
+          "<svg width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='#3D2B1F' stroke-width='2.5' stroke-linecap='round'><line x1='18' y1='6' x2='6' y2='18'/><line x1='6' y1='6' x2='18' y2='18'/></svg>" +
+        "</button>" +
+        "<div style='display:flex;gap:8px'>" +
+          "<button class='art-btn-icon' onclick=\"_shareArticle('" + a.id + "')\">" +
+            "<svg width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='#3D2B1F' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8'/><polyline points='16 6 12 2 8 6'/><line x1='12' y1='2' x2='12' y2='15'/></svg>" +
+          "</button>" +
+        "</div>" +
+      "</div>" +
+      "<div class='art-body'>" + bodyHtml + "</div>" +
+    "</div>";
+  document.body.appendChild(modal);
+  modal.onclick = function(e) { if (e.target === modal) modal.remove(); };
+}
+
+// Partage natif si dispo
+function _shareArticle(id) {
+  if (navigator.share) {
+    navigator.share({ title: 'SkinMatch', text: 'Conseil skincare', url: window.location.href }).catch(function(){});
+  } else if (typeof showToast === 'function') {
+    showToast(LANG === 'en' ? 'Sharing not available' : 'Partage non disponible', { type: 'info' });
+  }
+}
+
+// Fallback simple pour articles sans format détaillé
+function _showArticleSimple(a) {
   var modal = document.createElement("div");
   modal.id = "article-modal";
   modal.style.cssText = "position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:9999;display:flex;flex-direction:column;justify-content:flex-end";
   modal.innerHTML = "<div style='background:#fff;border-radius:24px 24px 0 0;max-height:85vh;overflow-y:auto;padding:24px 20px 40px'>" +
     "<div style='display:flex;justify-content:space-between;align-items:center;margin-bottom:16px'>" +
     "<div style='font-size:10px;font-weight:700;color:var(--acc2);text-transform:uppercase;letter-spacing:.5px'>" + a.tag + " · " + a.read + "</div>" +
-    "<button onclick=\"document.getElementById('article-modal').remove()\" style=\"background:var(--bg);border:none;border-radius:50%;width:32px;height:32px;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--mut)\">&#x2715;</button></div>" +
+    "<button onclick=\"document.getElementById('article-modal').remove()\" style=\"background:var(--bg);border:none;border-radius:50%;width:32px;height:32px;font-size:18px;cursor:pointer\">&#x2715;</button></div>" +
     "<div style='font-size:22px;font-family:Georgia,serif;font-weight:700;color:var(--pri);line-height:1.3;margin-bottom:12px'>" + a.emoji + " " + a.title + "</div>" +
     "<div style='font-size:13px;color:var(--acc2);font-style:italic;line-height:1.6;margin-bottom:16px;padding:12px;background:var(--blush);border-radius:12px'>" + a.intro + "</div>" +
-    "<div style='font-size:14px;color:var(--pri);line-height:1.8'>" + a.content.replace(/\. /g, ".<br><br>").replace(/\d\./g, function(m) { return "<strong>" + m + "</strong>"; }) + "</div>" +
+    "<div style='font-size:14px;color:var(--pri);line-height:1.8'>" + (a.content || "").replace(/\. /g, ".<br><br>") + "</div>" +
     "</div>";
   document.body.appendChild(modal);
   modal.onclick = function(e) { if (e.target === modal) modal.remove(); };
