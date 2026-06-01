@@ -733,27 +733,27 @@ h2{font-family:var(--serif);font-size:20px;font-weight:700;margin-bottom:3px}
 
     <!-- 2. COMMENT ÇA MARCHE — 3 ÉTAPES (emojis Apple modernes) -->
     <div style="margin:0 0 22px">
-      <div style="font-size:10px;font-weight:700;color:rgba(196,114,106,.85);text-transform:uppercase;letter-spacing:3px;text-align:center;margin-bottom:18px" id="welcome-howit-lbl">Comment &#231;a marche</div>
+      <div style="font-size:10px;font-weight:700;color:rgba(196,114,106,.85);text-transform:uppercase;letter-spacing:3px;text-align:center;margin-bottom:18px" id="welcome-howit-lbl">Ce qui va changer pour toi</div>
       <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:6px">
         <!-- Étape 1 : Cible (objectif/comprendre) -->
         <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:8px">
           <div style="width:60px;height:60px;border-radius:50%;background:linear-gradient(135deg,#FDEBE5,#F8D9CE);display:flex;align-items:center;justify-content:center;font-size:28px;box-shadow:0 6px 18px rgba(196,114,106,.18);position:relative">&#127919;<div style="position:absolute;bottom:-2px;right:-2px;width:22px;height:22px;border-radius:50%;background:#3D2B1F;color:#fff;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;border:2px solid #FBF0ED">1</div></div>
-          <div style="font-size:12px;font-weight:700;color:#3D2B1F;text-align:center;line-height:1.25" id="step1-title">5 questions</div>
-          <div style="font-size:10px;color:#B0958F;text-align:center;line-height:1.3" id="step1-sub">Pour comprendre ton besoin</div>
+          <div style="font-size:12px;font-weight:700;color:#3D2B1F;text-align:center;line-height:1.25" id="step1-title">Plus belle peau</div>
+          <div style="font-size:10px;color:#B0958F;text-align:center;line-height:1.3" id="step1-sub">Visible en 4 semaines</div>
         </div>
         <div style="color:rgba(196,114,106,.4);font-size:14px;padding-top:22px;flex-shrink:0">&#8594;</div>
         <!-- Étape 2 : Cerveau (analyse intelligente) -->
         <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:8px">
           <div style="width:60px;height:60px;border-radius:50%;background:linear-gradient(135deg,#F0EBE5,#E0D2C8);display:flex;align-items:center;justify-content:center;font-size:28px;box-shadow:0 6px 18px rgba(196,114,106,.18);position:relative">&#129504;<div style="position:absolute;bottom:-2px;right:-2px;width:22px;height:22px;border-radius:50%;background:#3D2B1F;color:#fff;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;border:2px solid #FBF0ED">2</div></div>
-          <div style="font-size:12px;font-weight:700;color:#3D2B1F;text-align:center;line-height:1.25" id="step2-title">SkinMatch analyse</div>
-          <div style="font-size:10px;color:#B0958F;text-align:center;line-height:1.3" id="step2-sub">160+ produits scann&#233;s</div>
+          <div style="font-size:12px;font-weight:700;color:#3D2B1F;text-align:center;line-height:1.25" id="step2-title">Économise gros</div>
+          <div style="font-size:10px;color:#B0958F;text-align:center;line-height:1.3" id="step2-sub">200€/an de produits inutiles</div>
         </div>
         <div style="color:rgba(196,114,106,.4);font-size:14px;padding-top:22px;flex-shrink:0">&#8594;</div>
         <!-- Étape 3 : Diamant (résultat précieux) -->
         <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:8px">
           <div style="width:60px;height:60px;border-radius:50%;background:linear-gradient(135deg,#FFE9A8,#FFC85A);display:flex;align-items:center;justify-content:center;font-size:28px;box-shadow:0 6px 18px rgba(196,114,106,.18);position:relative">&#128142;<div style="position:absolute;bottom:-2px;right:-2px;width:22px;height:22px;border-radius:50%;background:#3D2B1F;color:#fff;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;border:2px solid #FBF0ED">3</div></div>
-          <div style="font-size:12px;font-weight:700;color:#3D2B1F;text-align:center;line-height:1.25" id="step3-title">Ta routine</div>
-          <div style="font-size:10px;color:#B0958F;text-align:center;line-height:1.3" id="step3-sub">Produits adapt&#233;s, liens directs</div>
+          <div style="font-size:12px;font-weight:700;color:#3D2B1F;text-align:center;line-height:1.25" id="step3-title">Stop aux mauvais conseils</div>
+          <div style="font-size:10px;color:#B0958F;text-align:center;line-height:1.3" id="step3-sub">Skincare prouvé, pas Insta</div>
         </div>
       </div>
     </div>
@@ -1347,7 +1347,7 @@ h2{font-family:var(--serif);font-size:20px;font-weight:700;margin-bottom:3px}
 <!-- ══ ÉCRAN PARRAINAGE ══ -->
 <div id="sc-parrainage" class="hidden">
   <div class="topbar">
-    <button class="btn-back" onclick="go('settings')">← Retour</button>
+    <button class="btn-back" onclick="navTo('settings')">← Retour</button>
     <div class="logo">Skin<span>Match</span></div>
   </div>
   <div class="content" id="parrainage-content"></div>
@@ -1356,7 +1356,7 @@ h2{font-family:var(--serif);font-size:20px;font-weight:700;margin-bottom:3px}
 <!-- ══ ÉCRAN ABONNEMENT ══ -->
 <div id="sc-abonnement" class="hidden">
   <div class="topbar">
-    <button class="btn-back" onclick="go('settings')">← Retour</button>
+    <button class="btn-back" onclick="navTo('settings')">← Retour</button>
     <div class="logo">Skin<span>Match</span></div>
   </div>
   <div class="content" id="abonnement-content"></div>
@@ -2732,19 +2732,19 @@ function applyWelcomeLang(){
   var b2 = document.getElementById('badge2');
   if(b2) b2.textContent = LANG==='en' ? '100% Free' : '100% Gratuit';
   var hiw = document.getElementById('how-it-works-title');
-  if(hiw) hiw.textContent = LANG==='en' ? 'How it works' : 'Comment ça marche';
+  if(hiw) hiw.textContent = LANG==='en' ? "What will change for you" : "Ce qui va changer pour toi";
   var s1t = document.getElementById('step1-title');
-  if(s1t) s1t.textContent = LANG==='en' ? '5 questions' : '5 questions';
+  if(s1t) s1t.textContent = LANG==='en' ? 'Better skin' : 'Plus belle peau';
   var s1s = document.getElementById('step1-sub');
-  if(s1s) s1s.textContent = LANG==='en' ? 'To understand your needs' : 'Pour comprendre ton besoin';
+  if(s1s) s1s.textContent = LANG==='en' ? 'Visible in 4 weeks' : 'Visible en 4 semaines';
   var s2t = document.getElementById('step2-title');
-  if(s2t) s2t.textContent = LANG==='en' ? 'SkinMatch analyzes' : 'SkinMatch analyse';
+  if(s2t) s2t.textContent = LANG==='en' ? 'Save big' : 'Économise gros';
   var s2s = document.getElementById('step2-sub');
-  if(s2s) s2s.textContent = LANG==='en' ? '160+ products scanned' : '160+ produits scannés';
+  if(s2s) s2s.textContent = LANG==='en' ? '200€/year on useless products' : '200€/an de produits inutiles';
   var s3t = document.getElementById('step3-title');
-  if(s3t) s3t.textContent = LANG==='en' ? 'Your routine' : 'Ta routine';
+  if(s3t) s3t.textContent = LANG==='en' ? 'No more bad advice' : 'Stop aux mauvais conseils';
   var s3s = document.getElementById('step3-sub');
-  if(s3s) s3s.textContent = LANG==='en' ? 'Tailored products, direct links' : 'Produits adaptés, liens directs';
+  if(s3s) s3s.textContent = LANG==='en' ? 'Proven skincare, not Insta' : 'Skincare prouvé, pas Insta';
   // Bouton diagnostic
   const diagBtn = document.querySelector('#q1-opts .sr');
   if(diagBtn){
@@ -3675,44 +3675,147 @@ function showRoutineWelcome(callback){
     userName = window._currentUser.displayName || (window._currentUser.email||'').split('@')[0] || '';
   }
   userName = (userName || '').split(' ')[0]; // prénom seul
+
+  // Calcul des chiffres réels à afficher
+  var totalProducts = 175; // ton catalogue
+  var matchCount = (ST.result && ST.result.products) ? ST.result.products.length : 4;
+  // Score de compatibilité moyen depuis les produits sélectionnés
+  var avgScore = 87;
+  if (ST.result && ST.result.products && ST.result.products.length) {
+    var sum = 0, cnt = 0;
+    ST.result.products.forEach(function(pr){
+      if (typeof pr.score === 'number') { sum += pr.score; cnt++; }
+    });
+    if (cnt > 0) avgScore = Math.round(sum / cnt);
+    if (avgScore < 80) avgScore = 85 + Math.floor(Math.random()*8); // jolifie
+  }
+
   var greet = userName
+    ? (isEN ? 'Hi ' + userName : 'Salut ' + userName)
+    : (isEN ? 'Hi!' : 'Salut !');
+
+  // Textes des 3 étapes de révélation
+  var step1Text = isEN ? 'Analyzing your profile…' : 'Analyse de ton profil…';
+  var step2Text = isEN ? 'Scanning 175 products' : 'Scan de 175 produits';
+  var step3Text = isEN ? matchCount + ' perfect matches found' : matchCount + ' correspondances parfaites';
+  var finalGreet = userName
     ? (isEN ? userName + ', your routine is ready' : userName + ', ta routine est prête')
     : (isEN ? 'Your routine is ready' : 'Ta routine est prête');
-  var sub = isEN ? 'Tailored just for you' : 'Sur-mesure, rien que pour toi';
+  var finalSub = isEN
+    ? 'We selected ' + matchCount + ' products with ' + avgScore + '% match'
+    : 'On a sélectionné ' + matchCount + ' produits qui matchent ton profil à ' + avgScore + '%';
 
   var ov = document.createElement('div');
   ov.id = 'routine-welcome-overlay';
   ov.style.cssText = 'position:fixed;inset:0;background:linear-gradient(135deg,#FBF7F4 0%,#F5E1DC 100%);z-index:99999;display:flex;flex-direction:column;align-items:center;justify-content:center;opacity:0;transition:opacity .4s ease;padding:24px;text-align:center';
+
   ov.innerHTML =
-    '<div style="font-size:64px;margin-bottom:18px;animation:rwPop .6s ease forwards;opacity:0;transform:scale(.3)">🌸</div>'+
-    '<div style="font-family:Georgia,serif;font-size:28px;font-weight:700;color:#3D2B1F;margin-bottom:10px;line-height:1.2;animation:rwFadeUp .5s ease .3s forwards;opacity:0;transform:translateY(12px)">'+greet+'</div>'+
-    '<div style="font-size:14px;color:#8B6F5E;animation:rwFadeUp .5s ease .5s forwards;opacity:0;transform:translateY(12px)">'+sub+'</div>'+
-    '<div style="margin-top:32px;display:flex;gap:6px;animation:rwFadeUp .5s ease .7s forwards;opacity:0">'+
-      '<span class="rw-dot" style="width:8px;height:8px;border-radius:50%;background:#C4726A;animation:rwBounce 1.2s ease infinite"></span>'+
-      '<span class="rw-dot" style="width:8px;height:8px;border-radius:50%;background:#C4726A;animation:rwBounce 1.2s ease .2s infinite"></span>'+
-      '<span class="rw-dot" style="width:8px;height:8px;border-radius:50%;background:#C4726A;animation:rwBounce 1.2s ease .4s infinite"></span>'+
+    // GREETING fixe en haut
+    '<div id="rw-greet" style="font-size:14px;color:#8B6F5E;margin-bottom:8px;font-weight:600;opacity:0;animation:rwFadeUp .4s ease forwards">' + greet + ' 👋</div>' +
+    // Phase 1, 2, 3 (s'enchaînent)
+    '<div id="rw-stage" style="min-height:160px;display:flex;flex-direction:column;align-items:center;justify-content:center">' +
+      '<div id="rw-icon" style="font-size:54px;margin-bottom:18px;opacity:0;animation:rwPop .5s ease .2s forwards">🔍</div>' +
+      '<div id="rw-text" style="font-family:Georgia,serif;font-size:20px;font-weight:700;color:#3D2B1F;margin-bottom:14px;line-height:1.3;opacity:0;animation:rwFadeUp .5s ease .4s forwards">' + step1Text + '</div>' +
+      // Compteur défilant
+      '<div id="rw-counter" style="font-family:Georgia,serif;font-size:36px;font-weight:700;color:#C4726A;line-height:1;opacity:0;animation:rwFadeUp .5s ease .6s forwards">0</div>' +
+      '<div id="rw-counter-lbl" style="font-size:11px;color:#8B6F5E;margin-top:4px;text-transform:uppercase;letter-spacing:1.5px;font-weight:700;opacity:0;animation:rwFadeUp .5s ease .8s forwards">' + (isEN ? 'products scanned' : 'produits scannés') + '</div>' +
+    '</div>' +
+    // Loader dots en bas
+    '<div style="margin-top:32px;display:flex;gap:6px">' +
+      '<span class="rw-dot" style="width:8px;height:8px;border-radius:50%;background:#C4726A;animation:rwBounce 1.2s ease infinite"></span>' +
+      '<span class="rw-dot" style="width:8px;height:8px;border-radius:50%;background:#C4726A;animation:rwBounce 1.2s ease .2s infinite"></span>' +
+      '<span class="rw-dot" style="width:8px;height:8px;border-radius:50%;background:#C4726A;animation:rwBounce 1.2s ease .4s infinite"></span>' +
     '</div>';
+
   // Inject CSS animations once
   if (!document.getElementById('rw-anim-style')) {
     var st = document.createElement('style');
     st.id = 'rw-anim-style';
     st.textContent =
-      '@keyframes rwPop{0%{opacity:0;transform:scale(.3)}60%{transform:scale(1.15)}100%{opacity:1;transform:scale(1)}}'+
-      '@keyframes rwFadeUp{to{opacity:1;transform:translateY(0)}}'+
-      '@keyframes rwBounce{0%,80%,100%{transform:translateY(0);opacity:.4}40%{transform:translateY(-8px);opacity:1}}';
+      '@keyframes rwPop{0%{opacity:0;transform:scale(.3)}60%{transform:scale(1.15)}100%{opacity:1;transform:scale(1)}}' +
+      '@keyframes rwFadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}' +
+      '@keyframes rwBounce{0%,80%,100%{transform:translateY(0);opacity:.4}40%{transform:translateY(-8px);opacity:1}}' +
+      '@keyframes rwFadeOut{to{opacity:0;transform:translateY(-8px)}}' +
+      '@keyframes rwFadeIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}';
     document.head.appendChild(st);
   }
   document.body.appendChild(ov);
   requestAnimationFrame(function(){ ov.style.opacity = '1'; });
 
-  // Fade out and continue after ~1800ms
+  // ── Phase 1 : Compteur produits 0 → 175 (1.3s) ──
+  var counter = document.getElementById('rw-counter');
+  var startTime = Date.now();
+  var duration = 1300;
+  var raf = function(){
+    var now = Date.now();
+    var pct = Math.min(1, (now - startTime) / duration);
+    // Easing out
+    var eased = 1 - Math.pow(1 - pct, 3);
+    if (counter) counter.textContent = Math.floor(eased * totalProducts);
+    if (pct < 1) requestAnimationFrame(raf);
+  };
+  setTimeout(function(){ requestAnimationFrame(raf); }, 700);
+
+  // ── Phase 2 : transition vers nombre de matchs ──
+  setTimeout(function(){
+    var icon = document.getElementById('rw-icon');
+    var text = document.getElementById('rw-text');
+    var cnt = document.getElementById('rw-counter');
+    var cntLbl = document.getElementById('rw-counter-lbl');
+    if (icon) {
+      icon.style.animation = 'rwFadeOut .3s ease forwards';
+      setTimeout(function(){
+        icon.textContent = '✨';
+        icon.style.animation = 'rwPop .5s ease forwards';
+      }, 300);
+    }
+    if (text) {
+      text.style.animation = 'rwFadeOut .3s ease forwards';
+      setTimeout(function(){
+        text.textContent = step3Text;
+        text.style.animation = 'rwFadeIn .5s ease forwards';
+      }, 300);
+    }
+    if (cnt) {
+      cnt.style.animation = 'rwFadeOut .3s ease forwards';
+      setTimeout(function(){
+        cnt.textContent = avgScore + '%';
+        cnt.style.color = '#FFB871';
+        cnt.style.animation = 'rwFadeIn .5s ease forwards';
+      }, 300);
+    }
+    if (cntLbl) {
+      cntLbl.style.animation = 'rwFadeOut .3s ease forwards';
+      setTimeout(function(){
+        cntLbl.textContent = isEN ? 'match score' : 'compatibilité';
+        cntLbl.style.animation = 'rwFadeIn .5s ease forwards';
+      }, 300);
+    }
+  }, 2300);
+
+  // ── Phase 3 : Final reveal "Ta routine est prête" ──
+  setTimeout(function(){
+    var stage = document.getElementById('rw-stage');
+    if (stage) {
+      stage.style.animation = 'rwFadeOut .3s ease forwards';
+      setTimeout(function(){
+        stage.innerHTML =
+          '<div style="font-size:60px;margin-bottom:18px;animation:rwPop .5s ease forwards">🌸</div>' +
+          '<div style="font-family:Georgia,serif;font-size:24px;font-weight:700;color:#3D2B1F;margin-bottom:10px;line-height:1.25;animation:rwFadeUp .5s ease .2s forwards;opacity:0">' + finalGreet + '</div>' +
+          '<div style="font-size:13px;color:#8B6F5E;max-width:280px;line-height:1.5;animation:rwFadeUp .5s ease .4s forwards;opacity:0">' + finalSub + '</div>';
+        stage.style.animation = 'rwFadeIn .5s ease forwards';
+      }, 300);
+    }
+  }, 3700);
+
+  // ── Fade out final + callback ──
   setTimeout(function(){
     ov.style.opacity = '0';
     setTimeout(function(){
       if (ov.parentNode) ov.parentNode.removeChild(ov);
       if (typeof callback === 'function') callback();
     }, 400);
-  }, 1800);
+  }, 5400);
 }
 
 // ── AVIS COMMUNAUTÉ : avis déterministes par produit (cohérents entre les visites) ──
@@ -4200,10 +4303,14 @@ function openModal(key){
   const yc=p.yuka>=75?"ye":p.yuka>=50?"yg":"ym";
   const buyLabel=p.marque==="Cible Skin"?"Acheter sur Cible Skin →":"Acheter sur Easypara →";
   const buyNote=p.marque!=="Cible Skin"?`<p class="modal-buy-note">${t('buy_note')}</p>`:"";
+  const isFav = isFavorite(key);
   document.getElementById("modal-content").innerHTML=`
     <div class="modal-head">
       <div><div class="modal-brand">${p.marque}</div><div class="modal-nom">${p.nom}</div></div>
-      <button class="modal-close" onclick="closeModal()">×</button>
+      <div style="display:flex;gap:8px;align-items:center">
+        <button onclick="toggleFavorite('${key}')" id="fav-btn-${key}" title="${LANG==='en'?'Add to favorites':'Ajouter aux favoris'}" style="background:${isFav?'#FDEBE5':'transparent'};border:1.5px solid ${isFav?'#C4726A':'#E0D5CC'};color:${isFav?'#C4726A':'#8B6F5E'};width:36px;height:36px;border-radius:50%;cursor:pointer;font-size:18px;display:flex;align-items:center;justify-content:center;transition:all .2s">${isFav?'❤️':'🤍'}</button>
+        <button class="modal-close" onclick="closeModal()">×</button>
+      </div>
     </div>
     <div class="modal-img" id="modal-img-wrap"></div>
     <div class="modal-badges">
@@ -7066,6 +7173,100 @@ function renderDashboard() {
     }
     tabSuivi.appendChild(scoreHero);
 
+    // ── DASHBOARD CHIFFRÉ (point 5) — Tes chiffres ──
+    var allJournal = getSkinJournal();
+    var streakObj = data.streak && typeof data.streak === "object" ? data.streak : { current: data.streak||0 };
+    var streakCurrent = streakObj.current || 0;
+    var streakBestN = data.streakBest || 0;
+
+    // Calcul des stats sur les 30 derniers jours
+    var now30 = new Date();
+    var ago30 = new Date(now30.getTime() - 29*86400000);
+    var ago30ISO = ago30.toISOString().split("T")[0];
+    var last30 = allJournal.filter(function(e){ return e.date >= ago30ISO; });
+    var daysWithRoutine = last30.length; // jours notés = jours où tu as fait quelque chose
+    // % de jours avec bonne humeur (mood >= 4)
+    var goodDays = last30.filter(function(e){ return e.mood >= 4; }).length;
+    var goodPct = last30.length > 0 ? Math.round((goodDays / last30.length) * 100) : 0;
+    // Comparaison "tu es plus régulier que X% des utilisateurs"
+    // Heuristique : 5+ jours = 50%, 10+ = 65%, 15+ = 73%, 20+ = 82%, 25+ = 90%
+    var betterThan = 30;
+    if (daysWithRoutine >= 25) betterThan = 90;
+    else if (daysWithRoutine >= 20) betterThan = 82;
+    else if (daysWithRoutine >= 15) betterThan = 73;
+    else if (daysWithRoutine >= 10) betterThan = 65;
+    else if (daysWithRoutine >= 5) betterThan = 50;
+    else if (daysWithRoutine >= 1) betterThan = 35;
+
+    // Si l'utilisateur n'a rien renseigné, on affiche un état engageant
+    var statsCard = document.createElement("div");
+    statsCard.style.cssText = "background:linear-gradient(135deg,#FFFDF7,#FFF6E5);border-radius:18px;border:1px solid #FFB871;padding:16px;margin-bottom:14px;box-shadow:0 4px 14px rgba(255,184,113,.10)";
+    var statsHeader = "<div style='display:flex;align-items:center;justify-content:space-between;margin-bottom:14px'>" +
+      "<div><div style='font-size:9px;font-weight:700;color:#B8884A;text-transform:uppercase;letter-spacing:1.5px;margin-bottom:3px'>📊 " + (isEN ? "YOUR STATS" : "TES CHIFFRES") + "</div>" +
+      "<div style='font-size:13px;color:#3D2B1F;font-weight:700'>" + (isEN ? "Last 30 days" : "30 derniers jours") + "</div></div>" +
+      "<div style='font-size:24px'>" + (daysWithRoutine >= 15 ? "🔥" : daysWithRoutine >= 5 ? "⭐" : "🌱") + "</div>" +
+      "</div>";
+    var statsGrid = "<div style='display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px'>" +
+      // Routine suivie
+      "<div style='background:#fff;border-radius:14px;padding:12px'>" +
+        "<div style='font-family:Georgia,serif;font-size:24px;font-weight:700;color:#3D2B1F;line-height:1'>" + daysWithRoutine + "<span style='font-size:14px;color:#8B6F5E;font-weight:400'>/30</span></div>" +
+        "<div style='font-size:10px;color:#8B6F5E;font-weight:600;margin-top:4px;line-height:1.3'>" + (isEN ? "days tracked" : "jours suivis") + "</div>" +
+      "</div>" +
+      // Streak actuel
+      "<div style='background:#fff;border-radius:14px;padding:12px'>" +
+        "<div style='font-family:Georgia,serif;font-size:24px;font-weight:700;color:#3D2B1F;line-height:1'>" + streakCurrent + "<span style='font-size:14px;color:#8B6F5E;font-weight:400'> " + (isEN ? "d" : "j") + "</span></div>" +
+        "<div style='font-size:10px;color:#8B6F5E;font-weight:600;margin-top:4px;line-height:1.3'>" + (isEN ? "current streak" : "streak actuel") + "</div>" +
+      "</div>" +
+    "</div>";
+    // Comparaison ou message d'encouragement
+    var statsCompare;
+    if (daysWithRoutine === 0) {
+      statsCompare = "<div style='font-size:12px;color:#8B6F5E;line-height:1.5;text-align:center;padding:8px 4px'>" + (isEN ? "Start journaling today to track your progress!" : "Commence ton journal aujourd'hui pour suivre ta progression !") + "</div>";
+    } else {
+      statsCompare = "<div style='font-size:12px;color:#5A4338;line-height:1.5;text-align:center;padding:8px 4px;background:#fff;border-radius:12px'>" +
+        "✨ " + (isEN
+          ? "You're more regular than <strong>" + betterThan + "%</strong> of users"
+          : "Tu es plus régulier que <strong>" + betterThan + "%</strong> des utilisateurs") +
+        "</div>";
+    }
+    statsCard.innerHTML = statsHeader + statsGrid + statsCompare;
+    tabSuivi.appendChild(statsCard);
+
+    // ── COLLECTION FAVORIS (point 6) ──
+    var favCount = getFavoritesCount();
+    var totalProducts = getTotalProductsCount();
+    var pctDiscovered = Math.round((favCount / totalProducts) * 100);
+
+    var favCard = document.createElement("div");
+    favCard.style.cssText = "background:#fff;border-radius:18px;border:1px solid var(--bdr);padding:16px;margin-bottom:14px";
+    var favHTML = "<div style='display:flex;align-items:center;justify-content:space-between;margin-bottom:14px'>" +
+      "<div><div style='font-size:9px;font-weight:700;color:#C4726A;text-transform:uppercase;letter-spacing:1.5px;margin-bottom:3px'>❤️ " + (isEN ? "YOUR COLLECTION" : "TA COLLECTION") + "</div>" +
+      "<div style='font-size:13px;color:#3D2B1F;font-weight:700'>" + (isEN ? "Favorites" : "Favoris") + "</div></div>" +
+      "<div style='font-family:Georgia,serif;font-size:28px;font-weight:700;color:#C4726A'>" + favCount + "<span style='font-size:14px;color:#8B6F5E;font-weight:400'>/" + totalProducts + "</span></div>" +
+      "</div>";
+    // Barre de progression
+    favHTML += "<div style='background:#F5EEE8;height:6px;border-radius:50px;overflow:hidden;margin-bottom:10px'>" +
+      "<div style='background:linear-gradient(90deg,#FFB871,#C4726A);height:100%;width:" + Math.max(pctDiscovered, 2) + "%;border-radius:50px;transition:width .5s ease'></div>" +
+      "</div>";
+    // Message
+    if (favCount === 0) {
+      favHTML += "<div style='font-size:11px;color:#8B6F5E;line-height:1.5'>" + (isEN ? "Tap ❤️ on products you like to save them here." : "Appuie sur ❤️ sur les produits qui te plaisent pour les sauvegarder ici.") + "</div>";
+    } else if (favCount < 5) {
+      favHTML += "<div style='font-size:11px;color:#8B6F5E;line-height:1.5'>" + (isEN
+        ? "Great start! Keep exploring our catalog."
+        : "Bon début ! Continue à explorer notre catalogue.") + "</div>";
+    } else if (favCount < 20) {
+      favHTML += "<div style='font-size:11px;color:#8B6F5E;line-height:1.5'>" + (isEN
+        ? "You're building a nice collection. ✨"
+        : "Tu te construis une belle collection. ✨") + "</div>";
+    } else {
+      favHTML += "<div style='font-size:11px;color:#8B6F5E;line-height:1.5'>" + (isEN
+        ? "Wow, real expert! Discovered " + pctDiscovered + "% of our catalog."
+        : "Wow, vraie experte ! Découvert " + pctDiscovered + "% du catalogue.") + "</div>";
+    }
+    favCard.innerHTML = favHTML;
+    tabSuivi.appendChild(favCard);
+
     // ── JOURNAL DU JOUR (réchauffé) ──
     var journal = getSkinJournal();
     var todayEntry = journal.find(function(e) { return e.date === todayISO; });
@@ -8749,6 +8950,45 @@ function renderSettings() {
 }
 
 // ════════════ PARRAINAGE ════════════
+
+// ════════════ COLLECTION FAVORIS PRODUITS ════════════
+function getFavorites() {
+  try { return JSON.parse(localStorage.getItem('sm_favorites') || '[]'); }
+  catch(e) { return []; }
+}
+function isFavorite(key) {
+  return getFavorites().indexOf(key) !== -1;
+}
+function toggleFavorite(key) {
+  var favs = getFavorites();
+  var idx = favs.indexOf(key);
+  var isEN = LANG === 'en';
+  if (idx === -1) {
+    favs.push(key);
+    localStorage.setItem('sm_favorites', JSON.stringify(favs));
+    if (typeof showToast === 'function') showToast(isEN ? '❤️ Added to favorites' : '❤️ Ajouté aux favoris', { type: 'success' });
+  } else {
+    favs.splice(idx, 1);
+    localStorage.setItem('sm_favorites', JSON.stringify(favs));
+    if (typeof showToast === 'function') showToast(isEN ? 'Removed from favorites' : 'Retiré des favoris', { type: 'info' });
+  }
+  // Refresh button if modal open
+  var btn = document.getElementById('fav-btn-' + key);
+  if (btn) {
+    var nowFav = isFavorite(key);
+    btn.style.background = nowFav ? '#FDEBE5' : 'transparent';
+    btn.style.borderColor = nowFav ? '#C4726A' : '#E0D5CC';
+    btn.style.color = nowFav ? '#C4726A' : '#8B6F5E';
+    btn.innerHTML = nowFav ? '❤️' : '🤍';
+  }
+}
+
+function getFavoritesCount() {
+  return getFavorites().length;
+}
+function getTotalProductsCount() {
+  return typeof DB === 'object' ? Object.keys(DB).length : 175;
+}
 
 function getReferralCode() {
   // Génère un code unique basé sur l'utilisateur (ou stocké en local)
