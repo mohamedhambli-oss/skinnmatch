@@ -370,15 +370,23 @@ h2{font-family:var(--serif);font-size:20px;font-weight:700;margin-bottom:3px}
 
 /* ── MODALE CARTE PARTAGE ── */
 #share-card-modal {
-  display:none;position:fixed;inset:0;
+  display:flex;position:fixed;inset:0;
   background:rgba(61,43,31,.65);
   backdrop-filter:blur(6px);
   z-index:9999;
   align-items:flex-end;
   justify-content:center;
   padding:0;
+  visibility:hidden;
+  pointer-events:none;
+  opacity:0;
+  transition:opacity .25s ease, visibility .25s ease;
 }
-#share-card-modal.open { display:flex; }
+#share-card-modal.open {
+  visibility:visible;
+  pointer-events:auto;
+  opacity:1;
+}
 #share-card-inner {
   width:100%;max-width:460px;
   background:#F8F2ED;
@@ -4202,6 +4210,47 @@ function switchTab(tab){
   document.getElementById("ro-pm").style.display=tab==="pm"?"block":"none";
 }
 
+function _fillShareCard(steps, userName, isEN) {
+  var skinLabels = {grasse:"Peau grasse",seche:"Peau sèche",mixte:"Peau mixte",sensible:"Peau sensible",normale:"Peau normale"};
+  var skinLabel = skinLabels[ST.skinType] || (ST.skinType || "mixte");
+  var ageLabel = ST.ageGroup || "26-35";
+
+  var nameEl = document.getElementById("sc-card-name");
+  if (nameEl) nameEl.textContent = userName || (isEN ? "My routine" : "Ma routine");
+
+  var skinEl = document.getElementById("sc-card-skin");
+  if (skinEl) skinEl.textContent = skinLabel + " · " + ageLabel + " ans";
+
+  var totalPrix = steps.reduce(function(s,p){ return s + (parseFloat(String(p.prix||0).replace(/[^0-9.]/g,""))||0); }, 0);
+  var compat = steps.length > 0 ? Math.round(steps.reduce(function(s,p){ return s + (p.compat||85); },0) / steps.length) : 87;
+
+  var scoreTxt = document.getElementById("sc-score-txt");
+  if (scoreTxt) scoreTxt.textContent = compat + "%";
+  var scoreArc = document.getElementById("sc-score-arc");
+  if (scoreArc) {
+    var offset = 94.2 - (compat/100) * 94.2;
+    scoreArc.setAttribute("stroke-dashoffset", offset.toFixed(1));
+  }
+  var scoreLbl = document.getElementById("sc-card-score-lbl");
+  if (scoreLbl) scoreLbl.textContent = compat >= 90 ? (isEN?"Perfect match":"Parfait pour toi") : compat >= 75 ? (isEN?"Well adapted":"Très adapté") : (isEN?"Adapted":"Adapté");
+
+  var countEl = document.getElementById("sc-card-count");
+  if (countEl) countEl.textContent = steps.length;
+  var totalEl = document.getElementById("sc-card-total");
+  if (totalEl) totalEl.textContent = Math.round(totalPrix) + "€";
+
+  var prodsEl = document.getElementById("sc-card-products");
+  if (prodsEl) {
+    prodsEl.innerHTML = steps.slice(0,5).map(function(s, i) {
+      return "<div class='sc-prod'>" +
+        "<div class='sc-prod-n'>0"+(i+1)+"</div>" +
+        "<div class='sc-prod-name'>"+s.nom+"</div>" +
+        "<div class='sc-prod-price'>"+(s.prix?(parseFloat(String(s.prix).replace(/[^0-9.]/g,""))||0)+"€":"")+"</div>" +
+        "</div>";
+    }).join("");
+  }
+}
+
 function toggleShare(){
   var r = ST.result;
   if (!r) return;
@@ -4210,9 +4259,9 @@ function toggleShare(){
   var userName = window._currentUser
     ? (window._currentUser.displayName || window._currentUser.email.split("@")[0])
     : "";
-
-  // ── Préparer le deeplink ──
   var steps = r.steps || [];
+
+  // Préparer le deeplink
   var routineData = {
     skin: ST.skinType, age: ST.ageGroup, budget: ST.budget,
     concerns: ST.concerns,
@@ -4221,69 +4270,35 @@ function toggleShare(){
   };
   try { window._shareEncoded = btoa(unescape(encodeURIComponent(JSON.stringify(routineData)))); } catch(e) { window._shareEncoded = ""; }
 
-  // ── Ouvrir la modale EN PREMIER ──
+  // Remettre le titre et les bons boutons
+  var modalTitle = document.getElementById("share-modal-title");
+  if (modalTitle) modalTitle.textContent = isEN ? "Your routine to share" : "Ta routine à partager";
+  var btnsEl = document.querySelector('.share-btns');
+  if (btnsEl) {
+    btnsEl.innerHTML =
+      '<button class="share-btn share-btn-dl" onclick="downloadCard()">' +
+        '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>' +
+        (isEN ? 'Download' : 'Télécharger') +
+      '</button>' +
+      '<button class="share-btn share-btn-share" onclick="shareRoutineLink()">' +
+        '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>' +
+        (isEN ? 'Share link' : 'Partager le lien') +
+      '</button>';
+  }
+
+  // Remplir AVANT d'ouvrir (modale déjà dans le DOM, juste cachée)
+  _fillShareCard(steps, userName, isEN);
+
+  // Ouvrir la modale
   var modal = document.getElementById("share-card-modal");
   if (modal) modal.classList.add("open");
 
-  // ── Remplir la carte APRÈS (80ms pour que iOS rende le DOM) ──
-  setTimeout(function() {
-    var skinLabels = {grasse:"Peau grasse",seche:"Peau sèche",mixte:"Peau mixte",sensible:"Peau sensible",normale:"Peau normale"};
-    var skinLabel = skinLabels[ST.skinType] || (ST.skinType || "mixte");
-    var ageLabel = ST.ageGroup || "26-35";
-
-    var nameEl = document.getElementById("sc-card-name");
-    if (nameEl) nameEl.textContent = userName || (isEN ? "My routine" : "Ma routine");
-
-    var skinEl = document.getElementById("sc-card-skin");
-    if (skinEl) skinEl.textContent = skinLabel + " · " + ageLabel + " ans";
-
-    var totalPrix = steps.reduce(function(s,p){ return s + (parseFloat(String(p.prix||0).replace(/[^0-9.]/g,""))||0); }, 0);
-    var compat = steps.length > 0 ? Math.round(steps.reduce(function(s,p){ return s + (p.compat||85); },0) / steps.length) : 87;
-
-    var scoreTxt = document.getElementById("sc-score-txt");
-    if (scoreTxt) scoreTxt.textContent = compat + "%";
-    var scoreArc = document.getElementById("sc-score-arc");
-    if (scoreArc) {
-      var offset = 94.2 - (compat/100) * 94.2;
-      scoreArc.setAttribute("stroke-dashoffset", offset.toFixed(1));
-    }
-    var scoreLbl = document.getElementById("sc-card-score-lbl");
-    if (scoreLbl) scoreLbl.textContent = compat >= 90 ? (isEN?"Perfect match":"Parfait pour toi") : compat >= 75 ? (isEN?"Well adapted":"Très adapté") : (isEN?"Adapted":"Adapté");
-
-    var countEl = document.getElementById("sc-card-count");
-    if (countEl) countEl.textContent = steps.length;
-    var totalEl = document.getElementById("sc-card-total");
-    if (totalEl) totalEl.textContent = Math.round(totalPrix) + "€";
-
-    var prodsEl = document.getElementById("sc-card-products");
-    if (prodsEl) {
-      prodsEl.innerHTML = steps.slice(0,5).map(function(s, i) {
-        return "<div class='sc-prod'>" +
-          "<div class='sc-prod-n'>0"+(i+1)+"</div>" +
-          "<div class='sc-prod-name'>"+s.nom+"</div>" +
-          "<div class='sc-prod-price'>"+(s.prix?(parseFloat(String(s.prix).replace(/[^0-9.]/g,""))||0)+"€":"")+"</div>" +
-          "</div>";
-      }).join("");
-    }
-
-    // Remettre le titre correct (au cas où)
-    var modalTitle = document.getElementById("share-modal-title");
-    if (modalTitle) modalTitle.textContent = isEN ? "Your routine to share" : "Ta routine à partager";
-
-    // Remettre les bons boutons (au cas où une routine partagée les aurait remplacés)
-    var btnsEl = document.querySelector('.share-btns');
-    if (btnsEl) {
-      btnsEl.innerHTML =
-        '<button class="share-btn share-btn-dl" onclick="downloadCard()">' +
-          '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>' +
-          (isEN ? 'Download' : 'Télécharger') +
-        '</button>' +
-        '<button class="share-btn share-btn-share" onclick="shareRoutineLink()">' +
-          '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>' +
-          (isEN ? 'Share link' : 'Partager le lien') +
-        '</button>';
-    }
-  }, 80);
+  // Double rAF pour s'assurer que le paint est terminé, puis re-remplir
+  requestAnimationFrame(function() {
+    requestAnimationFrame(function() {
+      _fillShareCard(steps, userName, isEN);
+    });
+  });
 }
 
 function closeShareModal() {
