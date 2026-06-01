@@ -4211,52 +4211,8 @@ function toggleShare(){
     ? (window._currentUser.displayName || window._currentUser.email.split("@")[0])
     : "";
 
-  // ── Remplir la carte ──
-  var name = document.getElementById("sc-card-name");
-  if (name) name.textContent = userName || (isEN ? "My routine" : "Ma routine");
-
-  var skinLabels = {grasse:"Peau grasse",seche:"Peau sèche",mixte:"Peau mixte",sensible:"Peau sensible",normale:"Peau normale"};
-  var skinLabel = skinLabels[ST.skinType] || (ST.skinType || "mixte");
-  var ageLabel = ST.ageGroup || "26-35";
-  var skinEl = document.getElementById("sc-card-skin");
-  if (skinEl) skinEl.textContent = skinLabel + " · " + ageLabel + " ans";
-
-  var steps = r.steps || [];
-  var totalPrix = steps.reduce(function(s,p){ return s + (parseFloat(String(p.prix||0).replace(/[^0-9.]/g,""))||0); }, 0);
-  var compat = steps.length > 0 ? Math.round(steps.reduce(function(s,p){ return s + (p.compat||85); },0) / steps.length) : 87;
-
-  var scoreTxt = document.getElementById("sc-score-txt");
-  if (scoreTxt) scoreTxt.textContent = compat + "%";
-  var scoreArc = document.getElementById("sc-score-arc");
-  if (scoreArc) {
-    var circ = 94.2;
-    var offset = circ - (compat/100) * circ;
-    scoreArc.setAttribute("stroke-dashoffset", offset.toFixed(1));
-  }
-  var scoreLbl = document.getElementById("sc-card-score-lbl");
-  if (scoreLbl) scoreLbl.textContent = compat >= 90 ? (isEN?"Perfect match":"Parfait pour toi") : compat >= 75 ? (isEN?"Well adapted":"Très adapté") : (isEN?"Adapted":"Adapté");
-
-  var countEl = document.getElementById("sc-card-count");
-  if (countEl) countEl.textContent = steps.length;
-  var totalEl = document.getElementById("sc-card-total");
-  if (totalEl) totalEl.textContent = Math.round(totalPrix)+"€";
-
-  var prodsEl = document.getElementById("sc-card-products");
-  if (prodsEl) {
-    prodsEl.innerHTML = steps.slice(0,5).map(function(s, i) {
-      return "<div class='sc-prod'>" +
-        "<div class='sc-prod-n'>0"+(i+1)+"</div>" +
-        "<div class='sc-prod-name'>"+s.nom+"</div>" +
-        "<div class='sc-prod-price'>"+(s.prix?(parseFloat(String(s.prix).replace(/[^0-9.]/g,""))||0)+"€":"")+"</div>" +
-        "</div>";
-    }).join("");
-  }
-
-  // ── Ouvrir la modale ──
-  var modal = document.getElementById("share-card-modal");
-  if (modal) modal.classList.add("open");
-
   // ── Préparer le deeplink ──
+  var steps = r.steps || [];
   var routineData = {
     skin: ST.skinType, age: ST.ageGroup, budget: ST.budget,
     concerns: ST.concerns,
@@ -4264,6 +4220,70 @@ function toggleShare(){
     sharedBy: userName
   };
   try { window._shareEncoded = btoa(unescape(encodeURIComponent(JSON.stringify(routineData)))); } catch(e) { window._shareEncoded = ""; }
+
+  // ── Ouvrir la modale EN PREMIER ──
+  var modal = document.getElementById("share-card-modal");
+  if (modal) modal.classList.add("open");
+
+  // ── Remplir la carte APRÈS (80ms pour que iOS rende le DOM) ──
+  setTimeout(function() {
+    var skinLabels = {grasse:"Peau grasse",seche:"Peau sèche",mixte:"Peau mixte",sensible:"Peau sensible",normale:"Peau normale"};
+    var skinLabel = skinLabels[ST.skinType] || (ST.skinType || "mixte");
+    var ageLabel = ST.ageGroup || "26-35";
+
+    var nameEl = document.getElementById("sc-card-name");
+    if (nameEl) nameEl.textContent = userName || (isEN ? "My routine" : "Ma routine");
+
+    var skinEl = document.getElementById("sc-card-skin");
+    if (skinEl) skinEl.textContent = skinLabel + " · " + ageLabel + " ans";
+
+    var totalPrix = steps.reduce(function(s,p){ return s + (parseFloat(String(p.prix||0).replace(/[^0-9.]/g,""))||0); }, 0);
+    var compat = steps.length > 0 ? Math.round(steps.reduce(function(s,p){ return s + (p.compat||85); },0) / steps.length) : 87;
+
+    var scoreTxt = document.getElementById("sc-score-txt");
+    if (scoreTxt) scoreTxt.textContent = compat + "%";
+    var scoreArc = document.getElementById("sc-score-arc");
+    if (scoreArc) {
+      var offset = 94.2 - (compat/100) * 94.2;
+      scoreArc.setAttribute("stroke-dashoffset", offset.toFixed(1));
+    }
+    var scoreLbl = document.getElementById("sc-card-score-lbl");
+    if (scoreLbl) scoreLbl.textContent = compat >= 90 ? (isEN?"Perfect match":"Parfait pour toi") : compat >= 75 ? (isEN?"Well adapted":"Très adapté") : (isEN?"Adapted":"Adapté");
+
+    var countEl = document.getElementById("sc-card-count");
+    if (countEl) countEl.textContent = steps.length;
+    var totalEl = document.getElementById("sc-card-total");
+    if (totalEl) totalEl.textContent = Math.round(totalPrix) + "€";
+
+    var prodsEl = document.getElementById("sc-card-products");
+    if (prodsEl) {
+      prodsEl.innerHTML = steps.slice(0,5).map(function(s, i) {
+        return "<div class='sc-prod'>" +
+          "<div class='sc-prod-n'>0"+(i+1)+"</div>" +
+          "<div class='sc-prod-name'>"+s.nom+"</div>" +
+          "<div class='sc-prod-price'>"+(s.prix?(parseFloat(String(s.prix).replace(/[^0-9.]/g,""))||0)+"€":"")+"</div>" +
+          "</div>";
+      }).join("");
+    }
+
+    // Remettre le titre correct (au cas où)
+    var modalTitle = document.getElementById("share-modal-title");
+    if (modalTitle) modalTitle.textContent = isEN ? "Your routine to share" : "Ta routine à partager";
+
+    // Remettre les bons boutons (au cas où une routine partagée les aurait remplacés)
+    var btnsEl = document.querySelector('.share-btns');
+    if (btnsEl) {
+      btnsEl.innerHTML =
+        '<button class="share-btn share-btn-dl" onclick="downloadCard()">' +
+          '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>' +
+          (isEN ? 'Download' : 'Télécharger') +
+        '</button>' +
+        '<button class="share-btn share-btn-share" onclick="shareRoutineLink()">' +
+          '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>' +
+          (isEN ? 'Share link' : 'Partager le lien') +
+        '</button>';
+    }
+  }, 80);
 }
 
 function closeShareModal() {
@@ -10282,6 +10302,8 @@ function openPhotoTracker() {
     });
   }, 150);
 }
+
+function _captureNewPhoto() {
   // Input file caché
   var input = document.createElement('input');
   input.type = 'file';
