@@ -9659,64 +9659,65 @@ function _checkSharedRoutine() {
     window._sharedBy = sd.sharedBy || '';
     window._isSharedView = true;
 
-    // Afficher la carte de la routine partagée directement
     var isEN = LANG === 'en';
     var sharedName = window._sharedBy || (isEN ? "someone" : "quelqu'un");
 
-    // Remplir la carte
-    var nameEl = document.getElementById('sc-card-name');
-    if (nameEl) nameEl.textContent = window._sharedBy || 'Routine';
-
-    var skinLabels = {grasse:'Peau grasse',seche:'Peau sèche',mixte:'Peau mixte',sensible:'Peau sensible',normale:'Peau normale'};
-    var skinEl = document.getElementById('sc-card-skin');
-    if (skinEl) skinEl.textContent = (skinLabels[ST.skinType] || ST.skinType) + ' · ' + ST.ageGroup + ' ans';
-
-    var steps = sharedResult.steps || [];
-    var totalPrix = steps.reduce(function(s,p){ return s+(parseFloat(String(p.prix||0).replace(/[^0-9.]/g,""))||0); }, 0);
-    var compat = steps.length > 0 ? Math.round(steps.reduce(function(s,p){ return s+(p.compat||85); },0)/steps.length) : 87;
-
-    var scoreTxt = document.getElementById('sc-score-txt');
-    if (scoreTxt) scoreTxt.textContent = compat + '%';
-    var scoreArc = document.getElementById('sc-score-arc');
-    if (scoreArc) {
-      var offset = 94.2 - (compat/100)*94.2;
-      scoreArc.setAttribute('stroke-dashoffset', offset.toFixed(1));
-    }
-    var scoreLbl = document.getElementById('sc-card-score-lbl');
-    if (scoreLbl) scoreLbl.textContent = compat >= 90 ? (isEN?'Perfect':'Parfait') : compat >= 75 ? (isEN?'Well adapted':'Très adapté') : (isEN?'Adapted':'Adapté');
-
-    var countEl = document.getElementById('sc-card-count');
-    if (countEl) countEl.textContent = steps.length;
-    var totalEl = document.getElementById('sc-card-total');
-    if (totalEl) totalEl.textContent = '~' + totalPrix + '€';
-
-    var prodsEl = document.getElementById('sc-card-products');
-    if (prodsEl) {
-      prodsEl.innerHTML = steps.slice(0,5).map(function(s,i){
-        return "<div class='sc-prod'><div class='sc-prod-n'>0"+(i+1)+"</div><div class='sc-prod-name'>"+s.nom+"</div><div class='sc-prod-price'>"+(s.prix?'~'+s.prix+'€':'')+"</div></div>";
-      }).join('');
-    }
-
-    // Changer le titre de la modale
-    var modalTitle = document.getElementById('share-modal-title');
-    if (modalTitle) {
-      modalTitle.textContent = isEN
-        ? '🌸 Routine shared by ' + sharedName
-        : '🌸 Routine partagée par ' + sharedName;
-    }
-
-    // Remplacer les boutons par "Obtiens la tienne"
-    var btnsEl = document.querySelector('.share-btns');
-    if (btnsEl) {
-      btnsEl.innerHTML =
-        '<button class="share-btn share-btn-share" style="flex:1" onclick="closeShareModal();showTermsModal()">' +
-        (isEN ? '✨ Get my free routine' : '✨ Obtiens la mienne gratuitement') +
-        '</button>';
-    }
-
-    // Ouvrir la modale
+    // Ouvrir la modale EN PREMIER pour que le DOM soit visible
     var modal = document.getElementById('share-card-modal');
     if (modal) modal.classList.add('open');
+
+    // Remplir la carte APRÈS ouverture (setTimeout pour laisser le DOM se rendre)
+    setTimeout(function() {
+      var nameEl = document.getElementById('sc-card-name');
+      if (nameEl) nameEl.textContent = window._sharedBy || 'Routine';
+
+      var skinLabels = {grasse:'Peau grasse',seche:'Peau sèche',mixte:'Peau mixte',sensible:'Peau sensible',normale:'Peau normale'};
+      var skinEl = document.getElementById('sc-card-skin');
+      if (skinEl) skinEl.textContent = (skinLabels[ST.skinType] || ST.skinType) + ' · ' + ST.ageGroup + ' ans';
+
+      var steps = sharedResult.steps || [];
+      var totalPrix = steps.reduce(function(s,p){ return s+(parseFloat(String(p.prix||0).replace(/[^0-9.]/g,""))||0); }, 0);
+      var compat = steps.length > 0 ? Math.round(steps.reduce(function(s,p){ return s+(p.compat||85); },0)/steps.length) : 87;
+
+      var scoreTxt = document.getElementById('sc-score-txt');
+      if (scoreTxt) scoreTxt.textContent = compat + '%';
+      var scoreArc = document.getElementById('sc-score-arc');
+      if (scoreArc) {
+        var offset = 94.2 - (compat/100)*94.2;
+        scoreArc.setAttribute('stroke-dashoffset', offset.toFixed(1));
+      }
+      var scoreLbl = document.getElementById('sc-card-score-lbl');
+      if (scoreLbl) scoreLbl.textContent = compat >= 90 ? (isEN?'Perfect':'Parfait') : compat >= 75 ? (isEN?'Well adapted':'Très adapté') : (isEN?'Adapted':'Adapté');
+
+      var countEl = document.getElementById('sc-card-count');
+      if (countEl) countEl.textContent = steps.length;
+      var totalEl = document.getElementById('sc-card-total');
+      if (totalEl) totalEl.textContent = '~' + Math.round(totalPrix) + '€';
+
+      var prodsEl = document.getElementById('sc-card-products');
+      if (prodsEl) {
+        prodsEl.innerHTML = steps.slice(0,5).map(function(s,i){
+          return "<div class='sc-prod'><div class='sc-prod-n'>0"+(i+1)+"</div><div class='sc-prod-name'>"+s.nom+"</div><div class='sc-prod-price'>"+(s.prix ? (parseFloat(String(s.prix).replace(/[^0-9.]/g,""))||0)+"€" : "")+"</div></div>";
+        }).join('');
+      }
+
+      // Titre de la modale
+      var modalTitle = document.getElementById('share-modal-title');
+      if (modalTitle) {
+        modalTitle.innerHTML = isEN
+          ? '🌸 Routine shared by <strong>' + sharedName + '</strong>'
+          : '🌸 Routine partagée par <strong>' + sharedName + '</strong>';
+      }
+
+      // Remplacer les boutons par "Obtiens la tienne"
+      var btnsEl = document.querySelector('.share-btns');
+      if (btnsEl) {
+        btnsEl.innerHTML =
+          '<button class="share-btn share-btn-share" style="flex:1;font-size:14px;padding:14px" onclick="closeShareModal();showTermsModal()">' +
+          (isEN ? '✨ Get my free routine' : '✨ Obtiens la mienne gratuitement') +
+          '</button>';
+      }
+    }, 80);
 
   } catch(e) { console.log('shared routine error:', e); }
 }
