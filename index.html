@@ -1569,49 +1569,11 @@ h2{font-family:var(--serif);font-size:20px;font-weight:700;margin-bottom:3px}
     <div class="share-modal-handle"></div>
     <div class="share-modal-title" id="share-modal-title">Ta routine à partager</div>
 
-    <!-- Carte générée dynamiquement -->
-    <div class="share-card-wrap" id="share-card-preview">
-      <div class="sc-topbar-stripe"></div>
-      <div class="sc-body">
-        <div class="sc-left">
-          <div class="sc-logo">Skin<em>Match</em></div>
-          <div>
-            <div class="sc-name" id="sc-card-name">—</div>
-            <div class="sc-skintype" id="sc-card-skin">—</div>
-          </div>
-          <div class="sc-score-row">
-            <svg width="38" height="38" viewBox="0 0 38 38">
-              <circle cx="19" cy="19" r="15" fill="none" stroke="rgba(196,114,106,.12)" stroke-width="3"/>
-              <circle id="sc-score-arc" cx="19" cy="19" r="15" fill="none" stroke="#C4726A" stroke-width="3"
-                stroke-dasharray="94.2" stroke-dashoffset="12.2"
-                stroke-linecap="round" transform="rotate(-90 19 19)"/>
-              <text x="19" y="19" text-anchor="middle" dominant-baseline="central"
-                font-family="Georgia,serif" font-size="9" font-weight="600" fill="#3D2B1F" id="sc-score-txt">87%</text>
-            </svg>
-            <div>
-              <div class="sc-score-label" id="sc-card-score-lbl">Très adapté</div>
-              <div class="sc-score-sub">à ton profil cutané</div>
-            </div>
-          </div>
-          <div class="sc-stats">
-            <div class="sc-st"><div class="sc-st-val" id="sc-card-count">4</div><div class="sc-st-lbl">Produits</div></div>
-            <div class="sc-st"><div class="sc-st-val" id="sc-card-total">65€</div><div class="sc-st-lbl">Budget</div></div>
-          </div>
-        </div>
-        <div class="sc-vsep"></div>
-        <div class="sc-right">
-          <div class="sc-prod-lbl">Ma sélection</div>
-          <div id="sc-card-products"></div>
-        </div>
-      </div>
-      <div class="sc-footer">
-        <div class="sc-footer-brand">Skin<em>Match</em></div>
-        <div class="sc-footer-url">100% gratuit</div>
-      </div>
-    </div>
+    <!-- Carte reconstruite entièrement en JS à chaque ouverture -->
+    <div id="share-card-preview"></div>
 
     <!-- Boutons -->
-    <div class="share-btns">
+    <div class="share-btns" id="share-btns-wrap">
       <button class="share-btn share-btn-dl" onclick="downloadCard()">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
         Télécharger
@@ -4210,51 +4172,49 @@ function switchTab(tab){
   document.getElementById("ro-pm").style.display=tab==="pm"?"block":"none";
 }
 
-function _fillShareCard(steps, userName, isEN) {
+function _buildShareCardHTML(steps, userName, skinType, ageGroup, isEN) {
   var skinLabels = {grasse:"Peau grasse",seche:"Peau sèche",mixte:"Peau mixte",sensible:"Peau sensible",normale:"Peau normale"};
-  var skinLabel = skinLabels[ST.skinType] || (ST.skinType || "mixte");
-  var ageLabel = ST.ageGroup || "26-35";
+  var skinLabel = skinLabels[skinType] || skinType || "mixte";
+  var ageLabel = ageGroup || "26-35";
+  var displayName = userName || (isEN ? "My routine" : "Ma routine");
+  var totalPrix = steps.reduce(function(s,p){ return s+(parseFloat(String(p.prix||0).replace(/[^0-9.]/g,""))||0); },0);
+  var compat = steps.length > 0 ? Math.round(steps.reduce(function(s,p){ return s+(p.compat||85); },0)/steps.length) : 87;
+  var compatLabel = compat >= 90 ? (isEN?"Perfect match":"Parfait pour toi") : compat >= 75 ? (isEN?"Well adapted":"Très adapté") : (isEN?"Adapted":"Adapté");
+  var arcOffset = (94.2 - (compat/100)*94.2).toFixed(1);
+  var prodsHTML = steps.slice(0,5).map(function(s,i){
+    var prix = s.prix ? (parseFloat(String(s.prix).replace(/[^0-9.]/g,""))||0)+"€" : "";
+    return "<div class='sc-prod'><div class='sc-prod-n'>0"+(i+1)+"</div><div class='sc-prod-name'>"+s.nom+"</div><div class='sc-prod-price'>"+prix+"</div></div>";
+  }).join("");
 
-  var nameEl = document.getElementById("sc-card-name");
-  if (nameEl) nameEl.textContent = userName || (isEN ? "My routine" : "Ma routine");
-
-  var skinEl = document.getElementById("sc-card-skin");
-  if (skinEl) skinEl.textContent = skinLabel + " · " + ageLabel + " ans";
-
-  var totalPrix = steps.reduce(function(s,p){ return s + (parseFloat(String(p.prix||0).replace(/[^0-9.]/g,""))||0); }, 0);
-  var compat = steps.length > 0 ? Math.round(steps.reduce(function(s,p){ return s + (p.compat||85); },0) / steps.length) : 87;
-
-  var scoreTxt = document.getElementById("sc-score-txt");
-  if (scoreTxt) scoreTxt.textContent = compat + "%";
-  var scoreArc = document.getElementById("sc-score-arc");
-  if (scoreArc) {
-    var offset = 94.2 - (compat/100) * 94.2;
-    scoreArc.setAttribute("stroke-dashoffset", offset.toFixed(1));
-  }
-  var scoreLbl = document.getElementById("sc-card-score-lbl");
-  if (scoreLbl) scoreLbl.textContent = compat >= 90 ? (isEN?"Perfect match":"Parfait pour toi") : compat >= 75 ? (isEN?"Well adapted":"Très adapté") : (isEN?"Adapted":"Adapté");
-
-  var countEl = document.getElementById("sc-card-count");
-  if (countEl) countEl.textContent = steps.length;
-  var totalEl = document.getElementById("sc-card-total");
-  if (totalEl) totalEl.textContent = Math.round(totalPrix) + "€";
-
-  var prodsEl = document.getElementById("sc-card-products");
-  if (prodsEl) {
-    prodsEl.innerHTML = steps.slice(0,5).map(function(s, i) {
-      return "<div class='sc-prod'>" +
-        "<div class='sc-prod-n'>0"+(i+1)+"</div>" +
-        "<div class='sc-prod-name'>"+s.nom+"</div>" +
-        "<div class='sc-prod-price'>"+(s.prix?(parseFloat(String(s.prix).replace(/[^0-9.]/g,""))||0)+"€":"")+"</div>" +
-        "</div>";
-    }).join("");
-  }
+  return "<div class='share-card-wrap'>" +
+    "<div class='sc-topbar-stripe'></div>" +
+    "<div class='sc-body'>" +
+      "<div class='sc-left'>" +
+        "<div class='sc-logo'>Skin<em>Match</em></div>" +
+        "<div><div class='sc-name'>"+displayName+"</div><div class='sc-skintype'>"+skinLabel+" · "+ageLabel+" ans</div></div>" +
+        "<div class='sc-score-row'>" +
+          "<svg width='38' height='38' viewBox='0 0 38 38'>" +
+            "<circle cx='19' cy='19' r='15' fill='none' stroke='rgba(196,114,106,.12)' stroke-width='3'/>" +
+            "<circle cx='19' cy='19' r='15' fill='none' stroke='#C4726A' stroke-width='3' stroke-dasharray='94.2' stroke-dashoffset='"+arcOffset+"' stroke-linecap='round' transform='rotate(-90 19 19)'/>" +
+            "<text x='19' y='19' text-anchor='middle' dominant-baseline='central' font-family='Georgia,serif' font-size='9' font-weight='600' fill='#3D2B1F'>"+compat+"%</text>" +
+          "</svg>" +
+          "<div><div class='sc-score-label'>"+compatLabel+"</div><div class='sc-score-sub'>"+(isEN?"for your skin":"à ton profil cutané")+"</div></div>" +
+        "</div>" +
+        "<div class='sc-stats'>" +
+          "<div class='sc-st'><div class='sc-st-val'>"+steps.length+"</div><div class='sc-st-lbl'>"+(isEN?"Products":"Produits")+"</div></div>" +
+          "<div class='sc-st'><div class='sc-st-val'>"+Math.round(totalPrix)+"€</div><div class='sc-st-lbl'>Budget</div></div>" +
+        "</div>" +
+      "</div>" +
+      "<div class='sc-vsep'></div>" +
+      "<div class='sc-right'><div class='sc-prod-lbl'>"+(isEN?"My selection":"Ma sélection")+"</div>"+prodsHTML+"</div>" +
+    "</div>" +
+    "<div class='sc-footer'><div class='sc-footer-brand'>Skin<em>Match</em></div><div class='sc-footer-url'>100% gratuit</div></div>" +
+  "</div>";
 }
 
 function toggleShare(){
   var r = ST.result;
   if (!r) return;
-
   var isEN = LANG === "en";
   var userName = window._currentUser
     ? (window._currentUser.displayName || window._currentUser.email.split("@")[0])
@@ -4270,35 +4230,29 @@ function toggleShare(){
   };
   try { window._shareEncoded = btoa(unescape(encodeURIComponent(JSON.stringify(routineData)))); } catch(e) { window._shareEncoded = ""; }
 
-  // Remettre le titre et les bons boutons
+  // Construire toute la carte en innerHTML - zéro getElementById
+  var preview = document.getElementById("share-card-preview");
+  if (preview) preview.innerHTML = _buildShareCardHTML(steps, userName, ST.skinType, ST.ageGroup, isEN);
+
+  // Titre et boutons
   var modalTitle = document.getElementById("share-modal-title");
   if (modalTitle) modalTitle.textContent = isEN ? "Your routine to share" : "Ta routine à partager";
-  var btnsEl = document.querySelector('.share-btns');
-  if (btnsEl) {
-    btnsEl.innerHTML =
+  var btnsWrap = document.getElementById("share-btns-wrap");
+  if (btnsWrap) {
+    btnsWrap.innerHTML =
       '<button class="share-btn share-btn-dl" onclick="downloadCard()">' +
         '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>' +
-        (isEN ? 'Download' : 'Télécharger') +
+        (isEN ? "Download" : "Télécharger") +
       '</button>' +
       '<button class="share-btn share-btn-share" onclick="shareRoutineLink()">' +
         '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>' +
-        (isEN ? 'Share link' : 'Partager le lien') +
+        (isEN ? "Share link" : "Partager le lien") +
       '</button>';
   }
-
-  // Remplir AVANT d'ouvrir (modale déjà dans le DOM, juste cachée)
-  _fillShareCard(steps, userName, isEN);
 
   // Ouvrir la modale
   var modal = document.getElementById("share-card-modal");
   if (modal) modal.classList.add("open");
-
-  // Double rAF pour s'assurer que le paint est terminé, puis re-remplir
-  requestAnimationFrame(function() {
-    requestAnimationFrame(function() {
-      _fillShareCard(steps, userName, isEN);
-    });
-  });
 }
 
 function closeShareModal() {
@@ -9697,62 +9651,28 @@ function _checkSharedRoutine() {
     var isEN = LANG === 'en';
     var sharedName = window._sharedBy || (isEN ? "someone" : "quelqu'un");
 
-    // Ouvrir la modale EN PREMIER pour que le DOM soit visible
+    // Ouvrir la modale
     var modal = document.getElementById('share-card-modal');
     if (modal) modal.classList.add('open');
 
-    // Remplir la carte APRÈS ouverture (setTimeout pour laisser le DOM se rendre)
-    setTimeout(function() {
-      var nameEl = document.getElementById('sc-card-name');
-      if (nameEl) nameEl.textContent = window._sharedBy || 'Routine';
+    // Construire toute la carte en innerHTML - fiable sur tous les navigateurs
+    var preview = document.getElementById('share-card-preview');
+    if (preview) preview.innerHTML = _buildShareCardHTML(sharedResult.steps || [], window._sharedBy || '', ST.skinType, ST.ageGroup, isEN);
 
-      var skinLabels = {grasse:'Peau grasse',seche:'Peau sèche',mixte:'Peau mixte',sensible:'Peau sensible',normale:'Peau normale'};
-      var skinEl = document.getElementById('sc-card-skin');
-      if (skinEl) skinEl.textContent = (skinLabels[ST.skinType] || ST.skinType) + ' · ' + ST.ageGroup + ' ans';
+    // Titre
+    var modalTitle = document.getElementById('share-modal-title');
+    if (modalTitle) modalTitle.innerHTML = isEN
+      ? '🌸 Routine shared by <strong>' + sharedName + '</strong>'
+      : '🌸 Routine partagée par <strong>' + sharedName + '</strong>';
 
-      var steps = sharedResult.steps || [];
-      var totalPrix = steps.reduce(function(s,p){ return s+(parseFloat(String(p.prix||0).replace(/[^0-9.]/g,""))||0); }, 0);
-      var compat = steps.length > 0 ? Math.round(steps.reduce(function(s,p){ return s+(p.compat||85); },0)/steps.length) : 87;
-
-      var scoreTxt = document.getElementById('sc-score-txt');
-      if (scoreTxt) scoreTxt.textContent = compat + '%';
-      var scoreArc = document.getElementById('sc-score-arc');
-      if (scoreArc) {
-        var offset = 94.2 - (compat/100)*94.2;
-        scoreArc.setAttribute('stroke-dashoffset', offset.toFixed(1));
-      }
-      var scoreLbl = document.getElementById('sc-card-score-lbl');
-      if (scoreLbl) scoreLbl.textContent = compat >= 90 ? (isEN?'Perfect':'Parfait') : compat >= 75 ? (isEN?'Well adapted':'Très adapté') : (isEN?'Adapted':'Adapté');
-
-      var countEl = document.getElementById('sc-card-count');
-      if (countEl) countEl.textContent = steps.length;
-      var totalEl = document.getElementById('sc-card-total');
-      if (totalEl) totalEl.textContent = '~' + Math.round(totalPrix) + '€';
-
-      var prodsEl = document.getElementById('sc-card-products');
-      if (prodsEl) {
-        prodsEl.innerHTML = steps.slice(0,5).map(function(s,i){
-          return "<div class='sc-prod'><div class='sc-prod-n'>0"+(i+1)+"</div><div class='sc-prod-name'>"+s.nom+"</div><div class='sc-prod-price'>"+(s.prix ? (parseFloat(String(s.prix).replace(/[^0-9.]/g,""))||0)+"€" : "")+"</div></div>";
-        }).join('');
-      }
-
-      // Titre de la modale
-      var modalTitle = document.getElementById('share-modal-title');
-      if (modalTitle) {
-        modalTitle.innerHTML = isEN
-          ? '🌸 Routine shared by <strong>' + sharedName + '</strong>'
-          : '🌸 Routine partagée par <strong>' + sharedName + '</strong>';
-      }
-
-      // Remplacer les boutons par "Obtiens la tienne"
-      var btnsEl = document.querySelector('.share-btns');
-      if (btnsEl) {
-        btnsEl.innerHTML =
-          '<button class="share-btn share-btn-share" style="flex:1;font-size:14px;padding:14px" onclick="closeShareModal();showTermsModal()">' +
-          (isEN ? '✨ Get my free routine' : '✨ Obtiens la mienne gratuitement') +
-          '</button>';
-      }
-    }, 80);
+    // Bouton "Obtiens la tienne"
+    var btnsWrap = document.getElementById('share-btns-wrap');
+    if (btnsWrap) {
+      btnsWrap.innerHTML =
+        '<button class="share-btn share-btn-share" style="flex:1;font-size:14px;padding:14px" onclick="closeShareModal();showTermsModal()">' +
+        (isEN ? '✨ Get my free routine' : '✨ Obtiens la mienne gratuitement') +
+        '</button>';
+    }
 
   } catch(e) { console.log('shared routine error:', e); }
 }
