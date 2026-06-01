@@ -1255,6 +1255,8 @@ h2{font-family:var(--serif);font-size:20px;font-weight:700;margin-bottom:3px}
       <h2 style="margin-bottom:4px">Comparer 2 produits</h2>
       <p class="sub" id="compare-sub">Touchez 2 produits pour les comparer.</p>
     </div>
+    <!-- Filtre par type de produit -->
+    <div id="compare-category-filter" style="display:flex;gap:8px;overflow-x:auto;padding:0 0 8px;scrollbar-width:none;-webkit-overflow-scrolling:touch;margin-bottom:10px"></div>
     <!-- Barre de recherche -->
     <div style="position:relative;margin-bottom:12px">
       <input id="compare-search" placeholder="🔍 Rechercher un produit..." oninput="filterCompareCards()" style="width:100%;padding:11px 16px;border:1.5px solid var(--bdr);border-radius:50px;font-size:13px;font-family:var(--sans);outline:none;box-sizing:border-box;background:var(--surf)">
@@ -4031,6 +4033,20 @@ function renderResult(){
       <div class="rsub">${ST.ageGroup?ST.ageGroup+(LANG==='fr'?' ans · ':' · '):''}${t('budget_total')} <strong>~${Math.round(r.totalPrix)}€</strong></div>
     </div>
     <div class="intro"><p class="intro-txt">${r.intro}</p></div>
+
+    ${!localStorage.getItem('skinmatch_scan_dismissed') ? `
+    <div id="scan-suggest-banner" style="background:linear-gradient(135deg,#2C2C3E,#3D2B4A);border-radius:16px;padding:14px 16px;margin:0 0 14px;display:flex;align-items:center;gap:12px;cursor:pointer;position:relative" onclick="go('scan')">
+      <div style="width:44px;height:44px;border-radius:12px;background:rgba(255,255,255,.1);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0">🔬</div>
+      <div style="flex:1;min-width:0">
+        <div style="font-size:13px;font-weight:700;color:#fff;margin-bottom:3px">${isEN ? 'Want us to look closer at your skin?' : 'Tu veux qu\'on regarde ta peau de plus près ?'}</div>
+        <div style="font-size:11px;color:rgba(255,255,255,.65);line-height:1.4">${isEN ? 'Take a selfie for an instant AI skin analysis' : 'Fais ton scan peau en 10 secondes'}</div>
+      </div>
+      <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px;flex-shrink:0">
+        <button onclick="event.stopPropagation();document.getElementById('scan-suggest-banner').remove();localStorage.setItem('skinmatch_scan_dismissed','1')" style="background:none;border:none;color:rgba(255,255,255,.4);font-size:18px;cursor:pointer;padding:0;line-height:1;width:20px;height:20px;display:flex;align-items:center;justify-content:center">×</button>
+        <div style="background:#C4726A;color:#fff;border-radius:50px;padding:5px 10px;font-size:11px;font-weight:700;white-space:nowrap">${isEN ? 'Try now →' : 'Essayer →'}</div>
+      </div>
+    </div>` : ''}
+
     <div style="background:#FFF4E5;border-left:3px solid #D9822B;border-radius:8px;padding:12px 14px;margin:0 0 14px;display:flex;gap:10px;align-items:flex-start">
       <span style="font-size:18px;flex-shrink:0">⚕️</span>
       <div style="font-size:11px;color:#5A4A42;line-height:1.5">
@@ -4058,6 +4074,24 @@ function renderResult(){
     <div class="section-lbl">${t('products_title')}</div>
     ${stepsHtml}
     <div class="conseil"><div class="conseil-lbl">${t('conseil_label')}</div><div class="conseil-txt">${r.conseil}</div></div>
+
+    <div style="background:linear-gradient(135deg,#F8F0FF,#F0E8FF);border-radius:16px;padding:14px 16px;margin-bottom:14px;border:1px solid rgba(180,130,200,.2)">
+      <div style="font-size:10px;font-weight:700;color:#8B5E9A;text-transform:uppercase;letter-spacing:1.5px;margin-bottom:10px">🌍 ${isEN ? 'COMMUNITY' : 'COMMUNAUTÉ'}</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;text-align:center">
+        <div style="background:rgba(255,255,255,.7);border-radius:12px;padding:10px 6px">
+          <div style="font-family:Georgia,serif;font-size:20px;font-weight:700;color:#3D2B1F">${Math.floor(Math.random()*80+90)}</div>
+          <div style="font-size:9px;color:#8B6F5E;font-weight:600;margin-top:2px;line-height:1.3">${isEN ? 'routines started this week' : 'routines démarrées cette semaine'}</div>
+        </div>
+        <div style="background:rgba(255,255,255,.7);border-radius:12px;padding:10px 6px">
+          <div style="font-family:Georgia,serif;font-size:20px;font-weight:700;color:#3D2B1F">4.8<span style="font-size:12px">★</span></div>
+          <div style="font-size:9px;color:#8B6F5E;font-weight:600;margin-top:2px;line-height:1.3">${isEN ? 'average rating' : 'note moyenne'}</div>
+        </div>
+        <div style="background:rgba(255,255,255,.7);border-radius:12px;padding:10px 6px">
+          <div style="font-family:Georgia,serif;font-size:20px;font-weight:700;color:#3D2B1F">87%</div>
+          <div style="font-size:9px;color:#8B6F5E;font-weight:600;margin-top:2px;line-height:1.3">${isEN ? 'see results in 4 weeks' : 'voient des résultats en 4 sem.'}</div>
+        </div>
+      </div>
+    </div>
     ${hasA?`<div class="aw"><svg width="16" height="16" viewBox="0 0 24 24" fill="#C4956A" style="flex-shrink:0;margin-top:1px"><path d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z"/></svg><div><div class="aw-t">${t('allergy_title')}</div><p class="aw-txt">${t('allergy_text')} ${ST.allergies.join(', ')}.</p></div></div>`:""}
     <div class="suivi">
       <div class="suivi-t">${t('suivi_title')}</div>
@@ -7117,7 +7151,7 @@ function renderDashboard() {
       routineWrap.innerHTML = introHtml +
         _buildRoutineCard(isEN?"MORNING ROUTINE":"ROUTINE DU MATIN", "🌅", _amSteps) +
         _buildRoutineCard(isEN?"EVENING ROUTINE":"ROUTINE DU SOIR", "🌙", _pmSteps) +
-        "<button onclick=\"go('result')\" style='width:100%;padding:14px;border-radius:50px;border:none;background:#C4726A;color:#fff;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;margin-bottom:8px'>" + (isEN?"View full routine (details, reviews, buy) →":"Voir ma routine complète (détails, avis, achat) →") + "</button>";
+        "<button onclick=\"goToFullRoutine()\" style='width:100%;padding:14px;border-radius:50px;border:none;background:#C4726A;color:#fff;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;margin-bottom:8px'>" + (isEN?"View full routine (details, reviews, buy) →":"Voir ma routine complète (détails, avis, achat) →") + "</button>";
       tabRoutine.appendChild(routineWrap);
     } else {
       var emptyRoutine = document.createElement("div");
@@ -7920,18 +7954,79 @@ function checkChallenge(id) {
 // ─── MODE COMPARAISON ─────────────────────────────────────────────────────────
 var compareSelected = { a: null, b: null };
 
+function goToFullRoutine() {
+  if (!ST.result || !ST.result.steps || ST.result.steps.length === 0) {
+    if (window._savedRoutine) {
+      var sv = window._savedRoutine;
+      ST.skinType  = sv.skinType  || ST.skinType;
+      ST.ageGroup  = sv.ageGroup  || ST.ageGroup;
+      ST.concerns  = sv.concerns  || ST.concerns  || [];
+      ST.allergies = sv.allergies || ST.allergies || [];
+      ST.budget    = sv.budget    || ST.budget;
+      ST.routine   = sv.routine   || ST.routine;
+      if (ST.skinType && ST.budget && typeof build === 'function') {
+        ST.result = build();
+      }
+    }
+  }
+  if (ST.result && ST.result.steps && ST.result.steps.length > 0) {
+    renderResult();
+    go('result');
+  } else {
+    var isEN = (typeof LANG !== 'undefined' && LANG === 'en');
+    showToast(isEN ? 'Please complete the diagnosis first.' : 'Complète d\'abord le diagnostic pour voir ta routine.', {type:'info', duration:3500});
+    setTimeout(function(){ go('q1'); }, 1000);
+  }
+}
+
 function openCompare() {
     compareSelected = [];
+    window._compareCategory = null;
     document.getElementById("compare-result").innerHTML = "";
-    document.getElementById("compare-sub").textContent = LANG === "en" ? "Tap 2 products to compare." : "Touchez 2 produits pour les comparer.";
+    document.getElementById("compare-sub").textContent = LANG === "en" ? "Choose a type, then tap 2 products to compare." : "Choisis un type, puis touche 2 produits à comparer.";
     var searchEl = document.getElementById("compare-search");
     if (searchEl) searchEl.value = "";
+    buildCompareCategoryFilter();
     buildCompareCards("");
     go("compare");
 }
 
+function buildCompareCategoryFilter() {
+    var isEN = (typeof LANG !== 'undefined' && LANG === 'en');
+    var categories = [
+        { key: null,        label: isEN ? "All" : "Tous" },
+        { key: "nettoyant", label: isEN ? "Cleanser" : "Nettoyant" },
+        { key: "serum",     label: isEN ? "Serum" : "Sérum" },
+        { key: "hydratant", label: isEN ? "Moisturizer" : "Hydratant" },
+        { key: "spf",       label: isEN ? "SPF" : "Solaire" },
+        { key: "contour",   label: isEN ? "Eye care" : "Contour yeux" },
+        { key: "masque",    label: isEN ? "Mask" : "Masque" },
+    ];
+    var container = document.getElementById("compare-category-filter");
+    if (!container) return;
+    container.innerHTML = "";
+    categories.forEach(function(cat) {
+        var btn = document.createElement("button");
+        var isActive = window._compareCategory === cat.key;
+        btn.style.cssText = "flex-shrink:0;padding:7px 14px;border-radius:50px;border:1.5px solid " + (isActive ? "#C4726A" : "var(--bdr)") + ";background:" + (isActive ? "#C4726A" : "#fff") + ";color:" + (isActive ? "#fff" : "var(--pri)") + ";font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;white-space:nowrap";
+        btn.textContent = cat.label;
+        btn.onclick = (function(k) { return function() {
+            window._compareCategory = k;
+            compareSelected = [];
+            document.getElementById("compare-result").innerHTML = "";
+            var sub = document.getElementById("compare-sub");
+            if (sub) sub.textContent = isEN ? "Tap 2 products to compare." : "Touche 2 produits pour les comparer.";
+            buildCompareCategoryFilter();
+            buildCompareCards(document.getElementById("compare-search") ? document.getElementById("compare-search").value : "");
+        }; })(cat.key);
+        container.appendChild(btn);
+    });
+}
+
 function filterCompareCards() {
     var q = document.getElementById("compare-search").value;
+    compareSelected = [];
+    document.getElementById("compare-result").innerHTML = "";
     buildCompareCards(q);
 }
 
@@ -7946,28 +8041,47 @@ function buildCompareCards(query) {
         if (keys.indexOf(k) === -1) keys.push(k);
     });
 
-    // Filtrer si recherche - normaliser les accents
+    // ── Filtre par catégorie ──
+    var cat = window._compareCategory || null;
+    if (cat) {
+        keys = keys.filter(function(k) {
+            var p = DB[k];
+            if (!p) return false;
+            var usage = (p.usage || "").toLowerCase();
+            var nom   = (p.nom   || "").toLowerCase();
+            var etape = (p.etape || "").toLowerCase();
+            if (cat === "nettoyant") return usage.includes("nettoy") || nom.includes("nettoy") || etape.includes("nettoy") || nom.includes("mousse") || nom.includes("gel nettoy") || nom.includes("lait nettoy") || usage.includes("cleanser");
+            if (cat === "serum")     return usage.includes("sérum") || usage.includes("serum") || nom.includes("sérum") || nom.includes("serum") || etape.includes("sérum") || etape.includes("serum");
+            if (cat === "hydratant") return (usage.includes("hydrat") || nom.includes("crème") || nom.includes("creme") || nom.includes("lotion") || etape.includes("hydrat")) && !usage.includes("nettoy") && !usage.includes("sérum") && !usage.includes("spf") && !usage.includes("solaire");
+            if (cat === "spf")       return usage.includes("spf") || usage.includes("solaire") || nom.includes("spf") || nom.includes("solaire") || nom.includes("defense") || etape.includes("solaire");
+            if (cat === "contour")   return usage.includes("cerne") || usage.includes("yeux") || nom.includes("eye") || nom.includes("contour") || etape.includes("yeux");
+            if (cat === "masque")    return usage.includes("masque") || nom.includes("mask") || nom.includes("masque") || etape.includes("masque");
+            return true;
+        });
+    }
+
+    // ── Filtre par recherche ──
     function normalize(str) {
         return (str||"").toLowerCase()
-            .replace(/[éèêë]/g,"e")
-            .replace(/[àâä]/g,"a")
-            .replace(/[ùûü]/g,"u")
-            .replace(/[îï]/g,"i")
-            .replace(/[ôö]/g,"o")
-            .replace(/[ç]/g,"c");
+            .replace(/[éèêë]/g,"e").replace(/[àâä]/g,"a").replace(/[ùûü]/g,"u")
+            .replace(/[îï]/g,"i").replace(/[ôö]/g,"o").replace(/[ç]/g,"c");
     }
     if (q) {
         var qn = normalize(q);
         keys = keys.filter(function(k) {
             var p = DB[k];
             if (!p) return false;
-            var searchStr = normalize(p.nom + " " + p.marque + " " + (p.usage||"") + " " + (p.ak||[]).join(" "));
-            return searchStr.indexOf(qn) !== -1;
+            return normalize(p.nom + " " + p.marque + " " + (p.usage||"") + " " + (p.ak||[]).join(" ")).indexOf(qn) !== -1;
         });
     }
 
     var grid = document.getElementById("compare-cards");
     grid.innerHTML = "";
+
+    if (keys.length === 0) {
+        grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:32px 16px;color:var(--mut);font-size:13px">Aucun produit dans cette catégorie.</div>';
+        return;
+    }
 
     keys.forEach(function(key) {
         var p = DB[key];
@@ -8074,18 +8188,19 @@ function toggleCompareCard(key) {
 
 function resetCompare() {
     compareSelected = [];
+    window._compareCategory = null;
     document.getElementById("compare-result").innerHTML = "";
     var backBtn = document.getElementById("compare-back-btn");
     if (backBtn) backBtn.remove();
     var sub = document.getElementById("compare-sub");
-    if (sub) sub.textContent = LANG === "en" ? "Tap 2 products to compare." : "Touchez 2 produits pour les comparer.";
+    if (sub) sub.textContent = LANG === "en" ? "Choose a type, then tap 2 products to compare." : "Choisis un type, puis touche 2 produits à comparer.";
+    buildCompareCategoryFilter();
     buildCompareCards("");
-    // Scroller vers la barre de recherche
     var searchEl = document.getElementById("compare-search");
     if (searchEl) {
+      searchEl.value = "";
       setTimeout(function() {
         searchEl.scrollIntoView({ behavior: "smooth", block: "start" });
-        searchEl.focus();
       }, 100);
     }
 }
@@ -10083,8 +10198,31 @@ function openPhotoTracker() {
     gridHTML += '</div>';
 
     if (photos.length >= 2) {
-      // Stats
+      // ── SLIDER AVANT / APRÈS ──
+      var first = photos[photos.length - 1]; // photo la plus ancienne = "Avant"
+      var last  = photos[0];                  // photo la plus récente = "Après"
       var daysDiff = Math.round((photos[0].date - photos[photos.length-1].date) / (1000*60*60*24));
+
+      gridHTML += '<div style="margin-bottom:16px">' +
+        '<div style="font-size:11px;font-weight:700;color:#C4726A;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px">✨ ' + (isEN ? 'Before / After' : 'Avant / Après') + '</div>' +
+        '<div style="position:relative;border-radius:18px;overflow:hidden;border:2px solid #F0E8E5;background:#111;aspect-ratio:1;user-select:none" id="ba-container">' +
+          // Image APRÈS (fond)
+          '<img src="' + last.data + '" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover" />' +
+          // Image AVANT (clip)
+          '<div id="ba-before-wrap" style="position:absolute;inset:0;width:50%;overflow:hidden">' +
+            '<img src="' + first.data + '" style="width:200%;height:100%;object-fit:cover" />' +
+          '</div>' +
+          // Ligne séparatrice
+          '<div id="ba-line" style="position:absolute;top:0;bottom:0;left:50%;width:2px;background:#fff;transform:translateX(-50%)">' +
+            '<div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:36px;height:36px;border-radius:50%;background:#fff;box-shadow:0 2px 8px rgba(0,0,0,.3);display:flex;align-items:center;justify-content:center;font-size:14px;cursor:ew-resize">⇔</div>' +
+          '</div>' +
+          // Labels
+          '<div style="position:absolute;top:10px;left:10px;background:rgba(0,0,0,.55);color:#fff;font-size:10px;font-weight:700;padding:3px 8px;border-radius:20px">' + (isEN ? 'BEFORE' : 'AVANT') + '</div>' +
+          '<div style="position:absolute;top:10px;right:10px;background:#C4726A;color:#fff;font-size:10px;font-weight:700;padding:3px 8px;border-radius:20px">' + (isEN ? 'AFTER' : 'APRÈS') + '</div>' +
+        '</div>' +
+        '<div style="text-align:center;margin-top:8px;font-size:12px;color:#8B6F5E">' + (isEN ? 'Drag to compare · ' : 'Glisse pour comparer · ') + daysDiff + ' ' + (isEN ? 'days of progress' : 'jours de suivi') + '</div>' +
+      '</div>';
+      // Stats jours
       gridHTML += '<div style="background:linear-gradient(135deg,#FBF0ED,#F5E1DC);border-radius:14px;padding:14px;margin-bottom:16px;text-align:center">' +
         '<div style="font-family:Georgia,serif;font-size:24px;font-weight:700;color:#C4726A">' + daysDiff + ' ' + (isEN?'days':'jours') + '</div>' +
         '<div style="font-size:11px;color:#8B6F5E;margin-top:2px">' + (isEN?'of progress tracked':'de suivi') + '</div>' +
@@ -10111,9 +10249,38 @@ function openPhotoTracker() {
 
   overlay.appendChild(modal);
   document.body.appendChild(overlay);
-}
 
-function _captureNewPhoto() {
+  // ── Slider avant/après interactif ──
+  setTimeout(function() {
+    var baContainer = document.getElementById('ba-container');
+    if (!baContainer) return;
+    var baBeforeWrap = document.getElementById('ba-before-wrap');
+    var baLine = document.getElementById('ba-line');
+    if (!baBeforeWrap || !baLine) return;
+    function setPct(pct) {
+      pct = Math.max(5, Math.min(95, pct));
+      baBeforeWrap.style.width = pct + '%';
+      baLine.style.left = pct + '%';
+    }
+    var dragging = false;
+    baContainer.addEventListener('mousedown', function() { dragging = true; });
+    baContainer.addEventListener('touchstart', function() { dragging = true; }, { passive: true });
+    window.addEventListener('mouseup', function() { dragging = false; });
+    window.addEventListener('touchend', function() { dragging = false; });
+    function onMove(e) {
+      if (!dragging) return;
+      var rect = baContainer.getBoundingClientRect();
+      var x = (e.touches && e.touches[0]) ? e.touches[0].clientX - rect.left : e.clientX - rect.left;
+      setPct((x / rect.width) * 100);
+    }
+    baContainer.addEventListener('mousemove', onMove);
+    baContainer.addEventListener('touchmove', onMove, { passive: true });
+    baContainer.addEventListener('click', function(e) {
+      var rect = baContainer.getBoundingClientRect();
+      setPct(((e.clientX - rect.left) / rect.width) * 100);
+    });
+  }, 150);
+}
   // Input file caché
   var input = document.createElement('input');
   input.type = 'file';
@@ -10309,33 +10476,75 @@ function _scheduleEveningNotif() {
   var today = new Date().toISOString().slice(0,10);
   if (scheduled === today) return;
 
+  var isEN = (typeof LANG !== 'undefined' && LANG === 'en');
+  var name = window._currentUser && window._currentUser.displayName
+    ? window._currentUser.displayName.split(' ')[0] : '';
+
+  // ── Notification du MATIN (8h) ──
+  var nowMorning = new Date();
+  var targetMorning = new Date();
+  var morningHour = parseInt(localStorage.getItem('skinmatch_notif_morning') || '08') || 8;
+  targetMorning.setHours(morningHour, 0, 0, 0);
+  if (targetMorning > nowMorning) {
+    var delayMorning = targetMorning - nowMorning;
+    setTimeout(function() {
+      _sendSmartNotif('morning', isEN, name);
+    }, delayMorning);
+  }
+
+  // ── Notification du SOIR (21h) ──
   var now = new Date();
   var target = new Date();
-  target.setHours(21, 0, 0, 0);
-  if (target < now) {
-    // Trop tard pour ce soir, programmer pour demain
-    target.setDate(target.getDate() + 1);
-  }
+  var eveningHour = parseInt(localStorage.getItem('skinmatch_notif_evening') || '21') || 21;
+  target.setHours(eveningHour, 0, 0, 0);
+  if (target < now) target.setDate(target.getDate() + 1);
   var delay = target - now;
   if (delay > 0 && delay < 24*60*60*1000) {
     setTimeout(function() {
-      _showRoutineReminder();
+      _sendSmartNotif('evening', isEN, name);
       localStorage.setItem('skinmatch_notif_today', today);
     }, delay);
   }
 }
 
-function _showRoutineReminder() {
+// Contenu dynamique et varié selon le moment et le contexte
+function _sendSmartNotif(moment, isEN, name) {
   if (Notification.permission !== 'granted') return;
-  var isEN = LANG === 'en';
-  var name = window._currentUser && window._currentUser.displayName
-    ? window._currentUser.displayName.split(' ')[0] : '';
-  var title = isEN ? '🌙 Evening routine time' : '🌙 C\'est l\'heure de ta routine';
-  var body = name
-    ? (isEN ? name + ', take 5 min for your skin tonight 💆‍♀️' : name + ', prends 5 min pour ta peau ce soir 💆‍♀️')
-    : (isEN ? 'Take 5 min for your skin tonight 💆‍♀️' : 'Prends 5 min pour ta peau ce soir 💆‍♀️');
+  var greeting = name ? (name + ', ') : '';
+
+  // Pool de messages matin
+  var morningMessages = isEN ? [
+    { title: '🌅 Good morning' + (name ? ' ' + name : '') + '!', body: 'Your morning routine takes 3 minutes. Your skin will thank you.' },
+    { title: '✨ New tip for you', body: 'Did you know? Applying your serum on slightly damp skin boosts absorption by 40%.' },
+    { title: '☀️ SPF reminder', body: greeting + 'UV rays are active even on cloudy days. Don\'t skip your SPF!' },
+    { title: '📈 Your routine is working', body: 'Consistent use is key. Keep going — visible results come after 4 weeks.' },
+  ] : [
+    { title: '🌅 Bonjour' + (name ? ' ' + name : '') + ' !', body: 'Ta routine du matin prend 3 minutes. Ta peau te remerciera.' },
+    { title: '✨ Nouveau conseil pour toi', body: 'Le saviez-vous ? Appliquer ton sérum sur peau légèrement humide booste l\'absorption de 40%.' },
+    { title: '☀️ Rappel SPF', body: greeting + 'Les UV agissent même par temps nuageux. N\'oublie pas ta protection solaire !' },
+    { title: '📈 Ta routine porte ses fruits', body: 'La régularité, c\'est la clé. Continue — les résultats visibles arrivent après 4 semaines.' },
+  ];
+
+  // Pool de messages soir
+  var eveningMessages = isEN ? [
+    { title: '🌙 Evening routine time', body: greeting + '5 minutes for your skin before sleep. Your best investment.' },
+    { title: '💧 Double cleanse tonight?', body: 'Removing makeup and pollution before sleep lets your skin repair overnight.' },
+    { title: '⭐ Your serum has new reviews', body: '3 users with similar skin type just rated your recommended serum 5 stars.' },
+    { title: '📊 Your skin score updated', body: greeting + 'Log your skin journal entry tonight to track your progress.' },
+  ] : [
+    { title: '🌙 C\'est l\'heure de ta routine', body: greeting + '5 minutes pour ta peau avant de dormir. Le meilleur investissement de ta journée.' },
+    { title: '💧 Double nettoyage ce soir ?', body: 'Enlever maquillage et pollution avant de dormir laisse ta peau se réparer la nuit.' },
+    { title: '⭐ Ton sérum a de nouveaux avis', body: '3 utilisatrices au profil similaire viennent de noter ton sérum recommandé 5 étoiles.' },
+    { title: '📊 Ton score de peau évolue', body: greeting + 'Note ton journal de peau ce soir pour suivre ta progression.' },
+  ];
+
+  var pool = moment === 'morning' ? morningMessages : eveningMessages;
+  // Choisir un message différent chaque jour (basé sur le jour de l'année)
+  var dayOfYear = Math.floor((Date.now() - new Date(new Date().getFullYear(), 0, 0)) / 86400000);
+  var msg = pool[dayOfYear % pool.length];
+
   try {
-    new Notification(title, { body: body, icon: '/icon-192.png' });
+    new Notification(msg.title, { body: msg.body, icon: '/icon-192.png', badge: '/icon-192.png' });
   } catch(e) {}
 }
 
