@@ -718,6 +718,8 @@ h2{font-family:var(--serif);font-size:20px;font-weight:700;margin-bottom:3px}
 
     <!-- Bouton passer -->
     <button onclick="skipOnboarding()" style="position:absolute;top:16px;right:16px;z-index:10;background:rgba(196,114,106,.12);border:none;border-radius:50px;padding:6px 14px;font-size:12px;font-weight:600;color:#8B6F5E;cursor:pointer;font-family:inherit">Passer →</button>
+    <!-- Bouton retour -->
+    <button id="onb-back-btn" onclick="prevOnboardingSlide()" style="position:absolute;top:16px;left:16px;z-index:10;background:rgba(196,114,106,.12);border:none;border-radius:50px;padding:6px 14px;font-size:12px;font-weight:600;color:#8B6F5E;cursor:pointer;font-family:inherit;display:none">← Retour</button>
 
     <!-- Slides container -->
     <div id="onb-slides" style="flex:1;overflow:hidden;position:relative">
@@ -9671,6 +9673,13 @@ function skipOnboarding() {
   updateNav('welcome');
 }
 
+function prevOnboardingSlide() {
+  if (_onbSlide > 0) {
+    _onbSlide--;
+    _updateOnboarding();
+  }
+}
+
 function nextOnboardingSlide() {
   if (_onbSlide < _onbTotal - 1) {
     _onbSlide++;
@@ -9694,8 +9703,9 @@ function _updateOnboarding() {
       dot.style.background = i === _onbSlide ? '#C4726A' : 'rgba(196,114,106,.3)';
     }
   }
-  // Bouton
-  var btn = document.getElementById('onb-btn');
+  // Bouton retour
+  var backBtn = document.getElementById('onb-back-btn');
+  if (backBtn) backBtn.style.display = _onbSlide > 0 ? '' : 'none';
   if (btn) {
     var isLast = _onbSlide === _onbTotal - 1;
     btn.textContent = isLast ? (isEN ? "Let's go! →" : "C'est parti ! →") : (isEN ? "Next →" : "Suivant →");
@@ -9738,6 +9748,7 @@ function _updateOnboarding() {
     var diff = startX - e.changedTouches[0].clientX;
     if (Math.abs(diff) > 50) {
       if (diff > 0) nextOnboardingSlide(); // swipe gauche → suivant
+      else prevOnboardingSlide();           // swipe droite → retour
     }
   }, { passive: true });
 })();
