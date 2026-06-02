@@ -712,6 +712,57 @@ h2{font-family:var(--serif);font-size:20px;font-weight:700;margin-bottom:3px}
 </div>
 
 
+<!-- ══ ONBOARDING (premier lancement) ══ -->
+<div id="sc-onboarding" class="hidden">
+  <div style="min-height:100%;display:flex;flex-direction:column;background:#FBF0ED;position:relative;overflow:hidden">
+
+    <!-- Bouton passer -->
+    <button onclick="skipOnboarding()" style="position:absolute;top:16px;right:16px;z-index:10;background:rgba(196,114,106,.12);border:none;border-radius:50px;padding:6px 14px;font-size:12px;font-weight:600;color:#8B6F5E;cursor:pointer;font-family:inherit">Passer →</button>
+
+    <!-- Slides container -->
+    <div id="onb-slides" style="flex:1;overflow:hidden;position:relative">
+
+      <!-- SLIDE 1 -->
+      <div class="onb-slide" id="onb-slide-0" style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 28px;text-align:center;transition:transform .4s cubic-bezier(.25,.46,.45,.94)">
+        <div style="width:140px;height:140px;border-radius:40px;background:linear-gradient(135deg,#FDEBE5,#F5D0C8);display:flex;align-items:center;justify-content:center;font-size:64px;margin-bottom:32px;box-shadow:0 20px 40px rgba(196,114,106,.2)">🔬</div>
+        <div style="font-size:10px;font-weight:700;color:#C4726A;text-transform:uppercase;letter-spacing:3px;margin-bottom:12px">Étape 1 sur 3</div>
+        <h2 style="font-family:Georgia,serif;font-size:26px;font-weight:700;color:#3D2B1F;line-height:1.2;margin-bottom:16px">Ton diagnostic<br>en 60 secondes</h2>
+        <p style="font-size:14px;color:#8B6F5E;line-height:1.7;max-width:300px">5 questions sur ta peau, ton âge et ton budget. SkinMatch analyse tout pour toi.</p>
+      </div>
+
+      <!-- SLIDE 2 -->
+      <div class="onb-slide" id="onb-slide-1" style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 28px;text-align:center;transform:translateX(100%);transition:transform .4s cubic-bezier(.25,.46,.45,.94)">
+        <div style="width:140px;height:140px;border-radius:40px;background:linear-gradient(135deg,#E8F0FF,#D0DEFF);display:flex;align-items:center;justify-content:center;font-size:64px;margin-bottom:32px;box-shadow:0 20px 40px rgba(100,130,255,.15)">✨</div>
+        <div style="font-size:10px;font-weight:700;color:#C4726A;text-transform:uppercase;letter-spacing:3px;margin-bottom:12px">Étape 2 sur 3</div>
+        <h2 style="font-family:Georgia,serif;font-size:26px;font-weight:700;color:#3D2B1F;line-height:1.2;margin-bottom:16px">Ta routine<br>sur-mesure</h2>
+        <p style="font-size:14px;color:#8B6F5E;line-height:1.7;max-width:300px">SkinMatch sélectionne les meilleurs produits parmi 160+ références, adaptés à ton profil exact.</p>
+      </div>
+
+      <!-- SLIDE 3 -->
+      <div class="onb-slide" id="onb-slide-2" style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 28px;text-align:center;transform:translateX(200%);transition:transform .4s cubic-bezier(.25,.46,.45,.94)">
+        <div style="width:140px;height:140px;border-radius:40px;background:linear-gradient(135deg,#D4F5E8,#A8E0C8);display:flex;align-items:center;justify-content:center;font-size:64px;margin-bottom:32px;box-shadow:0 20px 40px rgba(46,125,50,.15)">📈</div>
+        <div style="font-size:10px;font-weight:700;color:#C4726A;text-transform:uppercase;letter-spacing:3px;margin-bottom:12px">Étape 3 sur 3</div>
+        <h2 style="font-family:Georgia,serif;font-size:26px;font-weight:700;color:#3D2B1F;line-height:1.2;margin-bottom:16px">Suis tes progrès<br>semaine après semaine</h2>
+        <p style="font-size:14px;color:#8B6F5E;line-height:1.7;max-width:300px">Journal de peau, streak quotidien, photos avant/après. Tu vois vraiment ta progression.</p>
+      </div>
+
+    </div>
+
+    <!-- Dots + bouton -->
+    <div style="padding:24px 28px 40px;display:flex;flex-direction:column;align-items:center;gap:20px">
+      <!-- Dots -->
+      <div style="display:flex;gap:8px">
+        <div class="onb-dot" id="onb-dot-0" style="width:24px;height:8px;border-radius:50px;background:#C4726A;transition:all .3s"></div>
+        <div class="onb-dot" id="onb-dot-1" style="width:8px;height:8px;border-radius:50px;background:rgba(196,114,106,.3);transition:all .3s"></div>
+        <div class="onb-dot" id="onb-dot-2" style="width:8px;height:8px;border-radius:50px;background:rgba(196,114,106,.3);transition:all .3s"></div>
+      </div>
+      <!-- Bouton suivant / commencer -->
+      <button id="onb-btn" onclick="nextOnboardingSlide()" style="width:100%;max-width:340px;padding:16px;border-radius:50px;border:none;background:linear-gradient(135deg,#C4726A,#A85A52);color:#fff;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit;box-shadow:0 8px 24px rgba(196,114,106,.3)">Suivant →</button>
+    </div>
+
+  </div>
+</div>
+
 <!-- ══ WELCOME ══ -->
 <div id="sc-welcome" class="hidden">
   <div class="topbar">
@@ -2466,7 +2517,7 @@ function getRegionProducts() {
   return available;
 }
 
-const SCREENS=["lang","welcome","register","login","scan","q1","diag","q2","q3","q4","q5","result","compare","suivi","dashboard","scan-product","profile","articles","settings","parrainage","abonnement","privacy","cgu","mentions"];
+const SCREENS=["lang","onboarding","welcome","register","login","scan","q1","diag","q2","q3","q4","q5","result","compare","suivi","dashboard","scan-product","profile","articles","settings","parrainage","abonnement","privacy","cgu","mentions"];
 
 const ST={
   screen:'lang',user:null,
@@ -2542,10 +2593,14 @@ function setLang(l){
   LANG = l;
   localStorage.setItem('skinmatch_lang', l);
   initQuestions();
-  go('welcome');
-  setTimeout(applyWelcomeLang, 50);
-  // Afficher la modale région après 300ms
-  setTimeout(function(){ showRegionModal(); }, 300);
+  // Premier lancement → onboarding, sinon welcome
+  if (_shouldShowOnboarding()) {
+    showOnboarding();
+  } else {
+    go('welcome');
+    setTimeout(applyWelcomeLang, 50);
+    setTimeout(function(){ showRegionModal(); }, 300);
+  }
 }
 
 // ─── AUTH ─────────────────────────────────────────────────────────────────────
@@ -9596,6 +9651,97 @@ function getReferralData() {
   return JSON.parse(localStorage.getItem('sm_referrals') || '{"invited":[]}');
 }
 
+// ════════════ ONBOARDING ════════════
+var _onbSlide = 0;
+var _onbTotal = 3;
+
+function _shouldShowOnboarding() {
+  return !localStorage.getItem('skinmatch_onboarded');
+}
+
+function showOnboarding() {
+  _onbSlide = 0;
+  _updateOnboarding();
+  go('onboarding');
+}
+
+function skipOnboarding() {
+  localStorage.setItem('skinmatch_onboarded', '1');
+  go('welcome');
+  updateNav('welcome');
+}
+
+function nextOnboardingSlide() {
+  if (_onbSlide < _onbTotal - 1) {
+    _onbSlide++;
+    _updateOnboarding();
+  } else {
+    skipOnboarding();
+  }
+}
+
+function _updateOnboarding() {
+  var isEN = LANG === 'en';
+  // Slides
+  for (var i = 0; i < _onbTotal; i++) {
+    var slide = document.getElementById('onb-slide-' + i);
+    if (slide) {
+      slide.style.transform = i < _onbSlide ? 'translateX(-100%)' : i === _onbSlide ? 'translateX(0)' : 'translateX(' + ((i - _onbSlide) * 100) + '%)';
+    }
+    var dot = document.getElementById('onb-dot-' + i);
+    if (dot) {
+      dot.style.width = i === _onbSlide ? '24px' : '8px';
+      dot.style.background = i === _onbSlide ? '#C4726A' : 'rgba(196,114,106,.3)';
+    }
+  }
+  // Bouton
+  var btn = document.getElementById('onb-btn');
+  if (btn) {
+    var isLast = _onbSlide === _onbTotal - 1;
+    btn.textContent = isLast ? (isEN ? "Let's go! →" : "C'est parti ! →") : (isEN ? "Next →" : "Suivant →");
+  }
+  // Bouton passer
+  var skip = document.querySelector('#sc-onboarding button[onclick="skipOnboarding()"]');
+  if (skip) skip.textContent = isEN ? 'Skip →' : 'Passer →';
+  // Mettre à jour les textes selon la langue
+  var slide1Title = document.querySelector('#onb-slide-0 h2');
+  var slide1Sub = document.querySelector('#onb-slide-0 p');
+  var slide1Step = document.querySelector('#onb-slide-0 [style*="letter-spacing:3px"]');
+  if (slide1Title) slide1Title.innerHTML = isEN ? 'Your diagnosis<br>in 60 seconds' : 'Ton diagnostic<br>en 60 secondes';
+  if (slide1Sub) slide1Sub.textContent = isEN ? '5 questions about your skin, age and budget. SkinMatch analyzes everything for you.' : '5 questions sur ta peau, ton âge et ton budget. SkinMatch analyse tout pour toi.';
+  if (slide1Step) slide1Step.textContent = isEN ? 'Step 1 of 3' : 'Étape 1 sur 3';
+  var slide2Title = document.querySelector('#onb-slide-1 h2');
+  var slide2Sub = document.querySelector('#onb-slide-1 p');
+  var slide2Step = document.querySelector('#onb-slide-1 [style*="letter-spacing:3px"]');
+  if (slide2Title) slide2Title.innerHTML = isEN ? 'Your tailored<br>routine' : 'Ta routine<br>sur-mesure';
+  if (slide2Sub) slide2Sub.textContent = isEN ? 'SkinMatch selects the best products from 160+ references, tailored to your exact profile.' : 'SkinMatch sélectionne les meilleurs produits parmi 160+ références, adaptés à ton profil exact.';
+  if (slide2Step) slide2Step.textContent = isEN ? 'Step 2 of 3' : 'Étape 2 sur 3';
+  var slide3Title = document.querySelector('#onb-slide-2 h2');
+  var slide3Sub = document.querySelector('#onb-slide-2 p');
+  var slide3Step = document.querySelector('#onb-slide-2 [style*="letter-spacing:3px"]');
+  if (slide3Title) slide3Title.innerHTML = isEN ? 'Track your progress<br>week after week' : 'Suis tes progrès<br>semaine après semaine';
+  if (slide3Sub) slide3Sub.textContent = isEN ? 'Skin journal, daily streak, before/after photos. You truly see your progress.' : 'Journal de peau, streak quotidien, photos avant/après. Tu vois vraiment ta progression.';
+  if (slide3Step) slide3Step.textContent = isEN ? 'Step 3 of 3' : 'Étape 3 sur 3';
+}
+
+// Swipe support pour l'onboarding
+(function() {
+  var startX = 0;
+  document.addEventListener('touchstart', function(e) {
+    var onb = document.getElementById('sc-onboarding');
+    if (!onb || onb.classList.contains('hidden')) return;
+    startX = e.touches[0].clientX;
+  }, { passive: true });
+  document.addEventListener('touchend', function(e) {
+    var onb = document.getElementById('sc-onboarding');
+    if (!onb || onb.classList.contains('hidden')) return;
+    var diff = startX - e.changedTouches[0].clientX;
+    if (Math.abs(diff) > 50) {
+      if (diff > 0) nextOnboardingSlide(); // swipe gauche → suivant
+    }
+  }, { passive: true });
+})();
+
 function renderParrainage() {
   var isEN = LANG === 'en';
   var content = document.getElementById('parrainage-content');
@@ -9702,10 +9848,25 @@ function renderParrainage() {
   }
 
   // ── Footer ──
-  html += '<div style="text-align:center;padding:0 24px 30px;font-size:11px;color:#8B6F5E;line-height:1.6">' + (isEN ? "Your friend also gets " : "Ton amie reçoit aussi ") + '<strong style="color:#C4726A">' + (isEN ? "7 days of Premium free" : "7 jours Premium gratuits") + '</strong>' + (isEN ? " on sign-up." : " à l'inscription.") + '</div>';
+  html += '<div style="background:linear-gradient(135deg,#FBF0ED,#F5E1DC);border-radius:18px;padding:16px;margin-bottom:24px;text-align:center">';
+  html += '<div style="font-size:13px;font-weight:700;color:#3D2B1F;margin-bottom:4px">' + (isEN ? "🎁 Your friend also benefits!" : "🎁 Ton amie en profite aussi !") + '</div>';
+  html += '<div style="font-size:12px;color:#8B6F5E;line-height:1.5">' + (isEN ? "She gets " : "Elle reçoit ") + '<strong style="color:#C4726A">' + (isEN ? "7 days Premium free" : "7 jours Premium gratuits") + '</strong>' + (isEN ? " on sign-up. Win-win!" : " à l'inscription. Gagnant-gagnant !") + '</div>';
+  html += '</div>';
+
+  // ── Partage multi-canaux ──
+  html += '<div style="font-size:11px;font-weight:700;color:#8B6F5E;text-transform:uppercase;letter-spacing:1.5px;margin-bottom:12px">📱 ' + (isEN ? "SHARE VIA" : "PARTAGER VIA") + '</div>';
+  html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:24px">';
+  var channels = isEN
+    ? [{icon:"💬",label:"WhatsApp",action:"shareVia('whatsapp')"},{icon:"📸",label:"Instagram",action:"shareVia('instagram')"},{icon:"✉️",label:"SMS",action:"shareVia('sms')"},{icon:"🔗",label:"Copy link",action:"copyReferralLink()"}]
+    : [{icon:"💬",label:"WhatsApp",action:"shareVia('whatsapp')"},{icon:"📸",label:"Instagram",action:"shareVia('instagram')"},{icon:"✉️",label:"SMS",action:"shareVia('sms')"},{icon:"🔗",label:"Copier le lien",action:"copyReferralLink()"}];
+  channels.forEach(function(ch) {
+    html += '<button onclick="' + ch.action + '" style="padding:12px;border-radius:16px;border:1.5px solid var(--bdr);background:#fff;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:8px;font-size:13px;font-weight:600;color:#3D2B1F">';
+    html += '<span style="font-size:18px">' + ch.icon + '</span>' + ch.label;
+    html += '</button>';
+  });
+  html += '</div>';
 
   content.innerHTML = html;
-}
 
 function copyReferralCode() {
   var code = getReferralCode();
@@ -9752,7 +9913,37 @@ function shareReferralLink() {
   }
 }
 
-// ════════════ ABONNEMENT ════════════
+function shareVia(channel) {
+  var code = getReferralCode();
+  var isEN = LANG === 'en';
+  var url = 'https://mohamedhambli-oss.github.io/skinnmatch/?ref=' + code;
+  var text = isEN
+    ? "I use SkinMatch for my skincare routine! Use code " + code + " for 7 days Premium free: "
+    : "J'utilise SkinMatch pour ma routine skincare ! Code " + code + " = 7 jours Premium gratuits : ";
+
+  if (channel === 'whatsapp') {
+    window.open('https://wa.me/?text=' + encodeURIComponent(text + url), '_blank');
+  } else if (channel === 'instagram') {
+    copyReferralLink();
+    showToast(isEN ? "Link copied! Paste it in your Instagram story 📸" : "Lien copié ! Colle-le dans ta story Instagram 📸", { type: 'info', duration: 4000 });
+  } else if (channel === 'sms') {
+    window.open('sms:?body=' + encodeURIComponent(text + url), '_blank');
+  }
+}
+
+function copyReferralLink() {
+  var code = getReferralCode();
+  var isEN = LANG === 'en';
+  var url = 'https://mohamedhambli-oss.github.io/skinnmatch/?ref=' + code;
+  var text = isEN
+    ? "SkinMatch — my skincare app. Use code " + code + " for 7 days free: " + url
+    : "SkinMatch — mon appli skincare. Code " + code + " pour 7j gratuits : " + url;
+  if (navigator.clipboard) {
+    navigator.clipboard.writeText(text).then(function() {
+      showToast(isEN ? "Link copied!" : "Lien copié !", { type: 'success' });
+    }).catch(function(){});
+  }
+}
 function getUserTier() {
   // Pour l'instant : tier stocké en local (à brancher sur Firestore plus tard)
   return localStorage.getItem('sm_user_tier') || 'gratuit';
@@ -9761,6 +9952,190 @@ function getUserTier() {
 function renderAbonnement() {
   var isEN = LANG === 'en';
   var content = document.getElementById('abonnement-content');
+  if (!content) return;
+
+  var currentTier = getUserTier();
+
+  var html = '';
+
+  // ── HERO ──
+  html += '<div style="text-align:center;padding:16px 8px 4px">';
+  html += '<div style="display:inline-flex;align-items:center;gap:6px;background:linear-gradient(135deg,#FFD896,#FFB871);padding:5px 12px;border-radius:50px;font-size:10px;font-weight:700;letter-spacing:1.5px;color:#5A4338;text-transform:uppercase;margin-bottom:14px">&#10024; ' + (isEN ? "Choose your plan" : "Choisis ton plan") + '</div>';
+  html += '<h1 style="font-family:Georgia,serif;font-size:24px;font-weight:700;margin:0 0 8px;line-height:1.2;color:#3D2B1F">' + (isEN ? "Boost your routine,<br>unlock your potential" : "Booste ta routine,<br>débloque ton potentiel") + '</h1>';
+  html += '<p style="font-size:13px;color:#8B6F5E;line-height:1.5;margin:0 0 8px;padding:0 12px">' + (isEN ? "3 levels to support you." : "3 niveaux pour t'accompagner.") + '</p>';
+  // Badges sociaux
+  html += '<div style="display:flex;justify-content:center;gap:8px;flex-wrap:wrap;margin-bottom:20px">';
+  html += '<div style="display:flex;align-items:center;gap:4px;background:#E8F5E9;border-radius:50px;padding:4px 10px;font-size:11px;font-weight:600;color:#2E7D32">✓ ' + (isEN ? "No commitment" : "Sans engagement") + '</div>';
+  html += '<div style="display:flex;align-items:center;gap:4px;background:#E3F2FD;border-radius:50px;padding:4px 10px;font-size:11px;font-weight:600;color:#1565C0">✓ ' + (isEN ? "Cancel anytime" : "Résiliable à tout moment") + '</div>';
+  html += '<div style="display:flex;align-items:center;gap:4px;background:#FFF8E1;border-radius:50px;padding:4px 10px;font-size:11px;font-weight:600;color:#E65100">✓ ' + (isEN ? "7 days free with referral" : "7j gratuits avec parrainage") + '</div>';
+  html += '</div>';
+  html += '</div>';
+
+  // ── PLANS ──
+
+  // GRATUIT
+  var isFree = currentTier === 'gratuit';
+  html += '<div style="background:#FBF7F4;border-radius:22px;padding:20px;margin-bottom:12px;border:' + (isFree ? '2px solid #C4726A' : '1.5px solid #E8DFD8') + ';position:relative">';
+  if (isFree) html += '<div style="position:absolute;top:-10px;left:18px;background:#C4726A;color:#fff;padding:3px 10px;border-radius:50px;font-size:9px;font-weight:700;letter-spacing:.5px;text-transform:uppercase">' + (isEN ? "Current plan" : "Plan actuel") + '</div>';
+  html += '<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px">';
+  html += '<div><h3 style="font-family:Georgia,serif;font-size:20px;font-weight:700;margin:0;line-height:1.1">' + (isEN ? "Free" : "Gratuit") + '</h3>';
+  html += '<div style="font-size:11px;color:#8B6F5E;margin-top:2px">' + (isEN ? "Discover SkinMatch" : "Pour découvrir SkinMatch") + '</div></div>';
+  html += '<div style="width:40px;height:40px;border-radius:12px;background:#F0E8E5;display:flex;align-items:center;justify-content:center;font-size:22px">🌱</div>';
+  html += '</div>';
+  html += '<div style="display:flex;align-items:baseline;gap:4px;margin-bottom:14px"><span style="font-family:Georgia,serif;font-size:30px;font-weight:700;line-height:1">0€</span><span style="font-size:12px;color:#8B6F5E">/ ' + (isEN ? "month" : "mois") + '</span></div>';
+  html += '<ul style="list-style:none;padding:0;margin:0 0 16px">';
+  html += _featLine("check", "<strong>1</strong> " + (isEN ? "skin scan / month" : "scan peau / mois"));
+  html += _featLine("check", "<strong>5</strong> " + (isEN ? "product scans / month" : "scans produits / mois"));
+  html += _featLine("check", "<strong>5</strong> " + (isEN ? "Skin Coach tips / month" : "conseils Skin Coach / mois"));
+  html += _featLine("check", (isEN ? "Diagnosis + personalized routine" : "Diagnostic + routine personnalisée"));
+  html += _featLine("check", (isEN ? "Streak & daily tracking" : "Streak & suivi quotidien"));
+  html += '</ul>';
+  if (isFree) {
+    html += '<button style="width:100%;padding:14px;border-radius:50px;background:#F5EEE8;color:#3D2B1F;border:none;font-size:13px;font-weight:700;font-family:inherit;cursor:default">✓ ' + (isEN ? "Current plan" : "Plan actuel") + '</button>';
+  } else {
+    html += '<button onclick="selectTier(\'gratuit\')" style="width:100%;padding:14px;border-radius:50px;background:#fff;color:#3D2B1F;border:1px solid var(--bdr);font-size:13px;font-weight:700;font-family:inherit;cursor:pointer">' + (isEN ? "Switch to Free" : "Repasser gratuit") + '</button>';
+  }
+  html += '</div>';
+
+  // PREMIUM
+  var isPremium = currentTier === 'premium';
+  html += '<div style="background:linear-gradient(135deg,#FFFDF7,#FFF6E5);border-radius:22px;padding:20px;margin-bottom:12px;border:2px solid #FFB871;box-shadow:0 8px 24px rgba(255,184,113,.20);position:relative">';
+  html += '<div style="position:absolute;top:-10px;right:18px;background:linear-gradient(135deg,#FFD896,#FFB871);color:#5A4338;padding:4px 10px;border-radius:50px;font-size:9px;font-weight:700;letter-spacing:.5px;text-transform:uppercase">&#11088; ' + (isEN ? "Most popular" : "Le plus populaire") + '</div>';
+  if (isPremium) html += '<div style="position:absolute;top:-10px;left:18px;background:#C4726A;color:#fff;padding:3px 10px;border-radius:50px;font-size:9px;font-weight:700;letter-spacing:.5px;text-transform:uppercase">' + (isEN ? "Current plan" : "Plan actuel") + '</div>';
+  html += '<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px">';
+  html += '<div><h3 style="font-family:Georgia,serif;font-size:20px;font-weight:700;margin:0;line-height:1.1">Premium</h3>';
+  html += '<div style="font-size:11px;color:#8B6F5E;margin-top:2px">' + (isEN ? "To go further" : "Pour aller plus loin") + '</div></div>';
+  html += '<div style="width:40px;height:40px;border-radius:12px;background:linear-gradient(135deg,#FFD896,#FFB871);display:flex;align-items:center;justify-content:center;font-size:22px">&#10024;</div>';
+  html += '</div>';
+  html += '<div style="display:flex;align-items:baseline;gap:4px;margin-bottom:4px"><span style="font-family:Georgia,serif;font-size:30px;font-weight:700;line-height:1">4,99€</span><span style="font-size:12px;color:#8B6F5E">/ ' + (isEN ? "month" : "mois") + '</span></div>';
+  html += '<div style="font-size:11px;color:#8B6F5E;margin-bottom:14px">' + (isEN ? "≈ the price of a coffee" : "≈ le prix d'un café") + '</div>';
+  html += '<ul style="list-style:none;padding:0;margin:0 0 16px">';
+  html += _featLine("gold", "<strong>4</strong> " + (isEN ? "skin scans / month" : "scans peau / mois") + " (1/" + (isEN ? "week" : "semaine") + ")");
+  html += _featLine("gold", "<strong>30</strong> " + (isEN ? "product scans / month" : "scans produits / mois"));
+  html += _featLine("gold", "<strong>" + (isEN ? "Unlimited" : "Illimités") + "</strong> " + (isEN ? "Skin Coach messages" : "messages Skin Coach"));
+  html += _featLine("gold", (isEN ? "Extended tracking + graph" : "Suivi étendu + graphique"));
+  html += _featLine("gold", (isEN ? "Ad-free experience" : "Expérience sans publicité"));
+  html += _featLine("gold", (isEN ? "Priority support" : "Support prioritaire"));
+  html += '</ul>';
+  if (isPremium) {
+    html += '<button style="width:100%;padding:14px;border-radius:50px;background:#F5EEE8;color:#3D2B1F;border:none;font-size:13px;font-weight:700;font-family:inherit;cursor:default">✓ ' + (isEN ? "Current plan" : "Plan actuel") + '</button>';
+  } else {
+    html += '<button onclick="selectTier(\'premium\')" style="width:100%;padding:14px;border-radius:50px;background:linear-gradient(135deg,#C4726A,#A85A52);color:#fff;border:none;font-size:13px;font-weight:700;font-family:inherit;cursor:pointer;box-shadow:0 6px 16px rgba(196,114,106,.3)">' + (isEN ? "Choose Premium →" : "Choisir Premium →") + '</button>';
+  }
+  html += '</div>';
+
+  // TITANIUM
+  var isTitanium = currentTier === 'titanium';
+  html += '<div style="background:linear-gradient(135deg,#3D2B1F,#5A4338);border-radius:22px;padding:20px;margin-bottom:20px;color:#fff;position:relative">';
+  if (isTitanium) html += '<div style="position:absolute;top:-10px;left:18px;background:rgba(255,255,255,.9);color:#3D2B1F;padding:3px 10px;border-radius:50px;font-size:9px;font-weight:700;letter-spacing:.5px;text-transform:uppercase">' + (isEN ? "Current plan" : "Plan actuel") + '</div>';
+  html += '<div style="display:inline-flex;align-items:center;gap:4px;font-size:9px;font-weight:700;letter-spacing:1px;color:#FFD896;text-transform:uppercase;margin-bottom:6px">&#128081; ' + (isEN ? "Ultimate premium" : "Premium ultime") + '</div>';
+  html += '<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px">';
+  html += '<div><h3 style="font-family:Georgia,serif;font-size:20px;font-weight:700;margin:0;line-height:1.1;color:#fff">Titanium</h3>';
+  html += '<div style="font-size:11px;color:rgba(255,255,255,.7);margin-top:2px">' + (isEN ? "The expert experience" : "L\'expérience experte") + '</div></div>';
+  html += '<div style="width:40px;height:40px;border-radius:12px;background:rgba(255,255,255,.15);display:flex;align-items:center;justify-content:center;font-size:22px;color:#FFD896">&#128142;</div>';
+  html += '</div>';
+  html += '<div style="display:flex;align-items:baseline;gap:4px;margin-bottom:4px"><span style="font-family:Georgia,serif;font-size:30px;font-weight:700;line-height:1;color:#fff">14,99€</span><span style="font-size:12px;color:rgba(255,255,255,.7)">/ ' + (isEN ? "month" : "mois") + '</span></div>';
+  html += '<div style="font-size:11px;color:rgba(255,255,255,.6);margin-bottom:14px">' + (isEN ? "The most complete skincare experience" : "L\'expérience skincare la plus complète") + '</div>';
+  html += '<ul style="list-style:none;padding:0;margin:0 0 16px">';
+  html += _featLine("silver", "<strong>" + (isEN ? "Everything unlimited" : "Tout illimité") + "</strong> — " + (isEN ? "scans, tips, history" : "scans, conseils, historique"), true);
+  html += _featLine("silver", "<strong>1</strong> " + (isEN ? "dermatologist review on your file / year" : "avis dermato sur ton dossier / an"), true);
+  html += _featLine("silver", (isEN ? "Advanced AI photo analysis" : "Analyse IA approfondie des photos"), true);
+  html += _featLine("silver", (isEN ? "Personalized weekly report" : "Rapport hebdomadaire personnalisé"), true);
+  html += _featLine("silver", (isEN ? "All Premium features included" : "Toutes les features Premium incluses"), true);
+  html += '</ul>';
+  if (isTitanium) {
+    html += '<button style="width:100%;padding:14px;border-radius:50px;background:rgba(255,255,255,.15);color:#fff;border:none;font-size:13px;font-weight:700;font-family:inherit;cursor:default">✓ ' + (isEN ? "Current plan" : "Plan actuel") + '</button>';
+  } else {
+    html += '<button onclick="selectTier(\'titanium\')" style="width:100%;padding:14px;border-radius:50px;background:#fff;color:#3D2B1F;border:none;font-size:13px;font-weight:700;font-family:inherit;cursor:pointer">' + (isEN ? "Choose Titanium →" : "Choisir Titanium →") + '</button>';
+  }
+  html += '</div>';
+
+  // ── TÉMOIGNAGES ──
+  html += '<div style="margin-bottom:24px">';
+  html += '<div style="font-size:11px;font-weight:700;color:#8B6F5E;text-transform:uppercase;letter-spacing:1.5px;margin-bottom:14px;text-align:center">💬 ' + (isEN ? "THEY UPGRADED" : "ILS ONT CRAQUÉ") + '</div>';
+  var tests = isEN ? [
+    { av:"S", name:"Sarah M.", text:"\"The unlimited Skin Coach alone is worth it. I ask 5 questions a day.\"", tier:"Premium" },
+    { av:"A", name:"Amina K.", text:"\"The dermatologist review changed everything for my skin.\"", tier:"Titanium" }
+  ] : [
+    { av:"S", name:"Sarah M.", text:"\"Le Skin Coach illimité à lui seul vaut le coup. Je pose 5 questions par jour.\"", tier:"Premium" },
+    { av:"A", name:"Amina K.", text:"\"L'avis dermato a tout changé pour ma peau. Ça vaut largement le prix.\"", tier:"Titanium" }
+  ];
+  tests.forEach(function(t) {
+    html += '<div style="background:#fff;border-radius:18px;padding:14px 16px;border:1px solid var(--bdr);margin-bottom:10px">';
+    html += '<div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">';
+    html += '<div style="width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#C4726A,#A85A52);display:flex;align-items:center;justify-content:center;color:#fff;font-size:13px;font-weight:700">' + t.av + '</div>';
+    html += '<div><div style="font-size:13px;font-weight:700;color:#3D2B1F">' + t.name + '</div>';
+    html += '<div style="font-size:10px;font-weight:700;color:#C4726A">' + t.tier + '</div></div>';
+    html += '<div style="margin-left:auto;color:#F5A623;font-size:11px">★★★★★</div>';
+    html += '</div>';
+    html += '<div style="font-size:12px;color:#5A4A42;line-height:1.6;font-style:italic">' + t.text + '</div>';
+    html += '</div>';
+  });
+  html += '</div>';
+
+  // ── COMPARATIF ──
+  html += '<div style="background:#fff;border-radius:18px;border:1px solid var(--bdr);overflow:hidden;margin-bottom:24px">';
+  html += '<div style="padding:14px 16px;background:#FBF0ED;font-size:11px;font-weight:700;color:#8B6F5E;text-transform:uppercase;letter-spacing:1.5px">📊 ' + (isEN ? "COMPARISON" : "COMPARATIF") + '</div>';
+  var rows = isEN ? [
+    ["Skin scans / month", "1", "4", "∞"],
+    ["Product scans / month", "5", "30", "∞"],
+    ["Skin Coach", "5 tips", "Unlimited", "Unlimited"],
+    ["Dermatologist review", "✕", "✕", "1 / year"],
+    ["Support", "Standard", "Priority", "Priority"],
+  ] : [
+    ["Scans peau / mois", "1", "4", "∞"],
+    ["Scans produits / mois", "5", "30", "∞"],
+    ["Skin Coach", "5 conseils", "Illimité", "Illimité"],
+    ["Avis dermato", "✕", "✕", "1 / an"],
+    ["Support", "Standard", "Prioritaire", "Prioritaire"],
+  ];
+  var tierColors = ["#8B6F5E", "#C4726A", "#3D2B1F"];
+  var tierBgs = ["#FBF7F4", "#FFFDF7", "#F5EEE8"];
+  // Header
+  html += '<div style="display:grid;grid-template-columns:1.5fr 1fr 1fr 1fr;gap:0">';
+  html += '<div style="padding:10px 12px;font-size:10px;font-weight:700;color:#8B6F5E;background:#F8F4F2"></div>';
+  [isEN?"Free":"Gratuit","Premium","Titanium"].forEach(function(t,i){
+    html += '<div style="padding:10px 6px;text-align:center;font-size:11px;font-weight:700;color:' + tierColors[i] + ';background:' + tierBgs[i] + '">' + t + '</div>';
+  });
+  html += '</div>';
+  rows.forEach(function(row, ri) {
+    html += '<div style="display:grid;grid-template-columns:1.5fr 1fr 1fr 1fr;gap:0;border-top:1px solid var(--bdr)">';
+    html += '<div style="padding:10px 12px;font-size:11px;color:#5A4A42;font-weight:600">' + row[0] + '</div>';
+    [row[1],row[2],row[3]].forEach(function(v,i){
+      var isX = v === '✕';
+      html += '<div style="padding:10px 6px;text-align:center;font-size:11px;font-weight:700;color:' + (isX ? '#CCC' : tierColors[i]) + ';background:' + tierBgs[i] + '">' + v + '</div>';
+    });
+    html += '</div>';
+  });
+  html += '</div>';
+
+  // ── FAQ ──
+  html += '<div style="margin-bottom:24px">';
+  html += '<div style="font-size:11px;font-weight:700;color:#8B6F5E;text-transform:uppercase;letter-spacing:1.5px;margin-bottom:14px">❓ FAQ</div>';
+  var faqs = isEN ? [
+    ["Can I cancel anytime?", "Yes. No commitment, no hidden fees. Cancel in one tap from Settings."],
+    ["Is there a free trial?", "Invite a friend with your referral code and get 7 days Premium free."],
+    ["How does payment work?", "Payment via App Store or Google Play. Billed monthly, cancel anytime."],
+  ] : [
+    ["Je peux résilier à tout moment ?", "Oui. Sans engagement, sans frais cachés. Résiliation en un tap depuis les Réglages."],
+    ["Y a-t-il un essai gratuit ?", "Invite une amie avec ton code de parrainage et obtiens 7 jours Premium gratuits."],
+    ["Comment fonctionne le paiement ?", "Paiement via App Store ou Google Play. Mensuel, résiliable à tout moment."],
+  ];
+  faqs.forEach(function(faq, i) {
+    html += '<div style="background:#fff;border-radius:14px;padding:14px 16px;border:1px solid var(--bdr);margin-bottom:8px">';
+    html += '<div style="font-size:13px;font-weight:700;color:#3D2B1F;margin-bottom:6px">' + faq[0] + '</div>';
+    html += '<div style="font-size:12px;color:#8B6F5E;line-height:1.6">' + faq[1] + '</div>';
+    html += '</div>';
+  });
+  html += '</div>';
+
+  // ── FOOTER ──
+  html += '<div style="text-align:center;padding:0 18px 30px;font-size:11px;color:#8B6F5E;line-height:1.6">';
+  html += '<a href="#" onclick="go(\'cgu\');return false;" style="color:#C4726A;text-decoration:none;font-weight:600">' + (isEN ? "Terms" : "CGU") + '</a> · <a href="#" onclick="go(\'privacy\');return false;" style="color:#C4726A;text-decoration:none;font-weight:600">' + (isEN ? "Privacy" : "Confidentialité") + '</a>';
+  html += '</div>';
+
+  content.innerHTML = html;
+}
   if (!content) return;
 
   var currentTier = getUserTier();
@@ -10167,12 +10542,15 @@ var _firebaseWait = setTimeout(function() {
     LANG = _savedLang; REGION = _savedRegion;
     initQuestions(); go('welcome'); updateNav('welcome');
     setTimeout(applyWelcomeLang, 50);
+    setTimeout(function(){ var b=document.getElementById('region-badge'); if(b){var f={'fr':'🇫🇷','dz':'🇩🇿','ma':'🇲🇦','tn':'🇹🇳','gb':'🇬🇧','de':'🇩🇪','es':'🇪🇸','be':'🇧🇪','ch':'🇨🇭','ca':'🇨🇦','us':'🇺🇸','other':'🌍'}; b.textContent=f[REGION]||'🌍';} }, 100);
   } else { go('lang'); }
   _hideSplash();
 }, 2500);
 
 window._onAuthResolved = function(user) {
   clearTimeout(_firebaseWait);
+  var _flagMap = {'fr':'🇫🇷','dz':'🇩🇿','ma':'🇲🇦','tn':'🇹🇳','gb':'🇬🇧','de':'🇩🇪','es':'🇪🇸','be':'🇧🇪','ch':'🇨🇭','ca':'🇨🇦','us':'🇺🇸','other':'🌍'};
+  function _updateRegionBadge() { var b=document.getElementById('region-badge'); if(b) b.textContent=_flagMap[REGION]||'🌍'; }
   if (user) {
     loadSavedRoutine(user).then(function() {
       var lang = LANG || localStorage.getItem('skinmatch_lang');
@@ -10183,6 +10561,7 @@ window._onAuthResolved = function(user) {
         localStorage.setItem('skinmatch_region', region);
         initQuestions(); go('welcome'); updateNav('welcome');
         setTimeout(applyWelcomeLang, 50);
+        setTimeout(_updateRegionBadge, 100);
       } else { go('lang'); }
       _hideSplash();
     });
@@ -10191,6 +10570,7 @@ window._onAuthResolved = function(user) {
       LANG = _savedLang; REGION = _savedRegion;
       initQuestions(); go('welcome'); updateNav('welcome');
       setTimeout(applyWelcomeLang, 50);
+      setTimeout(_updateRegionBadge, 100);
     } else { go('lang'); }
     _hideSplash();
   }
