@@ -7250,9 +7250,9 @@ function renderDashboard() {
     } else if (tabKey === "conseils") {
       headerTitle = isEN ? "Learn 📚" : "Apprendre 📚";
       headerSub = isEN ? "The right moves, explained simply." : "Les bons gestes, expliqués simplement.";
-    } else {
-      headerTitle = greeting + (firstName ? " " + firstName : "") + " 👋";
-      headerSub = isEN ? "Your personalized skincare space" : "Ton espace skincare personnalisé";
+    } else if (tabKey === "communaute") {
+      headerTitle = isEN ? "Community 🌸" : "Communauté 🌸";
+      headerSub = isEN ? "Share, inspire, discover." : "Partage, inspire, découvre.";
     }
     var headerEl = document.createElement("div");
     headerEl.style.cssText = "margin-bottom:16px";
@@ -7286,10 +7286,11 @@ function renderDashboard() {
     var tabsEl = document.createElement("div");
     tabsEl.style.cssText = "display:flex;gap:5px;margin-bottom:18px";
     var _tabDefs = [
-      { id:"routine", label: isEN?"Routine":"Routine" },
-      { id:"suivi", label: isEN?"Tracking":"Suivi" },
-      { id:"motiv", label: isEN?"Motivation":"Motivation" },
-      { id:"conseils", label: isEN?"Tips":"Conseils" }
+      { id:"routine",    label: isEN?"Routine":"Routine" },
+      { id:"suivi",      label: isEN?"Tracking":"Suivi" },
+      { id:"motiv",      label: isEN?"Motivation":"Motivation" },
+      { id:"conseils",   label: isEN?"Tips":"Conseils" },
+      { id:"communaute", label: isEN?"Community":"Communauté" }
     ];
     _tabDefs.forEach(function(td){
       var b = document.createElement("button");
@@ -7305,22 +7306,26 @@ function renderDashboard() {
     wrap.appendChild(tabsEl);
 
     // 4 conteneurs d'onglets — chaque section s'ajoute dans le bon
-    var tabRoutine = document.createElement("div");
-    var tabSuivi = document.createElement("div");
-    var tabMotiv = document.createElement("div");
-    var tabConseils = document.createElement("div");
-    tabRoutine.id = "espace-tab-routine";
-    tabSuivi.id = "espace-tab-suivi";
-    tabMotiv.id = "espace-tab-motiv";
-    tabConseils.id = "espace-tab-conseils";
-    tabRoutine.style.display  = (window._espaceTab === "routine")  ? "block" : "none";
-    tabSuivi.style.display    = (window._espaceTab === "suivi")    ? "block" : "none";
-    tabMotiv.style.display    = (window._espaceTab === "motiv")    ? "block" : "none";
-    tabConseils.style.display = (window._espaceTab === "conseils") ? "block" : "none";
+    var tabRoutine    = document.createElement("div");
+    var tabSuivi      = document.createElement("div");
+    var tabMotiv      = document.createElement("div");
+    var tabConseils   = document.createElement("div");
+    var tabCommunaute = document.createElement("div");
+    tabRoutine.id    = "espace-tab-routine";
+    tabSuivi.id      = "espace-tab-suivi";
+    tabMotiv.id      = "espace-tab-motiv";
+    tabConseils.id   = "espace-tab-conseils";
+    tabCommunaute.id = "espace-tab-communaute";
+    tabRoutine.style.display    = (window._espaceTab === "routine")    ? "block" : "none";
+    tabSuivi.style.display      = (window._espaceTab === "suivi")      ? "block" : "none";
+    tabMotiv.style.display      = (window._espaceTab === "motiv")      ? "block" : "none";
+    tabConseils.style.display   = (window._espaceTab === "conseils")   ? "block" : "none";
+    tabCommunaute.style.display = (window._espaceTab === "communaute") ? "block" : "none";
     wrap.appendChild(tabRoutine);
     wrap.appendChild(tabSuivi);
     wrap.appendChild(tabMotiv);
     wrap.appendChild(tabConseils);
+    wrap.appendChild(tabCommunaute);
 
     // ════════════ ONGLET ROUTINE ════════════
     if (ST.result && ST.result.steps && ST.result.steps.length > 0) {
@@ -8103,6 +8108,171 @@ function renderDashboard() {
         "<div style='font-size:13px'>" + (isEN ? "No article in this category yet" : "Aucun article dans cette catégorie") + "</div>";
       tabConseils.appendChild(emptyEl);
     }
+
+    // ════════════ ONGLET COMMUNAUTÉ ════════════
+    if (window._espaceTab === "communaute") {
+      _renderCommunauteTab(tabCommunaute, isEN);
+    }
+}
+
+function _renderCommunauteTab(container, isEN) {
+  container.innerHTML = '';
+
+  // ── Filtres par type de peau ──
+  var filterRow = document.createElement("div");
+  filterRow.style.cssText = "display:flex;gap:8px;overflow-x:auto;padding-bottom:10px;scrollbar-width:none;margin-bottom:14px;-webkit-overflow-scrolling:touch";
+  var filters = [
+    {key:null,   lbl:isEN?"All":"Tous"},
+    {key:"mixte",lbl:isEN?"Combo":"Mixte"},
+    {key:"grasse",lbl:isEN?"Oily":"Grasse"},
+    {key:"seche", lbl:isEN?"Dry":"Sèche"},
+    {key:"sensible",lbl:isEN?"Sensitive":"Sensible"},
+    {key:"normale",lbl:isEN?"Normal":"Normale"}
+  ];
+  filters.forEach(function(f) {
+    var btn = document.createElement("button");
+    var active = _skinFilter === f.key;
+    btn.style.cssText = "flex-shrink:0;padding:7px 14px;border-radius:50px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;border:1.5px solid " + (active?"#C4726A":"var(--bdr)") + ";background:" + (active?"#C4726A":"#fff") + ";color:" + (active?"#fff":"var(--pri)") + ";white-space:nowrap";
+    btn.textContent = f.lbl;
+    btn.onclick = (function(k){ return function(){ _skinFilter = k; renderDashboard(); }; })(f.key);
+    filterRow.appendChild(btn);
+  });
+  container.appendChild(filterRow);
+
+  // ── Stats communauté ──
+  var statsBar = document.createElement("div");
+  statsBar.style.cssText = "background:linear-gradient(135deg,#FBF0ED,#F5E1DC);border-radius:16px;padding:12px 16px;display:flex;justify-content:space-between;margin-bottom:16px";
+  statsBar.innerHTML =
+    "<div style='text-align:center'><div style='font-family:Georgia,serif;font-size:18px;font-weight:700;color:#C4726A'>2.4k</div><div style='font-size:10px;color:#8B6F5E;font-weight:600;margin-top:2px'>" + (isEN?"Members":"Membres") + "</div></div>" +
+    "<div style='width:1px;background:rgba(196,114,106,.2)'></div>" +
+    "<div style='text-align:center'><div style='font-family:Georgia,serif;font-size:18px;font-weight:700;color:#C4726A'>847</div><div style='font-size:10px;color:#8B6F5E;font-weight:600;margin-top:2px'>" + (isEN?"Posts this week":"Posts cette semaine") + "</div></div>" +
+    "<div style='width:1px;background:rgba(196,114,106,.2)'></div>" +
+    "<div style='text-align:center'><div style='font-family:Georgia,serif;font-size:18px;font-weight:700;color:#C4726A'>4.8★</div><div style='font-size:10px;color:#8B6F5E;font-weight:600;margin-top:2px'>" + (isEN?"Avg rating":"Note moy.") + "</div></div>";
+  container.appendChild(statsBar);
+
+  // ── Bouton poster ──
+  var postBtn = document.createElement("button");
+  postBtn.style.cssText = "width:100%;padding:14px;border-radius:50px;background:linear-gradient(135deg,#C4726A,#A85A52);color:#fff;border:none;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;margin-bottom:18px;display:flex;align-items:center;justify-content:center;gap:8px;box-shadow:0 6px 16px rgba(196,114,106,.25)";
+  postBtn.innerHTML = "✏️ " + (isEN ? "Share my routine" : "Partager ma routine");
+  postBtn.onclick = function() {
+    showToast(isEN ? "Coming soon — stay tuned! 🌸" : "Bientôt disponible — reste connecté(e) ! 🌸", { type:'info', duration:3000 });
+  };
+  container.appendChild(postBtn);
+
+  // ── Feed posts ──
+  var posts = _skinFilter ? COMM_POSTS.filter(function(p){ return p.skin === _skinFilter; }) : COMM_POSTS;
+  if (posts.length === 0) {
+    var emptyDiv = document.createElement("div");
+    emptyDiv.style.cssText = "text-align:center;padding:40px 20px;background:#fff;border-radius:18px;border:1px solid var(--bdr)";
+    emptyDiv.innerHTML = "<div style='font-size:32px;margin-bottom:10px'>🔍</div><div style='font-size:13px;color:#8B6F5E'>" + (isEN?"No posts for this skin type yet.":"Aucun post pour ce type de peau.") + "</div>";
+    container.appendChild(emptyDiv);
+    return;
+  }
+
+  posts.forEach(function(p) {
+    var card = document.createElement("div");
+    card.style.cssText = "background:#fff;border-radius:20px;border:1px solid var(--bdr);margin-bottom:14px;overflow:hidden";
+
+    var html = '';
+
+    // Header auteur
+    html += '<div style="display:flex;align-items:center;gap:10px;padding:14px 14px 0">';
+    html += '<div style="width:38px;height:38px;border-radius:50%;flex-shrink:0;background:' + p.av + ';display:flex;align-items:center;justify-content:center;color:#fff;font-size:15px;font-weight:700">' + p.author.charAt(0) + '</div>';
+    html += '<div style="flex:1;min-width:0"><div style="font-size:13px;font-weight:700;color:#3D2B1F">' + p.author + '</div>';
+    html += '<div style="font-size:11px;color:#8B6F5E">' + p.city + ' · ' + p.time + '</div></div>';
+    // Badge type
+    var typeColors = {routine:'#E8F5E9,#2E7D32',progression:'#E3F2FD,#1565C0',bonplan:'#FFF8E1,#E65100',question:'#F3E5F5,#6A1B9A'};
+    var typeLabels = {routine:isEN?'Routine':'Routine',progression:isEN?'Progress':'Progression',bonplan:isEN?'Deal':'Bon plan',question:isEN?'Question':'Question'};
+    var tc = (typeColors[p.type]||'#F0F0F0,#666').split(',');
+    html += '<div style="font-size:10px;font-weight:700;padding:3px 8px;border-radius:20px;background:' + tc[0] + ';color:' + tc[1] + ';flex-shrink:0">' + (typeLabels[p.type]||p.type) + '</div>';
+    html += '</div>';
+
+    // Texte
+    html += '<div style="padding:10px 14px;font-size:13px;color:#3D2B1F;line-height:1.6">' + p.text + '</div>';
+
+    // Contenu spécifique au type
+    if (p.type === 'routine' && p.routine) {
+      html += '<div style="padding:0 14px 10px">';
+      html += '<div style="background:#FBF0ED;border-radius:14px;overflow:hidden">';
+      p.routine.slice(0,3).forEach(function(r) {
+        html += '<div style="display:flex;align-items:center;gap:8px;padding:8px 12px;border-bottom:1px solid rgba(196,114,106,.1)">';
+        html += '<div style="width:22px;height:22px;border-radius:50%;background:#C4726A;color:#fff;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0">0' + r.n + '</div>';
+        html += '<div style="flex:1;font-size:12px;font-weight:600;color:#3D2B1F">' + r.name + '</div>';
+        html += '<div style="font-size:11px;color:#C4726A;font-weight:700">' + r.price + '</div>';
+        html += '</div>';
+      });
+      html += '</div></div>';
+    }
+    if (p.type === 'progression' && p.score) {
+      html += '<div style="padding:0 14px 10px;display:flex;align-items:center;gap:10px">';
+      html += '<div style="width:40px;height:40px;border-radius:12px;background:#FBF0ED;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0">' + (p.prodIcon||'✨') + '</div>';
+      html += '<div><div style="font-size:12px;font-weight:700;color:#3D2B1F">' + (p.prodName||'') + '</div>';
+      html += '<div style="font-size:11px;color:#8B6F5E">' + (p.prodBrand||'') + '</div></div>';
+      html += '<div style="margin-left:auto;font-size:14px;font-weight:700;color:#2E7D32">' + p.score + '</div>';
+      html += '</div>';
+    }
+    if (p.type === 'bonplan' && p.promo) {
+      html += '<div style="padding:0 14px 10px;display:flex;align-items:center;gap:10px">';
+      html += '<div style="width:40px;height:40px;border-radius:12px;background:#FFF8E1;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0">' + (p.prodIcon||'💰') + '</div>';
+      html += '<div style="flex:1"><div style="font-size:12px;font-weight:700;color:#3D2B1F">' + (p.prodName||'') + '</div>';
+      html += '<div style="font-size:11px;color:#8B6F5E">' + (p.prodBrand||'') + '</div></div>';
+      html += '<div style="text-align:right"><div style="font-size:14px;font-weight:700;color:#E65100">' + (p.price||'') + '</div>';
+      if (p.oldPrice) html += '<div style="font-size:11px;color:#9E9E9E;text-decoration:line-through">' + p.oldPrice + '</div>';
+      if (p.promo) html += '<div style="background:#E65100;color:#fff;font-size:9px;font-weight:700;padding:2px 6px;border-radius:20px;margin-top:2px">' + p.promo + '</div>';
+      html += '</div></div>';
+    }
+    if (p.type === 'question' && p.replies) {
+      html += '<div style="padding:0 14px 10px">';
+      p.replies.slice(0,2).forEach(function(r) {
+        html += '<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">';
+        html += '<div style="width:24px;height:24px;border-radius:50%;flex-shrink:0;background:' + r.c + ';display:flex;align-items:center;justify-content:center;color:#fff;font-size:10px;font-weight:700">' + r.i + '</div>';
+        html += '<div style="background:#F5EEE8;border-radius:50px;padding:6px 12px;font-size:12px;color:#3D2B1F;flex:1">' + r.t + '</div>';
+        html += '</div>';
+      });
+      html += '</div>';
+    }
+
+    // Tags
+    if (p.tags && p.tags.length) {
+      html += '<div style="padding:0 14px 10px;display:flex;gap:6px;flex-wrap:wrap">';
+      p.tags.forEach(function(t) {
+        html += '<div style="font-size:11px;font-weight:600;color:#C4726A;background:#FBF0ED;padding:3px 8px;border-radius:20px">' + t + '</div>';
+      });
+      html += '</div>';
+    }
+
+    // Actions (likes, commentaires)
+    var likedKey = 'smlike_' + p.id;
+    var isLiked = localStorage.getItem(likedKey) === '1' || p.liked;
+    var likeCount = parseInt(localStorage.getItem(likedKey + '_count') || p.likes);
+    html += '<div style="padding:10px 14px 14px;display:flex;align-items:center;gap:16px;border-top:1px solid var(--bdr)">';
+    html += '<button id="like-btn-' + p.id + '" onclick="_toggleLike(\'' + p.id + '\',' + p.likes + ')" style="display:flex;align-items:center;gap:5px;background:none;border:none;cursor:pointer;padding:0;font-size:13px;font-weight:600;color:' + (isLiked?"#C4726A":"#8B6F5E") + ';font-family:inherit">' + (isLiked?"❤️":"🤍") + ' <span id="like-count-' + p.id + '">' + likeCount + '</span></button>';
+    html += '<div style="display:flex;align-items:center;gap:5px;font-size:13px;font-weight:600;color:#8B6F5E">💬 ' + p.comments + '</div>';
+    html += '<button onclick="showToast(isEN?\'Comment coming soon!\':\'Commentaires bientôt !\',{type:\'info\'})" style="margin-left:auto;background:none;border:none;cursor:pointer;font-size:12px;font-weight:600;color:#C4726A;font-family:inherit">' + (isEN?"Reply":"Répondre") + ' →</button>';
+    html += '</div>';
+
+    card.innerHTML = html;
+    container.appendChild(card);
+  });
+}
+
+function _toggleLike(postId, originalLikes) {
+  var key = 'smlike_' + postId;
+  var countKey = key + '_count';
+  var isLiked = localStorage.getItem(key) === '1';
+  var btn = document.getElementById('like-btn-' + postId);
+  var countEl = document.getElementById('like-count-' + postId);
+  if (!isLiked) {
+    localStorage.setItem(key, '1');
+    var newCount = (parseInt(localStorage.getItem(countKey) || originalLikes)) + 1;
+    localStorage.setItem(countKey, newCount);
+    if (btn) { btn.style.color = '#C4726A'; btn.innerHTML = '❤️ <span id="like-count-' + postId + '">' + newCount + '</span>'; }
+  } else {
+    localStorage.removeItem(key);
+    var newCount2 = Math.max(0, (parseInt(localStorage.getItem(countKey) || originalLikes)) - 1);
+    localStorage.setItem(countKey, newCount2);
+    if (btn) { btn.style.color = '#8B6F5E'; btn.innerHTML = '🤍 <span id="like-count-' + postId + '">' + newCount2 + '</span>'; }
+  }
 }
 
 // ── FONCTIONS JOURNAL ──
