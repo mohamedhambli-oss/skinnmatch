@@ -4599,14 +4599,33 @@ function startDiagnostic() {
 var chatbotOpen = false;
 var chatbotHistory = [];
 
+function _clearCoachMemory() {
+  localStorage.removeItem(COACH_MEMORY_KEY);
+  // Vider les messages affichés et remettre le message d'accueil
+  var container = document.getElementById('chatbot-messages');
+  if (container) {
+    container.innerHTML = '<div id="chatbot-welcome-msg" style="background:#fff;border-radius:14px 14px 14px 4px;padding:12px 14px;max-width:85%;box-shadow:0 1px 4px rgba(0,0,0,.08)"><p style="font-size:13px;color:#3D2B1F;margin:0;line-height:1.5">🗑 Mémoire effacée. Nouvelle conversation !</p></div>';
+  }
+  var sub = document.getElementById('chatbot-subtitle');
+  if (sub) sub.textContent = 'Nouvelle conversation';
+}
+
+function _showCoachMemoryStatus() {
+  var memory = _getCoachMemory();
+  var count = Math.floor(memory.length / 2);
+  var sub = document.getElementById('chatbot-subtitle');
+  if (sub) sub.textContent = count > 0 ? ('💬 ' + count + ' échange' + (count>1?'s':'') + ' mémorisé' + (count>1?'s':'')) : 'Nouvelle conversation';
+}
+
 function toggleChatbot() {
   chatbotOpen = !chatbotOpen;
   var modal = document.getElementById('chatbot-modal');
   if (modal) modal.style.display = chatbotOpen ? 'flex' : 'none';
   if (chatbotOpen) {
     var input = document.getElementById('chatbot-input');
-    if (input) input.focus();
-    // Personnaliser le message d'accueil avec le prénom de l'utilisateur connecté
+    if (input) { input.focus(); }
+
+    // Personnaliser le message d'accueil
     var prenom = '';
     if (window._currentUser) {
       var raw = window._currentUser.displayName || (window._currentUser.email || '').split('@')[0] || '';
@@ -4614,18 +4633,33 @@ function toggleChatbot() {
       if (prenom) prenom = prenom.charAt(0).toUpperCase() + prenom.slice(1);
     }
     var isEN = LANG === 'en';
-    var welcomeText = prenom
-      ? (isEN
-          ? "👋 Hi " + prenom + " ! I'm your Skin Coach. Ask me anything about your skin, products, ingredients or routine. I'm here 24/7!"
-          : "👋 Salut " + prenom + " ! Je suis ton Skin Coach. Pose-moi toutes tes questions sur ta peau, les produits, les actifs ou ta routine. Je suis là 24h/24 !")
-      : (isEN
-          ? "👋 Hi! I'm your Skin Coach. Ask me anything about your skin, products, ingredients or routine. I'm here 24/7!"
-          : "👋 Bonjour ! Je suis ton Skin Coach. Pose-moi toutes tes questions sur ta peau, les produits, les actifs ou ta routine. Je suis là 24h/24 !");
-    // Remplacer le contenu du message d'accueil statique
+    var memory = _getCoachMemory();
+    var msgCount = Math.floor(memory.length / 2);
+
+    // Sous-titre avec mémoire
+    var sub = document.getElementById('chatbot-subtitle');
+    if (sub) {
+      sub.textContent = msgCount > 0
+        ? '💬 ' + msgCount + (isEN ? ' exchange' : ' échange') + (msgCount>1?'s':'') + (isEN?' remembered':' mémorisé' + (msgCount>1?'s':''))
+        : (isEN ? 'Answers in seconds' : 'Répond en quelques secondes');
+    }
+
+    // Message d'accueil personnalisé
     var welcomeMsg = document.getElementById('chatbot-welcome-msg');
     if (welcomeMsg) {
       var p = welcomeMsg.querySelector('p');
-      if (p) p.textContent = welcomeText;
+      if (p) {
+        var skinCtx = ST.skinType ? (isEN ? ' I remember your ' + ST.skinType + ' skin.' : ' Je me souviens de ta peau ' + ST.skinType + '.') : '';
+        if (msgCount > 0) {
+          p.textContent = isEN
+            ? '👋 Welcome back' + (prenom?' '+prenom:'') + '!' + skinCtx + ' I remember our last conversations. How can I help?'
+            : '👋 Bon retour' + (prenom?' '+prenom:'') + ' !' + skinCtx + ' Je me souviens de nos échanges précédents. Comment puis-je t\'aider ?';
+        } else {
+          p.textContent = prenom
+            ? (isEN ? '👋 Hi ' + prenom + '! I\'m your Skin Coach. Ask me anything!' : '👋 Salut ' + prenom + ' ! Je suis ton Skin Coach. Pose-moi toutes tes questions !')
+            : (isEN ? '👋 Hi! I\'m your Skin Coach. Ask me anything!' : '👋 Bonjour ! Je suis ton Skin Coach. Pose-moi tes questions !');
+        }
+      }
     }
   }
 }
@@ -4661,17 +4695,116 @@ function removeTypingIndicator() {
   if (el) el.remove();
 }
 
-function sendChatMessage() {
+// ── MÉMOIRE DU COACH ──
+var COACH_MEMORY_KEY = 'skinmatch_coach_memory';
+
+function _getCoachMemory() {
+  try { return JSON.parse(localStorage.getItem(COACH_MEMORY_KEY) || '[]'); } catch(e) { return []; }
+}
+
+function _saveCoachMemory(history) {
+  // Garder seulement les 20 derniers échanges pour ne pas dépasser les tokens
+  var trimmed = history.slice(-20);
+  try { localStorage.setItem(COACH_MEMORY_KEY, JSON.stringify(trimmed)); } catch(e) {}
+}
+
+function _buildCoachSystemPrompt() {
+  var isEN = LANG === 'en';
+  var prenom = '';
+  if (window._currentUser) {
+    var raw = window._currentUser.displayName || (window._currentUser.email||'').split('@')[0]||'';
+    prenom = raw.split(' ')[0];
+    if (prenom) prenom = prenom.charAt(0).toUpperCase() + prenom.slice(1);
+  }
+
+  var skinCtx = '';
+  if (ST.skinType) skinCtx += (isEN ? 'Skin type: ' : 'Type de peau : ') + ST.skinType + '. ';
+  if (ST.ageGroup) skinCtx += (isEN ? 'Age group: ' : 'Tranche d\'âge : ') + ST.ageGroup + '. ';
+  if (ST.concerns && ST.concerns.length) skinCtx += (isEN ? 'Concerns: ' : 'Problèmes : ') + ST.concerns.join(', ') + '. ';
+  if (ST.allergies && ST.allergies.length) skinCtx += (isEN ? 'Allergies: ' : 'Allergies : ') + ST.allergies.join(', ') + '. ';
+  if (ST.budget) skinCtx += (isEN ? 'Budget: ' : 'Budget : ') + ST.budget + '. ';
+  if (ST.result && ST.result.steps && ST.result.steps.length) {
+    var prods = ST.result.steps.map(function(s){ return s.nom + ' (' + s.marque + ')'; }).join(', ');
+    skinCtx += (isEN ? 'Current routine: ' : 'Routine actuelle : ') + prods + '. ';
+  }
+
+  // Streak
+  var data = getDashData();
+  var streakN = data.streak && typeof data.streak==='object' ? (data.streak.current||0) : (data.streak||0);
+  if (streakN > 0) skinCtx += (isEN ? 'Current streak: ' : 'Série actuelle : ') + streakN + (isEN?' days.':' jours.');
+
+  if (isEN) {
+    return "You are SkinMatch's Skin Coach, an expert skincare AI assistant. You are warm, precise, and personalized." +
+      (prenom ? " You are speaking with " + prenom + "." : "") +
+      (skinCtx ? " User profile: " + skinCtx : "") +
+      " Answer in English. Be concise (2-4 sentences max unless the user asks for more detail). " +
+      "You remember past conversations in this session. Never break character. Never say you are an AI. " +
+      "If you don't know something, say 'I recommend consulting a dermatologist.'";
+  }
+  return "Tu es le Skin Coach de SkinMatch, un assistant IA expert en skincare. Tu es chaleureux, précis et personnalisé." +
+    (prenom ? " Tu parles avec " + prenom + "." : "") +
+    (skinCtx ? " Profil utilisateur : " + skinCtx : "") +
+    " Réponds en français. Sois concis (2 à 4 phrases max sauf si l'utilisateur demande plus de détails). " +
+    "Tu te souviens des conversations passées dans cette session. Ne romps jamais ton rôle. " +
+    "Si tu ne sais pas, dis 'Je recommande de consulter un dermatologue.'";
+}
+
+async function sendChatMessage() {
   var input = document.getElementById('chatbot-input');
   if (!input || !input.value.trim()) return;
-  var userMsg = input.value.trim().toLowerCase();
+  var userMsg = input.value.trim();
   input.value = '';
-  addChatMessage(input.value || userMsg, true);
+  input.disabled = true;
+
+  addChatMessage(userMsg, true);
   addTypingIndicator();
-  setTimeout(function() {
+
+  // Charger l'historique mémorisé
+  var memory = _getCoachMemory();
+  memory.push({ role: 'user', parts: [{ text: userMsg }] });
+
+  var GEMINI_KEY = "AIzaSyAcnK0dToixkPc6jgteaDK5w3XD4XKuU_Y";
+  var systemPrompt = _buildCoachSystemPrompt();
+
+  // Construire les contents : system instruction + historique
+  var contents = memory.slice(-12); // max 12 derniers messages
+
+  try {
+    var res = await fetch(
+      "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=" + GEMINI_KEY,
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          system_instruction: { parts: [{ text: systemPrompt }] },
+          contents: contents,
+          generationConfig: { maxOutputTokens: 300, temperature: 0.7 }
+        })
+      }
+    );
+    var data = await res.json();
+    var reply = data.candidates && data.candidates[0] && data.candidates[0].content && data.candidates[0].content.parts
+      ? data.candidates[0].content.parts[0].text
+      : null;
+
+    if (!reply && data.error) throw new Error(data.error.message);
+    if (!reply) throw new Error('empty');
+
+    // Sauvegarder l'échange en mémoire
+    memory.push({ role: 'model', parts: [{ text: reply }] });
+    _saveCoachMemory(memory);
+
     removeTypingIndicator();
-    addChatMessage(getChatbotResponse(userMsg), false);
-  }, 800);
+    addChatMessage(reply, false);
+  } catch(err) {
+    removeTypingIndicator();
+    // Fallback sur la réponse locale si Gemini échoue
+    var fallback = getChatbotResponse(userMsg.toLowerCase());
+    addChatMessage(fallback, false);
+  }
+
+  input.disabled = false;
+  input.focus();
 }
 
 function getChatbotResponse(msg) {
@@ -7066,7 +7199,27 @@ function renderDashboard() {
     }
     var headerEl = document.createElement("div");
     headerEl.style.cssText = "margin-bottom:16px";
+
+    // Bannière streak urgente dans le header si streak > 0 et pas validé aujourd'hui
+    var _hExpiryHours = _getStreakExpiryHours();
+    var _hStreakN = data.streak && typeof data.streak==="object" ? (data.streak.current||0) : (data.streak||0);
+    var _hStreakLast = data.streakLastDate || null;
+    var _hTodayISO = new Date().toISOString().split("T")[0];
+    var _hStreakValidated = (_hStreakLast === _hTodayISO);
+
+    var streakPill = "";
+    if (_hStreakN > 0) {
+      var pillColor = _hExpiryHours !== null ? "#FF3B0E" : (_hStreakValidated ? "#2E7D32" : "#C4726A");
+      var pillText = _hExpiryHours !== null
+        ? "⚠️ " + _hStreakN + "j — expire dans " + _hExpiryHours + "h"
+        : _hStreakValidated
+          ? "🔥 " + _hStreakN + (isEN?" days in a row":" jours de suite")
+          : "🔥 " + _hStreakN + (isEN?" day streak":" jours — valide aujourd'hui");
+      streakPill = "<div style='display:inline-flex;align-items:center;gap:5px;background:" + pillColor + ";color:#fff;border-radius:50px;padding:4px 12px;font-size:11px;font-weight:700;margin-bottom:8px;cursor:pointer' onclick=\"window._espaceTab='motiv';renderDashboard()\">" + pillText + "</div>";
+    }
+
     headerEl.innerHTML =
+      (streakPill ? "<div>" + streakPill + "</div>" : "") +
       "<div style='font-size:22px;font-family:Georgia,serif;font-weight:700;color:var(--pri);line-height:1.2'>" + headerTitle + "</div>" +
       "<div style='font-size:13px;color:var(--mut);margin-top:4px'>" + headerSub + "</div>";
     wrap.appendChild(headerEl);
@@ -7255,6 +7408,114 @@ function renderDashboard() {
     statsCard.innerHTML = statsHeader + statsGrid + statsCompare;
     tabSuivi.appendChild(statsCard);
 
+    // ── INSIGHTS JOURNAL (analyse patterns) ──
+    var journalAll = getSkinJournal();
+    if (journalAll.length >= 5) {
+      var insightCard = document.createElement("div");
+      insightCard.style.cssText = "background:linear-gradient(135deg,#F0F8FF,#E8F0FF);border-radius:18px;border:1px solid #BDD0F0;padding:16px;margin-bottom:14px";
+
+      // Analyse par jour de la semaine
+      var dayScores = [0,0,0,0,0,0,0];
+      var dayCounts = [0,0,0,0,0,0,0];
+      journalAll.forEach(function(e) {
+        var d = new Date(e.date).getDay();
+        dayScores[d] += e.mood;
+        dayCounts[d]++;
+      });
+      var bestDayIdx = -1, bestDayAvg = 0;
+      var worstDayIdx = -1, worstDayAvg = 99;
+      for (var di = 0; di < 7; di++) {
+        if (dayCounts[di] > 0) {
+          var avg = dayScores[di] / dayCounts[di];
+          if (avg > bestDayAvg) { bestDayAvg = avg; bestDayIdx = di; }
+          if (avg < worstDayAvg) { worstDayAvg = avg; worstDayIdx = di; }
+        }
+      }
+      var dayNames = isEN ? ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'] : ['Dim','Lun','Mar','Mer','Jeu','Ven','Sam'];
+
+      // Tendance globale (derniers 7 jours vs 7 précédents)
+      var last7 = journalAll.slice(-7);
+      var prev7 = journalAll.slice(-14, -7);
+      var trend = null;
+      if (last7.length >= 3 && prev7.length >= 3) {
+        var avgLast = last7.reduce(function(s,e){return s+e.mood;},0)/last7.length;
+        var avgPrev = prev7.reduce(function(s,e){return s+e.mood;},0)/prev7.length;
+        trend = avgLast - avgPrev;
+      }
+
+      var insightHTML = "<div style='font-size:9px;font-weight:700;color:#5A7AB8;text-transform:uppercase;letter-spacing:1.5px;margin-bottom:10px'>🔍 " + (isEN?"SKIN INSIGHTS":"INSIGHTS PEAU") + "</div>";
+
+      if (bestDayIdx >= 0 && bestDayIdx !== worstDayIdx) {
+        insightHTML += "<div style='display:flex;gap:8px;margin-bottom:8px'>" +
+          "<div style='flex:1;background:#fff;border-radius:12px;padding:10px;text-align:center'>" +
+            "<div style='font-size:18px;margin-bottom:4px'>😊</div>" +
+            "<div style='font-size:10px;font-weight:700;color:#3D2B1F'>" + (isEN?"Best day":"Meilleur jour") + "</div>" +
+            "<div style='font-size:13px;font-weight:700;color:#2E7D32'>" + dayNames[bestDayIdx] + "</div>" +
+          "</div>" +
+          "<div style='flex:1;background:#fff;border-radius:12px;padding:10px;text-align:center'>" +
+            "<div style='font-size:18px;margin-bottom:4px'>😕</div>" +
+            "<div style='font-size:10px;font-weight:700;color:#3D2B1F'>" + (isEN?"Hardest day":"Jour difficile") + "</div>" +
+            "<div style='font-size:13px;font-weight:700;color:#C4726A'>" + dayNames[worstDayIdx] + "</div>" +
+          "</div>" +
+        "</div>";
+      }
+
+      if (trend !== null) {
+        var trendIcon = trend > 0.3 ? "📈" : trend < -0.3 ? "📉" : "📊";
+        var trendText = trend > 0.3
+          ? (isEN ? "Your skin is improving this week!" : "Ta peau s'améliore cette semaine !")
+          : trend < -0.3
+            ? (isEN ? "Tougher week — check your routine" : "Semaine difficile — vérifie ta routine")
+            : (isEN ? "Stable skin, keep it up!" : "Peau stable, continue !");
+        insightHTML += "<div style='background:#fff;border-radius:12px;padding:10px;display:flex;align-items:center;gap:8px'>" +
+          "<div style='font-size:20px'>" + trendIcon + "</div>" +
+          "<div style='font-size:12px;color:#3D2B1F;font-weight:600'>" + trendText + "</div>" +
+        "</div>";
+      }
+
+      insightCard.innerHTML = insightHTML;
+      tabSuivi.appendChild(insightCard);
+    }
+
+    // ── GRAPHIQUE ÉVOLUTION SCORE DE PEAU ──
+    if (suivi.entries && suivi.entries.length >= 2) {
+      var graphCard = document.createElement("div");
+      graphCard.style.cssText = "background:#fff;border-radius:18px;border:1px solid var(--bdr);padding:16px;margin-bottom:14px";
+
+      var graphEntries = suivi.entries.slice(-8); // 8 dernières semaines max
+      var maxScore = 100;
+      var graphW = 280, graphH = 80;
+      var pts = graphEntries.map(function(e, i) {
+        var x = (i / Math.max(graphEntries.length-1, 1)) * graphW;
+        var y = graphH - (e.rating / 5) * graphH;
+        return { x: x, y: y, v: Math.round(e.rating*20) };
+      });
+
+      var pathD = pts.map(function(p, i){ return (i===0?"M":"L") + p.x.toFixed(1) + "," + p.y.toFixed(1); }).join(" ");
+      // Zone remplie sous la courbe
+      var areaD = pathD + " L" + pts[pts.length-1].x.toFixed(1) + "," + graphH + " L0," + graphH + " Z";
+
+      var dotsHTML = pts.map(function(p, i) {
+        var isLast = i === pts.length - 1;
+        return "<circle cx='" + p.x.toFixed(1) + "' cy='" + p.y.toFixed(1) + "' r='" + (isLast?5:3) + "' fill='" + (isLast?"#C4726A":"#F0D5C8") + "' stroke='#C4726A' stroke-width='1.5'/>" +
+          (isLast ? "<text x='" + p.x.toFixed(1) + "' y='" + (p.y-10).toFixed(1) + "' text-anchor='middle' font-size='10' font-weight='700' fill='#C4726A'>" + p.v + "%</text>" : "");
+      }).join("");
+
+      var graphHTML = "<div style='font-size:9px;font-weight:700;color:#C4726A;text-transform:uppercase;letter-spacing:1.5px;margin-bottom:12px'>📈 " + (isEN?"SKIN SCORE EVOLUTION":"ÉVOLUTION DU SCORE") + "</div>" +
+        "<svg width='100%' viewBox='0 0 " + graphW + " " + (graphH+20) + "' style='overflow:visible'>" +
+          "<defs><linearGradient id='graphGrad' x1='0' y1='0' x2='0' y2='1'><stop offset='0%' stop-color='#C4726A' stop-opacity='.3'/><stop offset='100%' stop-color='#C4726A' stop-opacity='.02'/></linearGradient></defs>" +
+          "<path d='" + areaD + "' fill='url(#graphGrad)'/>" +
+          "<path d='" + pathD + "' fill='none' stroke='#C4726A' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/>" +
+          dotsHTML +
+        "</svg>" +
+        "<div style='display:flex;justify-content:space-between;margin-top:4px'>" +
+          "<div style='font-size:9px;color:#B0958F'>" + (isEN?"Oldest":"Le plus ancien") + "</div>" +
+          "<div style='font-size:9px;color:#B0958F'>" + (isEN?"Today":"Aujourd'hui") + "</div>" +
+        "</div>";
+      graphCard.innerHTML = graphHTML;
+      tabSuivi.appendChild(graphCard);
+    }
+
     // ── COLLECTION FAVORIS (point 6) ──
     var favCount = getFavoritesCount();
     var totalProducts = getTotalProductsCount();
@@ -7345,6 +7606,103 @@ function renderDashboard() {
 
     // ════════════ ONGLET MOTIVATION (REFONDU) ════════════
 
+    // ── Vérifier si le streak a été cassé depuis le dernier lancement ──
+    _checkStreakBreak();
+    var _streakWasBrokenVal = window._streakWasBroken || 0;
+    window._streakWasBroken = 0; // reset
+
+    // ── BANNIÈRE ALERTE EXPIRATION STREAK ──
+    var _expiryHours = _getStreakExpiryHours();
+    var _dataFresh = getDashData(); // re-lire après _checkStreakBreak
+    var _streakNFresh = _dataFresh.streak && typeof _dataFresh.streak==="object" ? (_dataFresh.streak.current||0) : (_dataFresh.streak||0);
+
+    if (_streakNFresh > 0 && _expiryHours !== null) {
+      var alertBanner = document.createElement("div");
+      alertBanner.style.cssText = "background:linear-gradient(135deg,#FF6B35,#FF3B0E);border-radius:18px;padding:14px 16px;margin-bottom:14px;display:flex;align-items:center;gap:12px;animation:pulse 2s ease-in-out infinite";
+      if (!document.getElementById('pulse-style')) {
+        var ps = document.createElement('style'); ps.id='pulse-style';
+        ps.textContent = '@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(255,59,14,.4)}50%{box-shadow:0 0 0 8px rgba(255,59,14,0)}}';
+        document.head.appendChild(ps);
+      }
+      alertBanner.innerHTML =
+        "<div style='font-size:28px'>⚠️</div>" +
+        "<div style='flex:1'>" +
+          "<div style='font-size:13px;font-weight:700;color:#fff;margin-bottom:3px'>" +
+            (isEN ? 'Your streak expires in ' + _expiryHours + 'h!' : 'Ton streak expire dans ' + _expiryHours + 'h !') +
+          "</div>" +
+          "<div style='font-size:11px;color:rgba(255,255,255,.85)'>" +
+            (isEN ? 'Validate your routine before midnight to keep your ' + _streakNFresh + '-day series' : 'Valide ta routine avant minuit pour garder ta série de ' + _streakNFresh + ' jours') +
+          "</div>" +
+        "</div>" +
+        "<button onclick='incrementStreak()' style='background:#fff;border:none;border-radius:50px;padding:10px 14px;font-size:12px;font-weight:700;color:#FF3B0E;cursor:pointer;font-family:inherit;flex-shrink:0'>" +
+          (isEN ? 'Validate ✓' : 'Valider ✓') +
+        "</button>";
+      tabMotiv.appendChild(alertBanner);
+    }
+
+    // ── STREAK CASSÉ : message de reset ──
+    if (_streakWasBrokenVal >= 3) {
+      var brokenBanner = document.createElement("div");
+      brokenBanner.style.cssText = "background:#FFF4E5;border:2px solid #FFB871;border-radius:18px;padding:14px 16px;margin-bottom:14px;text-align:center";
+      brokenBanner.innerHTML =
+        "<div style='font-size:24px;margin-bottom:6px'>💔</div>" +
+        "<div style='font-size:13px;font-weight:700;color:#3D2B1F;margin-bottom:4px'>" +
+          (isEN ? 'You lost your ' + _streakWasBrokenVal + '-day streak' : 'Tu as perdu ta série de ' + _streakWasBrokenVal + ' jours') +
+        "</div>" +
+        "<div style='font-size:12px;color:#8B6F5E'>" +
+          (isEN ? 'It happens. Start again today and come back stronger! 💪' : 'Ça arrive. Recommence aujourd\'hui et reviens plus fort ! 💪') +
+        "</div>";
+      tabMotiv.appendChild(brokenBanner);
+    }
+
+    // ── CONTENU ÉPHÉMÈRE DU JOUR (disparaît toutes les 24h) ──
+    var _dayOfYear = Math.floor((Date.now() - new Date(new Date().getFullYear(),0,0)) / 86400000);
+    var DAILY_CHALLENGES_FR = [
+      { icon:"☀️", title:"SPF obligatoire", desc:"Applique ton SPF ce matin — même si tu restes dedans." },
+      { icon:"💧", title:"Double nettoyage", desc:"Ce soir, fais un double nettoyage : démaquillant puis gel." },
+      { icon:"🥤", title:"Hydratation interne", desc:"Bois 2L d'eau aujourd'hui. Ta peau te remerciera." },
+      { icon:"🌙", title:"Pas d'écran 1h avant lit", desc:"La lumière bleue perturbe la régénération de ta peau." },
+      { icon:"🧖", title:"Massage 2 minutes", desc:"Masse ta crème du soir pendant 2 min sur ton visage." },
+      { icon:"📔", title:"Note ton état de peau", desc:"Remplis ton journal de peau ce soir pour tracker ta progression." },
+      { icon:"🌿", title:"Ingrédient du jour : Niacinamide", desc:"Idéal pour resserrer les pores et unifier le teint." },
+    ];
+    var DAILY_CHALLENGES_EN = [
+      { icon:"☀️", title:"SPF is mandatory", desc:"Apply your SPF this morning — even if you stay indoors." },
+      { icon:"💧", title:"Double cleanse tonight", desc:"Tonight, double cleanse: makeup remover then gel cleanser." },
+      { icon:"🥤", title:"Internal hydration", desc:"Drink 2L of water today. Your skin will thank you." },
+      { icon:"🌙", title:"No screens 1h before bed", desc:"Blue light disrupts skin regeneration during sleep." },
+      { icon:"🧖", title:"2-minute massage", desc:"Massage your evening cream for 2 minutes across your face." },
+      { icon:"📔", title:"Log your skin today", desc:"Fill in your skin journal tonight to track your progress." },
+      { icon:"🌿", title:"Today's ingredient: Niacinamide", desc:"Perfect for minimizing pores and evening skin tone." },
+    ];
+    var _dc = isEN ? DAILY_CHALLENGES_EN : DAILY_CHALLENGES_FR;
+    var _todayChallenge = _dc[_dayOfYear % _dc.length];
+    var _todayChallengeKey = 'skinmatch_dc_' + new Date().toISOString().split("T")[0];
+    var _dcDone = localStorage.getItem(_todayChallengeKey) === '1';
+
+    var ephCard = document.createElement("div");
+    ephCard.style.cssText = "border-radius:20px;padding:16px;margin-bottom:14px;overflow:hidden;position:relative;" +
+      (_dcDone ? "background:#E8F5E9;border:2px solid #A5D6A7" : "background:linear-gradient(135deg,#2C2C3E,#3D2B4A);border:none");
+    ephCard.innerHTML =
+      "<div style='position:absolute;top:0;right:0;background:rgba(255,255,255,.06);width:100px;height:100px;border-radius:50%;transform:translate(30px,-30px)'></div>" +
+      "<div style='display:flex;align-items:center;gap:10px;margin-bottom:12px;position:relative'>" +
+        "<div style='font-size:28px'>" + _todayChallenge.icon + "</div>" +
+        "<div>" +
+          "<div style='font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:2px;color:" + (_dcDone?"#2E7D32":"rgba(255,255,255,.6)") + "'>" +
+            "🗓 " + (isEN ? "TODAY'S CHALLENGE" : "DÉFI DU JOUR") +
+          "</div>" +
+          "<div style='font-size:14px;font-weight:700;color:" + (_dcDone?"#1B5E20":"#fff") + "'>" + _todayChallenge.title + "</div>" +
+        "</div>" +
+      "</div>" +
+      "<div style='font-size:12px;line-height:1.6;margin-bottom:14px;position:relative;color:" + (_dcDone?"#2E7D32":"rgba(255,255,255,.85)") + "'>" + _todayChallenge.desc + "</div>" +
+      (!_dcDone
+        ? "<button onclick=\"localStorage.setItem('" + _todayChallengeKey + "','1');renderDashboard()\" style='width:100%;padding:12px;border-radius:50px;background:#C4726A;border:none;color:#fff;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;position:relative'>" +
+            (isEN ? "Done! ✓" : "C'est fait ! ✓") +
+          "</button>"
+        : "<div style='text-align:center;font-size:13px;font-weight:700;color:#2E7D32'>✅ " + (isEN?"Challenge completed today!":"Défi accompli aujourd'hui !") + "</div>"
+      );
+    tabMotiv.appendChild(ephCard);
+
     // ── STREAK HERO CARD (gradient chaleureux + semaine visualisée) ──
     var _todayStr = new Date().toISOString().split("T")[0];
     var _streakN = data.streak && typeof data.streak === "object" ? (data.streak.current||0) : (data.streak||0);
@@ -7432,6 +7790,50 @@ function renderDashboard() {
     });
     badgesEl.appendChild(badgesGrid);
     tabMotiv.appendChild(badgesEl);
+
+    // ── DÉFI HEBDOMADAIRE COMMUNAUTAIRE ──
+    var _weekNum = Math.floor((Date.now() / 86400000 + 4) / 7); // numéro de semaine
+    var WEEKLY_CHALLENGES_FR = [
+      { icon:"☀️", title:"La semaine SPF", stat:"94%", statLabel:"des utilisateurs l'ont mis tous les jours", desc:"Applique ton SPF chaque matin cette semaine, sans exception." },
+      { icon:"💧", title:"Hydratation maximale", stat:"87%", statLabel:"voient une amélioration en 7 jours", desc:"Ajoute un sérum hydratant à ta routine cette semaine." },
+      { icon:"🌙", title:"Routine soir complète", stat:"91%", statLabel:"dorment avec une peau nettoyée", desc:"Fais ta routine soir complète chaque jour de la semaine." },
+      { icon:"📔", title:"Journal quotidien", stat:"78%", statLabel:"notent une meilleure connaissance de leur peau", desc:"Note ton journal de peau chaque soir cette semaine." },
+    ];
+    var WEEKLY_CHALLENGES_EN = [
+      { icon:"☀️", title:"SPF week", stat:"94%", statLabel:"of users applied it every single day", desc:"Apply your SPF every morning this week, no exceptions." },
+      { icon:"💧", title:"Maximum hydration", stat:"87%", statLabel:"see improvement in 7 days", desc:"Add a hydrating serum to your routine this week." },
+      { icon:"🌙", title:"Full evening routine", stat:"91%", statLabel:"go to sleep with a clean face", desc:"Complete your full evening routine every day this week." },
+      { icon:"📔", title:"Daily journal", stat:"78%", statLabel:"report better skin awareness", desc:"Log your skin journal every evening this week." },
+    ];
+    var _wc = (isEN ? WEEKLY_CHALLENGES_EN : WEEKLY_CHALLENGES_FR)[_weekNum % 4];
+    var _wcKey = 'skinmatch_wc_' + _weekNum;
+    var _wcJoined = localStorage.getItem(_wcKey) === '1';
+
+    var weeklyCard = document.createElement("div");
+    weeklyCard.style.cssText = "background:#fff;border-radius:20px;border:2px solid " + (_wcJoined?"#A5D6A7":"#F0D5C8") + ";overflow:hidden;margin-bottom:14px";
+    weeklyCard.innerHTML =
+      "<div style='background:" + (_wcJoined?"linear-gradient(135deg,#E8F5E9,#C8E6C9)":"linear-gradient(135deg,#FBF0ED,#F5E1DC)") + ";padding:12px 14px;display:flex;align-items:center;gap:8px'>" +
+        "<div style='font-size:20px'>" + _wc.icon + "</div>" +
+        "<div style='flex:1'>" +
+          "<div style='font-size:9px;font-weight:700;color:" + (_wcJoined?"#2E7D32":"#C4726A") + ";text-transform:uppercase;letter-spacing:1.5px;margin-bottom:2px'>🏅 " + (isEN?"THIS WEEK'S CHALLENGE":"DÉFI DE LA SEMAINE") + "</div>" +
+          "<div style='font-size:14px;font-weight:700;color:#3D2B1F'>" + _wc.title + "</div>" +
+        "</div>" +
+        (_wcJoined ? "<div style='font-size:20px'>✅</div>" : "") +
+      "</div>" +
+      "<div style='padding:12px 14px'>" +
+        "<div style='font-size:12px;color:#5A4A42;line-height:1.6;margin-bottom:10px'>" + _wc.desc + "</div>" +
+        "<div style='background:#F8F2ED;border-radius:10px;padding:10px;margin-bottom:12px;text-align:center'>" +
+          "<div style='font-family:Georgia,serif;font-size:22px;font-weight:700;color:#C4726A'>" + _wc.stat + "</div>" +
+          "<div style='font-size:11px;color:#8B6F5E'>" + _wc.statLabel + "</div>" +
+        "</div>" +
+        (!_wcJoined
+          ? "<button onclick=\"localStorage.setItem('" + _wcKey + "','1');renderDashboard()\" style='width:100%;padding:12px;border-radius:50px;border:none;background:#C4726A;color:#fff;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit'>" +
+              (isEN?"Join the challenge →":"Rejoindre le défi →") +
+            "</button>"
+          : "<div style='text-align:center;font-size:12px;font-weight:600;color:#2E7D32'>" + (isEN?"You joined this challenge! 💪":"Tu as rejoint ce défi ! 💪") + "</div>"
+        ) +
+      "</div>";
+    tabMotiv.appendChild(weeklyCard);
 
     // ── DÉFIS AVEC GRADIENTS ET STATS ──
     var defisTitle = document.createElement("div");
@@ -8722,26 +9124,106 @@ window.onFirebaseUserReady = function(user) {
   var connLabel = document.getElementById('auth-connected-label');
   var btnStartTopText = document.getElementById('btn-start-top-text');
   var isEN = LANG === 'en';
+
   if (user) {
     var shortName = user.displayName ? user.displayName.split(' ')[0] : user.email.split('@')[0];
-    // Masquer les boutons login/register
     if (btnLog) btnLog.style.display = 'none';
     if (btnReg) btnReg.style.display = 'none';
-    // Afficher le badge connecté
     if (connBadge) connBadge.style.display = 'flex';
     if (connLabel) connLabel.textContent = (isEN ? 'Connected as ' : 'Connecté en tant que ') + shortName;
-    // Adapter le texte du bouton diagnostic (plus "sans compte" puisque déjà connecté)
     if (btnStartTopText) btnStartTopText.textContent = isEN ? 'Start my diagnosis' : 'Faire mon diagnostic';
-    // Charger routine sauvegardée
     loadSavedRoutine(user);
+
+    // ── Welcome dynamique pour utilisateur connecté ──
+    _renderDynamicWelcome(shortName, isEN);
   } else {
     if (btnLog) { btnLog.style.display = ''; btnLog.textContent = isEN ? 'I already have an account' : "J'ai déjà un compte"; btnLog.onclick = function(){ go('login'); }; }
     if (btnReg) { btnReg.style.display = ''; btnReg.textContent = isEN ? 'Create a free account' : 'Créer un compte gratuit'; }
     if (connBadge) connBadge.style.display = 'none';
-    // Texte par défaut quand pas connecté
     if (btnStartTopText) btnStartTopText.textContent = isEN ? 'Take the diagnosis, no account' : 'Faire le diagnostic sans compte';
+    // Supprimer le bloc dynamique si déconnecté
+    var dynBlock = document.getElementById('welcome-dynamic-block');
+    if (dynBlock) dynBlock.remove();
   }
 };
+
+function _renderDynamicWelcome(firstName, isEN) {
+  // Supprimer l'ancien bloc si présent
+  var old = document.getElementById('welcome-dynamic-block');
+  if (old) old.remove();
+
+  var data = getDashData();
+  var streakN = data.streak && typeof data.streak==='object' ? (data.streak.current||0) : (data.streak||0);
+  var streakLast = data.streakLastDate || null;
+  var todayISO = new Date().toISOString().split("T")[0];
+  var streakValidated = (streakLast === todayISO);
+
+  var hour = new Date().getHours();
+  var greeting = hour < 12 ? (isEN?'Good morning':'Bonjour') : hour < 18 ? (isEN?'Hello':'Salut') : (isEN?'Good evening':'Bonsoir');
+
+  // Message selon l'heure + streak
+  var subMsg = '';
+  if (streakN >= 7) subMsg = isEN ? '🔥 ' + streakN + '-day streak. You\'re unstoppable!' : '🔥 ' + streakN + ' jours de suite. Inarrêtable !';
+  else if (streakN >= 3) subMsg = isEN ? '✨ ' + streakN + ' days in a row. Keep it up!' : '✨ ' + streakN + ' jours de suite. Continue !';
+  else if (streakN === 1) subMsg = isEN ? '🌱 Day 1 done. Come back tomorrow!' : '🌱 Jour 1 fait. Reviens demain !';
+  else subMsg = isEN ? 'Start your routine streak today ↓' : 'Lance ta série de routine aujourd\'hui ↓';
+
+  // Produit du jour (premier produit AM de la routine)
+  var prodDuJour = null;
+  if (ST.result && ST.result.steps) {
+    var amSteps = ST.result.steps.filter(function(s){ return s.moment==='AM'||s.moment==='AM+PM'; });
+    if (amSteps.length > 0) {
+      var dayOfYear = Math.floor((Date.now() - new Date(new Date().getFullYear(),0,0)) / 86400000);
+      prodDuJour = amSteps[dayOfYear % amSteps.length];
+    }
+  }
+
+  var block = document.createElement('div');
+  block.id = 'welcome-dynamic-block';
+  block.style.cssText = 'margin-bottom:22px';
+
+  var html = '';
+
+  // ── Carte de bienvenue personnalisée ──
+  html += '<div style="background:linear-gradient(135deg,#3D2B1F,#6B4A3A);border-radius:20px;padding:18px;margin-bottom:14px;position:relative;overflow:hidden">' +
+    '<div style="position:absolute;top:-30px;right:-30px;width:120px;height:120px;border-radius:50%;background:rgba(255,255,255,.06)"></div>' +
+    '<div style="position:relative">' +
+      '<div style="font-size:11px;color:rgba(255,255,255,.6);margin-bottom:6px">' + greeting + ' 👋</div>' +
+      '<div style="font-family:Georgia,serif;font-size:22px;font-weight:700;color:#fff;margin-bottom:6px">' + firstName + '</div>' +
+      '<div style="font-size:13px;color:rgba(255,255,255,.85);margin-bottom:16px">' + subMsg + '</div>' +
+      // Boutons actions rapides
+      '<div style="display:flex;gap:8px">' +
+        '<button onclick="window._espaceTab=\'motiv\';openDashboard()" style="flex:1;padding:10px;border-radius:50px;background:#C4726A;border:none;color:#fff;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit">' +
+          (streakValidated ? (isEN?'✅ Validated':'✅ Validé') : (isEN?'🔥 Validate streak':'🔥 Valider streak')) +
+        '</button>' +
+        '<button onclick="openDashboard()" style="flex:1;padding:10px;border-radius:50px;background:rgba(255,255,255,.15);border:none;color:#fff;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit">' +
+          (isEN?'My space →':'Mon espace →') +
+        '</button>' +
+      '</div>' +
+    '</div>' +
+  '</div>';
+
+  // ── Produit du jour si routine existe ──
+  if (prodDuJour) {
+    html += '<div style="background:#fff;border-radius:16px;padding:12px 14px;border:1px solid var(--bdr);display:flex;align-items:center;gap:12px;margin-bottom:0">' +
+      '<div style="width:40px;height:40px;border-radius:10px;background:linear-gradient(135deg,#F5D0C8,#E8B5AB);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0">☀️</div>' +
+      '<div style="flex:1;min-width:0">' +
+        '<div style="font-size:9px;font-weight:700;color:#C4726A;text-transform:uppercase;letter-spacing:1px;margin-bottom:2px">' + (isEN?'MORNING PRODUCT':'PRODUIT DU MATIN') + '</div>' +
+        '<div style="font-size:13px;font-weight:700;color:#3D2B1F;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">' + prodDuJour.nom + '</div>' +
+        '<div style="font-size:11px;color:#8B6F5E">' + prodDuJour.marque + '</div>' +
+      '</div>' +
+      '<div style="color:#C4726A;font-size:18px;flex-shrink:0" onclick="go(\'result\')">›</div>' +
+    '</div>';
+  }
+
+  block.innerHTML = html;
+
+  // Insérer avant les chiffres clés (premier enfant du content)
+  var content = document.querySelector('#sc-welcome .content');
+  if (content && content.firstChild) {
+    content.insertBefore(block, content.firstChild);
+  }
+}
 
 async function loadSavedRoutine(user) {
   if (!window._firebaseReady || !user) return;
@@ -9598,6 +10080,7 @@ document.body.appendChild(_splashEl);
 function _hideSplash() {
   var s = document.getElementById('app-splash');
   if (s) { s.style.opacity = '0'; setTimeout(function(){ if(s.parentNode) s.parentNode.removeChild(s); }, 400); }
+  _checkStreakBreak(); // Vérifier si le streak a été cassé pendant l'absence
   _checkSharedRoutine();
 }
 
@@ -9774,10 +10257,13 @@ initQuestions();
       <div style="width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;font-size:18px">✨</div>
       <div>
         <div id="chatbot-title" style="font-size:14px;font-weight:700;color:#fff;font-family:Georgia,serif">Skin Coach</div>
-        <div id="chatbot-subtitle" style="font-size:11px;color:rgba(255,255,255,.8)">Répond en quelques secondes</div>
+        <div id="chatbot-subtitle" style="font-size:11px;color:rgba(255,255,255,.8)" onclick="_showCoachMemoryStatus()" style="cursor:pointer">Répond en quelques secondes</div>
       </div>
     </div>
-    <button onclick="toggleChatbot()" style="background:none;border:none;color:#fff;font-size:20px;cursor:pointer;padding:4px">×</button>
+    <div style="display:flex;align-items:center;gap:8px">
+      <button onclick="_clearCoachMemory()" title="Effacer la mémoire" style="background:rgba(255,255,255,.15);border:none;border-radius:50px;padding:4px 10px;color:#fff;font-size:10px;font-weight:600;cursor:pointer;font-family:inherit">🗑 Reset</button>
+      <button onclick="toggleChatbot()" style="background:none;border:none;color:#fff;font-size:20px;cursor:pointer;padding:4px">×</button>
+    </div>
   </div>
   <!-- Messages -->
   <div id="chatbot-messages" style="flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:10px">
@@ -10007,24 +10493,109 @@ function _showLoginRequired(context) {
 // ── CANCEL CHALLENGE ──
 function incrementStreak() {
   var data = getDashData();
-  var today = new Date().toISOString().split("T")[0];
+  var isEN = LANG === 'en';
+  var todayISO = new Date().toISOString().split("T")[0];
   var yesterday = new Date(); yesterday.setDate(yesterday.getDate()-1);
-  var yest = yesterday.toISOString().split("T")[0];
+  var yestISO = yesterday.toISOString().split("T")[0];
   var last = data.streakLastDate || null;
   var cur = data.streak && typeof data.streak==="object" ? (data.streak.current||0) : (data.streak||0);
-  if (last === today) return;
-  cur = (last === yest) ? cur+1 : 1;
+
+  if (last === todayISO) return; // Déjà validé aujourd'hui
+
+  // ── Détection break ──
+  var wasBroken = (last && last !== yestISO && last !== todayISO);
+  var lostStreak = wasBroken ? cur : 0;
+
+  cur = (last === yestISO) ? cur + 1 : 1;
   var best = Math.max(data.streakBest||0, cur);
-  data.streak = {current:cur};
+  data.streak = { current: cur };
   data.streakBest = best;
-  data.streakLastDate = today;
+  data.streakLastDate = todayISO;
   saveDashData(data);
-  var t = document.createElement("div");
-  t.style.cssText = "position:fixed;top:70px;left:50%;transform:translateX(-50%);background:#C4726A;color:#fff;padding:12px 20px;border-radius:50px;font-size:13px;font-weight:600;z-index:9999";
-  t.textContent = "🔥 Serie : " + cur + " jour" + (cur>1?"s":"") + " !";
-  document.body.appendChild(t);
-  setTimeout(function(){t.remove();}, 3000);
+
+  // ── Toast de punition si streak cassé ──
+  if (wasBroken && lostStreak >= 3) {
+    var punishMsg = isEN
+      ? '💔 Your ' + lostStreak + '-day streak was lost. Starting over at 1!'
+      : '💔 Ta série de ' + lostStreak + ' jours cassée. On repart de 1 !';
+    showToast(punishMsg, { type: 'warning', duration: 4000 });
+    setTimeout(function() { _showStreakCelebration(cur, isEN); }, 500);
+  } else {
+    _showStreakCelebration(cur, isEN);
+  }
   renderDashboard();
+}
+
+function _checkStreakBreak() {
+  // Appelée au chargement — vérifie si le streak a été cassé (2+ jours sans valider)
+  var data = getDashData();
+  var isEN = LANG === 'en';
+  var last = data.streakLastDate || null;
+  if (!last) return;
+  var cur = data.streak && typeof data.streak==="object" ? (data.streak.current||0) : (data.streak||0);
+  if (cur === 0) return;
+  var todayISO = new Date().toISOString().split("T")[0];
+  var yesterday = new Date(); yesterday.setDate(yesterday.getDate()-1);
+  var yestISO = yesterday.toISOString().split("T")[0];
+  // Si le dernier check n'est ni aujourd'hui ni hier → streak cassé
+  if (last !== todayISO && last !== yestISO) {
+    data.streak = { current: 0 };
+    saveDashData(data);
+    // Afficher une bannière de streak cassé dans le dashboard
+    window._streakWasBroken = cur;
+  }
+}
+
+function _showStreakCelebration(cur, isEN) {
+  var msg = cur === 1
+    ? (isEN ? '🌱 Day 1 — Great start!' : '🌱 Jour 1 — Belle mise en route !')
+    : cur < 7
+      ? (isEN ? '🔥 ' + cur + ' days in a row!' : '🔥 ' + cur + ' jours de suite !')
+      : cur < 30
+        ? (isEN ? '🔥🔥 ' + cur + ' days! You\'re on fire!' : '🔥🔥 ' + cur + ' jours ! Tu cartonnes !')
+        : (isEN ? '💎 ' + cur + ' days! Absolutely legendary!' : '💎 ' + cur + ' jours ! Tu es une légende !');
+
+  // Confetti animé
+  var overlay = document.createElement('div');
+  overlay.style.cssText = 'position:fixed;inset:0;pointer-events:none;z-index:99999';
+  var colors = ['#C4726A','#FFB871','#F5D0C8','#3D2B1F','#fff'];
+  for (var i = 0; i < 40; i++) {
+    var dot = document.createElement('div');
+    var color = colors[Math.floor(Math.random()*colors.length)];
+    var size = Math.random()*10+5;
+    var x = Math.random()*100;
+    var delay = Math.random()*0.8;
+    var duration = Math.random()*1.5+1;
+    dot.style.cssText = 'position:absolute;top:-20px;left:'+x+'%;width:'+size+'px;height:'+size+'px;border-radius:50%;background:'+color+';animation:confettiFall '+duration+'s ease-in '+delay+'s forwards';
+    overlay.appendChild(dot);
+  }
+  if (!document.getElementById('confetti-style')) {
+    var style = document.createElement('style');
+    style.id = 'confetti-style';
+    style.textContent = '@keyframes confettiFall{to{top:110%;opacity:0;transform:rotate(720deg)}}';
+    document.head.appendChild(style);
+  }
+  document.body.appendChild(overlay);
+  setTimeout(function(){ overlay.remove(); }, 3000);
+
+  showToast(msg, { type: 'success', duration: 3500 });
+}
+
+function _getStreakExpiryHours() {
+  // Retourne le nombre d'heures avant expiration du streak (ou null si déjà validé)
+  var data = getDashData();
+  var last = data.streakLastDate || null;
+  var cur = data.streak && typeof data.streak==="object" ? (data.streak.current||0) : (data.streak||0);
+  if (cur === 0 || !last) return null;
+  var todayISO = new Date().toISOString().split("T")[0];
+  if (last === todayISO) return null; // déjà validé
+
+  // Le streak expire à minuit
+  var now = new Date();
+  var midnight = new Date();
+  midnight.setHours(23, 59, 59, 999);
+  var hoursLeft = Math.ceil((midnight - now) / 3600000);
+  return hoursLeft <= 6 ? hoursLeft : null; // alerte seulement si < 6h
 }
 
 function cancelChallenge(id) {
