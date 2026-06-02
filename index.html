@@ -704,6 +704,53 @@ h2{font-family:var(--serif);font-size:20px;font-weight:700;margin-bottom:3px}
 </div>
 
 
+<!-- ══ ONBOARDING 3 SLIDES (s'affiche tant que pas de compte) ══ -->
+<div id="sc-onboarding" class="hidden">
+  <div style="min-height:100%;display:flex;flex-direction:column;background:linear-gradient(160deg,#FBF7F4 0%,#F5E1DC 100%);position:relative;overflow:hidden">
+    <!-- Cercles décoratifs -->
+    <div style="position:absolute;top:-60px;right:-60px;width:220px;height:220px;border-radius:50%;background:rgba(196,114,106,.08)"></div>
+    <div style="position:absolute;bottom:-40px;left:-40px;width:160px;height:160px;border-radius:50%;background:rgba(255,184,113,.10)"></div>
+
+    <!-- Header : Passer + indicateurs slides -->
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:18px 22px;position:relative;z-index:2">
+      <div style="display:flex;gap:6px" id="ob-dots">
+        <span class="ob-dot ob-dot-active" style="width:24px;height:6px;border-radius:50px;background:#C4726A;transition:all .3s"></span>
+        <span class="ob-dot" style="width:6px;height:6px;border-radius:50%;background:rgba(196,114,106,.3);transition:all .3s"></span>
+        <span class="ob-dot" style="width:6px;height:6px;border-radius:50%;background:rgba(196,114,106,.3);transition:all .3s"></span>
+      </div>
+      <button onclick="finishOnboarding()" style="background:transparent;border:none;color:#8B6F5E;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit" id="ob-skip">Passer</button>
+    </div>
+
+    <!-- Contenu principal -->
+    <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px 28px;position:relative;z-index:2;text-align:center">
+      <!-- Emoji hero -->
+      <div id="ob-icon" style="font-size:84px;margin-bottom:32px;animation:obPop .5s ease forwards">🎯</div>
+      <!-- Titre -->
+      <h1 id="ob-title" style="font-family:Georgia,serif;font-size:28px;font-weight:700;color:#3D2B1F;margin:0 0 16px;line-height:1.2">Diagnostic en 60 secondes</h1>
+      <!-- Description -->
+      <p id="ob-desc" style="font-size:15px;color:#8B6F5E;line-height:1.5;margin:0;max-width:320px">Réponds à 5 questions simples et reçois ta routine personnalisée en moins d'une minute.</p>
+    </div>
+
+    <!-- Footer : boutons -->
+    <div style="padding:20px 22px 34px;position:relative;z-index:2;display:flex;gap:12px;align-items:center">
+      <button id="ob-prev" onclick="onboardingPrev()" style="display:none;background:#fff;border:1.5px solid #E8DFD8;color:#3D2B1F;padding:14px 22px;border-radius:50px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit">←</button>
+      <button id="ob-next" onclick="onboardingNext()" style="flex:1;background:linear-gradient(135deg,#C4726A,#A85A52);color:#fff;border:none;padding:16px;border-radius:50px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;box-shadow:0 6px 20px rgba(196,114,106,.3)">Suivant →</button>
+    </div>
+  </div>
+</div>
+
+<style>
+@keyframes obPop {
+  0%{opacity:0;transform:scale(.5)}
+  60%{transform:scale(1.1)}
+  100%{opacity:1;transform:scale(1)}
+}
+@keyframes obFadeUp {
+  from{opacity:0;transform:translateY(15px)}
+  to{opacity:1;transform:translateY(0)}
+}
+</style>
+
 <!-- ══ WELCOME ══ -->
 <div id="sc-welcome" class="hidden">
   <div class="topbar">
@@ -2494,7 +2541,7 @@ function getRegionProducts() {
   return available;
 }
 
-const SCREENS=["lang","welcome","register","login","scan","q1","diag","q2","q3","q4","q5","result","compare","suivi","dashboard","scan-product","profile","articles","settings","parrainage","abonnement","privacy","cgu","mentions"];
+const SCREENS=["lang","onboarding","welcome","register","login","scan","q1","diag","q2","q3","q4","q5","result","compare","suivi","dashboard","scan-product","profile","articles","settings","parrainage","abonnement","privacy","cgu","mentions"];
 
 const ST={
   screen:'lang',user:null,
@@ -2570,7 +2617,7 @@ function setLang(l){
   try {
     LANG = l;
     localStorage.setItem('skinmatch_lang', l);
-    // Cacher sc-lang explicitement (au cas où)
+    // Cacher sc-lang explicitement
     var langScreen = document.getElementById('sc-lang');
     if (langScreen) langScreen.classList.add('hidden');
     // Auto-accept cookies (pour ne pas bloquer les nouveaux users)
@@ -2580,18 +2627,124 @@ function setLang(l){
     var cb = document.getElementById('cookie-banner');
     if (cb) cb.style.display = 'none';
     if (typeof initQuestions === 'function') initQuestions();
-    go('welcome');
-    setTimeout(function(){ if (typeof applyWelcomeLang === 'function') applyWelcomeLang(); }, 50);
-    // Afficher la modale région après 300ms
-    setTimeout(function(){ if (typeof showRegionModal === 'function') showRegionModal(); }, 300);
+    // Onboarding : si pas de compte connecté, on affiche les 3 slides
+    if (!window._currentUser) {
+      startOnboarding();
+    } else {
+      go('welcome');
+      setTimeout(function(){ if (typeof applyWelcomeLang === 'function') applyWelcomeLang(); }, 50);
+      setTimeout(function(){ if (typeof showRegionModal === 'function') showRegionModal(); }, 300);
+    }
   } catch(e) {
-    // Si erreur, au moins forcer welcome visible
     console.error('setLang error:', e);
     var allScreens = document.querySelectorAll('[id^="sc-"]');
     allScreens.forEach(function(s){ s.classList.add('hidden'); });
     var welcome = document.getElementById('sc-welcome');
     if (welcome) welcome.classList.remove('hidden');
   }
+}
+
+// ════════════ ONBOARDING 3 SLIDES ════════════
+var _obSlide = 0;
+var _OB_SLIDES_FR = [
+  { ic: "🎯", title: "Diagnostic en 60 secondes", desc: "Réponds à 5 questions simples et reçois ta routine personnalisée en moins d'une minute." },
+  { ic: "💎", title: "Une routine sur-mesure", desc: "On analyse 175+ produits pour sélectionner ceux qui matchent ton type de peau, ton âge et ton budget." },
+  { ic: "📈", title: "Suivi & progression", desc: "Photo hebdo, journal de peau, score qui évolue. Vois ta peau changer semaine après semaine." }
+];
+var _OB_SLIDES_EN = [
+  { ic: "🎯", title: "Diagnosis in 60 seconds", desc: "Answer 5 simple questions and get your personalized routine in less than a minute." },
+  { ic: "💎", title: "A tailored routine", desc: "We analyze 175+ products to select those that match your skin type, age and budget." },
+  { ic: "📈", title: "Tracking & progress", desc: "Weekly photos, skin journal, evolving score. Watch your skin change week after week." }
+];
+
+function startOnboarding() {
+  _obSlide = 0;
+  go('onboarding');
+  renderOnboardingSlide();
+}
+
+function renderOnboardingSlide() {
+  var isEN = LANG === 'en';
+  var slides = isEN ? _OB_SLIDES_EN : _OB_SLIDES_FR;
+  var s = slides[_obSlide];
+  if (!s) return;
+
+  var ic = document.getElementById('ob-icon');
+  var title = document.getElementById('ob-title');
+  var desc = document.getElementById('ob-desc');
+  var nextBtn = document.getElementById('ob-next');
+  var prevBtn = document.getElementById('ob-prev');
+  var skipBtn = document.getElementById('ob-skip');
+  var dots = document.querySelectorAll('#ob-dots .ob-dot');
+
+  if (ic) {
+    ic.style.animation = 'none';
+    void ic.offsetWidth;
+    ic.textContent = s.ic;
+    ic.style.animation = 'obPop .5s ease forwards';
+  }
+  if (title) {
+    title.style.animation = 'none';
+    void title.offsetWidth;
+    title.textContent = s.title;
+    title.style.animation = 'obFadeUp .5s ease .15s forwards';
+    title.style.opacity = '0';
+  }
+  if (desc) {
+    desc.style.animation = 'none';
+    void desc.offsetWidth;
+    desc.textContent = s.desc;
+    desc.style.animation = 'obFadeUp .5s ease .25s forwards';
+    desc.style.opacity = '0';
+  }
+  // Mise à jour des dots
+  dots.forEach(function(d, i) {
+    if (i === _obSlide) {
+      d.style.width = '24px';
+      d.style.height = '6px';
+      d.style.borderRadius = '50px';
+      d.style.background = '#C4726A';
+    } else {
+      d.style.width = '6px';
+      d.style.height = '6px';
+      d.style.borderRadius = '50%';
+      d.style.background = 'rgba(196,114,106,.3)';
+    }
+  });
+  // Bouton précédent visible à partir du slide 2
+  if (prevBtn) prevBtn.style.display = _obSlide === 0 ? 'none' : 'flex';
+  // Texte du bouton Suivant change au dernier slide
+  if (nextBtn) {
+    if (_obSlide === slides.length - 1) {
+      nextBtn.textContent = isEN ? "Let's go →" : "C'est parti →";
+    } else {
+      nextBtn.textContent = isEN ? "Next →" : "Suivant →";
+    }
+  }
+  if (skipBtn) skipBtn.textContent = isEN ? "Skip" : "Passer";
+}
+
+function onboardingNext() {
+  var slides = LANG === 'en' ? _OB_SLIDES_EN : _OB_SLIDES_FR;
+  if (_obSlide < slides.length - 1) {
+    _obSlide++;
+    renderOnboardingSlide();
+  } else {
+    finishOnboarding();
+  }
+}
+
+function onboardingPrev() {
+  if (_obSlide > 0) {
+    _obSlide--;
+    renderOnboardingSlide();
+  }
+}
+
+function finishOnboarding() {
+  go('welcome');
+  setTimeout(function(){ if (typeof applyWelcomeLang === 'function') applyWelcomeLang(); }, 50);
+  setTimeout(function(){ if (typeof showRegionModal === 'function') showRegionModal(); }, 300);
 }
 
 // ─── AUTH ─────────────────────────────────────────────────────────────────────
@@ -9629,8 +9782,14 @@ function _checkSharedRoutine() {
 var _firebaseWait = setTimeout(function() {
   if (_savedLang && _savedRegion) {
     LANG = _savedLang; REGION = _savedRegion;
-    initQuestions(); go('welcome'); updateNav('welcome');
-    setTimeout(applyWelcomeLang, 50);
+    initQuestions();
+    // Si pas de compte, on affiche les slides d'onboarding
+    if (!window._currentUser) {
+      startOnboarding();
+    } else {
+      go('welcome'); updateNav('welcome');
+      setTimeout(applyWelcomeLang, 50);
+    }
   } else { go('lang'); }
   _hideSplash();
 }, 2500);
@@ -9653,8 +9812,9 @@ window._onAuthResolved = function(user) {
   } else {
     if (_savedLang && _savedRegion) {
       LANG = _savedLang; REGION = _savedRegion;
-      initQuestions(); go('welcome'); updateNav('welcome');
-      setTimeout(applyWelcomeLang, 50);
+      initQuestions();
+      // Pas de user → onboarding slides
+      startOnboarding();
     } else { go('lang'); }
     _hideSplash();
   }
