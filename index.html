@@ -72,6 +72,7 @@
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
   import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signInWithPopup, signInWithRedirect, getRedirectResult, GoogleAuthProvider, onAuthStateChanged, signOut, updateProfile, sendEmailVerification, sendPasswordResetEmail, deleteUser, reauthenticateWithCredential, EmailAuthProvider } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
   import { getFirestore, doc, setDoc, getDoc, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+  import { getAnalytics, logEvent, setUserId, setUserProperties } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-analytics.js";
 
   const firebaseConfig = {
     apiKey: "AIzaSyBMWoVUUrj2R5FywcCl34z9ooFTI9ZMAE4",
@@ -87,11 +88,34 @@
   const auth = getAuth(app);
   const db = getFirestore(app);
   const googleProvider = new GoogleAuthProvider();
+  // Analytics — initialisé seulement si compatible (pas de erreur sur old browsers ou iframes)
+  let analytics = null;
+  try {
+    analytics = getAnalytics(app);
+  } catch(e) {
+    console.warn('Analytics non initialisé:', e.message);
+  }
 
   // Exposer globalement pour les fonctions existantes
   window._auth = auth;
   window._db = db;
   window._googleProvider = googleProvider;
+  window._analytics = analytics;
+  window._logEvent = (name, params) => {
+    if (analytics) {
+      try { logEvent(analytics, name, params || {}); } catch(e) {}
+    }
+  };
+  window._setUserId = (uid) => {
+    if (analytics && uid) {
+      try { setUserId(analytics, uid); } catch(e) {}
+    }
+  };
+  window._setUserProps = (props) => {
+    if (analytics && props) {
+      try { setUserProperties(analytics, props); } catch(e) {}
+    }
+  };
   window._createUserWithEmailAndPassword = createUserWithEmailAndPassword;
   window._signInWithEmailAndPassword = signInWithEmailAndPassword;
   window._signInWithPopup = signInWithPopup;
@@ -120,6 +144,9 @@
   onAuthStateChanged(auth, (user) => {
     window._currentUser = user;
     if (user) {
+      // Analytics : associer l'utilisateur
+      if (window._setUserId) window._setUserId(user.uid);
+      if (window._logEvent) window._logEvent('login', { method: user.providerData?.[0]?.providerId || 'unknown' });
       // Charger profil Firestore
       getDoc(doc(db, 'users', user.uid)).then(snap => {
         if (snap.exists()) {
@@ -949,7 +976,7 @@ h2{font-family:var(--serif);font-size:20px;font-weight:700;margin-bottom:3px}
     </div>
 
     <!-- Bouton analyser -->
-    <button id="scan-btn" class="btn-p" disabled onclick="analyzeSkin()" style="margin-bottom:12px" id="scan-btn">
+    <button id="scan-btn" class="btn-p" disabled onclick="analyzeSkin()" style="margin-bottom:12px">
       <span id="scan-btn-text">Analyser ma peau</span>
     </button>
 
@@ -2613,10 +2640,19 @@ function go(screen){
   if (typeof updateNav === 'function') updateNav(screen);
 }
 
+// ════════════ ANALYTICS HELPER ════════════
+// Track événements clés. Wrapper sécurisé : ne fait rien si analytics pas dispo.
+function track(eventName, params) {
+  try {
+    if (window._logEvent) window._logEvent(eventName, params || {});
+  } catch(e) { /* silencieux en prod */ }
+}
+
 function setLang(l){
   try {
     LANG = l;
     localStorage.setItem('skinmatch_lang', l);
+    track('lang_selected', { lang: l });
     // Cacher sc-lang explicitement
     var langScreen = document.getElementById('sc-lang');
     if (langScreen) langScreen.classList.add('hidden');
@@ -2742,6 +2778,7 @@ function onboardingPrev() {
 }
 
 function finishOnboarding() {
+  track('onboarding_finished', { slide_reached: _obSlide + 1 });
   go('welcome');
   setTimeout(function(){ if (typeof applyWelcomeLang === 'function') applyWelcomeLang(); }, 50);
   setTimeout(function(){ if (typeof showRegionModal === 'function') showRegionModal(); }, 300);
@@ -3814,6 +3851,15 @@ function doGenerate(){
   setTimeout(function() {
     ST.result=build();
     ST.showShare=false;
+    // Analytics : diagnostic complet
+    track('diagnostic_completed', {
+      skin_type: ST.skinType,
+      age_group: ST.ageGroup,
+      concerns: (ST.concerns||[]).join(','),
+      budget: ST.budget,
+      routine: ST.routine,
+      products_count: (ST.result.steps||[]).length
+    });
     // Animation de bienvenue personnalisée avant d'afficher la routine
     showRoutineWelcome(function(){
       renderResult();
@@ -3849,13 +3895,13 @@ function showRoutineWelcome(callback){
 
   // Calcul des chiffres réels à afficher
   var totalProducts = 175; // ton catalogue
-  var matchCount = (ST.result && ST.result.products) ? ST.result.products.length : 4;
+  var matchCount = (ST.result && ST.result.steps) ? ST.result.steps.length : 4;
   // Score de compatibilité moyen depuis les produits sélectionnés
   var avgScore = 87;
-  if (ST.result && ST.result.products && ST.result.products.length) {
+  if (ST.result && ST.result.steps && ST.result.steps.length) {
     var sum = 0, cnt = 0;
-    ST.result.products.forEach(function(pr){
-      if (typeof pr.score === 'number') { sum += pr.score; cnt++; }
+    ST.result.steps.forEach(function(pr){
+      if (typeof pr.compat === 'number') { sum += pr.compat; cnt++; }
     });
     if (cnt > 0) avgScore = Math.round(sum / cnt);
     if (avgScore < 80) avgScore = 85 + Math.floor(Math.random()*8); // jolifie
@@ -4468,6 +4514,7 @@ function toggleYuka(id){
 }
 function openModal(key){
   const p=DB[key];if(!p)return;
+  track('product_viewed', { key: key, marque: p.marque || '', prix: p.prix || '' });
   const src=IMGS[key]||"";
   const init=(p.marque||"").split(" ").map(w=>w[0]).join("").slice(0,2).toUpperCase();
   const fallbackImg=`<div class="pif"><div class="bi" style="font-size:32px">${init}</div><div class="bn" style="font-size:11px">${p.marque}</div></div>`;
@@ -9137,10 +9184,12 @@ function toggleFavorite(key) {
   if (idx === -1) {
     favs.push(key);
     localStorage.setItem('sm_favorites', JSON.stringify(favs));
+    track('product_favorited', { key: key });
     if (typeof showToast === 'function') showToast(isEN ? '❤️ Added to favorites' : '❤️ Ajouté aux favoris', { type: 'success' });
   } else {
     favs.splice(idx, 1);
     localStorage.setItem('sm_favorites', JSON.stringify(favs));
+    track('product_unfavorited', { key: key });
     if (typeof showToast === 'function') showToast(isEN ? 'Removed from favorites' : 'Retiré des favoris', { type: 'info' });
   }
   // Refresh button if modal open
@@ -9316,6 +9365,7 @@ function copyReferralCode() {
 
 function shareReferralLink() {
   var code = getReferralCode();
+  track('referral_shared', { code: code });
   var isEN = LANG === 'en';
   var url = 'https://mohamedhambli-oss.github.io/skinnmatch/?ref=' + code;
   var text = isEN
@@ -9452,6 +9502,7 @@ function _featLine(type, htmlText, isDark) {
 
 function selectTier(tier) {
   var isEN = LANG === 'en';
+  track('tier_clicked', { tier: tier });
   // POUR L'INSTANT : juste un toast d'info, le vrai paiement viendra après (Stripe/RevenueCat)
   if (typeof showToast === 'function') {
     if (tier === 'gratuit') {
@@ -9553,9 +9604,90 @@ function changeNotifTime(type) {
   setTimeout(function(){t.remove();}, 2500);
 }
 
+// ════════════ MESSAGES DE NOTIFICATIONS VARIÉS ════════════
+// Au lieu d'envoyer toujours le même message, on alterne pour générer de la curiosité.
+var _NOTIF_MORNING = {
+  fr: [
+    { emoji: '🌅', body: 'Ta routine du matin t\'attend. Allez, 60 secondes !' },
+    { emoji: '☀️', body: 'Hello ! N\'oublie pas le SPF aujourd\'hui ☀️' },
+    { emoji: '✨', body: 'Une belle peau commence le matin. C\'est parti.' },
+    { emoji: '💧', body: 'Hydratation > tout. Ta routine matin t\'attend.' },
+    { emoji: '🎯', body: 'J+{streak}. Continue ton streak.' },
+    { emoji: '🌸', body: 'Ta peau te dit merci d\'avance. Routine du matin !' }
+  ],
+  en: [
+    { emoji: '🌅', body: 'Your morning routine is waiting. 60 seconds, let\'s go!' },
+    { emoji: '☀️', body: 'Hey! Don\'t skip your SPF today ☀️' },
+    { emoji: '✨', body: 'Great skin starts in the morning. Let\'s do this.' },
+    { emoji: '💧', body: 'Hydration > everything. Your AM routine awaits.' },
+    { emoji: '🎯', body: 'Day {streak}. Keep your streak going.' },
+    { emoji: '🌸', body: 'Your skin thanks you in advance. Morning routine!' }
+  ]
+};
+var _NOTIF_EVENING = {
+  fr: [
+    { emoji: '🌙', body: 'Démaquillage + sérum + crème. La routine du soir !' },
+    { emoji: '✨', body: 'C\'est l\'heure du soin du soir. Détends-toi.' },
+    { emoji: '💆', body: '5 min pour ta peau. Tu mérites cette pause.' },
+    { emoji: '🌿', body: 'Routine du soir : un petit rituel, un grand résultat.' },
+    { emoji: '🔥', body: 'Streak J+{streak}. On ne lâche rien.' }
+  ],
+  en: [
+    { emoji: '🌙', body: 'Cleanse + serum + cream. Time for your PM routine!' },
+    { emoji: '✨', body: 'Evening skincare time. Take a moment for yourself.' },
+    { emoji: '💆', body: '5 min for your skin. You deserve this break.' },
+    { emoji: '🌿', body: 'PM routine: tiny ritual, huge results.' },
+    { emoji: '🔥', body: 'Streak day {streak}. Keep going!' }
+  ]
+};
+// Notif "événement" en milieu de journée — du contenu, pas un rappel
+var _NOTIF_EVENT = {
+  fr: [
+    { emoji: '💡', title: 'Astuce du jour', body: 'Le SPF se réapplique toutes les 2h en extérieur. Beaucoup l\'oublient !' },
+    { emoji: '🔬', title: 'Le savais-tu ?', body: 'Mélanger rétinol et vitamine C peut irriter ta peau. À séparer matin/soir.' },
+    { emoji: '🎁', title: 'Bonus parrainage', body: 'Invite 1 amie cette semaine = 1 mois Premium gratuit ✨' },
+    { emoji: '📊', title: 'Ta progression', body: 'Tu suis ta routine depuis {streak} jours. Belle régularité !' },
+    { emoji: '🆕', title: 'Nouvel article', body: 'On vient de publier un article sur la niacinamide. À lire dans Conseils !' },
+    { emoji: '⭐', title: 'Top du moment', body: 'Le sérum vitamine C est le plus aimé de la semaine. À découvrir.' },
+    { emoji: '🌟', title: 'Communauté', body: '127 personnes ont commencé une routine cette semaine. Tu fais partie du mouvement.' },
+    { emoji: '📷', title: 'Suivi photo', body: 'Pris ta photo de la semaine ? Compare ton avant/après dans Mon espace.' }
+  ],
+  en: [
+    { emoji: '💡', title: 'Tip of the day', body: 'SPF needs reapplying every 2h outdoors. Most people forget!' },
+    { emoji: '🔬', title: 'Did you know?', body: 'Mixing retinol and vitamin C can irritate your skin. Use them at different times.' },
+    { emoji: '🎁', title: 'Referral bonus', body: 'Invite 1 friend this week = 1 month Premium free ✨' },
+    { emoji: '📊', title: 'Your progress', body: 'You\'ve followed your routine for {streak} days. Great work!' },
+    { emoji: '🆕', title: 'New article', body: 'We just published a niacinamide deep-dive. Check Articles!' },
+    { emoji: '⭐', title: 'Trending now', body: 'Vitamin C serum is the most-loved product this week. Take a look.' },
+    { emoji: '🌟', title: 'Community', body: '127 people started a routine this week. You\'re part of the movement.' },
+    { emoji: '📷', title: 'Photo tracking', body: 'Did you take your weekly photo? Compare your before/after in My space.' }
+  ]
+};
+
+// Renvoie un message du jour, basé sur la date (déterministe : même jour = même message)
+function _getDailyMessage(pool, lang) {
+  var arr = pool[lang || 'fr'] || pool.fr;
+  var today = new Date();
+  var dayIndex = Math.floor(today.getTime() / 86400000); // jour absolu depuis epoch
+  return arr[dayIndex % arr.length];
+}
+
+// Construit le corps avec interpolation du streak si besoin
+function _fillBody(msg) {
+  var streak = 0;
+  try {
+    var d = typeof loadData === 'function' ? loadData() : null;
+    if (d && d.streak) {
+      streak = (typeof d.streak === 'object') ? (d.streak.current || 0) : d.streak;
+    }
+  } catch(e) {}
+  return msg.replace('{streak}', streak);
+}
+
 function requestNotifPermission() {
   if (!('Notification' in window)) return;
   Notification.requestPermission().then(function(perm) {
+    track('notif_permission', { granted: perm === 'granted' });
     if (perm === 'granted') {
       scheduleRoutineReminders();
       var wrap = document.getElementById('notif-btn-wrap');
@@ -9564,52 +9696,57 @@ function requestNotifPermission() {
   });
 }
 
+// ════════ Programmation des 3 notifications quotidiennes ════════
+// Matin 8h (rappel routine, message varié)
+// Midi 14h (notif événement type curiosité, contenu différent chaque jour)
+// Soir 21h (rappel routine soir, message varié)
 function scheduleRoutineReminders() {
-  // Notification matin 8h
+  _scheduleDailyNotif(8, 0, function() {
+    var msg = _getDailyMessage(_NOTIF_MORNING, LANG);
+    return { title: 'SkinMatch ' + msg.emoji, body: _fillBody(msg.body) };
+  });
+  _scheduleDailyNotif(14, 0, function() {
+    var msg = _getDailyMessage(_NOTIF_EVENT, LANG);
+    return { title: msg.emoji + ' ' + msg.title, body: _fillBody(msg.body) };
+  });
+  _scheduleDailyNotif(21, 0, function() {
+    var msg = _getDailyMessage(_NOTIF_EVENING, LANG);
+    return { title: 'SkinMatch ' + msg.emoji, body: _fillBody(msg.body) };
+  });
+}
+
+// Helper : programme une notif quotidienne à hh:mm
+function _scheduleDailyNotif(hh, mm, buildMsgFn) {
   var now = new Date();
-  var morning = new Date(now);
-  morning.setHours(8, 0, 0, 0);
-  if (morning <= now) morning.setDate(morning.getDate() + 1);
-  var msUntilMorning = morning - now;
+  var target = new Date(now);
+  target.setHours(hh, mm, 0, 0);
+  if (target <= now) target.setDate(target.getDate() + 1);
+  var msUntil = target - now;
   setTimeout(function() {
     if (Notification.permission === 'granted') {
-      new Notification('SkinMatch 🌅', {
-        body: LANG === 'en' ? 'Time for your morning skincare routine!' : 'Il est temps pour ta routine soin du matin !',
-        icon: '/skinnmatch/icon-192.png',
-        badge: '/skinnmatch/icon-192.png'
-      });
+      try {
+        var m = buildMsgFn();
+        new Notification(m.title, {
+          body: m.body,
+          icon: '/skinnmatch/icon-192.png',
+          badge: '/skinnmatch/icon-192.png',
+          tag: 'sm-daily-' + hh
+        });
+      } catch(e) {}
     }
     setInterval(function() {
       if (Notification.permission === 'granted') {
-        new Notification('SkinMatch 🌅', {
-          body: LANG === 'en' ? 'Time for your morning skincare routine!' : 'Il est temps pour ta routine soin du matin !',
-          icon: '/skinnmatch/icon-192.png'
-        });
+        try {
+          var m = buildMsgFn();
+          new Notification(m.title, {
+            body: m.body,
+            icon: '/skinnmatch/icon-192.png',
+            tag: 'sm-daily-' + hh
+          });
+        } catch(e) {}
       }
     }, 24 * 60 * 60 * 1000);
-  }, msUntilMorning);
-  
-  // Notification soir 21h
-  var evening = new Date(now);
-  evening.setHours(21, 0, 0, 0);
-  if (evening <= now) evening.setDate(evening.getDate() + 1);
-  var msUntilEvening = evening - now;
-  setTimeout(function() {
-    if (Notification.permission === 'granted') {
-      new Notification('SkinMatch 🌙', {
-        body: LANG === "en" ? "Don't forget your evening skincare routine!" : "N'oublie pas ta routine soin du soir !",
-        icon: '/skinnmatch/icon-192.png'
-      });
-    }
-    setInterval(function() {
-      if (Notification.permission === 'granted') {
-        new Notification('SkinMatch 🌙', {
-          body: LANG === "en" ? "Don't forget your evening skincare routine!" : "N'oublie pas ta routine soin du soir !",
-          icon: '/skinnmatch/icon-192.png'
-        });
-      }
-    }, 24 * 60 * 60 * 1000);
-  }, msUntilEvening);
+  }, msUntil);
 }
 
 // ══ FEEDBACK PRODUIT ══
@@ -9833,7 +9970,7 @@ initQuestions();
     </div>
     <div id="why-loading" style="text-align:center;padding:32px;display:none">
       <div style="width:40px;height:40px;border:3px solid #F2C4BC;border-top-color:#C4726A;border-radius:50%;animation:spin 1s linear infinite;margin:0 auto 14px"></div>
-      <div style="font-size:13px;color:#B0958F"><span id="scan-analyzing-text">Analyse en cours...</span></div>
+      <div style="font-size:13px;color:#B0958F"><span id="why-analyzing-text">Analyse en cours...</span></div>
     </div>
     <div id="why-content" style="font-size:14px;line-height:1.75;color:#3D2B1F"></div>
     <button onclick="closeWhyModal()" style="width:100%;margin-top:20px;padding:13px;border-radius:50px;border:none;background:#C4726A;color:#fff;font-size:14px;font-weight:700;cursor:pointer;font-family:'Outfit',sans-serif">Fermer</button>
@@ -10243,7 +10380,42 @@ function openPhotoTracker() {
   } else {
     // Afficher les photos en mosaïque, plus récente en premier
     photos.sort(function(a, b) { return b.date - a.date; });
-    var gridHTML = '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px">';
+
+    // ── SLIDER AVANT/APRÈS (si 2+ photos) ──
+    var sliderHTML = '';
+    if (photos.length >= 2) {
+      var firstPhoto = photos[photos.length - 1]; // plus ancienne
+      var lastPhoto = photos[0]; // plus récente
+      var dateFirst = new Date(firstPhoto.date).toLocaleDateString(isEN?'en-US':'fr-FR', {day:'numeric', month:'short'});
+      var dateLast = new Date(lastPhoto.date).toLocaleDateString(isEN?'en-US':'fr-FR', {day:'numeric', month:'short'});
+
+      sliderHTML =
+        '<div style="background:linear-gradient(135deg,#FBF0ED,#F5E1DC);border-radius:18px;padding:16px;margin-bottom:16px">' +
+          '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">' +
+            '<div style="font-size:10px;font-weight:700;color:#C4726A;text-transform:uppercase;letter-spacing:1.5px">✨ ' + (isEN?'BEFORE / AFTER':'AVANT / APRÈS') + '</div>' +
+            '<button onclick="shareBeforeAfter()" style="background:#C4726A;color:#fff;border:none;padding:6px 12px;border-radius:50px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit">📤 ' + (isEN?'Share':'Partager') + '</button>' +
+          '</div>' +
+          // Container du slider
+          '<div id="ba-slider" style="position:relative;width:100%;aspect-ratio:1;border-radius:14px;overflow:hidden;cursor:ew-resize;user-select:none;touch-action:none">' +
+            // Image après (en arrière-plan = pleine largeur)
+            '<img src="' + lastPhoto.data + '" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;pointer-events:none" alt="After" />' +
+            // Image avant (clipée selon la position du slider)
+            '<div id="ba-before-wrap" style="position:absolute;inset:0;width:50%;overflow:hidden;pointer-events:none">' +
+              '<img src="' + firstPhoto.data + '" id="ba-before-img" style="position:absolute;top:0;left:0;width:200%;max-width:none;height:100%;object-fit:cover;display:block" alt="Before" />' +
+            '</div>' +
+            // Labels
+            '<div style="position:absolute;top:10px;left:10px;background:rgba(0,0,0,.55);color:#fff;padding:4px 10px;border-radius:50px;font-size:10px;font-weight:700;letter-spacing:1px">' + (isEN?'BEFORE':'AVANT') + ' · ' + dateFirst + '</div>' +
+            '<div style="position:absolute;top:10px;right:10px;background:rgba(0,0,0,.55);color:#fff;padding:4px 10px;border-radius:50px;font-size:10px;font-weight:700;letter-spacing:1px">' + (isEN?'AFTER':'APRÈS') + ' · ' + dateLast + '</div>' +
+            // Handle / poignée
+            '<div id="ba-handle" style="position:absolute;top:0;bottom:0;left:50%;width:3px;background:#fff;transform:translateX(-50%);box-shadow:0 0 12px rgba(0,0,0,.4);pointer-events:none">' +
+              '<div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:42px;height:42px;background:#fff;border-radius:50%;box-shadow:0 4px 16px rgba(0,0,0,.3);display:flex;align-items:center;justify-content:center;font-size:18px;color:#C4726A;font-weight:700">⇄</div>' +
+            '</div>' +
+          '</div>' +
+          '<div style="text-align:center;font-size:11px;color:#8B6F5E;margin-top:10px;font-style:italic">' + (isEN?'Slide to compare':'Glisse pour comparer') + '</div>' +
+        '</div>';
+    }
+
+    var gridHTML = sliderHTML + '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px">';
     photos.forEach(function(p, i) {
       var dateStr = new Date(p.date).toLocaleDateString(isEN?'en-US':'fr-FR', {day:'numeric', month:'short'});
       var label = i === photos.length - 1 ? (isEN?'Start':'Début') : (i === 0 ? (isEN?'Now':'Aujourd\'hui') : (isEN?'Step ' + (photos.length - i):'Étape ' + (photos.length - i)));
@@ -10289,6 +10461,133 @@ function openPhotoTracker() {
 
   overlay.appendChild(modal);
   document.body.appendChild(overlay);
+
+  // ── Slider avant/après : interactivité (drag + touch) ──
+  setTimeout(function(){
+    var slider = document.getElementById('ba-slider');
+    if (!slider) return;
+    var beforeWrap = document.getElementById('ba-before-wrap');
+    var beforeImg = document.getElementById('ba-before-img');
+    var handle = document.getElementById('ba-handle');
+    var isDragging = false;
+    function getPctFromEvent(e) {
+      var rect = slider.getBoundingClientRect();
+      var x = e.touches ? e.touches[0].clientX : e.clientX;
+      return ((x - rect.left) / rect.width) * 100;
+    }
+    function updatePos(pct) {
+      pct = Math.max(0, Math.min(100, pct));
+      if (beforeWrap) beforeWrap.style.width = pct + '%';
+      if (beforeImg && pct > 0) {
+        beforeImg.style.width = (slider.offsetWidth / (pct/100)) + 'px';
+      }
+      if (handle) handle.style.left = pct + '%';
+    }
+    // Init au milieu
+    updatePos(50);
+    function onStart(e) { isDragging = true; updatePos(getPctFromEvent(e)); }
+    function onMove(e) {
+      if (!isDragging) return;
+      if (e.cancelable) e.preventDefault();
+      updatePos(getPctFromEvent(e));
+    }
+    function onEnd() { isDragging = false; }
+    slider.addEventListener('mousedown', onStart);
+    slider.addEventListener('touchstart', onStart, { passive: false });
+    document.addEventListener('mousemove', onMove);
+    document.addEventListener('touchmove', onMove, { passive: false });
+    document.addEventListener('mouseup', onEnd);
+    document.addEventListener('touchend', onEnd);
+  }, 100);
+}
+
+// ── Partage avant/après (génère une image PNG et déclenche partage natif) ──
+function shareBeforeAfter() {
+  var isEN = LANG === 'en';
+  var photos = _getPhotos();
+  if (photos.length < 2) {
+    if (typeof showToast === 'function') showToast(isEN ? 'Need at least 2 photos' : 'Il faut au moins 2 photos', { type: 'info' });
+    return;
+  }
+  track('before_after_shared');
+  photos.sort(function(a,b){ return b.date - a.date; });
+  var firstPhoto = photos[photos.length - 1];
+  var lastPhoto = photos[0];
+
+  // Générer une image canvas combinant avant/après - format story 9:16
+  var canvas = document.createElement('canvas');
+  canvas.width = 1080;
+  canvas.height = 1920;
+  var ctx = canvas.getContext('2d');
+
+  // Fond dégradé
+  var grad = ctx.createLinearGradient(0, 0, 0, 1920);
+  grad.addColorStop(0, '#FBF0ED');
+  grad.addColorStop(1, '#F5E1DC');
+  ctx.fillStyle = grad;
+  ctx.fillRect(0, 0, 1080, 1920);
+
+  // Titre
+  ctx.fillStyle = '#3D2B1F';
+  ctx.font = 'bold 60px Georgia, serif';
+  ctx.textAlign = 'center';
+  ctx.fillText(isEN ? 'My skin journey' : 'Mon évolution', 540, 180);
+
+  // Sous-titre : nombre de jours
+  ctx.fillStyle = '#8B6F5E';
+  ctx.font = '32px Arial, sans-serif';
+  var daysDiff = Math.round((lastPhoto.date - firstPhoto.date) / (1000*60*60*24));
+  ctx.fillText(daysDiff + ' ' + (isEN ? 'days of progress' : 'jours de progression'), 540, 240);
+
+  var loaded = 0;
+  var imgBefore = new Image();
+  var imgAfter = new Image();
+  function onLoad() {
+    loaded++;
+    if (loaded < 2) return;
+    ctx.drawImage(imgBefore, 60, 380, 480, 640);
+    ctx.drawImage(imgAfter, 540, 380, 480, 640);
+    // Labels
+    ctx.fillStyle = 'rgba(0,0,0,.6)';
+    ctx.fillRect(60, 380, 480, 60);
+    ctx.fillRect(540, 380, 480, 60);
+    ctx.fillStyle = '#fff';
+    ctx.font = 'bold 28px Arial';
+    ctx.textAlign = 'center';
+    ctx.fillText(isEN ? 'BEFORE' : 'AVANT', 300, 420);
+    ctx.fillText(isEN ? 'AFTER' : 'APRÈS', 780, 420);
+    // Logo
+    ctx.fillStyle = '#C4726A';
+    ctx.font = 'bold 56px Georgia, serif';
+    ctx.fillText('SkinMatch', 540, 1750);
+    ctx.fillStyle = '#8B6F5E';
+    ctx.font = '26px Arial';
+    ctx.fillText(isEN ? 'Your personal skincare coach' : 'Ton coach skincare personnel', 540, 1800);
+
+    canvas.toBlob(function(blob){
+      if (!blob) return;
+      var file = new File([blob], 'skinmatch-progress.png', { type: 'image/png' });
+      if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
+        navigator.share({
+          files: [file],
+          title: 'SkinMatch',
+          text: isEN ? 'My skin journey with SkinMatch ✨' : 'Mon évolution avec SkinMatch ✨'
+        }).catch(function(){});
+      } else {
+        var url = URL.createObjectURL(blob);
+        var a = document.createElement('a');
+        a.href = url;
+        a.download = 'skinmatch-progress.png';
+        a.click();
+        setTimeout(function(){ URL.revokeObjectURL(url); }, 1000);
+        if (typeof showToast === 'function') showToast(isEN ? 'Image downloaded!' : 'Image téléchargée !', { type: 'success' });
+      }
+    }, 'image/png');
+  }
+  imgBefore.onload = onLoad;
+  imgAfter.onload = onLoad;
+  imgBefore.src = firstPhoto.data;
+  imgAfter.src = lastPhoto.data;
 }
 
 function _captureNewPhoto() {
