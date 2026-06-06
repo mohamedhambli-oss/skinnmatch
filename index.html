@@ -2708,6 +2708,16 @@ function go(screen){
   if (typeof updateNav === 'function') updateNav(screen);
 }
 
+// Aller à la routine complète depuis le dashboard : on RECONSTRUIT le contenu
+// du résultat avant d'afficher l'écran (sinon page blanche car #result-content vide).
+function goToFullRoutine(){
+  try {
+    window._resultOrigin = 'dashboard';
+    if (typeof renderResult === 'function') renderResult();
+  } catch(e) { /* on navigue quand même */ }
+  go('result');
+}
+
 // ════════════ ANALYTICS HELPER ════════════
 // Track événements clés. Wrapper sécurisé : ne fait rien si analytics pas dispo.
 function track(eventName, params) {
@@ -3896,10 +3906,13 @@ function imgHtml(key,marque,size){
   var words = (marque||"").replace(/[^a-zA-Z ]/g,'').trim().split(" ");
   var init = words.length >= 2 && words[1] ? (words[0][0]+words[1][0]).toUpperCase() : (marque||"SK").substring(0,2).toUpperCase();
   var style = getBrandStyle(marque);
+  // Le fallback (initiales + marque) est TOUJOURS rendu en arrière-plan.
+  // Si l'image charge, elle le recouvre ; si elle échoue (404), onerror la masque
+  // et le fallback redevient visible — plus jamais de carré vide.
   return '<div style="width:'+size+'px;height:'+size+'px;border-radius:14px;background:'+style.bg+';display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;flex-shrink:0;overflow:hidden;position:relative">' +
+    '<span style="font-size:'+(size>60?22:16)+'px;font-weight:900;color:'+style.tx+';letter-spacing:.5px">'+init+'</span>' +
+    '<span style="font-size:9px;font-weight:600;color:'+style.tx+';opacity:.8;text-align:center;padding:0 4px;max-width:'+(size-8)+'px;overflow:hidden;white-space:nowrap">'+marque+'</span>' +
     (src ? '<img src="'+src+'" alt="'+marque+'" style="position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;border-radius:14px" onerror="this.style.display=\'none\'" />' : '') +
-    (!src ? '<span style="font-size:'+(size>60?22:16)+'px;font-weight:900;color:'+style.tx+';letter-spacing:.5px">'+init+'</span>' : '') +
-    (!src ? '<span style="font-size:9px;font-weight:600;color:'+style.tx+';opacity:.8;text-align:center;padding:0 4px;max-width:'+(size-8)+'px;overflow:hidden;white-space:nowrap">'+marque+'</span>' : '') +
   '</div>';
 }
 
@@ -7448,7 +7461,7 @@ function renderDashboard() {
       routineWrap.innerHTML = introHtml +
         _buildRoutineCard(isEN?"MORNING ROUTINE":"ROUTINE DU MATIN", "🌅", _amSteps) +
         _buildRoutineCard(isEN?"EVENING ROUTINE":"ROUTINE DU SOIR", "🌙", _pmSteps) +
-        "<button onclick=\"go('result')\" style='width:100%;padding:14px;border-radius:50px;border:none;background:#C4726A;color:#fff;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;margin-bottom:8px'>" + (isEN?"View full routine (details, reviews, buy) →":"Voir ma routine complète (détails, avis, achat) →") + "</button>";
+        "<button onclick=\"goToFullRoutine()\" style='width:100%;padding:14px;border-radius:50px;border:none;background:#C4726A;color:#fff;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;margin-bottom:8px'>" + (isEN?"View full routine (details, reviews, buy) →":"Voir ma routine complète (détails, avis, achat) →") + "</button>";
       tabRoutine.appendChild(routineWrap);
     } else {
       var emptyRoutine = document.createElement("div");
