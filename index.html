@@ -1763,7 +1763,7 @@ const T = {
     age3:"36 – 45 ans",age3_sub:"Anti-âge précoce",
     age4:"46 ans et +",age4_sub:"Correction intense",
     concerns:["Acné / Boutons","Taches & hyperpigmentation","Rides & anti-âge","Pores dilatés","Rougeurs / Couperose","Cernes & poches","Teint terne / Éclat","Déshydratation","Points noirs","Réactivité / Irritations"],
-    allergies:["Parfums / Fragrances","Parabènes","Alcool","Sulfates (SLS/SLES)","Silicones","Huiles essentielles","Acide salicylique","Rétinol","Vitamine C","Acides (AHA/BHA)","Aucune allergie connue","Autre..."],
+    allergies:["Parfums / Fragrances","Parabènes","Alcool","Sulfates (SLS/SLES)","Silicones","Huiles essentielles","Acide salicylique","Rétinol","Vitamine C","Acides (AHA/BHA)","Methylisothiazolinone (MIT)","Phénoxyéthanol","Limonène","Linalool","Lanoline","Aucune allergie connue","Autre..."],
     budgets:[
       {id:"low",label:"Économique",sub:"Efficace sans se ruiner"},
       {id:"mid",label:"Modéré ",sub:"Le meilleur compromis"},
@@ -1864,7 +1864,7 @@ const T = {
     age3:"36 – 45",age3_sub:"Early anti-aging",
     age4:"46+",age4_sub:"Intensive correction",
     concerns:["Acne / Blemishes","Dark spots & hyperpigmentation","Wrinkles & anti-aging","Enlarged pores","Redness / Rosacea","Dark circles & puffiness","Dull complexion / Radiance","Dehydration","Blackheads","Sensitivity / Irritations"],
-    allergies:["Fragrances / Perfumes","Parabens","Alcohol","Sulfates (SLS/SLES)","Silicones","Essential oils","Salicylic acid","Retinol","Vitamin C","Acids (AHA/BHA)","No known allergies"],
+    allergies:["Fragrances / Perfumes","Parabens","Alcohol","Sulfates (SLS/SLES)","Silicones","Essential oils","Salicylic acid","Retinol","Vitamin C","Acids (AHA/BHA)","Methylisothiazolinone (MIT)","Phénoxyéthanol","Limonène","Linalool","Lanoline","No known allergies"],
     budgets:[
       {id:"low",label:"Budget",sub:"Effective without breaking the bank"},
       {id:"mid",label:"Mid-range ",sub:"The best compromise"},
@@ -2253,6 +2253,81 @@ function getWhy(key,skin,concern,age){
   return l.why_prefix+' '+(sL[skin]||'')+' ('+(age||'')+'), '+l.why_against+' '+(cL[concern]||concern)+'. '+benText+'.';
 }
 
+// ════════════ DÉTECTION FINE D'ALLERGÈNES ════════════
+// Couvre les 26 allergènes de parfum réglementés UE + conservateurs/filtres fréquents.
+// Complète (ne remplace pas) le système de 9 drapeaux INCI_DB existant.
+// Chaque label affiché → synonymes INCI recherchés (minuscules).
+var FINE_ALLERGENS = {
+  "Linalool": ["linalool"],
+  "Limonène": ["limonene", "d-limonene", "limonène"],
+  "Géraniol": ["geraniol", "géraniol"],
+  "Citronellol": ["citronellol"],
+  "Citral": ["citral"],
+  "Eugénol": ["eugenol", "eugénol"],
+  "Coumarine": ["coumarin", "coumarine"],
+  "Benzyl Alcohol": ["benzyl alcohol"],
+  "Benzyl Salicylate": ["benzyl salicylate"],
+  "Benzyl Benzoate": ["benzyl benzoate"],
+  "Cinnamal": ["cinnamal", "cinnamaldehyde"],
+  "Hydroxycitronellal": ["hydroxycitronellal"],
+  "Isoeugénol": ["isoeugenol", "isoeugénol"],
+  "Farnesol": ["farnesol"],
+  "Hexyl Cinnamal": ["hexyl cinnamal"],
+  "Lyral (HICC)": ["hydroxyisohexyl 3-cyclohexene", "lyral"],
+  "Amyl Cinnamal": ["amyl cinnamal", "amylcinnamal"],
+  "Anise Alcohol": ["anise alcohol", "anisyl alcohol"],
+  "Methylisothiazolinone (MIT)": ["methylisothiazolinone", "méthylisothiazolinone"],
+  "Methylchloroisothiazolinone (MCIT)": ["methylchloroisothiazolinone"],
+  "Lanoline": ["lanolin", "lanoline"],
+  "Propylène Glycol": ["propylene glycol", "propylène glycol"],
+  "Phénoxyéthanol": ["phenoxyethanol", "phénoxyéthanol"],
+  "Bisabolol": ["bisabolol"],
+  "Oxybenzone (filtre UV)": ["benzophenone-3", "oxybenzone"],
+  "Octocrylène (filtre UV)": ["octocrylene", "octocrylène"]
+};
+// Allergènes appartenant à la famille "parfum" : si déclarés et que le produit
+// est parfumé (parfum:true) sans liste INCI complète, on avertit (probable) au lieu d'exclure.
+var FRAGRANCE_FAMILY = {
+  "Linalool":1,"Limonène":1,"Géraniol":1,"Citronellol":1,"Citral":1,"Eugénol":1,
+  "Coumarine":1,"Benzyl Alcohol":1,"Benzyl Salicylate":1,"Benzyl Benzoate":1,
+  "Cinnamal":1,"Hydroxycitronellal":1,"Isoeugénol":1,"Farnesol":1,"Hexyl Cinnamal":1,
+  "Lyral (HICC)":1,"Amyl Cinnamal":1,"Anise Alcohol":1
+};
+
+// Détecte les allergènes fins et les allergies texte libre "Autre:" dans un produit.
+// Retour : { hit:bool, detected:[labels certains], uncertain:[labels probables] }
+//   - detected → l'ingrédient figure dans les données du produit (exclusion dure)
+//   - uncertain → allergène de parfum déclaré + produit parfumé mais ingrédient non listé (avertissement seulement)
+function detectFineAllergens(key, allergies) {
+  var p = (typeof DB!=="undefined") ? DB[key] : null;
+  var inci = (typeof INCI_DB!=="undefined") ? INCI_DB[key] : null;
+  var res = { hit:false, detected:[], uncertain:[] };
+  if (!p || !allergies || !allergies.length) return res;
+
+  var hay = ((p.comp||[]).join(" ") + " " + (p.ak||[]).join(" ") + " " +
+             (p.usage||"") + " " + (p.texture||"") + " " + (p.nom||"")).toLowerCase();
+  var isPerfumed = !!(inci && inci.parfum === true) || hay.indexOf("parfum")>-1 || hay.indexOf("fragrance")>-1;
+
+  allergies.forEach(function(a){
+    if (!a || a === "Aucune allergie connue" || a === "No known allergies") return;
+    // Allergie texte libre "Autre: xxx" / "Other: xxx"
+    if (a.indexOf("Autre:")===0 || a.indexOf("Other:")===0) {
+      var custom = a.replace(/^(Autre:|Other:)\s*/i,"").toLowerCase().trim();
+      if (custom.length>2 && hay.indexOf(custom)>-1 && res.detected.indexOf(custom)===-1) res.detected.push(custom);
+      return;
+    }
+    // Allergène fin connu
+    var syns = FINE_ALLERGENS[a];
+    if (syns) {
+      var found = syns.some(function(s){ return hay.indexOf(s)>-1; });
+      if (found) { if(res.detected.indexOf(a)===-1) res.detected.push(a); }
+      else if (FRAGRANCE_FAMILY[a] && isPerfumed) { if(res.uncertain.indexOf(a)===-1) res.uncertain.push(a); }
+    }
+  });
+  res.hit = res.detected.length>0;
+  return res;
+}
+
 function getCompat(key,skin,concern,age,allergies){
   var p = DB[key];
   if (!p) return 70;
@@ -2283,6 +2358,10 @@ function getCompat(key,skin,concern,age,allergies){
   });
   if (hasAllergenInProduct) return 15;
 
+  // Complément : détection fine (allergènes parfum réglementés, conservateurs, "Autre:")
+  var fine = detectFineAllergens(key, allergies);
+  if (fine.hit) return 15;
+
   var s = 72;
   if (p.clean) s += 8;
   if (skin === 'sensible' && p.yuka >= 75) s += 8;
@@ -2300,7 +2379,7 @@ async function normalizeAutreWithAI(autreTexte, type) {
   // Appel à Claude pour analyser le texte libre
   var systemPrompt = type === 'concern'
     ? "Tu es un expert skincare. L'utilisateur décrit un problème de peau en texte libre. Retourne UNIQUEMENT une liste JSON des clés correspondantes parmi : acne, taches, rides, pores, rougeurs, cernes, eclat, deshydratation, imperfections, sensibilite. Exemple: [\"rougeurs\",\"sensibilite\"]. Si aucune correspondance, retourne []."
-    : "Tu es un expert cosmétique. L'utilisateur décrit une allergie en texte libre. Retourne UNIQUEMENT une liste JSON des catégories correspondantes parmi : Parfums / Fragrances, Parabènes, Alcool, Sulfates (SLS/SLES), Silicones, Huiles essentielles, Acide salicylique, Rétinol, Vitamine C, Acides (AHA/BHA). Exemple: [\"Parfums / Fragrances\"]. Si aucune correspondance, retourne [].";
+    : "Tu es un expert cosmétique. L'utilisateur décrit une allergie en texte libre. Retourne UNIQUEMENT une liste JSON des catégories correspondantes parmi : Parfums / Fragrances, Parabènes, Alcool, Sulfates (SLS/SLES), Silicones, Huiles essentielles, Acide salicylique, Rétinol, Vitamine C, Acides (AHA/BHA), Methylisothiazolinone (MIT), Methylchloroisothiazolinone (MCIT), Phénoxyéthanol, Limonène, Linalool, Géraniol, Citronellol, Citral, Eugénol, Coumarine, Lanoline, Propylène Glycol, Bisabolol, Oxybenzone (filtre UV), Octocrylène (filtre UV). Exemple: [\"Parfums / Fragrances\"]. Si aucune correspondance, retourne [].";
 
   try {
     var GEMINI_KEY = "AIzaSyAcnK0dToixkPc6jgteaDK5w3XD4XKuU_Y"; // Restreindre sur console.cloud.google.com
@@ -2410,7 +2489,9 @@ function build(){
     if (!DB[key]) return false;
     const userAllergies = ST.allergies || [];
     if (userAllergies.length === 0) return false;
-    // Vérifier via INCI_DB en priorité
+    // 1) Détection fine (allergènes parfum réglementés, conservateurs, filtres UV, "Autre:") — prioritaire
+    if (detectFineAllergens(key, userAllergies).hit) return true;
+    // 2) Vérifier via INCI_DB (9 drapeaux)
     const inciProd = INCI_DB[key];
     if (inciProd) {
       return userAllergies.some(function(allergy) {
@@ -4708,6 +4789,7 @@ function showWhyAI(key, nom, marque) {
   var AMAP = {"Parfums / Fragrances":"parfum","Parabènes":"paraben","Alcool":"alcohol","Rétinol":"retinol","Vitamine C":"vitc","Acide salicylique":"salicylic","Acides (AHA/BHA)":"aha_bha"};
   var inciProd = INCI_DB[key];
   var allergenWarning = "";
+  var allergenProbable = "";
   if (allergies.length > 0 && inciProd) {
     var detected = allergies.filter(function(a){
       var field = AMAP[a];
@@ -4715,6 +4797,17 @@ function showWhyAI(key, nom, marque) {
     });
     if (detected.length > 0) {
       allergenWarning = detected.join(", ");
+    }
+  }
+  // Complément : détection fine (certains + probables)
+  if (allergies.length > 0) {
+    var fineRes = detectFineAllergens(key, allergies);
+    if (fineRes.detected.length > 0) {
+      var merged = (allergenWarning ? allergenWarning.split(", ") : []).concat(fineRes.detected);
+      allergenWarning = merged.filter(function(v,i,arr){return arr.indexOf(v)===i;}).join(", ");
+    }
+    if (fineRes.uncertain.length > 0) {
+      allergenProbable = fineRes.uncertain.join(", ");
     }
   }
 
@@ -4759,6 +4852,12 @@ function showWhyAI(key, nom, marque) {
     html += "<div style=\"background:#FFF0F0;border-radius:14px;padding:14px 16px;margin-bottom:14px;border:1px solid #FFCDD2\">";
     html += "<div style=\"display:flex;align-items:center;gap:8px;margin-bottom:6px\"><span style=\"font-size:18px\">🚨</span><span style=\"font-size:13px;font-weight:700;color:#C62828\">Allergène présent</span></div>";
     html += "<div style=\"font-size:12px;color:#5A4A42;line-height:1.6\">Ce produit contient <strong>" + allergenWarning + "</strong> — un ingrédient que tu as signalé comme allergène. Consulte un pharmacien avant utilisation.</div></div>";
+  }
+  // ── ALERTE ALLERGÈNE PROBABLE (parfum non détaillé) ──
+  if (allergenProbable) {
+    html += "<div style=\"background:#FFF8E1;border-radius:14px;padding:14px 16px;margin-bottom:14px;border:1px solid #FFE0A3\">";
+    html += "<div style=\"display:flex;align-items:center;gap:8px;margin-bottom:6px\"><span style=\"font-size:18px\">⚠️</span><span style=\"font-size:13px;font-weight:700;color:#E65100\">Allergène possible</span></div>";
+    html += "<div style=\"font-size:12px;color:#5A4A42;line-height:1.6\">Ce produit est parfumé et peut contenir <strong>" + allergenProbable + "</strong>, sans que la liste détaillée soit confirmée. Vérifie la composition au dos du produit ou demande à un pharmacien.</div></div>";
   }
 
   // ── INFOS PRODUIT ──
@@ -6644,13 +6743,17 @@ function confirmRegion() {
   setRegion(selectedRegionValue);
 }
 
+var REGION_FLAGS = {fr:'🇫🇷',dz:'🇩🇿',ma:'🇲🇦',gb:'🇬🇧',es:'🇪🇸',de:'🇩🇪',be:'🇧🇪',ch:'🇨🇭',other:'🌍'};
+function refreshRegionBadge() {
+  var badge = document.getElementById('region-badge');
+  if (badge) badge.textContent = (REGION_FLAGS[REGION] || '🌍');
+}
 function setRegion(r) {
   REGION = r;
+  try { localStorage.setItem('skinmatch_region', r); } catch(e) {}
   var m = document.getElementById('region-modal');
   if (m) m.style.display = 'none';
-  var flags = {fr:'🇫🇷',dz:'🇩🇿',ma:'🇲🇦',gb:'🇬🇧',es:'🇪🇸',de:'🇩🇪',other:'🌍'};
-  var badge = document.getElementById('region-badge');
-  if (badge) badge.textContent = (flags[r] || '🌍');
+  refreshRegionBadge();
 }
 
 function closeWhyModal() {
@@ -7400,12 +7503,13 @@ function renderDashboard() {
       { id:"routine", label: isEN?"Routine":"Routine" },
       { id:"suivi", label: isEN?"Tracking":"Suivi" },
       { id:"motiv", label: isEN?"Motivation":"Motivation" },
+      { id:"communaute", label: isEN?"Community":"Communauté" },
       { id:"conseils", label: isEN?"Tips":"Conseils" }
     ];
     _tabDefs.forEach(function(td){
       var b = document.createElement("button");
       var active = window._espaceTab === td.id;
-      b.style.cssText = "flex:1;text-align:center;padding:10px 2px;border-radius:50px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;border:none;transition:all .2s;white-space:nowrap;" +
+      b.style.cssText = "flex:1;text-align:center;padding:10px 1px;border-radius:50px;font-size:10.5px;font-weight:700;cursor:pointer;font-family:inherit;border:none;transition:all .2s;white-space:nowrap;" +
         (active
           ? "background:linear-gradient(135deg,#C4726A,#A85A52);color:#fff;box-shadow:0 4px 10px rgba(196,114,106,.25)"
           : "background:transparent;color:var(--mut)");
@@ -7419,19 +7523,67 @@ function renderDashboard() {
     var tabRoutine = document.createElement("div");
     var tabSuivi = document.createElement("div");
     var tabMotiv = document.createElement("div");
+    var tabCommunaute = document.createElement("div");
     var tabConseils = document.createElement("div");
     tabRoutine.id = "espace-tab-routine";
     tabSuivi.id = "espace-tab-suivi";
     tabMotiv.id = "espace-tab-motiv";
+    tabCommunaute.id = "espace-tab-communaute";
     tabConseils.id = "espace-tab-conseils";
     tabRoutine.style.display  = (window._espaceTab === "routine")  ? "block" : "none";
     tabSuivi.style.display    = (window._espaceTab === "suivi")    ? "block" : "none";
     tabMotiv.style.display    = (window._espaceTab === "motiv")    ? "block" : "none";
+    tabCommunaute.style.display = (window._espaceTab === "communaute") ? "block" : "none";
     tabConseils.style.display = (window._espaceTab === "conseils") ? "block" : "none";
     wrap.appendChild(tabRoutine);
     wrap.appendChild(tabSuivi);
     wrap.appendChild(tabMotiv);
+    wrap.appendChild(tabCommunaute);
     wrap.appendChild(tabConseils);
+
+    // ════════════ ONGLET COMMUNAUTÉ (à venir) ════════════
+    (function(){
+      var saved = false;
+      try { saved = localStorage.getItem('sm_community_waitlist') === '1'; } catch(e){}
+      var box = document.createElement("div");
+      box.style.cssText = "text-align:center;padding:40px 24px;background:linear-gradient(135deg,#FBF3F0,#F6E7E2);border-radius:24px;margin-top:8px";
+      var emoji = document.createElement("div");
+      emoji.style.cssText = "font-size:52px;margin-bottom:16px";
+      emoji.textContent = "💬";
+      box.appendChild(emoji);
+      var title = document.createElement("div");
+      title.style.cssText = "font-family:Georgia,serif;font-size:24px;font-weight:700;color:#3A2520;margin-bottom:10px";
+      title.textContent = isEN ? "Community — coming soon" : "Communauté — bientôt disponible";
+      box.appendChild(title);
+      var desc = document.createElement("div");
+      desc.style.cssText = "font-size:15px;color:#8A6F68;line-height:1.5;margin-bottom:24px;max-width:340px;margin-left:auto;margin-right:auto";
+      desc.textContent = isEN
+        ? "Soon you'll be able to share your progress, swap tips and follow other skincare routines. Want to be notified at launch?"
+        : "Bientôt, tu pourras partager tes progrès, échanger tes astuces et suivre les routines des autres. Tu veux être prévenu(e) au lancement ?";
+      box.appendChild(desc);
+
+      if (saved) {
+        var done = document.createElement("div");
+        done.style.cssText = "display:inline-block;padding:14px 28px;border-radius:50px;background:#E8F3EC;color:#2E7D4F;font-weight:700;font-size:15px";
+        done.textContent = isEN ? "✓ You're on the list!" : "✓ Tu es sur la liste !";
+        box.appendChild(done);
+      } else {
+        var btn = document.createElement("button");
+        btn.style.cssText = "padding:15px 34px;border-radius:50px;border:none;background:linear-gradient(135deg,#C4726A,#A85A52);color:#fff;font-weight:700;font-size:15px;cursor:pointer;font-family:inherit;box-shadow:0 4px 14px rgba(196,114,106,.3)";
+        btn.textContent = isEN ? "Notify me 🔔" : "Préviens-moi 🔔";
+        btn.onclick = function(){
+          try {
+            localStorage.setItem('sm_community_waitlist','1');
+            var uid = (window._currentUser && window._currentUser.uid) || 'anon';
+            if (window._logEvent) window._logEvent('community_waitlist_join', { uid: uid });
+            // TODO post-lancement : sauvegarder l'inscription en base pour récupérer la liste d'attente
+          } catch(e){}
+          renderDashboard();
+        };
+        box.appendChild(btn);
+      }
+      tabCommunaute.appendChild(box);
+    })();
 
     // ════════════ ONGLET ROUTINE ════════════
     if (ST.result && ST.result.steps && ST.result.steps.length > 0) {
@@ -10101,6 +10253,13 @@ window._onAuthResolved = function(user) {
   }
 };
 initQuestions();
+// Afficher le drapeau de la région sauvegardée dès le chargement (corrige le globe persistant)
+try {
+  var _r = REGION || localStorage.getItem('skinmatch_region');
+  if (_r) { REGION = _r; }
+} catch(e) {}
+setTimeout(refreshRegionBadge, 300);
+setTimeout(refreshRegionBadge, 1200);
 </script>
 
 <div id="why-modal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.55);z-index:9999;align-items:flex-end;justify-content:center">
@@ -11357,6 +11516,11 @@ function _showReplaceAlts(container, alts, oldKey, reasonId, isEN, overlay) {
           inci:ap.inci||[], yuka:ap.yuka||0, pourquoi:ap.pourquoi||'',
           lien:ap.lien||'', ak:ap.ak||[]
         });
+        // Recalculer le total (sans mélanger les devises) — corrige le bug du total incohérent
+        try {
+          r.totalPrix = _computeTotal(r.steps);
+          r.currency = _detectCurrency(r.steps);
+        } catch(e) {}
       }
       if (overlay) overlay.remove();
       renderResult();
