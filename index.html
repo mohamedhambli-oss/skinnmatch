@@ -842,6 +842,24 @@ h2{font-family:var(--serif);font-size:20px;font-weight:700;margin-bottom:3px}
       <div style="color:#C4726A;font-size:16px;font-weight:700;flex-shrink:0">&#8594;</div>
     </div>
 
+    <!-- 3ter. BANDEAU TROUVER UN PRODUIT -->
+    <div onclick="startFindProduct()" style="background:#fff;border-radius:14px;padding:12px 14px;margin-bottom:22px;border:1px dashed rgba(196,114,106,.35);display:flex;align-items:center;gap:10px;cursor:pointer">
+      <div style="width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,#C4726A,#A85A52);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0">&#128269;</div>
+      <div style="flex:1;font-size:12px;color:#3D2B1F;line-height:1.3;text-align:left">
+        <strong style="color:#C4726A;font-weight:700" id="find-banner-text">Trouver un produit adapté à ma peau</strong>
+      </div>
+      <div style="color:#C4726A;font-size:16px;font-weight:700;flex-shrink:0">&#8594;</div>
+    </div>
+
+    <!-- 3quater. BANDEAU TROUVER UN PRODUIT PAR PROBLÈME -->
+    <div onclick="startFindConcern()" style="background:#fff;border-radius:14px;padding:12px 14px;margin-bottom:22px;border:1px dashed rgba(196,114,106,.35);display:flex;align-items:center;gap:10px;cursor:pointer">
+      <div style="width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,#C4726A,#A85A52);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0">&#127919;</div>
+      <div style="flex:1;font-size:12px;color:#3D2B1F;line-height:1.3;text-align:left">
+        <strong style="color:#C4726A;font-weight:700" id="concern-banner-text">J'ai un problème précis (acné, taches, rides...)</strong>
+      </div>
+      <div style="color:#C4726A;font-size:16px;font-weight:700;flex-shrink:0">&#8594;</div>
+    </div>
+
     <!-- 3bis. BOUTON DIAGNOSTIC (mis en avant, au-dessus des avis) -->
     <button onclick="showTermsModal()" id="btn-start-top" style="width:100%;box-sizing:border-box;padding:14px 20px;border-radius:50px;border:2px solid #C4726A;background:#fff;color:#C4726A;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;margin-bottom:22px;display:flex;align-items:center;justify-content:center;gap:8px">
       <span id="btn-start-top-text">Faire le diagnostic sans compte</span> &#8594;
@@ -1109,9 +1127,24 @@ h2{font-family:var(--serif);font-size:20px;font-weight:700;margin-bottom:3px}
   <div class="content">
     <div class="progress"><div class="progress-info"><div class="progress-pct">40%</div><div class="progress-step-txt">Etape 2 / 5</div></div><div class="progress-track"><div class="progress-fill" style="width:40%"></div></div><div class="progress-dots"><div class="pd done"></div><div class="pd on"></div><div class="pd "></div><div class="pd "></div><div class="pd "></div></div></div>
     <div class="step-lbl" id="step-lbl-2">Étape 2 / 5</div>
-    <h2 id="q2-title">Votre tranche d'âge</h2><p class="sub" id="q2-sub">L'âge nous aide à affiner les conseils — pas à changer ta routine.</p>
+    <h2 id="q2-title">Votre profil</h2><p class="sub" id="q2-sub">Ces informations affinent les conseils — et écartent les actifs déconseillés dans votre situation.</p>
     <div id="q2-opts"></div>
-    <button class="btn-p" id="q2-next" disabled onclick="go('q3')" style="margin-top:10px">Continuer</button>
+
+    <!-- Grossesse / allaitement : détermine l'exclusion d'actifs contre-indiqués -->
+    <div style="margin-top:22px">
+      <div style="font-size:13px;font-weight:700;color:#3D2B1F;margin-bottom:4px" id="q2-preg-title">Êtes-vous enceinte ou allaitante ?</div>
+      <p style="font-size:11.5px;color:#8B6F5E;margin-bottom:10px" id="q2-preg-sub">Certains actifs sont déconseillés pendant la grossesse et l'allaitement. Nous les écartons automatiquement.</p>
+      <div id="q2-preg-opts"></div>
+    </div>
+
+    <!-- Phototype : conditionne le conseil taches / solaire -->
+    <div style="margin-top:22px">
+      <div style="font-size:13px;font-weight:700;color:#3D2B1F;margin-bottom:4px" id="q2-photo-title">Votre carnation</div>
+      <p style="font-size:11.5px;color:#8B6F5E;margin-bottom:10px" id="q2-photo-sub">Les taches et la protection solaire ne se traitent pas de la même façon selon la carnation.</p>
+      <div id="q2-photo-opts"></div>
+    </div>
+
+    <button class="btn-p" id="q2-next" disabled onclick="go('q3')" style="margin-top:18px">Continuer</button>
   </div>
 </div>
 
@@ -1312,6 +1345,70 @@ h2{font-family:var(--serif);font-size:20px;font-weight:700;margin-bottom:3px}
     <div id="scan-history" style="margin-top:20px">
       <p style="font-size:12px;font-weight:700;color:#3D2B1F;text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px">Scans récents</p>
       <div id="scan-history-list" style="display:flex;flex-direction:column;gap:8px"></div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ══ TROUVER UN PRODUIT (peau → catégorie → liste triée par compatibilité) ══ -->
+<div id="sc-find-product" class="hidden">
+  <div class="topbar">
+    <button class="btn-back" onclick="findBack()" id="find-back-btn">← Retour</button>
+    <div class="logo"><div class="logo-icon">SM</div>Skin<span>Match</span></div>
+  </div>
+  <div class="content" style="padding-bottom:60px">
+
+    <!-- Étape 1 : type de peau -->
+    <div id="find-step-skin">
+      <div style="text-align:center;margin-bottom:20px">
+        <div style="font-size:10px;font-weight:700;color:#C4726A;text-transform:uppercase;letter-spacing:3px;margin-bottom:8px" id="find-step-lbl-1">Étape 1/2</div>
+        <h2 style="font-family:Georgia,serif;font-size:20px;font-weight:700;color:#3D2B1F;margin-bottom:6px" id="find-title-1">Ta peau est plutôt...</h2>
+        <p style="font-size:13px;color:#8B6F5E" id="find-sub-1">On adapte les recommandations à ton type de peau.</p>
+      </div>
+      <div id="find-skin-opts"></div>
+    </div>
+
+    <!-- Étape 2 : catégorie de produit -->
+    <div id="find-step-cat" style="display:none">
+      <div style="text-align:center;margin-bottom:20px">
+        <div style="font-size:10px;font-weight:700;color:#C4726A;text-transform:uppercase;letter-spacing:3px;margin-bottom:8px" id="find-step-lbl-2">Étape 2/2</div>
+        <h2 style="font-family:Georgia,serif;font-size:20px;font-weight:700;color:#3D2B1F;margin-bottom:6px" id="find-title-2">Quel type de produit cherches-tu ?</h2>
+      </div>
+      <div id="find-cat-opts"></div>
+    </div>
+
+    <!-- Étape 2bis : type de sérum (actif principal) — n'apparaît que pour la catégorie Sérum -->
+    <div id="find-step-subtype" style="display:none">
+      <div style="text-align:center;margin-bottom:20px">
+        <div style="font-size:10px;font-weight:700;color:#C4726A;text-transform:uppercase;letter-spacing:3px;margin-bottom:8px" id="find-subtype-lbl">Étape 3/3</div>
+        <h2 style="font-family:Georgia,serif;font-size:20px;font-weight:700;color:#3D2B1F;margin-bottom:6px" id="find-subtype-title">Un actif en particulier ?</h2>
+        <p style="font-size:13px;color:#8B6F5E" id="find-subtype-sub">Chaque actif cible un problème différent.</p>
+      </div>
+      <div id="find-subtype-opts"></div>
+    </div>
+
+    <!-- Étape 2ter : problème ciblé (mode "J'ai un problème précis") -->
+    <div id="find-step-concern" style="display:none">
+      <div style="text-align:center;margin-bottom:20px">
+        <div style="font-size:10px;font-weight:700;color:#C4726A;text-transform:uppercase;letter-spacing:3px;margin-bottom:8px" id="find-concern-lbl">Étape 2/2</div>
+        <h2 style="font-family:Georgia,serif;font-size:20px;font-weight:700;color:#3D2B1F;margin-bottom:6px" id="find-concern-title">Quel problème veux-tu traiter ?</h2>
+        <p style="font-size:13px;color:#8B6F5E" id="find-concern-sub">On te propose les produits dont les actifs ciblent ce problème.</p>
+      </div>
+      <div id="find-concern-opts"></div>
+    </div>
+
+    <!-- Étape 3 : résultats -->
+    <div id="find-step-results" style="display:none">
+      <div style="margin-bottom:16px">
+        <div id="find-results-title" style="font-family:Georgia,serif;font-size:19px;font-weight:700;color:#3D2B1F"></div>
+        <p style="font-size:11.5px;color:#A8837B;margin-top:3px" id="find-results-sub"></p>
+      </div>
+      <div id="find-results-list"></div>
+    </div>
+
+    <!-- Étape 4 : détail produit -->
+    <div id="find-step-detail" style="display:none">
+      <div id="find-detail-content"></div>
     </div>
 
   </div>
@@ -2205,7 +2302,52 @@ const DB = {
   // ══════════════════════════════════════════════════════════════════
   "de-eucerin-aqua": {nom:"Aquaphor Healing Ointment",marque:"Eucerin",prix:"8€",link:"https://www.eucerin.fr/produits/soins-du-corps/aquaphor/aquaphor-baume-reparateur",yuka:88,yl:"Excellent",usage:"Baume réparateur multi-usage peau très sèche",texture:"Baume",ak:["Panthenol","Bisabolol","Glycérine"],comp:["Petrolatum","Panthenol","Bisabolol"],clean:false,vegan:false,pq:"Peaux très sèches, lèvres, zones abîmées.",ben:"Répare et protège les peaux très sèches.",app:"Au besoin sur zones sèches, lèvres, talons.",moment:"AM+PM",ben_en:"Repairs and protects very dry skin.",region:["de"],video:"https://www.youtube.com/results?search_query=Eucerin+Aquaphor+review"},
   "de-nivea-creme": {ean:"4005900432872",nom:"NIVEA Crème Universelle Boîte Bleue",marque:"NIVEA",prix:"4€",link:"https://www.nivea.fr/produits/creme-universelle/LEA0001170601.html",yuka:74,yl:"Bon",usage:"Crème universelle visage et corps",texture:"Crème riche",ak:["Eucerit","Glycérine","Panthenol"],comp:["Eucerit","Glycerin","Panthenol"],clean:false,vegan:false,pq:"Tous types de peau.",ben:"Hydrate durablement visage et corps.",app:"Matin et soir.",moment:"AM+PM",ben_en:"Durably hydrates face and body.",region:["de","other"],video:"https://www.youtube.com/results?search_query=NIVEA+creme+bleue+review"},
-  "de-weleda-huile": {nom:"Huile de Soin Eclat du Soir Weleda",marque:"Weleda",prix:"22€",link:"https://www.weleda.fr/soins-visage/soins-hydratants/huile-de-soin-eclat-du-soir.html",yuka:90,yl:"Excellent",usage:"Huile visage bio rose musquée anti-âge",texture:"Huile",ak:["Rose musquée","Calendula","Vitamine E"],comp:["Rosehip Oil","Calendula","Tocopherol"],clean:true,vegan:true,pq:"Peaux matures, sèches, ternes.",ben:"Régénère et illumine les peaux fatiguées.",app:"Soir, quelques gouttes massées sur le visage.",moment:"PM",ben_en:"Regenerates and brightens tired skin.",region:["de"],video:"https://www.youtube.com/results?search_query=Weleda+huile+rose+musquee+review"}
+  "de-weleda-huile": {nom:"Huile de Soin Eclat du Soir Weleda",marque:"Weleda",prix:"22€",link:"https://www.weleda.fr/soins-visage/soins-hydratants/huile-de-soin-eclat-du-soir.html",yuka:90,yl:"Excellent",usage:"Huile visage bio rose musquée anti-âge",texture:"Huile",ak:["Rose musquée","Calendula","Vitamine E"],comp:["Rosehip Oil","Calendula","Tocopherol"],clean:true,vegan:true,pq:"Peaux matures, sèches, ternes.",ben:"Régénère et illumine les peaux fatiguées.",app:"Soir, quelques gouttes massées sur le visage.",moment:"PM",ben_en:"Regenerates and brightens tired skin.",region:["de"],video:"https://www.youtube.com/results?search_query=Weleda+huile+rose+musquee+review"},
+
+  // ─── PATCHS ─────────────────────────────────────────────────────────────────
+  // A COMPLETER AVANT LE LANCEMENT : ean, prix, link et yuka sont volontairement absents.
+  // Les champs descriptifs ci-dessous (mode d'action, application) sont fiables ; les donnees
+  // commerciales doivent etre relevees sur les fiches produit officielles avant mise en ligne.
+  // Sans "link", la fiche n'affiche simplement pas de bouton d'achat : rien ne casse.
+  "cosrx-patch": {nom:"Acne Pimple Master Patch",marque:"COSRX",usage:"Patch anti-boutons hydrocolloide",texture:"Patch",ak:["Hydrocolloide"],comp:["Cellulose Gum","Polyisobutylene","Styrene Isoprene Styrene Block Copolymer"],clean:false,vegan:true,pq:"Boutons ponctuels avec tete blanche.",ben:"Absorbe les exsudats du bouton, protege des frottements et du grattage, limite les marques post-inflammatoires.",app:"Sur peau propre et seche, appliquer sur le bouton et laisser 6 a 8 h (idealement la nuit). Retirer quand le patch devient opaque.",moment:"PM",ben_en:"Absorbs blemish fluid, protects from picking and limits post-inflammatory marks."},
+
+  "patch-hydro-large": {nom:"Patchs Hydrocolloides Grand Format",marque:"Generique pharmacie",usage:"Patch anti-boutons hydrocolloide zone etendue",texture:"Patch",ak:["Hydrocolloide"],comp:["Cellulose Gum","Polyisobutylene"],clean:false,vegan:true,pq:"Poussees sur le menton, la machoire ou le front.",ben:"Couvre plusieurs boutons proches, assainit la zone et evite le grattage nocturne.",app:"Sur peau propre et seche, une nuit. Ne pas appliquer sur un bouton perce recemment saignant.",moment:"PM",ben_en:"Covers clustered blemishes and prevents night-time picking."},
+
+  "patch-yeux-ha": {nom:"Patchs Yeux Acide Hyaluronique",marque:"Generique pharmacie",usage:"Patch contour des yeux hydratant anti-cernes",texture:"Patch",ak:["Acide hyaluronique","Cafeine","Panthenol"],comp:["Sodium Hyaluronate","Caffeine","Panthenol","Glycerin"],clean:false,vegan:true,pq:"Cernes creux, poches matinales, contour des yeux deshydrate.",ben:"Repulpe le contour de l'oeil, decongestionne et attenue l'aspect fatigue du regard.",app:"Appliquer 15 a 20 min sous les yeux sur peau propre, le matin de preference. 2 a 3 fois par semaine.",moment:"AM",ben_en:"Plumps the eye contour, decongests and reduces a tired look."},
+
+  // ─── AJOUTS OPEN BEAUTY FACTS ────────────────────────────────────────────────
+  // EAN, noms de marque et compositions INCI proviennent de la base ouverte
+  // Open Beauty Facts (openbeautyfacts.org). Les actifs cles sont derives des INCI reels.
+  // A COMPLETER : prix et link, qui ne figurent pas dans cette base.
+  "obf-laroch-eaumicella-1595": {ean:"3337872411595",nom:"Toleriane Eau Micellaire Ultra Peaux Sensibles",marque:"La Roche-Posay",usage:"Eau micellaire démaquillante visage et yeux",texture:"Eau micellaire",ak:["Glycérine"],comp:["Aqua/water","hexylene glycol","poloxamer 184","glycerin 1 %","disodium cocoamphodiacetate","disodium EDTA","citric acid","dihydrocholeth-30","sodium chloride","sodium diglycolate","sodium glycolate","polyaminopropyl biguanide","parfum/fragrance"],pq:"Peaux sensibles et réactives.",ben:"Démaquille et nettoie sans rinçage ni frottement, respecte les peaux intolérantes.",app:"Imbiber un coton, passer sur le visage et les yeux. Sans rinçage.",moment:"PM"},
+  "obf-bioder-cralinetsh-0053": {ean:"3401573670053",nom:"Créaline TS H2O Solution Micellaire",marque:"Bioderma",usage:"Eau micellaire démaquillante peaux sensibles",texture:"Eau micellaire",ak:["Formule douce"],comp:["Water (aqua)","PEG-6 caprylic/capric glycerides","propylène glycol","cucumis sativus (cucumber)fruit extract","fructooligosaccharides","mannitol","xylitol","rhamnose","cetrimonium bromide","disodium EDTA. [BI 446]"],pq:"Peaux sensibles, intolérantes.",ben:"Nettoie et apaise, limite les réactions des peaux fragilisées.",app:"Imbiber un coton, passer sur visage et yeux.",moment:"PM"},
+  "obf-avne-eaumicella-0179": {ean:"3282770390179",nom:"Eau Micellaire Démaquillante",marque:"Avène",usage:"Eau micellaire démaquillante apaisante",texture:"Eau micellaire",ak:["Glycérine","Eau thermale"],comp:["AVENE THERMAL SPRING WATER (AVENE AQUA). GLYCERIN. PENTYLENE GLYCOL. CITRIC ACID. COCO-GLUCOSIDE ETHYL LAUROYL ARGINATE HCL. FRAGRANCE (PARFUM). POLYGLYCERYL-4 CAPRATE. POLYGLYCERYL-6 CAPRYLATE. TREHALOSE. WATER AQUA"],pq:"Peaux sensibles.",ben:"Démaquille en douceur et calme les sensations d'inconfort.",app:"Coton imbibé, sans rinçage.",moment:"PM"},
+  "obf-laroch-larochepos-2516": {ean:"3337872412516",nom:"Effaclar Eau Micellaire Purifiante",marque:"La Roche-Posay",usage:"Eau micellaire démaquillante purifiante",texture:"Eau micellaire",ak:["Zinc PCA","Glycérine"],comp:["Aqua/water","PEG-7 caprylic/capric glycerides","poloxamer 124","poloxamer 184","PEG-6 caprylic/capric glycerides","glycerin","polysorbate 80","zinc PCA","sodium hydroxyde","disodium EDTA","BHT","mytrimonium bromide","parfum/fragrance","Code FIL : B185980/1."],pq:"Peaux grasses à imperfections.",ben:"Démaquille et élimine l'excès de sébum sans décaper.",app:"Coton imbibé matin et soir.",moment:"PM"},
+  "obf-uriage-eaumicella-3639": {ean:"3661434003639",nom:"Eau Micellaire Thermale",marque:"Uriage",usage:"Eau micellaire thermale démaquillante",texture:"Eau micellaire",ak:["Glycérine","Vitamine C"],comp:["aqua (water","eau)","polysorbate 20","glycerin","poloxamer 184","caprylyl/capryl glucoside","cetrimonium bromide","polyaminopropyl biguanide","parfum (fragrance)","prunus armeniaca (apricot) fruit extract","citric acid","ascorbic acid."],pq:"Peaux normales à sensibles.",ben:"Démaquille, apaise et nettoie en un geste grâce à l'eau thermale.",app:"Coton imbibé, sans rinçage.",moment:"PM"},
+  "obf-caudal-eaudmaquil-3526": {ean:"3522930003526",nom:"Eau Démaquillante Visage et Yeux",marque:"Caudalie",usage:"Eau démaquillante visage et yeux",texture:"Eau micellaire",ak:["Glycérine","Bisabolol"],comp:["aqua (water)","poloxamer 184","PEG-40 hydrogenated castor oil","glycerin","disodium cocoamphodiacetate","methylpropanediol","sodium chloride","polyaminopropyl biguanide","parfum (fragrance)","bisabolol","caprylyl glycol","phenylpropanol"],pq:"Peaux sensibles, yeux sensibles.",ben:"Démaquille le visage et le contour des yeux sans picoter.",app:"Coton imbibé, insister délicatement sur les yeux.",moment:"PM"},
+  "obf-laroch-effaclarma-3317": {ean:"3337875533317",nom:"Effaclar Masque Sébo-régulateur",marque:"La Roche-Posay",usage:"Masque sébo-régulateur visage",texture:"Masque",ak:["Panthénol","Glycérine","Vitamine E","Kaolin","Dioxyde de titane"],comp:["aqua / water","kaolin","argilla / magnesium aluminum silicate","propanediol","panthenol","glycerin","caprylic/capric triglyceride","ci 77891 / titanium dioxide","cetearyl alcohol","zea mays starch / corn starch","cellulose","ceteareth-20","lecithin","caprylyl glycol"],pq:"Peaux grasses, pores dilatés, imperfections.",ben:"Absorbe l'excès de sébum et affine le grain de peau.",app:"1 à 2 fois par semaine, 5 min, puis rincer.",moment:"PM"},
+  "obf-uriage-uriagehysa-4322": {ean:"3661434004322",nom:"Hyséac Masque Purifiant",marque:"Uriage",usage:"Masque purifiant visage argile",texture:"Masque",ak:["Glycérine","Kaolin"],comp:["AQUA (WATER","EAU)-KAOLIN-GLYCERIN - ILLITE - MAGNESIUM ALUMINUM SILICATE - BUTYLENE GLYCOL-CETEARYL ALCOHOL - CETEARYL ISONONANOATE-STEARETH-2 - STEARETH-21-CI 77891 (TITANUM DIOXIDE) - 1","2HEXANEDIOL-GLYCYRRHETINIC ACID - SODIUM COCOYL GLUTAMATE - PROPA - NEDIOL CHLORPHENESIN PARFUM (FRAGRANCE)- XANTHAN GUM LENS ESCULENTA (LENTIL) FRUIT EXTRACT - GLYCYRRHIZA INFLATA ROOT EXTRACT - o-CYMEN-5-OL-SALICYLOYL PHYTOS - PHINGOSINE-ZINC LACTATE-SODIUM CHLORIDE - CITRIC ACID OPUNTIA FICUS - INDICA STEM EXTRACT-ISOPRO - PYL ALCOHOL PHENOXYETHANOL - ETHYLHEXYLGLYCERIN - RHAMNOSE - GLUCOSE - GLUCURONIC ACID - DISO - DIUM PHOSPHATE"],pq:"Peaux mixtes à grasses.",ben:"Purifie, matifie et resserre les pores.",app:"2 fois par semaine sur peau propre, 10 min, rincer.",moment:"PM"},
+  "obf-vichy-masqueargi-8933": {ean:"3337875508933",nom:"Masque Argile Purifiant Pores",marque:"Vichy",usage:"Masque argile purifiant pores",texture:"Masque",ak:["Glycérine","Vitamine E","Allantoïne","Kaolin","Oxydes de fer"],comp:["AQUA","KAOLIN","ARGILLA","PROPANEDIOL","GLYCERIN","CAPRYLIC / CAPRIC TRIGLYCERIDE","CI 77891","CETEARYL ALCOHOL","ZEA MAYS STARCH","CI 77499","CI 77492","CI 77491","ALLANTOIN","CETEARETH-20"],pq:"Peaux mixtes à grasses, pores visibles.",ben:"Désincruste les pores et matifie durablement.",app:"2 fois par semaine, 5 min, rincer à l'eau tiède.",moment:"PM",teinte:true},
+  "obf-vichy-masqueminr-8919": {ean:"3337875508919",nom:"Masque Minéral Désaltérant",marque:"Vichy",usage:"Masque minéral désaltérant hydratant",texture:"Masque",ak:["Niacinamide","Glycérine"],comp:["aqua/water","glycerin","alcohol denat.","niacinamide","dipropylene glycol","pentylene glycol","butylene glycol","peg-8","peg/ppg/polybutyleneglycol-8/5/3 glycerin","peg-60 hydrogenated castor oil","CI 61570","carbomer","triethanolamine","phenoxyethanol"],pq:"Peaux déshydratées, inconfortables.",ben:"Réhydrate intensément et apaise les tiraillements.",app:"2 fois par semaine, 5 min, retirer l'excédent.",moment:"PM"},
+  "obf-vichy-masquepeel-8896": {ean:"3337875508896",nom:"Masque Peel Double Éclat",marque:"Vichy",usage:"Masque peel double éclat exfoliant",texture:"Masque exfoliant",ak:["Glycérine"],comp:["AQUA","ALCOHOLDENAT.","GLYCERIN","DIMETHICONE","HYDROXYETHYLPIPERAZINE ETHANE SULFONIC ACID","CI 14700","CI 19140","CARBOMER","VACCINIUM MYRTILLUS FRUIT EXTRACT","SACCHARUM OFFICINARUM EXTRACT","PUMICE","SODIUM HYDROXIDE","PHENOXYETHANOL","MANNOSE"],pq:"Teint terne, texture irrégulière.",ben:"Exfolie en douceur et ravive l'éclat du teint.",app:"1 fois par semaine, 5 min, rincer.",moment:"PM"},
+  "obf-cerave-ceraveeyer-7613": {ean:"3606000537613",nom:"Eye Repair Cream",marque:"CeraVe",usage:"Crème contour des yeux réparatrice",texture:"Crème",ak:["Niacinamide","Acide hyaluronique","Glycérine","Céramides","Vitamine E"],comp:["AQUA/WATER/EAU","NIACINAMIDE","CETYL ALCOHOL","CAPRYLIC/CAPRIC TRIGLYCERIDE","GLYCERIN","PROPANEDIOL","ISONONYL ISONONANOATE","JOJOBA ESTERS","PEG-20 METHYL GLUCOSE SESQUISTEARATE","CETEARYL ALCOHOL","DIMETHICONE","METHYL GLUCOSE SESQUISTEARATE","ASPARAGOPSIS ARMATA EXTRACT","CERAMIDE NP"],pq:"Contour des yeux sec, cernes.",ben:"Hydrate et renforce la barrière du contour de l'œil.",app:"Matin et soir, tapoter du coin interne vers l'externe.",moment:"AM+PM"},
+  "obf-vichy-liftactivy-3332": {ean:"3337871323332",nom:"Liftactiv Yeux",marque:"Vichy",usage:"Soin contour des yeux anti-âge",texture:"Crème",ak:["Glycérine","Caféine"],comp:["AQUA / WATER","DIMETHICONE","HYDROGENATED POLYISOBUTENE","GLYCERIN","RHAMNOSE","CETYL ALCOHOL","GLYCERYL STEARATE","POLYMETHYL METHACRYLATE","PEG-40 STEARATE","CERA ALBA / BEESWAX","PENTYLENE GLYCOL","STEARIC ACID","STEARYL ALCOHOL","SORBITAN TRISTEARATE"],pq:"Rides du contour, relâchement.",ben:"Raffermit et lisse le contour de l'œil.",app:"Matin et soir, tapoter délicatement.",moment:"AM+PM"},
+  "obf-vichy-aquatherma-0163": {ean:"3337871330163",nom:"Aqualia Thermal Baume Éveil Regard",marque:"Vichy",usage:"Baume éveil du regard hydratant",texture:"Baume",ak:["Acide hyaluronique","Glycérine","Caféine"],comp:["Aqua (Water)","Glycerin","Dimethicone","Propanediol","Dimethicone/Peg-10/15 Crosspolymer","CI 42090 / Blue 1","Caffeine","Sodium Chloride","Sodium Citrate","Sodium Hyaluronate","Sodium Hydroxide","Phenoxyethanol","p-Anisic Acid","Chondrus Crispus (Carrageenan)"],pq:"Regard fatigué, poches matinales.",ben:"Décongestionne et réveille le regard.",app:"Le matin, tapoter sous les yeux.",moment:"AM"},
+  "obf-caudal-baumelifta-1871": {ean:"3522930031871",nom:"Resveratrol Lift Baume Liftant Regard",marque:"Caudalie",usage:"Baume liftant contour des yeux",texture:"Baume",ak:["Acide hyaluronique","Glycérine","Vitamine E"],comp:["AQUA/WATER/EAU","GLYCERIN*","BUTYLENE GLYCOL*","COCO-CAPRYLATE*","ISOAMYL LAURATE*","ALBIZIA JULIBRISSIN BARK EXTRACT*","POLYACRYLATE CROSSPOLYMER-6","SODIUM POLYACRYLATE","ETHYLHEXYLGLYCERIN","GLYCOL PALMITATE","PALMITOYL GRAPEVINE SHOOT EXTRACT*","TOCOPHEROL*","CAPRYLYL GLYCOL","SORBITAN LAURATE*"],pq:"Contour des yeux relâché, rides.",ben:"Lisse et raffermit le contour de l'œil.",app:"Matin et soir, tapoter.",moment:"AM+PM"},
+  "obf-laroch-cicaplastb-6659": {ean:"30106659",nom:"Cicaplast Baume Lèvres",marque:"La Roche-Posay",usage:"Baume lèvres réparateur",texture:"Baume",ak:["Panthénol","Beurre de karité"],comp:["Caprylic/capric triglyceride","PPG-5 pentaerythrityl ether","PEG-5 pentaerythrityl ether","Butyrospermum parkii butter/shea butter","cera alba/beeswax","panthenol","hydrogenated vegetable oil","ethylhexyl palmitate","silica silylate","polybutene","glycine soja/soybean stereols","aqua/water","sodium saccharin","myristyl malate phosphonic acid"],pq:"Lèvres sèches, gercées, abîmées.",ben:"Répare et protège les lèvres très desséchées.",app:"Appliquer aussi souvent que nécessaire.",moment:"AM+PM"},
+  "obf-avne-sticklvres-4797": {ean:"3282770204797",nom:"Cold Cream Stick Lèvres",marque:"Avène",usage:"Stick lèvres nourrissant",texture:"Stick",ak:["Eau thermale","Dioxyde de titane"],comp:["Octyldodecanol","polyethylene","butylene glycol cocoate","hydrogenated microcrystalline wax","bis - ethylhexyloxyphenol methoxyphenyl triazine","diethylamino hydroxybenzoyl hexyl benzoate","diethylhexyl butamido triazone","butyl methoxydibenzoylmethane","ethylhexyl salicylate","Beeswax (cera alba)","hydrogenated castor oil","Avene thermal spring water (avene aqua)","aluminum hydroxide","butylene glycol"],pq:"Lèvres sèches, sensibles.",ben:"Nourrit et protège du froid et du vent.",app:"Appliquer sur les lèvres au besoin.",moment:"AM+PM"},
+  "obf-uriage-baridermci-5459": {ean:"3661434005459",nom:"Bariéderm Cica Baume Lèvres",marque:"Uriage",usage:"Baume lèvres protecteur réparateur",texture:"Baume",ak:["Glycérine","Squalane"],comp:["4 PARAFFINUM LIQUIDUM (MINERAL OIL) CERA MICROCRISTALLINA (MICROCRYSTALLINE WAX) - PARAFFIN - HYDROGENATED POLYDECENE - DIMETHICONE - TRIACONTANYL PVP - DIPENTA - ERYTHRITYL TETRAHYDROXY - - STEARATE/TETRAISOSTEARATE - GLYCERIN - SQUALANE - BRAS - SICA CAMPESTRIS (RAPESEED) STEROLS TOCOPHERYL ACE - TATE SYNTHETIC WAX - ETHYLE - NE/PROPYLENE COPOLYMER - POLYETHYLENE - POLYQUATER - NIUM-61 - BHT."],pq:"Lèvres abîmées, gercées.",ben:"Répare la barrière et protège durablement.",app:"Plusieurs fois par jour.",moment:"AM+PM"},
+  "obf-euceri-baumelvres-1691": {ean:"4005800061691",nom:"Baume Lèvres Calmant",marque:"Eucerin",usage:"Baume lèvres calmant",texture:"Baume",ak:["Panthénol","Glycérine","Beurre de karité"],comp:["Octyldodecanol","Alkyl Hydroxystearoyl Stearate","Ricinus Communis Seed Oil","Caprylic Capric Triglyceride","Glycerin","Bis-Diglyceryl Polyacyladipate-2","Panthenol","Aqua","Butylene Glycol","Polyglyceryl-3 Diisostearate","Butyrospermum Parkii Butter","Hydrogenated Castor Oil","Glycyrrhiza Inflata Root Extract","Calcium Pantothenate"],pq:"Lèvres sensibles, irritées.",ben:"Apaise et restaure le confort des lèvres.",app:"Au besoin, sur lèvres propres.",moment:"AM+PM"},
+  "obf-avne-baumeaprsr-3889": {ean:"3282779003889",nom:"Homme Baume Après-Rasage",marque:"Avène",usage:"Baume après-rasage apaisant homme",texture:"Baume",ak:["Glycérine","Bisabolol","Eau thermale"],comp:["AVENE THERMAL SPRING WATER (AVENE AQUA) (SAFFLOWER) SEED OIL (CARTHAMUS TINCTORIUS SEED OIL). DIMETHICONE. GLYCERIN. ARACHIDYL ALCOHOL ETHYLHEXYL PALMITATE. BEHENYL ALCOHOL METHYL GLUCETH 20. 1","2HEXANEDIOL ALUMINUM SUCROSE OCTASULFATE. ARACHIDYL GLUCOSIDE. BENZOIC ACID. BISABOLOL CAPRYLIC/CAPRIC TRIGLYCERIDE. CAPRYLYL GLYCOL DISODIUM EDTA. FRAGRANCE STEARATE. HYDROXYCAPRIC ACID. HYDROXYETHYL ACRYLATE/SODIUM ACRYLOYLDIMETHYL TAURATE COPOLYMER. ISOHEXADECANE. PEG-100 STEARATE. POLYSORBATE 6O. SODIUM HYDROXIDE. SORBITAN ISOSTEARATE. TOCOPHERYL ACETATE. TOCOPHERYL GLUCOSIDE. WATER (AQUA). CARTHAMUS TINCTORIUS (PARFUM). GLYCERYL"],pq:"Peaux masculines sensibles, feu du rasoir.",ben:"Calme les irritations et rougeurs post-rasage.",app:"Après le rasage, sur peau propre et sèche.",moment:"AM"},
+  "obf-avene-aveneclean-0259": {ean:"3282770100259",nom:"Cleanance Gel Nettoyant",marque:"Avène",usage:"Gel nettoyant purifiant visage",texture:"Gel moussant",ak:["Formule douce"],comp:["A VVAIER AGUA). WATER }SEIHIONATE. COCETH SULFATE. POIYSORBATE 20. SODIUM CETEARETH-60 MYRISTYI GLYCOL. PEG40 HYDROGENATED Clïk:c AC!D. DiSODlUM EDTA. FRAGRANCE (PARFUM). GIYCERYI IAURATE. 5 (Cl 61570). IAURIC ACD. SODIUM BENZOATE. SODIUM CHIORIDE. SODIUM SODIUM METHYL ISETHIONATE. YEIIOW 5 (Cl 19140). ZINC GLUCONATE."],pq:"Peaux grasses à imperfections.",ben:"Nettoie et purifie sans dessécher.",app:"Matin et soir, faire mousser puis rincer.",moment:"AM+PM"},
+  "obf-uriage-gelnettoya-9990": {ean:"3661434009990",nom:"Hyséac Gel Nettoyant Anti-Imperfections",marque:"Uriage",usage:"Gel nettoyant anti-imperfections",texture:"Gel moussant",ak:["Glycérine","Vitamine E"],comp:["AQUA (WATER","EAU) SODIUM LAURETH SULFATE 2 PEG-80 GLYCERYL COCOATE SODIUM COCOAMPHOACETATE PPG-2 HYDROXYETHYL COCO/ISOSTEARAMIDE SODIUM LAURETH-8 SULFATE SODIUM METHYL COCOYL TAURATE COCO-GLUCOSIDE GLYCERYL OLEATE SULFATE SODIUM OLETH SULFATE GLYCERIN⚫ MAGNESIUM LAURETH-8 SULFATE MAGNESIUM OLETH SULFATE EPILOBIUM ANGUSTIFOLIUM FLOWER/LEAF/STEM EXTRACT •PIROCTONE OLAMINE MAGNESIUM LAURETH HYDROGENATED VEGETABLE GLYCERIDES CITRATE. GLYCINE CITRIC ACID ACL 6361867 CNK 4766671 CNP 6046607 ESPANA CN 185696.8 PET 12 M TOCOPHEROL FR Laboratoires Dermatologiques d'Uriage 92200 Neuilly - FRANCE MADE IN FRANCE - www.uriage.com 01/28"],pq:"Peaux mixtes à grasses, imperfections.",ben:"Élimine sébum et impuretés, limite les boutons.",app:"Matin et soir, rincer abondamment.",moment:"AM+PM"},
+  "obf-cerave-gelmoussan-7197": {ean:"3337875597197",nom:"Gel Moussant Nettoyant",marque:"CeraVe",usage:"Gel moussant nettoyant visage",texture:"Gel moussant",ak:["Niacinamide","Glycérine","Céramides","Vitamine E"],comp:["aqua","water","cocamidopropyl hydroxysultaine","glycerin","sodium lauroyl sarcosinate","propanediol","peg-150 pentaerythrityl tetrastearate","niacinamide","peg-6 caprylic","capric glycerides","ceramide np","ceramide ap","ceramide eop","carbomer"],pq:"Peaux normales à grasses.",ben:"Nettoie sans altérer la barrière cutanée.",app:"Matin et soir sur peau humide.",moment:"AM+PM"},
+  "obf-ducray-keracnylge-7500": {ean:"3282770037500",nom:"Keracnyl Gel Moussant",marque:"Ducray",usage:"Gel moussant visage et corps anti-imperfections",texture:"Gel moussant",ak:["Formule douce"],comp:["water (aqua)","zinc coceth sulfate","lauryl betaine","decyl glucoside","ceteareth-60 myristyl glycol","polysorbate 20","sodium chloride","trideceth-9","bht","blue 1 (CI 42090)","citric acid","fragrance (parfum)","myrtus communis leaf extract","peg-40 hydrogenated castor oil"],pq:"Peaux à tendance acnéique.",ben:"Nettoie en profondeur les zones à imperfections.",app:"Matin et soir, visage et dos.",moment:"AM+PM"},
+  "obf-topicr-gelnettoya-2040": {ean:"3700281702040",nom:"Gel Nettoyant Surgras",marque:"Topicrem",usage:"Gel nettoyant surgras peaux sèches",texture:"Gel surgras",ak:["Glycérine","Vitamine E","Allantoïne"],comp:["AQUA (WATER)","GLYCERIN","SODIUM LAURETH SULFATE","DECYL GLUCOSIDE","BETAINE","SODIUM COCOAMPHOACETATE","COCO-GLUCOSIDE","GLYCERYL OLEATE","PEG-200 HDROGENATED GLYCERYL PALMATE","1","2-HEXANEDIOL","CITRIC ACID","ALLANTOIN","PEG-7 GLYCERYL COCOATE"],pq:"Peaux sèches à très sèches.",ben:"Nettoie sans décaper, préserve le film hydrolipidique.",app:"Matin et soir, rincer.",moment:"AM+PM"},
+  "obf-svr-gellavantt-1866": {ean:"3662361001866",nom:"Topialyse Gel Lavant",marque:"SVR",usage:"Gel lavant peaux sèches atopiques",texture:"Gel lavant",ak:["Formule douce"],comp:["AQUA/WATER/EAU","SODIUM C14-16 OLEFIN SULFONATE","COCO-GLUCOSIDE","COCO-BETAINE","GLYCER PARFUM FRAGRANCE","CITRIC ACID","SODIUM BENZOATE","POTASSIUM SORBATE","SODIUM PHYTATE 1000"],pq:"Peaux sèches, atopiques, réactives.",ben:"Lave en douceur et limite les démangeaisons.",app:"Visage et corps, rincer.",moment:"AM+PM"},
+  "obf-uriage-eauthermal-0164": {ean:"3661434000164",nom:"Eau Thermale d'Uriage",marque:"Uriage",usage:"Eau thermale apaisante en brume",texture:"Brume",ak:["Glycérine"],comp:["Eau magnésium laureth sulfate decyl glucoside glycerin cocamidopropyl betanne"],pq:"Peaux sensibles, réactives, après-soleil.",ben:"Apaise instantanément et calme les rougeurs.",app:"Vaporiser à 20 cm, tamponner sans frotter.",moment:"AM+PM"},
+  "obf-laroch-effaclardu-8451": {ean:"3337875518451",nom:"Effaclar Duo+ Unifiant Teinte Light",marque:"La Roche-Posay",usage:"Soin anti-imperfections unifiant teinté",texture:"Crème teintée",ak:["Niacinamide","Acide salicylique","Zinc PCA","Glycérine","Dioxyde de titane"],comp:["Aqua/water","glycerin","dimethicone","isocetyl stearate","niacinamide","isopropyl lauroyl sarcosinate","ammonium polyacryloyldimethyl taurate","methyl methacrylate crosspolymer","t-butyl alcohol","sodium hydroxide","oleic acid","salicylic acid","silica silylate","poloxamer 338"],pq:"Peaux à imperfections, marques post-acné.",ben:"Corrige les imperfections tout en unifiant le teint.",app:"Le matin sur peau propre.",moment:"AM",teinte:true}
+
 
 };
 
@@ -2361,6 +2503,10 @@ function getCompat(key,skin,concern,age,allergies){
   // Complément : détection fine (allergènes parfum réglementés, conservateurs, "Autre:")
   var fine = detectFineAllergens(key, allergies);
   if (fine.hit) return 15;
+
+  // Grossesse / allaitement : un produit contenant un actif déconseillé est écarté,
+  // au même titre qu'un allergène. La sécurité prime sur la pertinence cosmétique.
+  if (typeof isPregnancyMode === 'function' && isPregnancyMode() && pregnancyFlags(key).length > 0) return 10;
 
   var s = 72;
   if (p.clean) s += 8;
@@ -2520,7 +2666,8 @@ function build(){
     });
   };
 
-  const safeAvail = (key) => avail(key) && !hasAllergen(key);
+  // Un produit est retenu s'il est disponible, sans allergène ET compatible grossesse.
+  const safeAvail = (key) => avail(key) && !hasAllergen(key) && isPregnancySafe(key);
   const mk=(key,etape,moment)=>({...DB[key],etape,moment,key,img:IMGS[key],pourquoi:getWhy(key,sk,c[0],ST.ageGroup),compat:getCompat(key,sk,c[0],ST.ageGroup,ST.allergies)});
   // Trouver une alternative sans allergène pour une étape donnée
   const findSafeAlt = (etape, excludeKey) => {
@@ -2529,6 +2676,7 @@ function build(){
       !usedKeys.has(k) && 
       avail(k) && 
       !hasAllergen(k) && 
+      isPregnancySafe(k) && 
       DB[k].moment && 
       (DB[k].usage||"").toLowerCase().includes(
         etape === "Nettoyant" ? "nettoy" : 
@@ -2540,8 +2688,8 @@ function build(){
 
   const addStep=(key,etape,moment)=>{
     if(!key||!DB[key])return;
-    // Vérifier allergènes - chercher une alternative si nécessaire
-    if(hasAllergen(key)){
+    // Vérifier allergènes et contre-indications grossesse - chercher une alternative
+    if(hasAllergen(key) || !isPregnancySafe(key)){
       const safeAlt = findSafeAlt(etape, key);
       if(safeAlt){ key = safeAlt; } else { return; } // Skip si aucune alternative safe
     }
@@ -2717,11 +2865,648 @@ function getRegionProducts() {
   return available;
 }
 
-const SCREENS=["lang","onboarding","welcome","register","login","scan","q1","diag","q2","q3","q4","q5","result","compare","suivi","dashboard","scan-product","profile","articles","settings","parrainage","abonnement","privacy","cgu","mentions"];
+// ══════════ TROUVER UN PRODUIT (peau → catégorie → [actif ciblé] → liste triée par compatibilité) ══════════
+// ══════════ RECHERCHE PAR PROBLÈME ══════════
+// Pour chaque problème, les familles d'actifs qui le traitent réellement. Chaque entrée de `act`
+// est un groupe : [libellé canonique, ...variantes recherchées]. Le regroupement évite qu'un même
+// actif ressorte deux fois (ex. "Acide salicylique" et "Salicylic") et sert à expliquer POURQUOI
+// on propose le produit.
+var CONCERN_DEF = [
+  { id:'acne',           emoji:'🔴', fr:'Acné / Boutons',            en:'Acne / Breakouts', act:[
+    ['Acide salicylique','salicylique','salicylic','bha'], ['Niacinamide','niacinamide'],
+    ['Zinc','zinc'], ['Acide azélaïque','azélaïque','azelaic'], ['LHA','lha'],
+    ['Soufre','soufre'], ['Peroxyde de benzoyle','peroxyde'], ['Myrtacine','myrtacine'],
+    ['Hydrocolloïde','hydrocolloïde','hydrocolloide'] ] },
+  { id:'imperfections',  emoji:'⚫', fr:'Points noirs',              en:'Blackheads', act:[
+    ['Acide salicylique','salicylique','salicylic','bha'], ['LHA','lha'], ['Niacinamide','niacinamide'],
+    ['Charbon','charbon'], ['Argile','argile'], ['Zinc','zinc'],
+    ['Acide glycolique','glycolique','glycolic'],
+    ['Hydrocolloïde','hydrocolloïde','hydrocolloide'] ] },
+  { id:'pores',          emoji:'🕳️', fr:'Pores dilatés',            en:'Enlarged pores', act:[
+    ['Niacinamide','niacinamide'], ['Zinc','zinc'],
+    ['Acide salicylique','salicylique','salicylic','bha'], ['Argile','argile'], ['Charbon','charbon'] ] },
+  { id:'taches',         emoji:'🟤', fr:'Taches & hyperpigmentation', en:'Dark spots', act:[
+    ['Vitamine C','vitamine c','ascorbic'], ['Niacinamide','niacinamide'],
+    ['Acide tranexamique','tranexamique','tranexamic'], ['Arbutine','arbutine','arbutin'],
+    ['Acide kojique','kojique','kojic'], ['Viniférine','viniférine','viniferine'],
+    ['Acide glycolique','glycolique','glycolic'] ] },
+  { id:'rides',          emoji:'〰️', fr:'Rides & anti-âge',         en:'Wrinkles & anti-aging', act:[
+    ['Rétinol','retinol','rétinol','retinal'], ['Peptides','peptide'], ['Proxylane','proxylane'],
+    ['Collagène','collagène','collagen'], ['Bakuchiol','bakuchiol'], ['Vitamine A','vitamine a'] ] },
+  { id:'eclat',          emoji:'✨', fr:'Teint terne / Éclat',       en:'Dull complexion / Radiance', act:[
+    ['Vitamine C','vitamine c','ascorbic'], ['Acide glycolique','glycolique','glycolic'],
+    ['Acide lactique','lactique','lactic'], ['AHA','aha'], ['Niacinamide','niacinamide'],
+    ['Acide férulique','férulique','ferulic'], ['Viniférine','viniférine','viniferine'],
+    ['Antioxydants','antioxydant'] ] },
+  { id:'deshydratation', emoji:'💧', fr:'Déshydratation',            en:'Dehydration', act:[
+    ['Acide hyaluronique','hyaluronique','hyaluronate','hyaluronic'],
+    ['Céramides','céramide','ceramide'], ['Squalane','squalane'],
+    ['Panthénol','panthénol','panthenol'], ['Urée','urée'], ['Aquaporines','aquaporine'],
+    ['Glycérol','glycérol'] ] },
+  { id:'rougeurs',       emoji:'🌡️', fr:'Rougeurs / Couperose',     en:'Redness / Rosacea', act:[
+    ['Centella / Cica','cica','centella','madecassoside'], ['Panthénol','panthénol','panthenol'],
+    ['Eau thermale','eau thermale'], ['Allantoïne','allantoïne','allantoin'],
+    ['Ambophénol','ambophénol'], ['Néurosensine','neurosensine','néurosensine'] ] },
+  { id:'sensibilite',    emoji:'🌸', fr:'Réactivité / Irritations',  en:'Sensitivity / Irritation', act:[
+    ['Centella / Cica','cica','centella','madecassoside'], ['Panthénol','panthénol','panthenol'],
+    ['Avoine','avoine'], ['Beurre de karité','karité'], ['Eau thermale','eau thermale'],
+    ['Allantoïne','allantoïne','allantoin'], ['Céramides','céramide','ceramide'],
+    ['Néurosensine','neurosensine','néurosensine'] ] },
+  { id:'cernes',         emoji:'👁️', fr:'Cernes & poches',          en:'Dark circles & puffiness', act:[
+    ['Caféine','caféine','caffeine'], ['Vitamine K','vitamine k'], ['Peptides','peptide'],
+    ['Acide hyaluronique','hyaluronique','hyaluronic'] ] }
+];
+
+// Actifs d'un produit qui traitent le problème : on cherche dans les actifs clés, la composition
+// et l'usage, et on renvoie un libellé par groupe d'actif trouvé (donc jamais de doublon).
+function _matchConcernActives(key, concernDef) {
+  var p = DB[key];
+  if (!p) return [];
+  var aks = (p.ak || []);
+  var hay = (aks.join(' ') + ' ' + (p.comp||[]).join(' ') + ' ' + (p.usage||'')).toLowerCase();
+  var hits = [];
+  concernDef.act.forEach(function(group){
+    var canonical = group[0];
+    var variants = group.slice(1);
+    if (!variants.some(function(v){ return hay.indexOf(v) > -1; })) return;
+    // Si le produit nomme précisément l'actif (avec son dosage par ex.), on affiche son libellé.
+    var pretty = aks.find(function(a){
+      var al = a.toLowerCase();
+      return variants.some(function(v){ return al.indexOf(v) > -1; });
+    });
+    hits.push(pretty || canonical);
+  });
+  return hits;
+}
+
+// Produits déjà retenus par la logique de routine (ROUTE.ser) pour ce problème : ils ont été
+// sélectionnés éditorialement, donc on les fait remonter dans le classement.
+function _curatedForConcern(concernId) {
+  var e = (typeof ROUTE !== 'undefined' && ROUTE.ser) ? ROUTE.ser[concernId] : null;
+  if (!e) return [];
+  return [e.low, e.mid, e.high].filter(Boolean);
+}
+
+var FIND_CATEGORIES = [
+  { id:'nettoyant',   emoji:'🧴', fr:'Nettoyant',            en:'Cleanser',            sub_fr:'Gel, mousse',                  sub_en:'Gel, foam' },
+  { id:'demaquillant',emoji:'🧽', fr:'Démaquillant',         en:'Makeup remover',     sub_fr:'Eau micellaire, huile',        sub_en:'Micellar water, oil' },
+  { id:'serum',       emoji:'💧', fr:'Sérum',                en:'Serum',               sub_fr:'Soin concentré ciblé',         sub_en:'Concentrated targeted care' },
+  { id:'creme',       emoji:'🫙', fr:'Crème / Hydratant',    en:'Cream / Moisturizer', sub_fr:'Hydratation quotidienne',      sub_en:'Daily hydration' },
+  { id:'spf',         emoji:'☀️', fr:'Protection solaire',   en:'Sun protection',     sub_fr:'SPF, anti-UV',                 sub_en:'SPF, UV protection' },
+  { id:'masque',      emoji:'🎭', fr:'Masque',               en:'Mask',                sub_fr:'Soin ponctuel intensif',       sub_en:'Occasional intensive care' },
+  { id:'patch',       emoji:'🩹', fr:'Patchs',               en:'Patches',             sub_fr:'Boutons, yeux, soin localisé', sub_en:'Blemishes, eyes, spot care' },
+  { id:'gommage',     emoji:'🧂', fr:'Gommage / Exfoliant',  en:'Scrub / Exfoliant',   sub_fr:'Grain de peau, teint terne',   sub_en:'Texture, dull complexion' },
+  { id:'levres',      emoji:'💋', fr:'Lèvres',               en:'Lips',                sub_fr:'Baume, stick réparateur',      sub_en:'Balm, repairing stick' },
+  { id:'brume',       emoji:'💨', fr:'Brume / Eau thermale', en:'Mist / Thermal water',sub_fr:'Apaise, fixe, rafraîchit',     sub_en:'Soothes, sets, refreshes' },
+  { id:'homme',       emoji:'🧔', fr:'Homme / Rasage',       en:'Men / Shaving',       sub_fr:'Feu du rasoir, après-rasage',  sub_en:'Razor burn, aftershave' },
+  { id:'yeux',        emoji:'👁️', fr:'Contour des yeux',    en:'Eye care',           sub_fr:'Cernes, poches',               sub_en:'Dark circles, puffiness' },
+  { id:'corps',       emoji:'🧖', fr:'Corps',                en:'Body',                sub_fr:'Soin corporel',                sub_en:'Body care' }
+];
+var FIND_CAT_ORDER = ['patch','homme','levres','brume','gommage','spf','demaquillant','nettoyant','masque','yeux','corps','serum','creme'];
+
+// Mots-clés capillaires : SkinMatch est une app de soin du visage, les produits cheveux
+// (shampooings, soins anti-chute, etc.) sont volontairement exclus de "Trouver un produit"
+// plutôt que mal classés dans une catégorie visage qui ne leur correspond pas.
+var HAIR_EXCLUDE_KW = ['shampooing','cheveux','chute des cheveux','pellicul','capillaire'];
+
+function categorizeProduct(key) {
+  var p = DB[key];
+  if (!p) return null;
+  var hay = ((p.usage||'') + ' ' + (p.texture||'')).toLowerCase();
+  if (HAIR_EXCLUDE_KW.some(function(k){ return hay.indexOf(k) > -1; })) return null;
+  var KW = {
+    // Les patchs sont testés en premier : un patch contour des yeux doit atterrir dans
+    // "Patchs" (format), pas dans "Contour des yeux" (zone).
+    patch:        ['patch','hydrocolloïde','hydrocolloide'],
+    // Cibles specifiques testees avant les categories generiques : un baume levres ou un
+    // apres-rasage ne doit pas finir dans "Creme" par defaut.
+    homme:        ['après-rasage','apres-rasage','rasage','barbe'],
+    levres:       ['lèvres','levres'],
+    brume:        ['brume','eau thermale'],
+    gommage:      ['gommage','exfoliant','peel','scrub'],
+    spf:          ['spf','solaire','anti-uv',' uv '],
+    // Démaquillant vérifié avant Nettoyant : une eau micellaire ou un produit "nettoyant ET
+    // démaquillant" doit apparaître dans la catégorie la plus précise pour l'utilisateur.
+    demaquillant: ['démaquillant','demaquillant','micellaire'],
+    nettoyant:    ['nettoyant','nettoy'],
+    masque:       ['masque'],
+    yeux:         ['yeux','cernes'],
+    corps:        ['corps'],
+    serum:        ['sérum','serum'],
+    creme:        ['crème','creme','hydratant','lotion','tonifiant']
+  };
+  for (var i=0;i<FIND_CAT_ORDER.length;i++) {
+    var id = FIND_CAT_ORDER[i];
+    if (KW[id].some(function(k){ return hay.indexOf(k) > -1; })) return id;
+  }
+  return 'creme';
+}
+
+// Sous-catégorisation des sérums par actif principal : deux sérums n'ont souvent rien à voir
+// (rétinol anti-âge vs. niacinamide anti-imperfections), les mélanger dans une seule liste
+// n'a pas de sens pour un vrai conseil produit.
+var SERUM_ACTIVE_TYPES = [
+  { id:'retinol',     fr:'Rétinol',                        en:'Retinol',
+    concern_fr:'Anti-âge, rides, renouvellement cellulaire', concern_en:'Anti-aging, wrinkles, cell renewal',
+    kw:['retinol','rétinol','retinaldehyde','retinal'] },
+  { id:'tranexamic',  fr:'Acide tranexamique',              en:'Tranexamic acid',
+    concern_fr:'Taches pigmentaires, mélasma',                concern_en:'Dark spots, melasma',
+    kw:['tranexamique','tranexamic'] },
+  { id:'vitc',        fr:'Vitamine C',                      en:'Vitamin C',
+    concern_fr:'Éclat du teint, taches, effet antioxydant',   concern_en:'Radiance, dark spots, antioxidant effect',
+    kw:['vitamine c','ascorbic','ascorbique'] },
+  { id:'niacinamide', fr:'Niacinamide',                     en:'Niacinamide',
+    concern_fr:'Pores dilatés, excès de sébum, imperfections', concern_en:'Enlarged pores, excess sebum, blemishes',
+    kw:['niacinamide'] },
+  { id:'bha',         fr:'Acide salicylique (BHA)',         en:'Salicylic acid (BHA)',
+    concern_fr:'Imperfections, acné, points noirs',           concern_en:'Blemishes, acne, blackheads',
+    kw:['acide salicylique','salicylic','lha'] },
+  { id:'aha',         fr:'AHA (glycolique / lactique)',     en:'AHA (glycolic / lactic)',
+    concern_fr:'Teint terne, texture irrégulière, exfoliation', concern_en:'Dullness, uneven texture, exfoliation',
+    kw:['glycolique','glycolic','lactique','lactic','mandélique','mandelic'] },
+  { id:'ha',          fr:'Acide hyaluronique',               en:'Hyaluronic acid',
+    concern_fr:'Déshydratation, manque de volume',            concern_en:'Dehydration, lack of plumpness',
+    kw:['hyaluronique','hyaluronate','hyaluronic'] },
+  { id:'peptides',    fr:'Peptides / complexe anti-âge',    en:'Peptides / anti-aging complex',
+    concern_fr:'Fermeté, rides installées, relâchement',      concern_en:'Firmness, deep wrinkles, sagging',
+    kw:['peptide','proxylane','collagène','collagen','idans'] },
+  { id:'cafeine',     fr:'Caféine',                          en:'Caffeine',
+    concern_fr:'Cernes, poches, regard fatigué',              concern_en:'Dark circles, puffiness, tired eyes',
+    kw:['caféine','caffeine'] },
+  { id:'antioxydant', fr:'Antioxydant',                      en:'Antioxidant',
+    concern_fr:'Protection contre les radicaux libres',       concern_en:'Protection against free radicals',
+    kw:['antioxydant','ferulic','férulique','tocopherol','vitamine e'] }
+];
+var SERUM_ACTIVE_FALLBACK = { id:'autre', fr:'Autre actif', en:'Other active', concern_fr:'Soin ciblé spécifique', concern_en:'Specific targeted care' };
+
+function getSerumActiveType(key) {
+  var p = DB[key];
+  if (!p) return SERUM_ACTIVE_FALLBACK;
+  var hay = ((p.ak||[]).join(' ') + ' ' + (p.comp||[]).join(' ') + ' ' + (p.usage||'')).toLowerCase();
+  for (var i=0;i<SERUM_ACTIVE_TYPES.length;i++) {
+    if (SERUM_ACTIVE_TYPES[i].kw.some(function(k){ return hay.indexOf(k) > -1; })) return SERUM_ACTIVE_TYPES[i];
+  }
+  return SERUM_ACTIVE_FALLBACK;
+}
+
+function findMomentLabel(moment, isEN) {
+  if (!moment) return '';
+  if (moment === 'AM') return isEN ? 'Morning only' : 'Matin uniquement';
+  if (moment === 'PM') return isEN ? 'Evening only' : 'Soir uniquement';
+  if (moment.indexOf('AM') > -1 && moment.indexOf('PM') > -1) return isEN ? 'Morning & evening' : 'Matin et soir';
+  return moment;
+}
+
+// mode: 'cat' (recherche par type de produit) ou 'concern' (recherche par problème)
+var FP = { mode:'cat', skin:null, cat:null, subtype:null, concern:null };
+
+function startFindProduct() {
+  FP.mode = 'cat'; FP.skin = null; FP.cat = null; FP.subtype = null; FP.concern = null;
+  go('find-product');
+  setTimeout(function(){
+    renderFindSkinOpts();
+    renderFindStep('skin');
+  }, 0);
+}
+
+function startFindConcern() {
+  FP.mode = 'concern'; FP.skin = null; FP.cat = null; FP.subtype = null; FP.concern = null;
+  go('find-product');
+  setTimeout(function(){
+    renderFindSkinOpts();
+    renderFindStep('skin');
+  }, 0);
+}
+
+function renderFindStep(step) {
+  document.getElementById('find-step-skin').style.display = step === 'skin' ? 'block' : 'none';
+  document.getElementById('find-step-cat').style.display = step === 'cat' ? 'block' : 'none';
+  document.getElementById('find-step-concern').style.display = step === 'concern' ? 'block' : 'none';
+  document.getElementById('find-step-subtype').style.display = step === 'subtype' ? 'block' : 'none';
+  document.getElementById('find-step-results').style.display = step === 'results' ? 'block' : 'none';
+  document.getElementById('find-step-detail').style.display = step === 'detail' ? 'block' : 'none';
+  window.scrollTo({top:0, behavior:'instant'});
+}
+
+function findBack() {
+  var d = document.getElementById('find-step-detail');
+  var r = document.getElementById('find-step-results');
+  var s = document.getElementById('find-step-subtype');
+  var c = document.getElementById('find-step-cat');
+  var cc = document.getElementById('find-step-concern');
+  var step2 = FP.mode === 'concern' ? 'concern' : 'cat';
+  if (d && d.style.display === 'block') { renderFindStep('results'); return; }
+  if (r && r.style.display === 'block') {
+    if (FP.mode === 'cat' && FP.cat === 'serum') { renderFindStep('subtype'); } else { renderFindStep(step2); }
+    return;
+  }
+  if (s && s.style.display === 'block') { renderFindStep('cat'); return; }
+  if ((c && c.style.display === 'block') || (cc && cc.style.display === 'block')) { renderFindStep('skin'); return; }
+  go('welcome');
+}
+
+function findSkinLabel(skin, isEN) {
+  var labels = {
+    seche:    isEN ? 'dry skin'         : 'peau sèche',
+    grasse:   isEN ? 'oily skin'        : 'peau grasse',
+    mixte:    isEN ? 'combination skin' : 'peau mixte',
+    normale:  isEN ? 'normal skin'      : 'peau normale',
+    sensible: isEN ? 'sensitive skin'   : 'peau sensible'
+  };
+  return labels[skin] || skin;
+}
+
+function renderFindSkinOpts() {
+  var isEN = LANG === 'en';
+  var opts = [
+    { id:'seche',    emoji:'🏜️', fr:'Sèche',    en:'Dry',         sub_fr:'Tiraillements',  sub_en:'Tightness',   bg:'#FAF0ED' },
+    { id:'grasse',   emoji:'✨', fr:'Grasse',   en:'Oily',        sub_fr:'Brillance',      sub_en:'Shine',       bg:'#FBE8E4' },
+    { id:'mixte',    emoji:'🌓', fr:'Mixte',    en:'Combination', sub_fr:'Zone T',         sub_en:'T-zone',      bg:'#F6E2DC' },
+    { id:'normale',  emoji:'🌿', fr:'Normale',  en:'Normal',      sub_fr:'Équilibrée',     sub_en:'Balanced',    bg:'#FAF0ED' },
+    { id:'sensible', emoji:'🌸', fr:'Sensible', en:'Sensitive',   sub_fr:'Réactive',       sub_en:'Reactive',    bg:'#FBE8E4' }
+  ];
+  document.getElementById('find-skin-opts').innerHTML = opts.map(function(o){
+    return '<button class="sr" onclick="pickFindSkin(\''+o.id+'\')" style="align-items:center;gap:14px;padding:12px 14px">'
+      + '<div style="flex-shrink:0;width:44px;height:44px;border-radius:13px;background:'+o.bg+';display:flex;align-items:center;justify-content:center;font-size:19px;box-shadow:inset 0 0 0 1.5px rgba(196,114,106,.08)">'+o.emoji+'</div>'
+      + '<div style="flex:1;text-align:left"><div class="rl">'+(isEN?o.en:o.fr)+'</div><div class="rs">'+(isEN?o.sub_en:o.sub_fr)+'</div></div>'
+      + '<svg width="16" height="16" viewBox="0 0 24 24" fill="#C4887F"><path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6z"/></svg>'
+      + '</button>';
+  }).join('');
+}
+
+function pickFindSkin(skin) {
+  FP.skin = skin;
+  if (FP.mode === 'concern') {
+    renderFindConcernOpts();
+    renderFindStep('concern');
+  } else {
+    renderFindCatOpts();
+    renderFindStep('cat');
+  }
+}
+
+function renderFindConcernOpts() {
+  var isEN = LANG === 'en';
+  document.getElementById('find-concern-opts').innerHTML = CONCERN_DEF.map(function(c, i){
+    var bg = ['#FAF0ED','#FBE8E4','#F6E2DC'][i % 3];
+    // Nombre de produits du catalogue qui agissent réellement sur ce problème.
+    var n = Object.keys(DB).filter(function(k){
+      return categorizeProduct(k) && _matchConcernActives(k, c).length > 0;
+    }).length;
+    return '<button class="sr" onclick="pickFindConcern(\''+c.id+'\')" style="align-items:center;gap:14px;padding:12px 14px">'
+      + '<div style="flex-shrink:0;width:44px;height:44px;border-radius:13px;background:'+bg+';display:flex;align-items:center;justify-content:center;font-size:19px;box-shadow:inset 0 0 0 1.5px rgba(196,114,106,.08)">'+c.emoji+'</div>'
+      + '<div style="flex:1;text-align:left"><div class="rl">'+(isEN?c.en:c.fr)+'</div><div class="rs">'+n+' '+(isEN?'products':'produits')+'</div></div>'
+      + '<svg width="16" height="16" viewBox="0 0 24 24" fill="#C4887F"><path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6z"/></svg>'
+      + '</button>';
+  }).join('');
+  var t = document.getElementById('find-concern-title');
+  if (t) t.textContent = isEN ? 'What do you want to treat?' : 'Quel problème veux-tu traiter ?';
+  var s = document.getElementById('find-concern-sub');
+  if (s) s.textContent = isEN ? 'We only show products whose actives target it.' : 'On te propose les produits dont les actifs ciblent ce problème.';
+}
+
+function pickFindConcern(concernId) {
+  FP.concern = concernId;
+  renderFindResults();
+  renderFindStep('results');
+}
+
+// Nuances de la palette rose/blush de l'app : on différencie les catégories par l'intensité
+// du fond, pas par des teintes vives — l'app reste dans son univers skincare, doux et neutre.
+var FIND_CAT_COLORS = {
+  nettoyant:    { bg:'#FAF0ED' },
+  demaquillant: { bg:'#FBE8E4' },
+  serum:        { bg:'#F6E2DC' },
+  creme:        { bg:'#FAF0ED' },
+  spf:          { bg:'#FBE8E4' },
+  masque:       { bg:'#F6E2DC' },
+  patch:        { bg:'#FAF0ED' },
+  gommage:      { bg:'#FBE8E4' },
+  levres:       { bg:'#F6E2DC' },
+  brume:        { bg:'#FAF0ED' },
+  homme:        { bg:'#FBE8E4' },
+  yeux:         { bg:'#FAF0ED' },
+  corps:        { bg:'#FBE8E4' }
+};
+
+function renderFindCatOpts() {
+  var isEN = LANG === 'en';
+  document.getElementById('find-cat-opts').innerHTML = FIND_CATEGORIES.map(function(c){
+    var col = FIND_CAT_COLORS[c.id] || { bg:'#FBE8E4' };
+    return '<button class="sr" onclick="pickFindCategory(\''+c.id+'\')" style="align-items:center;gap:14px;padding:12px 14px">'
+      + '<div style="flex-shrink:0;width:44px;height:44px;border-radius:13px;background:'+col.bg+';display:flex;align-items:center;justify-content:center;font-size:19px;box-shadow:inset 0 0 0 1.5px rgba(196,114,106,.08)">'+c.emoji+'</div>'
+      + '<div style="flex:1;text-align:left"><div class="rl">'+(isEN?c.en:c.fr)+'</div><div class="rs">'+(isEN?c.sub_en:c.sub_fr)+'</div></div>'
+      + '<svg width="16" height="16" viewBox="0 0 24 24" fill="#C4887F"><path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6z"/></svg>'
+      + '</button>';
+  }).join('');
+}
+
+function pickFindCategory(catId) {
+  FP.cat = catId;
+  FP.subtype = null;
+  if (catId === 'serum') {
+    renderFindSubtypeOpts();
+    renderFindStep('subtype');
+  } else {
+    renderFindResults();
+    renderFindStep('results');
+  }
+}
+
+function renderFindSubtypeOpts() {
+  var isEN = LANG === 'en';
+  var regionKeys = new Set(getRegionProducts());
+  var serumKeys = Object.keys(DB).filter(function(k){ return regionKeys.has(k) && categorizeProduct(k) === 'serum'; });
+  var counts = {};
+  serumKeys.forEach(function(k){
+    var t = getSerumActiveType(k);
+    if (!counts[t.id]) counts[t.id] = { type:t, n:0 };
+    counts[t.id].n++;
+  });
+  var available = Object.keys(counts).map(function(id){ return counts[id]; }).sort(function(a,b){ return b.n - a.n; });
+
+  var allBtn = '<button class="sr" onclick="pickFindSubtype(null)" style="align-items:center;gap:14px;padding:12px 14px;border-color:#C4726A;background:var(--blush,#F5E8E6)">'
+    + '<div style="flex-shrink:0;width:40px;height:40px;border-radius:12px;background:#C4726A;display:flex;align-items:center;justify-content:center;font-size:18px">💧</div>'
+    + '<div style="flex:1;text-align:left"><div class="rl" style="color:#C4726A">'+(isEN?'All serums':'Tous les sérums')+'</div><div class="rs">'+(isEN?'See every serum, ranked by match':'Voir tous les sérums, classés par compatibilité')+'</div></div>'
+    + '<svg width="16" height="16" viewBox="0 0 24 24" fill="#C4887F"><path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6z"/></svg>'
+    + '</button>';
+
+  var typeBtns = available.map(function(c){
+    var t = c.type;
+    return '<button class="sr" onclick="pickFindSubtype(\''+t.id+'\')" style="align-items:center;gap:14px;padding:12px 14px">'
+      + '<div style="flex-shrink:0;width:40px;height:40px;border-radius:12px;background:var(--blush,#F5E8E6);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#C4726A">'+c.n+'</div>'
+      + '<div style="flex:1;text-align:left"><div class="rl">'+(isEN?t.en:t.fr)+'</div><div class="rs">'+(isEN?t.concern_en:t.concern_fr)+'</div></div>'
+      + '<svg width="16" height="16" viewBox="0 0 24 24" fill="#C4887F"><path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6z"/></svg>'
+      + '</button>';
+  }).join('');
+
+  document.getElementById('find-subtype-opts').innerHTML = allBtn + typeBtns;
+  var lbl = document.getElementById('find-subtype-title');
+  if (lbl) lbl.textContent = isEN ? 'Looking for a specific active?' : 'Un actif en particulier ?';
+  var sub = document.getElementById('find-subtype-sub');
+  if (sub) sub.textContent = isEN ? 'Each active targets a different concern.' : 'Chaque actif cible un problème différent.';
+}
+
+function pickFindSubtype(subtypeId) {
+  FP.subtype = subtypeId;
+  renderFindResults();
+  renderFindStep('results');
+}
+
+// Anneau de compatibilité en SVG (plus lisible et plus vivant qu'une simple pastille plate).
+function _findCompatRing(compat, color) {
+  var size = 40, r = 16.5, stroke = 3.5;
+  var circ = 2 * Math.PI * r;
+  var offset = circ * (1 - Math.max(0,Math.min(100,compat))/100);
+  return '<svg width="'+size+'" height="'+size+'" viewBox="0 0 '+size+' '+size+'" style="flex-shrink:0">'
+    + '<circle cx="'+(size/2)+'" cy="'+(size/2)+'" r="'+r+'" fill="none" stroke="#F3ECE8" stroke-width="'+stroke+'"/>'
+    + '<circle cx="'+(size/2)+'" cy="'+(size/2)+'" r="'+r+'" fill="none" stroke="'+color+'" stroke-width="'+stroke+'" stroke-linecap="round" stroke-dasharray="'+circ.toFixed(1)+'" stroke-dashoffset="'+offset.toFixed(1)+'" transform="rotate(-90 '+(size/2)+' '+(size/2)+')" style="transition:stroke-dashoffset .6s ease"/>'
+    + '<text x="'+(size/2)+'" y="'+(size/2+3.5)+'" text-anchor="middle" font-size="10.5" font-weight="600" fill="'+color+'" font-family="Outfit, sans-serif">'+compat+'</text>'
+    + '</svg>';
+}
+
+// Construit une carte produit. subLine est le texte contextuel (varie selon le mode).
+function _findProductCard(item, idx, isEN, subLineTxt, showTopBadge) {
+  var p = item.p, compat = item.compat;
+  // Palette skincare : sauge douce pour un très bon score, rose de la marque pour un bon
+  // score, taupe neutre en dessous. Aucune couleur saturée type vert/rouge d'alerte.
+  var color = compat>=85?'#8A9E86':compat>=70?'#C4726A':'#B0958F';
+  var initiales = (p.marque||'??').substring(0,2).toUpperCase();
+  var momentTxt = '';
+  if (p.moment === 'AM') momentTxt = isEN ? 'AM' : 'Matin';
+  else if (p.moment === 'PM') momentTxt = isEN ? 'PM' : 'Soir';
+
+  var subLine = subLineTxt
+    ? '<div style="font-size:11px;color:#A8837B;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">' + subLineTxt + '</div>'
+    : '';
+
+  var metaParts = [];
+  if (p.marque) metaParts.push(p.marque);
+  if (p.prix) metaParts.push(p.prix);
+  if (momentTxt) metaParts.push(momentTxt);
+
+  var topBadge = showTopBadge ? '<span style="display:inline-block;background:#FBE8E4;color:#A85A52;font-size:9px;font-weight:700;letter-spacing:.3px;border-radius:20px;padding:2px 7px;margin-left:6px;vertical-align:1.5px">TOP</span>' : '';
+
+  return '<div class="find-card" onclick="openFindDetail(\''+item.key+'\')" style="background:#fff;border-radius:14px;padding:11px 13px;margin-bottom:8px;display:flex;align-items:center;gap:11px;box-shadow:0 1px 5px rgba(196,114,106,.07);cursor:pointer;animation-delay:'+(Math.min(idx,8)*0.04).toFixed(3)+'s">'
+    + '<div style="width:40px;height:40px;border-radius:11px;background:#FAF0ED;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600;color:#A8837B;flex-shrink:0">'+initiales+'</div>'
+    + '<div style="flex:1;min-width:0">'
+    + '<div style="font-size:13.5px;font-weight:600;color:#3D2B1F;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+(p.nom||'')+topBadge+'</div>'
+    + '<div style="font-size:11.5px;color:#8B6F5E;margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+metaParts.join(' · ')+'</div>'
+    + subLine
+    + '</div>'
+    + _findCompatRing(compat, color)
+    + '</div>';
+}
+
+var FIND_CARD_STYLE = '<style>'
+  + '@keyframes findCardIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}'
+  + '.find-card{animation:findCardIn .35s cubic-bezier(.2,.7,.3,1) both;transition:transform .15s ease,box-shadow .15s ease}'
+  + '.find-card:active{transform:scale(.985)}'
+  + '@media (hover:hover){.find-card:hover{box-shadow:0 6px 16px rgba(196,114,106,.13)}}'
+  + '</style>';
+
+// Résultats du mode "problème" : uniquement les produits dont les actifs traitent le problème,
+// regroupés par type de produit (nettoyant, sérum, crème...) pour construire une vraie réponse.
+function renderFindConcernResults() {
+  var isEN = LANG === 'en';
+  var def = CONCERN_DEF.find(function(c){ return c.id === FP.concern; });
+  if (!def) return;
+  var regionKeys = new Set(getRegionProducts());
+  var curated = _curatedForConcern(FP.concern);
+
+  var list = Object.keys(DB).filter(function(k){
+    return regionKeys.has(k) && categorizeProduct(k) && isPregnancySafe(k);
+  }).map(function(k){
+    var actives = _matchConcernActives(k, def);
+    return {
+      key:k, p:DB[k], actives:actives,
+      cat: categorizeProduct(k),
+      compat: getCompat(k, FP.skin, FP.concern, null, []),
+      // Pertinence = nombre d'actifs qui traitent le problème, bonus si sélection éditoriale.
+      rel: actives.length + (curated.indexOf(k) > -1 ? 2 : 0)
+    };
+  }).filter(function(x){ return x.actives.length > 0; })
+    .sort(function(a,b){ return (b.rel - a.rel) || (b.compat - a.compat); });
+
+  var titleEl = document.getElementById('find-results-title');
+  if (titleEl) titleEl.textContent = isEN ? def.en : def.fr;
+  var subEl = document.getElementById('find-results-sub');
+  if (subEl) {
+    subEl.textContent = list.length + ' ' + (isEN?'products':'produits') + ' · '
+      + findSkinLabel(FP.skin, isEN) + ' · '
+      + (isEN ? 'actives that target it' : 'actifs qui ciblent ce problème');
+  }
+
+  var wrap = document.getElementById('find-results-list');
+  if (!wrap) return;
+  if (list.length === 0) {
+    wrap.innerHTML = '<div style="text-align:center;padding:30px 10px;color:#B0958F;font-size:13px">'
+      + (isEN ? 'No product in the catalogue targets this yet.' : 'Aucun produit du catalogue ne cible ce problème pour le moment.') + '</div>';
+    return;
+  }
+
+  // Regroupement par type de produit, dans l'ordre d'une routine.
+  var ORDER = ['demaquillant','nettoyant','gommage','serum','creme','spf','masque','patch','yeux','levres','brume','homme','corps'];
+  var groups = {};
+  list.forEach(function(x){ (groups[x.cat] = groups[x.cat] || []).push(x); });
+
+  var idx = 0;
+  var html = FIND_CARD_STYLE;
+  // Le conseil carnation precede la liste : sur taches et eclat, la strategie change
+  // radicalement selon le phototype, il faut le lire avant de choisir un produit.
+  if (FP.concern === 'taches' || FP.concern === 'eclat') {
+    html += buildPhototypeCard('taches', isEN);
+  }
+  ORDER.forEach(function(catId){
+    var items = groups[catId];
+    if (!items || !items.length) return;
+    var c = FIND_CATEGORIES.find(function(x){ return x.id === catId; });
+    html += '<div style="font-size:11px;font-weight:700;color:#A8837B;text-transform:uppercase;letter-spacing:1.2px;margin:16px 0 8px">'
+      + (c ? (isEN?c.en:c.fr) : catId) + ' <span style="color:#CBB3AC;font-weight:600">' + items.length + '</span></div>';
+    items.forEach(function(item, i){
+      // Ligne contextuelle utile ici : les actifs du produit qui traitent CE problème.
+      html += _findProductCard(item, idx, isEN, item.actives.slice(0,3).join(' · '), idx === 0);
+      idx++;
+    });
+  });
+  wrap.innerHTML = html;
+}
+
+function renderFindResults() {
+  if (FP.mode === 'concern') { renderFindConcernResults(); return; }
+  var isEN = LANG === 'en';
+  var regionKeys = new Set(getRegionProducts());
+  var cat = FIND_CATEGORIES.find(function(c){ return c.id === FP.cat; });
+  var list = Object.keys(DB).filter(function(k){
+    if (!regionKeys.has(k) || categorizeProduct(k) !== FP.cat) return false;
+    if (!isPregnancySafe(k)) return false; // contre-indication grossesse / allaitement
+    if (FP.cat === 'serum' && FP.subtype) return getSerumActiveType(k).id === FP.subtype;
+    return true;
+  }).map(function(k){
+    return { key:k, p:DB[k], compat: getCompat(k, FP.skin, null, null, []), serumType: FP.cat === 'serum' ? getSerumActiveType(k) : null };
+  }).sort(function(a,b){ return b.compat - a.compat; });
+
+  // Un filtre d'actif est actif → l'actif est déjà annoncé dans le titre. Le répéter sur
+  // chaque carte n'apporte rien et alourdit fortement la lecture (toutes les lignes identiques).
+  var filtered = (FP.cat === 'serum' && FP.subtype);
+
+  var subtypeLabel = '';
+  if (filtered) {
+    var t = SERUM_ACTIVE_TYPES.find(function(x){ return x.id === FP.subtype; }) || SERUM_ACTIVE_FALLBACK;
+    subtypeLabel = ' · ' + (isEN ? t.en : t.fr);
+  }
+  // Titre court : la catégorie (et l'actif si filtré). Le contexte peau + tri passe en sous-titre.
+  var titleEl = document.getElementById('find-results-title');
+  if (titleEl) titleEl.textContent = (cat ? (isEN?cat.en:cat.fr) : '') + subtypeLabel;
+  var subEl = document.getElementById('find-results-sub');
+  if (subEl) {
+    subEl.textContent = list.length + ' ' + (isEN ? 'products' : 'produits') + ' · '
+      + findSkinLabel(FP.skin, isEN) + ' · '
+      + (isEN ? 'best match first' : 'du plus compatible au moins compatible');
+  }
+
+  var wrap = document.getElementById('find-results-list');
+  if (!wrap) return;
+  if (list.length === 0) {
+    wrap.innerHTML = '<div style="text-align:center;padding:30px 10px;color:#B0958F;font-size:13px">' + (isEN ? 'No products in this category yet.' : 'Aucun produit dans cette catégorie pour le moment.') + '</div>';
+    return;
+  }
+
+  var photoLead = (FP.cat === 'spf') ? buildPhototypeCard('solaire', isEN) : '';
+  wrap.innerHTML = FIND_CARD_STYLE + photoLead + list.map(function(item, idx){
+    // Ligne 3 seulement quand elle apporte une info nouvelle :
+    //  - liste de sérums non filtrée → nom de l'actif seul (court), pour distinguer les produits
+    //  - autres catégories → "pour qui" du produit
+    var subLineTxt = '';
+    if (item.serumType && !filtered) {
+      subLineTxt = isEN ? item.serumType.en : item.serumType.fr;
+    } else if (!item.serumType && item.p.pq) {
+      subLineTxt = item.p.pq;
+    }
+    return _findProductCard(item, idx, isEN, subLineTxt, idx === 0);
+  }).join('');
+}
+
+function openFindDetail(key) {
+  var isEN = LANG === 'en';
+  var p = DB[key];
+  if (!p) return;
+  var compat = getCompat(key, FP.skin, FP.concern, null, []);
+  var color = compat>=85?'#7B8F77':compat>=70?'#C4726A':'#9C8078';
+  var bg = compat>=85?'#EFF3EE':compat>=70?'#FBE8E4':'#F4EDEA';
+  var serumType = (categorizeProduct(key) === 'serum') ? getSerumActiveType(key) : null;
+  // En mode "problème", on explique explicitement pourquoi ce produit est proposé.
+  var concernDefSel = FP.concern ? CONCERN_DEF.find(function(c){ return c.id === FP.concern; }) : null;
+  var concernActives = concernDefSel ? _matchConcernActives(key, concernDefSel) : [];
+  var momentLabel = findMomentLabel(p.moment, isEN);
+  var html = ''
+    + '<div style="background:#fff;border-radius:18px;padding:20px;box-shadow:0 4px 16px rgba(0,0,0,.06)">'
+    + '<div style="display:flex;align-items:center;gap:14px;margin-bottom:14px">'
+    + '<div style="width:56px;height:56px;border-radius:12px;background:#F5E8E6;display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:700;color:#C4726A;flex-shrink:0">'+((p.marque||'??').substring(0,2).toUpperCase())+'</div>'
+    + '<div style="flex:1"><div style="font-family:Georgia,serif;font-size:17px;font-weight:700;color:#3D2B1F">'+(p.nom||'')+'</div><div style="font-size:12px;color:#8B6F5E">'+(p.marque||'')+' · '+(p.prix||'')+'</div></div>'
+    + '</div>'
+    + (serumType ? '<div style="display:inline-block;background:#C4726A;color:#fff;font-size:11px;font-weight:700;border-radius:20px;padding:5px 12px;margin-bottom:14px">'+(isEN?serumType.en:serumType.fr)+'</div>' : '')
+    + '<div style="display:flex;align-items:center;gap:10px;background:'+bg+';border-radius:12px;padding:12px 14px;margin-bottom:14px">'
+    + '<div style="font-size:22px;font-weight:900;color:'+color+'">'+compat+'%</div>'
+    + '<div style="font-size:12px;color:'+color+';font-weight:600">'+(isEN?'Match for your skin':'Compatibilité avec ta peau')+'</div>'
+    + '</div>'
+    + '<div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px">'
+      + (p.texture ? '<span style="background:#FAF0ED;color:#7A6259;font-size:11px;font-weight:600;border-radius:20px;padding:4px 10px">'+p.texture+'</span>' : '')
+      + (momentLabel ? '<span style="background:#FAF0ED;color:#7A6259;font-size:11px;font-weight:600;border-radius:20px;padding:4px 10px">'+momentLabel+'</span>' : '')
+      + (typeof p.yuka === 'number' ? '<span style="background:#FAF0ED;color:#7A6259;font-size:11px;font-weight:600;border-radius:20px;padding:4px 10px">Yuka '+p.yuka+'/100</span>' : '')
+      + (p.clean ? '<span style="background:#EFF3EE;color:#7B8F77;font-size:11px;font-weight:600;border-radius:20px;padding:4px 10px">✓ '+(isEN?'Clean beauty':'Clean beauty')+'</span>' : '')
+      + (p.vegan ? '<span style="background:#EFF3EE;color:#7B8F77;font-size:11px;font-weight:600;border-radius:20px;padding:4px 10px">✦ Vegan</span>' : '')
+    + '</div>'
+    + (p.pq ? '<div style="font-size:13px;color:#3D2B1F;line-height:1.5;margin-bottom:10px"><strong>'+(isEN?'Recommended for: ':'Recommandé pour : ')+'</strong>'+p.pq+'</div>' : '')
+    + (serumType ? '<div style="font-size:13px;color:#3D2B1F;line-height:1.5;margin-bottom:10px"><strong>'+(isEN?'Targets: ':'Cible : ')+'</strong>'+(isEN?serumType.concern_en:serumType.concern_fr)+'</div>' : '')
+    + (concernActives.length ? '<div style="background:#FAF0ED;border-radius:12px;padding:11px 13px;margin-bottom:12px"><div style="font-size:11px;font-weight:700;color:#A85A52;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px">'+(isEN?'Why this product':'Pourquoi ce produit')+'</div><div style="font-size:12.5px;color:#5A4A42;line-height:1.5">'+(isEN?'Contains ':'Contient ')+concernActives.join(', ')+(isEN?', which target ':', qui agissent sur ')+(isEN?concernDefSel.en.toLowerCase():concernDefSel.fr.toLowerCase())+'.</div></div>' : '')
+    + (p.ben ? '<div style="font-size:13px;color:#5A4A42;line-height:1.6;margin-bottom:10px"><strong>'+(isEN?'Benefits: ':'Bénéfices : ')+'</strong>'+(isEN&&p.ben_en?p.ben_en:p.ben)+'</div>' : '')
+    + (p.app ? '<div style="font-size:13px;color:#5A4A42;line-height:1.6;margin-bottom:14px"><strong>'+(isEN?'How to use: ':'Application : ')+'</strong>'+p.app+'</div>' : '')
+    + (p.ak && p.ak.length ? '<div style="margin-bottom:6px;font-size:11px;font-weight:700;color:#3D2B1F;text-transform:uppercase;letter-spacing:.5px">'+(isEN?'Key actives':'Actifs clés')+'</div>' : '')
+    + (p.ak && p.ak.length ? '<div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:16px">'+p.ak.map(function(a){ return '<span style="background:#F5E8E6;color:#C4726A;font-size:11px;font-weight:600;border-radius:20px;padding:4px 10px">'+a+'</span>'; }).join('')+'</div>' : '')
+    + (p.link ? '<a href="'+p.link+'" target="_blank" rel="noopener" style="display:block;text-align:center;background:#C4726A;color:#fff;padding:13px;border-radius:50px;font-size:13px;font-weight:700;text-decoration:none">'+(isEN?'View product':'Voir le produit')+'</a>' : '');
+  var wrap = document.getElementById('find-detail-content');
+  if (wrap) wrap.innerHTML = html;
+  renderFindStep('detail');
+}
+
+const SCREENS=["lang","onboarding","welcome","register","login","scan","q1","diag","q2","q3","q4","q5","result","compare","suivi","dashboard","scan-product","find-product","profile","articles","settings","parrainage","abonnement","privacy","cgu","mentions"];
+
+// ══════════ GROSSESSE / ALLAITEMENT : ACTIFS DÉCONSEILLÉS ══════════
+// Liste volontairement prudente, alignée sur ce qu'une pharmacienne écarterait au comptoir.
+// Le rétinol et ses dérivés sont les plus critiques (rétinoïdes topiques contre-indiqués),
+// l'hydroquinone est fortement déconseillée, les salicylés à forte dose et certaines huiles
+// essentielles sont à éviter par précaution.
+var PREGNANCY_AVOID = [
+  { label:'Rétinol / rétinoïdes', kw:['retinol','rétinol','retinal','retinaldehyde','retinyl','trétinoïne','tretinoin','adapalène','adapalene','vitamine a'] },
+  { label:'Hydroquinone',          kw:['hydroquinone'] },
+  { label:'Acide salicylique dosé',kw:['acide salicylique 2','salicylic acid 2','acide salicylique 3'] },
+  { label:'Huiles essentielles',   kw:['huile essentielle','essential oil'] }
+];
+
+function isPregnancyMode() {
+  return ST.pregnancy === 'enceinte' || ST.pregnancy === 'allaitante';
+}
+
+// Renvoie les familles d'actifs déconseillées présentes dans un produit ([] si le produit est sûr).
+function pregnancyFlags(key) {
+  var p = DB[key];
+  if (!p) return [];
+  var hay = ((p.ak||[]).join(' ') + ' ' + (p.comp||[]).join(' ') + ' ' + (p.nom||'') + ' ' + (p.usage||'')).toLowerCase();
+  return PREGNANCY_AVOID.filter(function(g){
+    return g.kw.some(function(k){ return hay.indexOf(k) > -1; });
+  }).map(function(g){ return g.label; });
+}
+
+function isPregnancySafe(key) {
+  if (!isPregnancyMode()) return true;
+  return pregnancyFlags(key).length === 0;
+}
 
 const ST={
   screen:'lang',user:null,
   skinType:null,ageGroup:null,
+  pregnancy:null,phototype:null,
   concerns:[],allergies:[],
   budget:null,routine:null,
   result:null,showShare:false,
@@ -3279,6 +4064,7 @@ function initQuestions(){
   const ageData=l.ages||[{id:"18-25",label:"18-25 ans",sub:""},{id:"26-35",label:"26-35 ans",sub:""},{id:"36-45",label:"36-45 ans",sub:""},{id:"46+",label:"46+ ans",sub:""}];
   const ages=ageData;
   document.getElementById("q2-opts").innerHTML=ages.map(a=>`<button class="sr" onclick="pickAge('${a.id}',this)"><div><div class="rl">${a.label}</div><div class="rs">${a.sub}</div></div><svg class="ck" viewBox="0 0 24 24" fill="#2C2C2C"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg></button>`).join("");
+  renderQ2Extra();
   // Q3 - concerns
   const cIds=["acne","taches","rides","pores","rougeurs","cernes","eclat","deshydratation","imperfections","sensibilite","autre"];
   const concernsRaw=l.concerns||[];
@@ -3830,7 +4616,76 @@ function restartDiag(){
 }
 
 function pickSkin(id,el){ST.skinType=id;document.querySelectorAll("#q1-opts .sr").forEach(b=>b.classList.remove("on"));el.classList.add("on");document.getElementById("q1-next").disabled=false;setTimeout(function(){go("q2");},300);}
-function pickAge(id,el){ST.ageGroup=id;document.querySelectorAll("#q2-opts .sr").forEach(b=>b.classList.remove("on"));el.classList.add("on");document.getElementById("q2-next").disabled=false;setTimeout(function(){go("q3");},300);}
+function pickAge(id,el){
+  ST.ageGroup=id;
+  document.querySelectorAll("#q2-opts .sr").forEach(b=>b.classList.remove("on"));
+  el.classList.add("on");
+  // Plus d'avance automatique : deux questions (grossesse, carnation) suivent sur cet écran.
+  updateQ2Next();
+}
+
+// ── Grossesse / allaitement et carnation ──────────────────────────────────────
+var PREG_OPTS = [
+  { id:'non',        fr:'Non',                        en:'No',                       sub_fr:'',                                sub_en:'' },
+  { id:'enceinte',   fr:'Enceinte',                   en:'Pregnant',                 sub_fr:'Actifs à risque écartés',         sub_en:'Risky actives excluded' },
+  { id:'allaitante', fr:'Allaitante',                 en:'Breastfeeding',            sub_fr:'Actifs à risque écartés',         sub_en:'Risky actives excluded' },
+  { id:'nsp',        fr:'Je préfère ne pas répondre',  en:'Prefer not to say',        sub_fr:'',                                sub_en:'' }
+];
+
+// Échelle simplifiée inspirée de Fitzpatrick. Conditionne le conseil taches et solaire.
+var PHOTO_OPTS = [
+  { id:'I-II',   fr:'Très claire à claire',  en:'Very fair to fair',   sub_fr:'Brûle facilement, bronze peu',      sub_en:'Burns easily, tans little' },
+  { id:'III-IV', fr:'Claire mate à mate',    en:'Medium to olive',     sub_fr:'Bronze bien, brûle parfois',        sub_en:'Tans well, sometimes burns' },
+  { id:'V-VI',   fr:'Foncée à très foncée',  en:'Brown to deep',       sub_fr:'Brûle rarement, marque facilement', sub_en:'Rarely burns, marks easily' },
+  { id:'nsp',    fr:'Je ne sais pas',        en:"I don't know",        sub_fr:'',                                  sub_en:'' }
+];
+
+function renderQ2Extra() {
+  var isEN = LANG === 'en';
+  var row = function(o, group, fn){
+    return '<button class="sr" onclick="'+fn+'(\''+o.id+'\',this)" style="padding:11px 14px">'
+      + '<div style="flex:1;text-align:left"><div class="rl">'+(isEN?o.en:o.fr)+'</div>'
+      + ((isEN?o.sub_en:o.sub_fr) ? '<div class="rs">'+(isEN?o.sub_en:o.sub_fr)+'</div>' : '')
+      + '</div>'
+      + '<svg class="ck" viewBox="0 0 24 24" fill="#C4887F"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>'
+      + '</button>';
+  };
+  var pe = document.getElementById('q2-preg-opts');
+  if (pe) pe.innerHTML = PREG_OPTS.map(function(o){ return row(o,'preg','pickPregnancy'); }).join('');
+  var ph = document.getElementById('q2-photo-opts');
+  if (ph) ph.innerHTML = PHOTO_OPTS.map(function(o){ return row(o,'photo','pickPhototype'); }).join('');
+
+  if (isEN) {
+    var t;
+    if ((t=document.getElementById('q2-title'))) t.textContent = 'Your profile';
+    if ((t=document.getElementById('q2-sub'))) t.textContent = 'This refines our advice — and rules out actives not advised in your situation.';
+    if ((t=document.getElementById('q2-preg-title'))) t.textContent = 'Are you pregnant or breastfeeding?';
+    if ((t=document.getElementById('q2-preg-sub'))) t.textContent = 'Some actives are not advised during pregnancy and breastfeeding. We exclude them automatically.';
+    if ((t=document.getElementById('q2-photo-title'))) t.textContent = 'Your skin tone';
+    if ((t=document.getElementById('q2-photo-sub'))) t.textContent = 'Dark spots and sun protection are handled differently depending on skin tone.';
+  }
+}
+
+function pickPregnancy(id, el) {
+  ST.pregnancy = id;
+  document.querySelectorAll('#q2-preg-opts .sr').forEach(function(b){ b.classList.remove('on'); });
+  el.classList.add('on');
+  updateQ2Next();
+}
+
+function pickPhototype(id, el) {
+  ST.phototype = id;
+  document.querySelectorAll('#q2-photo-opts .sr').forEach(function(b){ b.classList.remove('on'); });
+  el.classList.add('on');
+  updateQ2Next();
+}
+
+// L'âge reste la seule réponse obligatoire : les deux nouvelles questions sont sensibles,
+// on ne bloque pas l'utilisateur qui ne souhaite pas y répondre.
+function updateQ2Next() {
+  var btn = document.getElementById('q2-next');
+  if (btn) btn.disabled = !ST.ageGroup;
+}
 
 function toggleAutreAllergy(btn) {
   var inputDiv = document.getElementById("allergy-autre-input");
@@ -4316,6 +5171,249 @@ function toggleReviews(key){
   if (chevron) chevron.style.transform = isOpen ? 'rotate(0deg)' : 'rotate(180deg)';
 }
 
+// ══════════ CARNATION (PHOTOTYPE) : CONSEIL TACHES ET SOLAIRE ══════════
+// Repose sur des données dermatologiques établies : le mécanisme dominant de l'hyperpigmentation
+// et la stratégie photoprotectrice changent nettement selon le phototype. Les phototypes clairs
+// font des lentigines solaires et un risque carcinologique élevé ; les phototypes foncés font
+// surtout de l'hyperpigmentation post-inflammatoire, où toute irritation laisse une marque
+// durable — l'agressivité thérapeutique y est contre-productive.
+var PHOTOTYPE_ADVICE = {
+  'I-II': {
+    fr_label:'Carnation très claire à claire',
+    en_label:'Very fair to fair skin',
+    taches_fr:"Tes taches sont le plus souvent des lentigines solaires (taches brunes plates liées au cumul d'UV) et des éphélides. Elles répondent bien à la vitamine C, aux AHA et au rétinol, que ta peau tolère généralement mieux que les phototypes foncés. Le point critique reste la prévention : sans photoprotection quotidienne, les taches traitées reviennent en une saison.",
+    taches_en:"Your spots are usually solar lentigines and freckles, driven by cumulative UV. They respond well to vitamin C, AHAs and retinol, which your skin generally tolerates better than darker phototypes. Prevention is the critical part: without daily photoprotection, treated spots return within a season.",
+    solaire_fr:"SPF 50+ non négociable toute l'année, y compris par temps couvert. Tu brûles vite et ton risque de cancer cutané est le plus élevé de tous les phototypes : la protection solaire n'est pas ici un geste cosmétique mais un geste de santé. Renouveler toutes les 2 h en exposition, et surveiller l'évolution de tes grains de beauté.",
+    solaire_en:"SPF 50+ year-round, including on cloudy days. You burn quickly and carry the highest skin cancer risk of any phototype: sun protection here is a health measure, not a cosmetic step. Reapply every 2 h when exposed, and monitor changes in your moles."
+  },
+  'III-IV': {
+    fr_label:'Carnation claire mate à mate',
+    en_label:'Medium to olive skin',
+    taches_fr:"C'est le phototype le plus exposé au mélasma : des plaques brunes symétriques sur les joues, le front ou la lèvre supérieure, déclenchées par les UV mais aussi par les hormones (grossesse, contraception) et la chaleur. Le mélasma récidive facilement et se traite dans la durée, avec des actifs comme l'acide tranexamique, la niacinamide ou l'acide azélaïque. Évite les gestes trop agressifs qui l'aggravent.",
+    taches_en:"This phototype is the most prone to melasma: symmetrical brown patches on the cheeks, forehead or upper lip, triggered by UV but also by hormones (pregnancy, contraception) and heat. Melasma recurs easily and is managed over time with actives such as tranexamic acid, niacinamide or azelaic acid. Avoid aggressive treatments, which worsen it.",
+    solaire_fr:"SPF 50 quotidien, et privilégie une protection large spectre incluant la lumière visible : dans ton phototype, la lumière visible participe directement à la pigmentation, ce qu'un filtre anti-UV seul ne bloque pas. Les écrans teintés (oxydes de fer) sont pour cela nettement supérieurs aux écrans transparents. La chaleur aussi aggrave le mélasma : attention aux expositions prolongées.",
+    solaire_en:"Daily SPF 50, and favour broad protection that also covers visible light: in your phototype, visible light directly drives pigmentation, which a UV-only filter does not block. Tinted sunscreens (iron oxides) are clearly superior to clear ones here. Heat also worsens melasma, so beware of prolonged exposure."
+  },
+  'V-VI': {
+    fr_label:'Carnation foncée à très foncée',
+    en_label:'Brown to deep skin',
+    taches_fr:"Ta problématique principale n'est pas la tache solaire mais l'hyperpigmentation post-inflammatoire : chaque bouton, chaque irritation, chaque geste trop agressif laisse une marque brune qui peut persister des mois. La conséquence est contre-intuitive — traiter fort aggrave le problème. La priorité est d'éteindre l'inflammation (acné, eczéma, frottements) avant de s'attaquer à la marque elle-même. Niacinamide, acide azélaïque et acide tranexamique sont bien tolérés ; les acides forts et les gommages mécaniques sont à introduire avec prudence.",
+    taches_en:"Your main issue is not sun spots but post-inflammatory hyperpigmentation: every blemish, irritation or overly aggressive step leaves a brown mark that can last months. The consequence is counter-intuitive — treating harder makes it worse. The priority is to calm the inflammation (acne, eczema, friction) before addressing the mark itself. Niacinamide, azelaic acid and tranexamic acid are well tolerated; strong acids and mechanical scrubs should be introduced cautiously.",
+    solaire_fr:"La mélanine offre une protection partielle, mais insuffisante : elle ne prévient ni le photovieillissement ni surtout l'aggravation des taches. Un SPF 30 à 50 quotidien reste indiqué. Choisis de préférence un écran teinté à oxydes de fer, qui protège de la lumière visible (moteur majeur de la pigmentation dans ton phototype) et évite le voile blanc des filtres minéraux classiques, principale raison pour laquelle les écrans sont abandonnés sur peaux foncées.",
+    solaire_en:"Melanin offers partial but insufficient protection: it prevents neither photoaging nor, above all, the worsening of dark marks. Daily SPF 30 to 50 remains indicated. Prefer a tinted sunscreen with iron oxides, which protects against visible light (a major driver of pigmentation in your phototype) and avoids the white cast of classic mineral filters — the main reason sunscreens are abandoned on deeper skin."
+  }
+};
+
+function getPhototypeAdvice() {
+  var pt = ST.phototype;
+  if (!pt || pt === 'nsp') return null;
+  return PHOTOTYPE_ADVICE[pt] || null;
+}
+
+// Carte de conseil carnation. `topic` vaut 'taches', 'solaire' ou 'both'.
+function buildPhototypeCard(topic, isEN) {
+  var a = getPhototypeAdvice();
+  if (!a) return '';
+  var blocks = [];
+  if (topic === 'taches' || topic === 'both') {
+    blocks.push({ t: isEN?'Pigmentation':'Taches & pigmentation', x: isEN?a.taches_en:a.taches_fr });
+  }
+  if (topic === 'solaire' || topic === 'both') {
+    blocks.push({ t: isEN?'Sun protection':'Protection solaire', x: isEN?a.solaire_en:a.solaire_fr });
+  }
+  if (!blocks.length) return '';
+  return '<div style="background:#fff;border-radius:16px;padding:16px;margin-bottom:12px;box-shadow:0 2px 10px rgba(196,114,106,.08)">'
+    + '<div style="font-size:11px;font-weight:700;color:#A8837B;text-transform:uppercase;letter-spacing:1px;margin-bottom:3px">'
+    + (isEN ? 'Tailored to your skin tone' : 'Adapté à ta carnation') + '</div>'
+    + '<div style="font-size:12px;color:#C4726A;font-weight:600;margin-bottom:11px">' + (isEN?a.en_label:a.fr_label) + '</div>'
+    + blocks.map(function(b){
+        return '<div style="border-top:1px solid #F3ECE8;padding-top:10px;margin-top:10px">'
+          + '<div style="font-size:12.5px;font-weight:700;color:#3D2B1F;margin-bottom:5px">' + b.t + '</div>'
+          + '<p style="font-size:12px;color:#5A4A42;line-height:1.6;margin:0">' + b.x + '</p></div>';
+      }).join('')
+    + '</div>';
+}
+
+// ══════════ LECTURE DE LA ROUTINE : COÛT MENSUEL, DÉLAIS, CONFLITS D'ACTIFS ══════════
+
+// Durée de vie moyenne d'un produit en usage quotidien, par étape. Sert à convertir le prix
+// d'achat en coût mensuel réel — un SPF se termine bien plus vite qu'un contour des yeux.
+var PRODUCT_LIFESPAN_MONTHS = {
+  'Nettoyant': 2, 'Démaquillant': 2, 'Sérum': 2.5, 'Sérum principal': 2.5, 'Sérum soir': 2.5,
+  'Hydratant': 2, 'Crème': 2, 'Protection solaire': 1.5, 'Contour des yeux': 4,
+  'Masque': 4, 'Patch': 2, 'Exfoliant': 3
+};
+
+function _lifespanFor(etape) {
+  if (!etape) return 2;
+  if (PRODUCT_LIFESPAN_MONTHS[etape]) return PRODUCT_LIFESPAN_MONTHS[etape];
+  var e = etape.toLowerCase();
+  if (e.indexOf('sérum') > -1 || e.indexOf('serum') > -1) return 2.5;
+  if (e.indexOf('solaire') > -1 || e.indexOf('spf') > -1) return 1.5;
+  if (e.indexOf('yeux') > -1) return 4;
+  if (e.indexOf('masque') > -1) return 4;
+  return 2;
+}
+
+function _parsePrice(prix) {
+  if (!prix) return 0;
+  var m = String(prix).replace(',', '.').match(/[\d.]+/);
+  return m ? parseFloat(m[0]) : 0;
+}
+
+// Délai avant résultat visible, par famille d'actif. Gérer l'attente évite l'abandon à 3 semaines,
+// qui est la première cause d'arrêt d'une routine.
+var ACTIVE_TIMELINE = [
+  { kw:['hyaluronique','hyaluronate','glycérine','squalane','céramide','ceramide','panthénol'],
+    fr:'Hydratation', delay_fr:'dès les premiers jours', delay_en:'within days', en:'Hydration' },
+  { kw:['niacinamide'], fr:'Niacinamide', en:'Niacinamide',
+    delay_fr:'4 à 6 semaines', delay_en:'4 to 6 weeks' },
+  { kw:['salicylique','salicylic','bha','lha'], fr:'BHA / acide salicylique', en:'BHA / salicylic acid',
+    delay_fr:'4 à 6 semaines', delay_en:'4 to 6 weeks' },
+  { kw:['glycolique','glycolic','lactique','lactic','aha'], fr:'AHA', en:'AHA',
+    delay_fr:'4 semaines', delay_en:'4 weeks' },
+  { kw:['vitamine c','ascorbic'], fr:'Vitamine C', en:'Vitamin C',
+    delay_fr:'6 à 8 semaines', delay_en:'6 to 8 weeks' },
+  { kw:['retinol','rétinol','retinal','bakuchiol'], fr:'Rétinol', en:'Retinol',
+    delay_fr:'8 à 12 semaines', delay_en:'8 to 12 weeks' },
+  { kw:['peptide','proxylane','collagène'], fr:'Peptides', en:'Peptides',
+    delay_fr:'8 à 12 semaines', delay_en:'8 to 12 weeks' },
+  { kw:['tranexamique','arbutine','kojique','viniférine'], fr:'Actifs anti-taches', en:'Brightening actives',
+    delay_fr:'8 à 12 semaines', delay_en:'8 to 12 weeks' },
+  { kw:['spf','solaire'], fr:'Protection solaire', en:'Sun protection',
+    delay_fr:'effet préventif immédiat', delay_en:'immediate preventive effect' }
+];
+
+// Associations d'actifs à ne pas appliquer au même moment : c'est la cause n°1 d'irritation
+// chez les débutants, qui concluent à tort qu'un produit "ne leur convient pas".
+var ACTIVE_CONFLICTS = [
+  { a:['retinol','rétinol','retinal'], b:['glycolique','glycolic','lactique','lactic','salicylique','salicylic'],
+    fr:'Rétinol et acides exfoliants (AHA/BHA) appliqués le même soir : risque d\'irritation et de fragilisation de la barrière cutanée. Alterne un soir sur deux.',
+    en:'Retinol and exfoliating acids on the same evening can irritate and weaken the skin barrier. Alternate every other evening.' },
+  { a:['retinol','rétinol','retinal'], b:['vitamine c','ascorbic'],
+    fr:'Rétinol et vitamine C au même moment : les deux perdent en efficacité et la peau tire. Vitamine C le matin, rétinol le soir.',
+    en:'Retinol and vitamin C together lose efficacy and can sting. Vitamin C in the morning, retinol at night.' },
+  { a:['glycolique','glycolic','lactique','lactic'], b:['salicylique','salicylic'],
+    fr:'Deux exfoliants chimiques en même temps : sur-exfoliation probable. N\'en garde qu\'un, ou espace-les de 48 h.',
+    en:'Two chemical exfoliants at once will likely over-exfoliate. Keep one, or space them 48 h apart.' }
+];
+
+function _stepHay(s) {
+  return ((s.ak||[]).join(' ') + ' ' + (s.comp||[]).join(' ') + ' ' + (s.usage||'') + ' ' + (s.nom||'')).toLowerCase();
+}
+
+function buildRoutineInsights(r, isEN) {
+  if (!r || !r.steps || !r.steps.length) return '';
+  var cur = r.currency || '€';
+
+  // ── 1. Coût mensuel réel ──
+  var monthly = 0, lines = [];
+  r.steps.forEach(function(s){
+    var price = _parsePrice(s.prix);
+    if (!price) return;
+    var months = _lifespanFor(s.etape);
+    var perMonth = price / months;
+    monthly += perMonth;
+    lines.push({ nom: s.nom, etape: s.etape, perMonth: perMonth, months: months });
+  });
+  var costHtml = '';
+  if (monthly > 0) {
+    costHtml = '<div style="background:#fff;border-radius:16px;padding:16px;margin-bottom:12px;box-shadow:0 2px 10px rgba(196,114,106,.08)">'
+      + '<div style="font-size:11px;font-weight:700;color:#A8837B;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px">'
+      + (isEN ? 'Real monthly cost' : 'Coût mensuel réel') + '</div>'
+      + '<div style="display:flex;align-items:baseline;gap:8px;margin-bottom:6px">'
+      + '<div style="font-family:Georgia,serif;font-size:30px;font-weight:800;color:#C4726A">~' + Math.round(monthly) + cur + '</div>'
+      + '<div style="font-size:12px;color:#8B6F5E">' + (isEN ? 'per month' : 'par mois') + '</div></div>'
+      + '<p style="font-size:11.5px;color:#8B6F5E;line-height:1.5;margin-bottom:10px">'
+      + (isEN
+          ? 'Estimated from how long each product actually lasts in daily use, not from the purchase price. You do not rebuy everything every month.'
+          : 'Estimé à partir de la durée réelle de chaque produit en usage quotidien, pas du prix d\'achat. Tu ne rachètes pas tout tous les mois.')
+      + '</p>'
+      + '<div style="border-top:1px solid #F3ECE8;padding-top:9px">'
+      + lines.map(function(l){
+          return '<div style="display:flex;justify-content:space-between;font-size:11.5px;color:#5A4A42;padding:3px 0">'
+            + '<span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;padding-right:10px">' + l.nom + '</span>'
+            + '<span style="color:#A8837B;flex-shrink:0">' + l.perMonth.toFixed(1) + cur + '/' + (isEN?'mo':'mois') + '</span></div>';
+        }).join('')
+      + '</div></div>';
+  }
+
+  // ── 2. Délais de résultat ──
+  var seen = {}, tl = [];
+  r.steps.forEach(function(s){
+    var hay = _stepHay(s);
+    ACTIVE_TIMELINE.forEach(function(a){
+      if (seen[a.fr]) return;
+      if (a.kw.some(function(k){ return hay.indexOf(k) > -1; })) {
+        seen[a.fr] = true;
+        tl.push(a);
+      }
+    });
+  });
+  var tlHtml = '';
+  if (tl.length) {
+    tlHtml = '<div style="background:#fff;border-radius:16px;padding:16px;margin-bottom:12px;box-shadow:0 2px 10px rgba(196,114,106,.08)">'
+      + '<div style="font-size:11px;font-weight:700;color:#A8837B;text-transform:uppercase;letter-spacing:1px;margin-bottom:4px">'
+      + (isEN ? 'When to expect results' : 'Quand voir les résultats') + '</div>'
+      + '<p style="font-size:11.5px;color:#8B6F5E;line-height:1.5;margin-bottom:10px">'
+      + (isEN ? 'Most routines are abandoned around week three, just before the actives start working.'
+              : 'La plupart des routines sont abandonnées vers la troisième semaine, juste avant que les actifs ne commencent à agir.')
+      + '</p>'
+      + tl.map(function(a){
+          return '<div style="display:flex;justify-content:space-between;align-items:center;font-size:12px;padding:6px 0;border-top:1px solid #F3ECE8">'
+            + '<span style="color:#3D2B1F;font-weight:600">' + (isEN?a.en:a.fr) + '</span>'
+            + '<span style="color:#C4726A;font-size:11.5px;text-align:right;flex-shrink:0;padding-left:10px">' + (isEN?a.delay_en:a.delay_fr) + '</span></div>';
+        }).join('')
+      + '</div>';
+  }
+
+  // ── 3. Conflits d'actifs / introduction progressive ──
+  var allHay = r.steps.map(_stepHay).join(' ');
+  var conflicts = ACTIVE_CONFLICTS.filter(function(c){
+    return c.a.some(function(k){ return allHay.indexOf(k) > -1; })
+        && c.b.some(function(k){ return allHay.indexOf(k) > -1; });
+  });
+  var hasStrong = /retinol|rétinol|retinal|glycolique|glycolic|salicylique|salicylic/.test(allHay);
+  var confHtml = '';
+  // Sur phototypes foncés, une exfoliation trop forte déclenche l'hyperpigmentation
+  // post-inflammatoire qu'on cherche justement à traiter. Avertissement spécifique.
+  var deepSkin = (ST.phototype === 'V-VI');
+  var strongAcid = /glycolique|glycolic|salicylique|salicylic|acide mandélique|peeling/.test(allHay);
+  if (conflicts.length || hasStrong) {
+    confHtml = '<div style="background:#FFF4E5;border:1px solid #EBD3A8;border-radius:16px;padding:16px;margin-bottom:12px">'
+      + '<div style="font-size:11px;font-weight:700;color:#9A6512;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px">'
+      + (isEN ? 'Introduce gradually' : 'Introduis progressivement') + '</div>'
+      + conflicts.map(function(c){
+          return '<p style="font-size:12px;color:#7A5510;line-height:1.55;margin-bottom:9px">• ' + (isEN?c.en:c.fr) + '</p>';
+        }).join('')
+      + (deepSkin && strongAcid
+          ? '<p style="font-size:12px;color:#7A5510;line-height:1.55;margin-bottom:9px">• '
+            + (isEN
+                ? 'On deep skin tones, over-exfoliating triggers the very post-inflammatory hyperpigmentation you are trying to fade. Go slower than the packaging suggests: once or twice a week is enough to start, and stop at the first sign of irritation.'
+                : 'Sur peau foncée, une exfoliation trop forte déclenche exactement l\'hyperpigmentation post-inflammatoire que tu cherches à estomper. Va plus lentement que ce qu\'indique le packaging : 1 à 2 fois par semaine suffit pour commencer, et arrête au premier signe d\'irritation.')
+            + '</p>'
+          : '')
+      + (hasStrong
+          ? '<p style="font-size:12px;color:#7A5510;line-height:1.55;margin-bottom:0">• '
+            + (isEN
+                ? 'Start any strong active (retinol, acids) twice a week for two weeks, then every other evening. Add one new product at a time, waiting a week between each, so you can tell what your skin reacts to.'
+                : 'Commence tout actif fort (rétinol, acides) 2 fois par semaine pendant 2 semaines, puis un soir sur deux. Ajoute un seul nouveau produit à la fois, en attendant une semaine entre chaque : c\'est le seul moyen de savoir à quoi ta peau réagit.')
+            + '</p>'
+          : '')
+      + '</div>';
+  }
+
+  // ── 4. Conseil selon la carnation ──
+  // Affiché si la carnation est renseignee : le volet "taches" seulement si c'est un probleme
+  // declare, le volet solaire toujours (il concerne tous les phototypes, differemment).
+  var wantsTaches = (ST.concerns||[]).some(function(c){ return c==='taches' || c==='eclat'; });
+  var photoHtml = buildPhototypeCard(wantsTaches ? 'both' : 'solaire', isEN);
+
+  if (!costHtml && !tlHtml && !confHtml && !photoHtml) return '';
+  return '<div class="section-lbl">' + (isEN ? 'Understanding your routine' : 'Comprendre ta routine') + '</div>'
+    + photoHtml + costHtml + tlHtml + confHtml;
+}
+
 function renderResult(){
   const r=ST.result;
   if(!r || !r.steps){
@@ -4423,8 +5521,18 @@ function renderResult(){
       ${roHtml(amSteps,"ro-am")}
       <div id="ro-pm" style="display:none">${roHtml(pmSteps,"").innerHTML||""}</div>
     </div>
+    ${isPregnancyMode() ? `<div style="background:#EFF3EE;border:1px solid #C6D3C2;border-radius:14px;padding:13px 15px;margin:14px 0;display:flex;gap:10px;align-items:flex-start">
+      <span style="font-size:16px;flex-shrink:0">\u2713</span>
+      <div style="font-size:11.5px;color:#4A5A46;line-height:1.55">
+        <strong style="color:#2F3D2C">${isEN?'Pregnancy-safe selection':'Sélection compatible grossesse'}</strong> \u2014
+        ${isEN
+          ? 'Products containing retinoids, hydroquinone, high-dose salicylic acid or essential oils have been excluded from this routine. Always confirm with your pharmacist or doctor.'
+          : 'Les produits contenant des rétinoïdes, de l\'hydroquinone, de l\'acide salicylique fortement dosé ou des huiles essentielles ont été écartés de cette routine. Confirme toujours avec ton pharmacien ou ton médecin.'}
+      </div>
+    </div>` : ''}
     <div class="section-lbl">${t('products_title')}</div>
     ${stepsHtml}
+    ${buildRoutineInsights(r, isEN)}
     <div class="conseil"><div class="conseil-lbl">${t('conseil_label')}</div><div class="conseil-txt">${r.conseil}</div></div>
     ${hasA?`<div class="aw"><svg width="16" height="16" viewBox="0 0 24 24" fill="#C4956A" style="flex-shrink:0;margin-top:1px"><path d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z"/></svg><div><div class="aw-t">${t('allergy_title')}</div><p class="aw-txt">${t('allergy_text')} ${ST.allergies.join(', ')}.</p></div></div>`:""}
     <!-- Disclaimer "Information uniquement" déplacé en bas de page -->
@@ -5322,6 +6430,52 @@ var barcodeFacingMode = "environment"; // caméra arrière pour scanner
 var barcodeDetector = null;
 var barcodeScanning = false;
 
+// Détecteur natif du navigateur (bien plus fiable que le décodeur JS pour les codes-barres 1D
+// type EAN/UPC). Utilisé en priorité par Html5Qrcode via experimentalFeatures ci-dessous,
+// et directement pour le scan depuis une image de la galerie.
+if (typeof window !== 'undefined' && 'BarcodeDetector' in window) {
+  try {
+    barcodeDetector = new BarcodeDetector({ formats: ['ean_13','ean_8','upc_a','upc_e','code_128','code_39'] });
+  } catch(e) { barcodeDetector = null; }
+}
+
+// Config partagée du scanner caméra : évite la duplication (et les divergences) entre
+// startBarcodeCamera() et flipBarcodeCamera(), et corrige la non-détection des codes-barres.
+function _barcodeScanConfig() {
+  return {
+    fps: 12,
+    // Zone de scan large et basse (pas carrée) : un code-barres 1D est bien plus large que haut,
+    // une zone carrée trop petite empêchait souvent de cadrer le code en entier → jamais détecté.
+    qrbox: function(viewfinderWidth, viewfinderHeight) {
+      return {
+        width: Math.round(Math.min(viewfinderWidth * 0.9, 340)),
+        height: Math.round(Math.min(viewfinderHeight * 0.5, 170))
+      };
+    },
+    aspectRatio: 1.777,
+    formatsToSupport: [
+      Html5QrcodeSupportedFormats.EAN_13, Html5QrcodeSupportedFormats.EAN_8,
+      Html5QrcodeSupportedFormats.UPC_A, Html5QrcodeSupportedFormats.UPC_E,
+      Html5QrcodeSupportedFormats.CODE_128, Html5QrcodeSupportedFormats.CODE_39
+    ],
+    // Sur les navigateurs compatibles (Chrome Android notamment), bascule sur l'API native
+    // BarcodeDetector qui est nettement plus fiable que le décodeur JS embarqué pour les
+    // codes-barres 1D — c'est le principal correctif à la non-détection.
+    experimentalFeatures: { useBarCodeDetectorIfSupported: true }
+  };
+}
+
+// Contraintes vidéo partagées : une résolution plus haute donne une image plus nette,
+// indispensable pour décoder un code-barres (l'image par défaut du navigateur est souvent
+// trop basse résolution / floue pour que le décodeur y arrive).
+function _barcodeVideoConstraints(facingMode) {
+  return {
+    facingMode: facingMode,
+    width: { ideal: 1920 },
+    height: { ideal: 1080 }
+  };
+}
+
 function startBarcodeCamera() {
   var isEN = LANG === 'en';
   if (!_canScan('product')) { _showScanPaywall('product'); return; }
@@ -5342,19 +6496,10 @@ function startBarcodeCamera() {
     else container.appendChild(readerDiv);
   }
   try {
-    window._html5Scanner = new Html5Qrcode("reader");
+    window._html5Scanner = new Html5Qrcode("reader", { verbose: false });
     window._html5Scanner.start(
-      { facingMode: "environment" },
-      {
-        fps: 10,
-        qrbox: function(w, h) { return { width: Math.min(260, w*0.8), height: Math.min(110, h*0.4) }; },
-        aspectRatio: 1.2,
-        formatsToSupport: [
-          Html5QrcodeSupportedFormats.EAN_13, Html5QrcodeSupportedFormats.EAN_8,
-          Html5QrcodeSupportedFormats.UPC_A, Html5QrcodeSupportedFormats.UPC_E,
-          Html5QrcodeSupportedFormats.CODE_128, Html5QrcodeSupportedFormats.CODE_39
-        ]
-      },
+      _barcodeVideoConstraints("environment"),
+      _barcodeScanConfig(),
       function(code) { onBarcodeDetected(code); },
       function() {}
     ).then(function() {
@@ -5446,19 +6591,10 @@ function flipBarcodeCamera() {
   var newFacing = window._currentFacing;
   try {
     window._html5Scanner.stop().then(function() {
-      window._html5Scanner = new Html5Qrcode("reader");
+      window._html5Scanner = new Html5Qrcode("reader", { verbose: false });
       window._html5Scanner.start(
-        { facingMode: newFacing },
-        {
-          fps: 10,
-          qrbox: function(w, h) { return { width: Math.min(260, w*0.8), height: Math.min(110, h*0.4) }; },
-          aspectRatio: 1.2,
-          formatsToSupport: [
-            Html5QrcodeSupportedFormats.EAN_13, Html5QrcodeSupportedFormats.EAN_8,
-            Html5QrcodeSupportedFormats.UPC_A, Html5QrcodeSupportedFormats.UPC_E,
-            Html5QrcodeSupportedFormats.CODE_128, Html5QrcodeSupportedFormats.CODE_39
-          ]
-        },
+        _barcodeVideoConstraints(newFacing),
+        _barcodeScanConfig(),
         function(code) { onBarcodeDetected(code); },
         function() {}
       ).catch(function(err) {
@@ -5792,7 +6928,7 @@ async function submitBarcodeContrib(code, prefillName, prefillBrand) {
           (LANG === "en" ? name + " has been added. The next user who scans this product will find it directly!" : 
                            name + " a été ajouté. Le prochain utilisateur qui scannera ce produit le trouvera directement !") + 
         "</div>" +
-        "<button onclick=\"resetBarcodeScanner()\" style=\"padding:12px 24px;border-radius:50px;border:none;background:#2E7D32;color:#fff;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit\">" +
+        "<button onclick=\"resetBarcodeScanner()\" style=\"padding:12px 24px;border-radius:50px;border:none;background:#C4726A;color:#fff;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit\">" +
           (LANG === "en" ? "Scan another product" : "Scanner un autre produit") +
         "</button>" +
       "</div>";
@@ -5934,6 +7070,7 @@ function simulateScanWithKey(dbKey) {
     var dbP = DB[dbKey];
     if (!demoKey) {
       productData = {
+        key: dbKey,
         nom: dbP.nom,
         marque: dbP.marque,
         cat: dbP.usage ? dbP.usage.split(' ').slice(0,3).join(' ') : 'Soin visage',
@@ -6039,8 +7176,8 @@ function displayScanResult(data) {
   var ageLabel = ST.ageGroup || "";
   var concerns = ST.concerns && ST.concerns.length > 0 ? ST.concerns : [];
   var allergies = ST.allergies && ST.allergies.length > 0 ? ST.allergies : [];
-  var scoreColor = globalScore >= 75 ? "#2E7D32" : globalScore >= 50 ? "#E65100" : "#C62828";
-  var scoreBg = globalScore >= 75 ? "#E8F5E9" : globalScore >= 50 ? "#FFF3E0" : "#FFEBEE";
+  var scoreColor = globalScore >= 75 ? "#7B8F77" : globalScore >= 50 ? "#C4726A" : "#9C8078";
+  var scoreBg = globalScore >= 75 ? "#EFF3EE" : globalScore >= 50 ? "#FBE8E4" : "#F4EDEA";
   var style = getBrandStyle(data.marque);
 
   function getVerdict() {
@@ -6156,6 +7293,17 @@ function displayScanResult(data) {
 
   var html = "";
 
+  // Alerte grossesse / allaitement : ici on AVERTIT au lieu de filtrer, car l'utilisatrice
+  // a le produit en main — elle doit savoir pourquoi il est déconseillé, pas le voir disparaître.
+  if (typeof isPregnancyMode === 'function' && isPregnancyMode() && data.key && pregnancyFlags(data.key).length > 0) {
+    var pf = pregnancyFlags(data.key);
+    var pregWord = ST.pregnancy === 'allaitante' ? "l'allaitement" : "la grossesse";
+    html += "<div style='background:#FFF4E5;border:1px solid #E8C48A;border-radius:16px;padding:14px 16px;margin-bottom:14px'>";
+    html += "<div style='font-size:13px;font-weight:800;color:#9A6512;margin-bottom:5px'>Deconseille pendant " + pregWord + "</div>";
+    html += "<div style='font-size:12.5px;color:#7A5510;line-height:1.5'>Ce produit contient : <strong>" + pf.join(", ") + "</strong>. Demandez l'avis de votre pharmacien ou de votre medecin avant utilisation.</div>";
+    html += "</div>";
+  }
+
   // En-tête produit
   html += "<div style='background:#fff;border-radius:18px;padding:16px;display:flex;align-items:center;gap:14px;margin-bottom:14px;box-shadow:0 2px 12px rgba(0,0,0,.07)'>";
   html += "<div style='width:60px;height:60px;border-radius:14px;background:" + style.bg + ";display:flex;flex-direction:column;align-items:center;justify-content:center;flex-shrink:0'>";
@@ -6189,7 +7337,7 @@ function displayScanResult(data) {
   var dimDesc = {formulation:"Qualité et sécurité des ingrédients", adaptation:"Compatibilité avec ton profil", actifs:"Efficacité pour tes problèmes", prix:"Rapport entre le prix et les bénéfices"};
   Object.keys(data.dimensions).forEach(function(dim) {
     var val = data.dimensions[dim];
-    var col = val >= 75 ? "#2E7D32" : val >= 50 ? "#E65100" : "#C62828";
+    var col = val >= 75 ? "#7B8F77" : val >= 50 ? "#C4726A" : "#9C8078";
     html += "<div style='margin-bottom:14px'>";
     html += "<div style='display:flex;justify-content:space-between;align-items:center;margin-bottom:3px'>";
     html += "<div><div style='font-size:13px;font-weight:600;color:#3D2B1F'>" + (dimLabels[dim]||dim) + "</div>";
@@ -6205,7 +7353,7 @@ function displayScanResult(data) {
   var dims = Object.keys(data.dimensions);
   dims.forEach(function(dim, i) {
     var val = data.dimensions[dim];
-    var col = val >= 75 ? "#2E7D32" : val >= 50 ? "#E65100" : "#C62828";
+    var col = val >= 75 ? "#7B8F77" : val >= 50 ? "#C4726A" : "#9C8078";
     var x = 8 + i * 72;
     var barH = Math.round(val * 0.52);
     html += "<rect x='" + x + "' y='" + (58-barH) + "' width='55' height='" + barH + "' rx='6' fill='" + col + "' opacity='.85'/>";
@@ -6252,8 +7400,8 @@ function displayScanResult(data) {
     html += "<p style='font-size:12px;font-weight:700;color:#3D2B1F;text-transform:uppercase;letter-spacing:.5px;margin-bottom:12px'>✅ Les actifs clés et leurs bénéfices</p>";
     data.pros.forEach(function(pro) {
       html += "<div style='display:flex;gap:12px;padding:10px 0;border-bottom:1px solid #F5F0ED'>";
-      html += "<div style='width:36px;height:36px;border-radius:10px;background:#E8F5E9;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:15px'>⚗️</div>";
-      html += "<div><div style='font-size:13px;font-weight:700;color:#2E7D32'>" + pro.actif + "</div>";
+      html += "<div style='width:36px;height:36px;border-radius:10px;background:#EFF3EE;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:15px'>⚗️</div>";
+      html += "<div><div style='font-size:13px;font-weight:700;color:#7B8F77'>" + pro.actif + "</div>";
       html += "<div style='font-size:12px;color:#5A4A42;margin-top:3px;line-height:1.6'>" + pro.explication + "</div></div></div>";
     });
     html += "</div>";
@@ -6276,13 +7424,13 @@ function displayScanResult(data) {
     alts.forEach(function(k) {
       var pr = DB[k];
       var altScore = getAdaptationScore(k);
-      var col = altScore >= 75 ? "#2E7D32" : "#E65100";
+      var col = altScore >= 75 ? "#7B8F77" : "#C4726A";
       var st = getBrandStyle(pr.marque);
       html += "<div style='display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid #F5F0ED'>";
       html += "<div style='width:40px;height:40px;border-radius:10px;background:" + st.bg + ";display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:" + st.tx + ";flex-shrink:0'>" + pr.marque.substring(0,2).toUpperCase() + "</div>";
       html += "<div style='flex:1'><div style='font-size:13px;font-weight:600;color:#3D2B1F'>" + pr.nom + "</div>";
       html += "<div style='font-size:11px;color:#8B6F5E'>" + pr.marque + " · " + pr.prix + "</div></div>";
-      html += "<div style='text-align:center;background:" + (altScore>=75?"#E8F5E9":"#FFF3E0") + ";border-radius:10px;padding:6px 10px'>";
+      html += "<div style='text-align:center;background:" + (altScore>=75?"#EFF3EE":"#FBE8E4") + ";border-radius:10px;padding:6px 10px'>";
       html += "<div style='font-size:16px;font-weight:900;color:" + col + "'>" + altScore + "</div>";
       html += "<div style='font-size:9px;color:" + col + "'>score</div></div></div>";
     });
