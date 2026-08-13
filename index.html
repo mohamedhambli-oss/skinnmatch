@@ -10,7 +10,7 @@
   style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
   img-src 'self' data: blob: https:;
   font-src 'self' data: https://fonts.gstatic.com;
-  connect-src 'self' https://*.googleapis.com https://*.firebaseio.com https://*.firebaseapp.com https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://firestore.googleapis.com https://api.openweathermap.org https://api.open-meteo.com https://geocoding-api.open-meteo.com https://world.openfoodfacts.org;
+  connect-src 'self' https://*.googleapis.com https://*.firebaseio.com https://*.firebaseapp.com https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://firestore.googleapis.com https://api.openweathermap.org https://api.open-meteo.com https://geocoding-api.open-meteo.com https://world.openfoodfacts.org https://world.openbeautyfacts.org https://*.openbeautyfacts.org;
   media-src 'self' blob:;
   frame-src https://www.youtube.com https://www.tiktok.com https://*.firebaseapp.com;
   object-src 'none';
@@ -63,7 +63,7 @@
 <meta name="theme-color" content="#FDF8F5">
 <meta name="description" content="SkinMatch — Analyse ta peau en 60 secondes et découvre ta routine skincare personnalisée. Gratuit.">
 <meta property="og:title" content="SkinMatch — Ta routine skincare personnalisée">
-<meta property="og:description" content="Diagnostic de peau personnalisé et recommandations de produits selon ton profil, ton âge et ton budget.">
+<meta property="og:description" content="Analyse de peau personnalisée et recommandations de produits selon ton profil, ton âge et ton budget.">
 <meta property="og:type" content="website">
 <title>SkinMatch — Your Skin, Your Routine</title>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
@@ -753,7 +753,7 @@ h2{font-family:var(--serif);font-size:20px;font-weight:700;margin-bottom:3px}
       <!-- Emoji hero -->
       <div id="ob-icon" style="font-size:84px;margin-bottom:32px;animation:obPop .5s ease forwards">🎯</div>
       <!-- Titre -->
-      <h1 id="ob-title" style="font-family:Georgia,serif;font-size:28px;font-weight:700;color:#3D2B1F;margin:0 0 16px;line-height:1.2">Diagnostic en 60 secondes</h1>
+      <h1 id="ob-title" style="font-family:Georgia,serif;font-size:28px;font-weight:700;color:#3D2B1F;margin:0 0 16px;line-height:1.2">Ton profil peau en 60 secondes</h1>
       <!-- Description -->
       <p id="ob-desc" style="font-size:15px;color:#8B6F5E;line-height:1.5;margin:0;max-width:320px">Réponds à 5 questions simples et reçois ta routine personnalisée en moins d'une minute.</p>
     </div>
@@ -862,7 +862,7 @@ h2{font-family:var(--serif);font-size:20px;font-weight:700;margin-bottom:3px}
 
     <!-- 3bis. BOUTON DIAGNOSTIC (mis en avant, au-dessus des avis) -->
     <button onclick="showTermsModal()" id="btn-start-top" style="width:100%;box-sizing:border-box;padding:14px 20px;border-radius:50px;border:2px solid #C4726A;background:#fff;color:#C4726A;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;margin-bottom:22px;display:flex;align-items:center;justify-content:center;gap:8px">
-      <span id="btn-start-top-text">Faire le diagnostic sans compte</span> &#8594;
+      <span id="btn-start-top-text">Analyser ma peau sans compte</span> &#8594;
     </button>
 
     <!-- 3. AVIS / TÉMOIGNAGES -->
@@ -1116,7 +1116,7 @@ h2{font-family:var(--serif);font-size:20px;font-weight:700;margin-bottom:3px}
       <div id="diag-result-type" style="font-family:var(--serif);font-size:24px;font-weight:700;margin-bottom:6px"></div>
       <div id="diag-result-desc" style="font-size:13px;color:var(--mut);line-height:1.6;margin-bottom:16px"></div>
       <button class="btn-p" onclick="confirmDiagResult()" style="margin-top:0">Confirmer mon type de peau</button>
-      <button onclick="restartDiag()" style="width:100%;padding:10px;border:none;background:none;color:var(--mut);font-size:12px;cursor:pointer;margin-top:8px;font-family:var(--sans);text-decoration:underline">Refaire le diagnostic</button>
+      <button onclick="restartDiag()" style="width:100%;padding:10px;border:none;background:none;color:var(--mut);font-size:12px;cursor:pointer;margin-top:8px;font-family:var(--sans);text-decoration:underline">Refaire mon analyse</button>
     </div>
   </div>
 </div>
@@ -1469,6 +1469,22 @@ h2{font-family:var(--serif);font-size:20px;font-weight:700;margin-bottom:3px}
   </div>
 </div>
 
+<!-- ══ ÉCRAN CYCLE (module hormonal) ══ -->
+<div id="sc-cycle" class="hidden">
+  <div class="topbar">
+    <button class="btn-back" onclick="go('dashboard')">← Retour</button>
+    <div class="logo"><div class="logo-icon">SM</div>Skin<span>Match</span></div>
+  </div>
+  <div class="content" style="padding-bottom:40px">
+    <div style="margin:8px 0 20px">
+      <div class="step-lbl">Ma peau &amp; mon cycle</div>
+      <h2 style="margin-bottom:4px" id="cycle-title">Peau et cycle</h2>
+      <p class="sub" id="cycle-sub">Ta peau ne réagit pas pareil selon la semaine</p>
+    </div>
+    <div id="cycle-content"></div>
+  </div>
+</div>
+
 <!-- ══ ÉCRAN ARTICLES ══ -->
 <div id="sc-articles" class="hidden">
   <div class="topbar">
@@ -1795,7 +1811,7 @@ let REGION = 'fr';
 const T = {
   fr:{
     welcome_title:"Votre routine.<br>Sur mesure.",
-    welcome_desc:"Diagnostic de peau personnalisé et recommandations selon votre profil, votre âge et votre budget.",
+    welcome_desc:"Analyse de peau personnalisée et recommandations selon votre profil, votre âge et votre budget.",
     btn_register:"Créer un compte",btn_login:"Se connecter",btn_guest:"Continuer sans compte",
     legal:"En continuant, vous acceptez nos conditions d'utilisation.",or:"ou",
     q1_title:"Type de peau",q1_sub:"Choisissez celui qui vous correspond.",
@@ -1812,7 +1828,7 @@ const T = {
     allergy_title:"Allergies enregistrées",allergy_text:"Vérifiez la composition. Allergènes :",
     suivi_title:"Suivi à 4 semaines",
     suivi_text:"Votre peau évolue. Revenez dans 4 semaines pour ajuster votre routine.",
-    suivi_btn:"Refaire le diagnostic",
+    suivi_btn:"Refaire mon analyse",
     fiche_btn:"En savoir plus",note_yuka:"🔬 Analyse INCI",
     budget_total:"Budget estimé :",compatible:"compatible",
     morning_only:"Matin seulement",result_routine:"Votre routine personnalisée",result_hello:"Bonjour",evening_only:"Soir seulement",both:"Matin & Soir",
@@ -1860,7 +1876,7 @@ const T = {
     age3:"36 – 45 ans",age3_sub:"Anti-âge précoce",
     age4:"46 ans et +",age4_sub:"Correction intense",
     concerns:["Acné / Boutons","Taches & hyperpigmentation","Rides & anti-âge","Pores dilatés","Rougeurs / Couperose","Cernes & poches","Teint terne / Éclat","Déshydratation","Points noirs","Réactivité / Irritations"],
-    allergies:["Parfums / Fragrances","Parabènes","Alcool","Sulfates (SLS/SLES)","Silicones","Huiles essentielles","Acide salicylique","Rétinol","Vitamine C","Acides (AHA/BHA)","Methylisothiazolinone (MIT)","Phénoxyéthanol","Limonène","Linalool","Lanoline","Aucune allergie connue","Autre..."],
+    allergies:["Parfums / Fragrances","Parabènes","Alcool","Sulfates (SLS/SLES)","Silicones","Huiles essentielles","Acide salicylique","Rétinol","Vitamine C","Acides (AHA/BHA)","Methylisothiazolinone (MIT)","Phénoxyéthanol","Limonène","Linalool","Géraniol","Citronellol","Citral","Coumarine","Lavande / Lavandin","Bergamote (Citrus aurantium bergamia)","Rose (huile / extrait de fleur)","Menthol","Lanoline","Aucune allergie connue","Autre..."],
     budgets:[
       {id:"low",label:"Économique",sub:"Efficace sans se ruiner"},
       {id:"mid",label:"Modéré ",sub:"Le meilleur compromis"},
@@ -1896,7 +1912,7 @@ const T = {
   },
   en:{
     welcome_title:"Your routine.<br>Tailored for you.",
-    welcome_desc:"Personalized skin diagnosis and dermatological recommendations based on your profile, age and budget.",
+    welcome_desc:"Personalized skin analysis and dermatological recommendations based on your profile, age and budget.",
     btn_register:"Create an account",btn_login:"Sign in",btn_guest:"Continue without account",
     legal:"By continuing, you agree to our terms of use.",or:"or",
     q1_title:"Skin type",q1_sub:"Choose the one that best describes your skin.",
@@ -1913,7 +1929,7 @@ const T = {
     allergy_title:"Registered allergies",allergy_text:"Check the ingredients. Declared allergens:",
     suivi_title:"4-week follow-up",
     suivi_text:"Your skin evolves. Come back in 4 weeks to adjust your routine.",
-    suivi_btn:"Redo the diagnosis",
+    suivi_btn:"Redo my analysis",
     fiche_btn:"Learn more",note_yuka:"🥕 Yuka score",
     budget_total:"Estimated budget:",compatible:"compatible",
     morning_only:"Morning only",result_routine:"Your personalized routine",result_hello:"Hello",evening_only:"Evening only",both:"Morning & Evening",
@@ -1961,7 +1977,7 @@ const T = {
     age3:"36 – 45",age3_sub:"Early anti-aging",
     age4:"46+",age4_sub:"Intensive correction",
     concerns:["Acne / Blemishes","Dark spots & hyperpigmentation","Wrinkles & anti-aging","Enlarged pores","Redness / Rosacea","Dark circles & puffiness","Dull complexion / Radiance","Dehydration","Blackheads","Sensitivity / Irritations"],
-    allergies:["Fragrances / Perfumes","Parabens","Alcohol","Sulfates (SLS/SLES)","Silicones","Essential oils","Salicylic acid","Retinol","Vitamin C","Acids (AHA/BHA)","Methylisothiazolinone (MIT)","Phénoxyéthanol","Limonène","Linalool","Lanoline","No known allergies"],
+    allergies:["Fragrances / Perfumes","Parabens","Alcohol","Sulfates (SLS/SLES)","Silicones","Essential oils","Salicylic acid","Retinol","Vitamin C","Acids (AHA/BHA)","Methylisothiazolinone (MIT)","Phénoxyéthanol","Limonène","Linalool","Géraniol","Citronellol","Citral","Coumarine","Lavande / Lavandin","Bergamote (Citrus aurantium bergamia)","Rose (huile / extrait de fleur)","Menthol","Lanoline","No known allergies"],
     budgets:[
       {id:"low",label:"Budget",sub:"Effective without breaking the bank"},
       {id:"mid",label:"Mid-range ",sub:"The best compromise"},
@@ -2435,6 +2451,185 @@ var FRAGRANCE_FAMILY = {
   "Cinnamal":1,"Hydroxycitronellal":1,"Isoeugénol":1,"Farnesol":1,"Hexyl Cinnamal":1,
   "Lyral (HICC)":1,"Amyl Cinnamal":1,"Anise Alcohol":1
 };
+
+// ════════════ ANNEXE III — RÈGLEMENT (UE) 2023/1545 ════════════
+// Mise à jour du référentiel : la liste des substances parfumantes à déclaration
+// individuelle est passée de 26 à 82 entrées. Applicable depuis le 31/07/2026
+// pour tout produit nouvellement mis sur le marché UE (écoulement des stocks
+// antérieurs jusqu'au 31/07/2028). Corrigendum JOUE 2025/90876 intégré :
+//   · "Rose ketone 4" renommé Damascenone (et non Damascone)
+//   · Pelargonium Graveolens éclaté en Oil / Flower Oil / Leaf Oil
+//   · ajout de Pogostemon Cablin Leaf Oil
+// Seuils inchangés : 0,001 % (sans rinçage) / 0,01 % (rincé).
+// n:0 = socle 2003 · n:1 = ajouté par 2023/1545
+var ANNEXE_III_2026 = [
+  // — Socle 2003 toujours en vigueur —
+  {l:"Amyl Cinnamal",v:["amyl cinnamal","amylcinnamal","amylcinnamaldehyde"],n:0},
+  {l:"Amylcinnamyl Alcohol",v:["amylcinnamyl alcohol","amyl cinnamyl alcohol"],n:0},
+  {l:"Anise Alcohol",v:["anise alcohol","anisyl alcohol"],n:0},
+  {l:"Benzyl Alcohol",v:["benzyl alcohol"],n:0},
+  {l:"Benzyl Benzoate",v:["benzyl benzoate"],n:0},
+  {l:"Benzyl Cinnamate",v:["benzyl cinnamate"],n:0},
+  {l:"Benzyl Salicylate",v:["benzyl salicylate"],n:0},
+  {l:"Cinnamal",v:["cinnamal","cinnamaldehyde"],n:0},
+  {l:"Cinnamyl Alcohol",v:["cinnamyl alcohol"],n:0},
+  {l:"Citral",v:["citral","geranial","neral"],n:0},
+  {l:"Citronellol",v:["citronellol"],n:0},
+  {l:"Coumarine",v:["coumarin","coumarine"],n:0},
+  {l:"Eugénol",v:["eugenol","eugénol"],n:0},
+  {l:"Farnesol",v:["farnesol"],n:0},
+  {l:"Géraniol",v:["geraniol","géraniol"],n:0},
+  {l:"Hexyl Cinnamal",v:["hexyl cinnamal"],n:0},
+  {l:"Hydroxycitronellal",v:["hydroxycitronellal"],n:0},
+  {l:"Isoeugénol",v:["isoeugenol","isoeugénol"],n:0},
+  {l:"Limonène",v:["limonene","limonène","d-limonene"],n:0},
+  {l:"Linalool",v:["linalool"],n:0},
+  {l:"Methyl 2-Octynoate",v:["methyl 2-octynoate","methyl octine carbonate"],n:0},
+  {l:"Alpha-Isomethyl Ionone",v:["alpha-isomethyl ionone","isomethyl ionone"],n:0},
+  {l:"Mousse de chêne (Evernia prunastri)",v:["evernia prunastri","oakmoss"],n:0},
+  {l:"Mousse d'arbre (Evernia furfuracea)",v:["evernia furfuracea","treemoss"],n:0},
+  // — Molécules ajoutées par 2023/1545 —
+  {l:"Acétyl Cédrène",v:["acetyl cedrene","acetylcedrene"],n:1},
+  {l:"Amyl Salicylate",v:["amyl salicylate","pentyl salicylate"],n:1},
+  {l:"Anéthole",v:["anethole","anéthole"],n:1},
+  {l:"Benzaldéhyde",v:["benzaldehyde","benzaldéhyde"],n:1},
+  {l:"Benzyl Isoeugénol",v:["benzyl isoeugenol"],n:1},
+  {l:"Bêta-Caryophyllène",v:["caryophyllene","caryophyllène"],n:1},
+  {l:"Camphre",v:["camphor","camphre"],n:1},
+  {l:"Carvone",v:["carvone"],n:1},
+  {l:"Oxyde de Caryophyllène",v:["caryophyllene oxide"],n:1},
+  {l:"Dimethyl Phenethyl Acetate",v:["dimethyl phenethyl acetate"],n:1},
+  {l:"Eugenyl Acetate",v:["eugenyl acetate"],n:1},
+  {l:"Geranyl Acetate",v:["geranyl acetate"],n:1},
+  {l:"Hexadécanolactone",v:["hexadecanolactone"],n:1},
+  {l:"Hexamethylindanopyran (Galaxolide)",v:["hexamethylindanopyran","galaxolide"],n:1},
+  {l:"Isoeugenyl Acetate",v:["isoeugenyl acetate"],n:1},
+  {l:"Linalyl Acetate",v:["linalyl acetate"],n:1},
+  {l:"Menthol",v:["menthol","levomenthol"],n:1},
+  {l:"6-Méthyl Coumarine",v:["6-methyl coumarin","methyl coumarin"],n:1},
+  {l:"Salicylate de méthyle",v:["methyl salicylate"],n:1},
+  {l:"Pinène",v:["pinene","pinène"],n:1},
+  {l:"3-Propylidenephthalide",v:["propylidenephthalide"],n:1},
+  {l:"Cétones de rose (Damascenone)",v:["damascenone","damascone","rose ketone"],n:1},
+  {l:"Salicylaldéhyde",v:["salicylaldehyde"],n:1},
+  {l:"Santalol",v:["santalol"],n:1},
+  {l:"Sclaréol",v:["sclareol"],n:1},
+  {l:"Alpha-Terpinène",v:["alpha-terpinene","terpinene"],n:1},
+  {l:"Terpinéol",v:["terpineol","terpinen-4-ol"],n:1},
+  {l:"Terpinolène",v:["terpinolene"],n:1},
+  {l:"Tetramethyl Acetyloctahydronaphthalenes",v:["tetramethyl acetyloctahydronaphthalen","iso e super"],n:1},
+  {l:"Trimethylbenzenepropanol",v:["trimethylbenzenepropanol","majantol"],n:1},
+  {l:"Trimethylcyclopentenyl Methylisopentenol",v:["trimethylcyclopentenyl methylisopentenol"],n:1},
+  {l:"Térébenthine",v:["turpentine","terebenthine","térébenthine"],n:1},
+  {l:"Vanilline",v:["vanillin","vanilline"],n:1},
+  // — Entrées botaniques groupées (grouping names de l'annexe) —
+  {l:"Ylang-ylang (Cananga odorata)",v:["cananga odorata","ylang"],n:1},
+  {l:"Cèdre de l'Atlas (Cedrus atlantica)",v:["cedrus atlantica"],n:1},
+  {l:"Cannelle de Chine (Cinnamomum cassia)",v:["cinnamomum cassia"],n:1},
+  {l:"Cannelle de Ceylan (Cinnamomum zeylanicum)",v:["cinnamomum zeylanicum","cinnamomum verum"],n:1},
+  {l:"Bergamote (Citrus aurantium bergamia)",v:["citrus aurantium bergamia","bergamot"],n:1},
+  {l:"Néroli (fleur d'oranger)",v:["citrus aurantium amara flower","citrus aurantium dulcis flower","neroli"],n:1},
+  {l:"Zeste d'orange (Citrus aurantium)",v:["citrus aurantium amara peel","citrus aurantium dulcis peel"],n:1},
+  {l:"Zeste de citron (Citrus limon)",v:["citrus limon peel","citrus medica limonum peel"],n:1},
+  {l:"Eucalyptus globulus",v:["eucalyptus globulus"],n:1},
+  {l:"Girofle (Eugenia caryophyllus)",v:["eugenia caryophyllus","clove oil"],n:1},
+  {l:"Jasmin",v:["jasminum officinale","jasminum grandiflorum","jasminum sambac"],n:1},
+  {l:"Cèdre de Virginie (Juniperus virginiana)",v:["juniperus virginiana"],n:1},
+  {l:"Laurier noble (Laurus nobilis)",v:["laurus nobilis leaf"],n:1},
+  {l:"Lavande / Lavandin",v:["lavandula angustifolia","lavandula hybrida","lavandula intermedia","lavandula latifolia","lavandula officinalis"],n:1},
+  {l:"Lemongrass (Cymbopogon)",v:["cymbopogon schoenanthus","cymbopogon flexuosus","cymbopogon citratus","lemongrass"],n:1},
+  {l:"Verveine odorante (Lippia citriodora)",v:["lippia citriodora"],n:1},
+  {l:"Menthe poivrée (Mentha piperita)",v:["mentha piperita"],n:1},
+  {l:"Menthe verte (Mentha viridis)",v:["mentha viridis","mentha spicata"],n:1},
+  {l:"Baume du Pérou (Myroxylon pereirae)",v:["myroxylon pereirae","balsam peru"],n:1},
+  {l:"Narcisse",v:["narcissus poeticus","narcissus jonquilla","narcissus pseudonarcissus","narcissus tazetta"],n:1},
+  {l:"Géranium rosat — huile",v:["pelargonium graveolens oil"],n:1},
+  {l:"Géranium rosat — huile de fleur",v:["pelargonium graveolens flower oil"],n:1},
+  {l:"Géranium rosat — huile de feuille",v:["pelargonium graveolens leaf oil"],n:1},
+  {l:"Pin mugo",v:["pinus mugo","pinus pumilio"],n:1},
+  {l:"Pin nain de Sibérie (Pinus pumila)",v:["pinus pumila"],n:1},
+  {l:"Patchouli — huile",v:["pogostemon cablin oil","patchouli oil"],n:1},
+  {l:"Patchouli — huile de feuille",v:["pogostemon cablin leaf oil"],n:1},
+  {l:"Rose (huile / extrait de fleur)",v:["rosa damascena flower oil","rosa damascena flower extract","rosa centifolia flower","rosa gallica flower","rosa alba flower","rosa moschata flower"],n:1},
+  {l:"Bois de santal (Santalum album)",v:["santalum album"],n:1}
+];
+
+// Substances désormais INTERDITES à la vente dans l'UE. Leur présence signale
+// un stock antérieur à l'interdiction ou un import hors UE — information que
+// l'utilisateur ne trouve nulle part ailleurs.
+var INTERDITS_UE = [
+  {l:"Butylphenyl Methylpropional (Lilial)",
+   v:["butylphenyl methylpropional","lilial"],
+   d:"Interdit dans l'UE depuis le 1er mars 2022 (classé CMR 1B)."},
+  {l:"Hydroxyisohexyl 3-Cyclohexene Carboxaldehyde (Lyral)",
+   v:["hydroxyisohexyl 3-cyclohexene","hicc","lyral"],
+   d:"Interdit à la vente dans l'UE depuis le 23 août 2021 (allergène majeur)."}
+];
+
+// Fusion NON destructive dans le système existant : on n'écrase aucune clé déjà
+// présente, on ne fait qu'étendre la couverture de detectFineAllergens().
+(function(){
+  var nouveaux = 0;
+  ANNEXE_III_2026.forEach(function(a){
+    if (!Object.prototype.hasOwnProperty.call(FINE_ALLERGENS, a.l)) {
+      FINE_ALLERGENS[a.l] = a.v.slice();
+      nouveaux++;
+    }
+    // Toutes les entrées de l'annexe III sont des substances parfumantes :
+    // sur un produit parfumé sans INCI complète, on avertit au lieu d'exclure.
+    if (!FRAGRANCE_FAMILY[a.l]) FRAGRANCE_FAMILY[a.l] = 1;
+  });
+  console.log("[Annexe III 2026] " + ANNEXE_III_2026.length + " entrées, " + nouveaux + " ajoutées au détecteur.");
+})();
+
+// Analyse une liste INCI brute (texte libre, ex. Open Beauty Facts).
+// Retour : { total, allergenes:[{l,n,src}], nouveaux:[...], interdits:[...], conflits:[...] }
+function analyseINCI(texte, allergiesUtilisateur) {
+  var res = { total:0, allergenes:[], nouveaux:[], interdits:[], conflits:[] };
+  if (!texte || typeof texte !== "string") return res;
+
+  var norm = function(s){
+    return String(s).toLowerCase()
+      .normalize("NFD").replace(/[\u0300-\u036f]/g,"")
+      .replace(/\([^)]*\)/g," ")
+      .replace(/[^a-z0-9\- ]/g," ")
+      .replace(/\s+/g," ").trim();
+  };
+  var tokens = texte.split(/[,;\n•·]+/).map(norm).filter(function(t){ return t.length > 2; });
+  res.total = tokens.length;
+
+  var vus = {};
+  tokens.forEach(function(tok){
+    ANNEXE_III_2026.forEach(function(a){
+      if (vus[a.l]) return;
+      var hit = a.v.some(function(v){ return tok.indexOf(norm(v)) > -1; });
+      if (hit) { vus[a.l] = 1; res.allergenes.push({ l:a.l, n:a.n, src:tok }); }
+    });
+    INTERDITS_UE.forEach(function(b){
+      if (res.interdits.some(function(x){ return x.l === b.l; })) return;
+      if (b.v.some(function(v){ return tok.indexOf(norm(v)) > -1; })) res.interdits.push(b);
+    });
+  });
+
+  res.nouveaux = res.allergenes.filter(function(a){ return a.n === 1; });
+
+  // Croisement avec les allergies déclarées par l'utilisateur
+  var perso = (allergiesUtilisateur || []).filter(function(a){
+    return a && a !== "Aucune allergie connue" && a !== "No known allergies";
+  });
+  res.conflits = res.allergenes.filter(function(a){
+    return perso.some(function(p){
+      if (p.indexOf("Autre:") === 0 || p.indexOf("Other:") === 0) {
+        var c = norm(p.replace(/^(Autre:|Other:)\s*/i,""));
+        return c.length > 2 && (norm(a.l).indexOf(c) > -1 || a.src.indexOf(c) > -1);
+      }
+      if (p === a.l) return true;
+      var syn = FINE_ALLERGENS[p];
+      return !!(syn && syn.some(function(s){ return a.src.indexOf(norm(s)) > -1; }));
+    });
+  });
+  return res;
+}
 
 // Détecte les allergènes fins et les allergies texte libre "Autre:" dans un produit.
 // Retour : { hit:bool, detected:[labels certains], uncertain:[labels probables] }
@@ -3470,7 +3665,7 @@ function openFindDetail(key) {
   renderFindStep('detail');
 }
 
-const SCREENS=["lang","onboarding","welcome","register","login","scan","q1","diag","q2","q3","q4","q5","result","compare","suivi","dashboard","scan-product","find-product","profile","articles","settings","parrainage","abonnement","privacy","cgu","mentions"];
+const SCREENS=["lang","onboarding","welcome","register","login","scan","q1","diag","q2","q3","q4","q5","result","compare","suivi","dashboard","scan-product","find-product","profile","articles","settings","parrainage","abonnement","privacy","cgu","mentions","cycle"];
 
 // ══════════ GROSSESSE / ALLAITEMENT : ACTIFS DÉCONSEILLÉS ══════════
 // Liste volontairement prudente, alignée sur ce qu'une pharmacienne écarterait au comptoir.
@@ -3627,12 +3822,12 @@ function setLang(l){
 // ════════════ ONBOARDING 3 SLIDES ════════════
 var _obSlide = 0;
 var _OB_SLIDES_FR = [
-  { ic: "🎯", title: "Diagnostic en 60 secondes", desc: "Réponds à 5 questions simples et reçois ta routine personnalisée en moins d'une minute." },
+  { ic: "🎯", title: "Ton profil peau en 60 secondes", desc: "Réponds à 5 questions simples et reçois ta routine personnalisée en moins d'une minute." },
   { ic: "💎", title: "Une routine sur-mesure", desc: "On analyse 175+ produits pour sélectionner ceux qui matchent ton type de peau, ton âge et ton budget." },
   { ic: "📈", title: "Suivi & progression", desc: "Photo hebdo, journal de peau, score qui évolue. Vois ta peau changer semaine après semaine." }
 ];
 var _OB_SLIDES_EN = [
-  { ic: "🎯", title: "Diagnosis in 60 seconds", desc: "Answer 5 simple questions and get your personalized routine in less than a minute." },
+  { ic: "🎯", title: "Your skin profile in 60 seconds", desc: "Answer 5 simple questions and get your personalized routine in less than a minute." },
   { ic: "💎", title: "A tailored routine", desc: "We analyze 175+ products to select those that match your skin type, age and budget." },
   { ic: "📈", title: "Tracking & progress", desc: "Weekly photos, skin journal, evolving score. Watch your skin change week after week." }
 ];
@@ -3766,9 +3961,9 @@ function applyWelcomeLang(){
   const badge = document.getElementById('welcome-badge');
   if(badge) badge.textContent = 'Skincare Intelligence';
   const btnStart = document.getElementById('btn-start-text');
-  if(btnStart) btnStart.textContent = LANG==='en'?'Start my diagnosis':'Commencer mon diagnostic';
+  if(btnStart) btnStart.textContent = LANG==='en'?'Start my skin analysis':'Commencer mon analyse';
   const btnStartTop = document.getElementById('btn-start-top-text');
-  if(btnStartTop) btnStartTop.textContent = LANG==='en'?'Take the diagnosis, no account':'Faire le diagnostic sans compte';
+  if(btnStartTop) btnStartTop.textContent = LANG==='en'?'Analyse my skin, no account':'Analyser ma peau sans compte';
   const stat1 = document.getElementById('stat1-label');
   if(stat1) stat1.textContent = LANG==='en'?'products analyzed':'produits analysés';
   const stat2 = document.getElementById('stat2-label');
@@ -4580,9 +4775,9 @@ function showDiagResult(){
   diagResult = winner;
   const res = getDiagResults()[winner];
   document.getElementById("diag-opts").innerHTML = "";
-  document.getElementById("diag-question").textContent = "Résultat de votre diagnostic";
+  document.getElementById("diag-question").textContent = "Résultat de votre analyse";
   document.getElementById("diag-sub").textContent = "";
-  document.getElementById("diag-step-lbl").textContent = "Diagnostic terminé ✓";
+  document.getElementById("diag-step-lbl").textContent = "Analyse terminée ✓";
   document.getElementById("diag-result-type").textContent = res.label;
   document.getElementById("diag-result-desc").textContent = res.desc;
   document.getElementById("diag-result").classList.remove("hidden");
@@ -5423,8 +5618,8 @@ function renderResult(){
       var isENg=(typeof LANG!=='undefined'&&LANG==='en');
       rc.innerHTML='<div style="padding:32px 18px;text-align:center"><div style="font-size:42px;margin-bottom:12px">🌸</div>'
         +'<h2 style="font-family:Georgia,serif;color:#3D2B1F;margin-bottom:8px">'+(isENg?'No routine yet':'Aucune routine générée')+'</h2>'
-        +'<p style="font-size:13px;color:#8B6F5E;line-height:1.6;margin-bottom:20px">'+(isENg?'Complete the diagnosis to discover your personalized Skin Match routine.':'Complète le diagnostic pour découvrir ta routine Skin Match personnalisée.')+'</p>'
-        +'<button onclick="go(\'q1\')" style="padding:12px 24px;border-radius:50px;background:#C4726A;color:#fff;border:none;font-weight:700;font-size:14px;cursor:pointer;font-family:inherit">'+(isENg?'Start the diagnosis':'Démarrer le diagnostic')+'</button></div>';
+        +'<p style="font-size:13px;color:#8B6F5E;line-height:1.6;margin-bottom:20px">'+(isENg?'Complete the analysis to discover your personalized Skin Match routine.':'Complète ton analyse pour découvrir ta routine Skin Match personnalisée.')+'</p>'
+        +'<button onclick="go(\'q1\')" style="padding:12px 24px;border-radius:50px;background:#C4726A;color:#fff;border:none;font-weight:700;font-size:14px;cursor:pointer;font-family:inherit">'+(isENg?'Start the analysis':'Démarrer mon analyse')+'</button></div>';
     }
     return;
   }
@@ -6207,7 +6402,7 @@ function getChatbotResponse(msg) {
   
   // Allergie
   if (m.includes('allergi') || m.includes('réaction') || m.includes('irritat') || m.includes('rouge')) {
-    return '⚠️ En cas de réaction allergique, arrête immédiatement le produit et rince à l\'eau. Les allergies courantes en skincare viennent souvent des parfums, conservateurs ou acides. Consulte un dermatologue si la réaction persiste. Tu peux refaire ton diagnostic SkinMatch en précisant tes allergies pour obtenir des produits adaptés.';
+    return '⚠️ En cas de réaction allergique, arrête immédiatement le produit et rince à l\'eau. Les allergies courantes en skincare viennent souvent des parfums, conservateurs ou acides. Consulte un dermatologue si la réaction persiste. Tu peux refaire ton analyse SkinMatch en précisant tes allergies pour obtenir des produits adaptés.';
   }
   // Acné
   if (m.includes('acné') || m.includes('bouton') || m.includes('imperfection') || m.includes('point noir')) {
@@ -6282,14 +6477,14 @@ function getChatbotResponse(msg) {
   }
   // Merci
   if (m.includes('merci') || m.includes('thanks') || m.includes('super') || m.includes('parfait')) {
-    return '😊 Avec plaisir ! N\'hésite pas si tu as d\'autres questions sur ta routine ou tes produits. Et n\'oublie pas de faire ton diagnostic SkinMatch pour des recommandations encore plus personnalisées !';
+    return '😊 Avec plaisir ! N\'hésite pas si tu as d\'autres questions sur ta routine ou tes produits. Et n\'oublie pas de faire ton analyse SkinMatch pour des recommandations encore plus personnalisées !';
   }
   // Peaux sensibles
   if (m.includes('sensible') || m.includes('réactiv') || m.includes('intolér')) {
     return '🌸 Pour les peaux sensibles, privilégie des formules sans parfum, sans alcool et sans huiles essentielles. Les marques les plus adaptées sont Avène, La Roche-Posay et Bioderma — leurs gammes Toleriane, Tolerance et Sensibio sont conçues pour les peaux les plus réactives. Introduis toujours un nouveau produit progressivement.';
   }
   // Question générale
-  return '🤔 Bonne question ! Pour te donner la meilleure réponse possible, peux-tu me préciser ton type de peau (sèche, grasse, mixte, normale ou sensible) et ton problème principal ? Tu peux aussi faire le diagnostic SkinMatch pour une routine 100% personnalisée. Je suis là pour t\'aider !';
+  return '🤔 Bonne question ! Pour te donner la meilleure réponse possible, peux-tu me préciser ton type de peau (sèche, grasse, mixte, normale ou sensible) et ton problème principal ? Tu peux aussi faire le analyse SkinMatch pour une routine 100% personnalisée. Je suis là pour t\'aider !';
 }
 
 function shareRoutine() {
@@ -6376,7 +6571,7 @@ var SCAN_DEMO_PRODUCTS = {
     initiales: 'LRP',
     dimensions: {formulation: 88, adaptation: 91, actifs: 92, prix: 72},
     pros: [
-      {actif: 'Acide salicylique', explication: 'Anti-acné cliniquement prouvé. Cible directement tes imperfections.'},
+      {actif: 'Acide salicylique', explication: 'Reconnu pour aider à réduire visuellement les imperfections.'},
       {actif: 'Niacinamide', explication: 'Réduit les marques post-acné et unifie ton teint progressivement.'},
       {actif: 'Lipohydroxy-acide (LHA)', explication: 'Exfoliant doux unique à La Roche-Posay, efficace sans irriter.'}
     ],
@@ -6631,12 +6826,13 @@ async function onBarcodeDetected(code) {
   // 3. Fallback Open Beauty Facts API
   showBarcodeLoading(code);
   try {
-    var resp = await fetch("https://world.openbeautyfacts.org/api/v2/product/" + code + ".json?fields=product_name,brands,categories_tags");
+    var resp = await fetch("https://world.openbeautyfacts.org/api/v2/product/" + code + ".json?fields=product_name,brands,categories_tags,ingredients_text,ingredients_text_fr");
     var data = await resp.json();
     if (data.status === 1 && data.product && data.product.product_name) {
       var productName = data.product.product_name;
       var brand = data.product.brands || "";
-      _incrementScan("product"); showBarcodeExternalResult(code, productName, brand);
+      var inci = data.product.ingredients_text_fr || data.product.ingredients_text || "";
+      _incrementScan("product"); showBarcodeExternalResult(code, productName, brand, inci);
     } else {
       showBarcodeNotFound(code);
     }
@@ -6858,10 +7054,59 @@ function showBarcodeNotFound(code) {
     "</div>";
 }
 
-function showBarcodeExternalResult(code, name, brand) {
+function showBarcodeExternalResult(code, name, brand, inci) {
   var resultDiv = document.getElementById("scan-product-result");
   if (!resultDiv) return;
   var isEN = LANG === "en";
+
+  // ── Analyse réglementaire de la liste INCI (annexe III, règlement 2023/1545) ──
+  var inciBloc = "";
+  if (inci && inci.length > 10) {
+    var an = analyseINCI(inci, (typeof ST !== "undefined" ? ST.allergies : []) || []);
+    var esc = function(s){ return String(s).replace(/[&<>"]/g, function(c){
+      return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]; }); };
+
+    if (an.interdits.length) {
+      inciBloc += "<div style=\"background:#FCEEEE;border:1px solid #F0C7C7;border-radius:12px;padding:12px;margin-bottom:10px\">" +
+        "<div style=\"font-size:12px;font-weight:700;color:#C02B2B;margin-bottom:4px\">⛔ " +
+        (isEN ? "Substance banned in the EU" : "Substance interdite dans l'UE") + "</div>" +
+        an.interdits.map(function(b){
+          return "<div style=\"font-size:11.5px;color:#7A3030;line-height:1.45\"><b>" + esc(b.l) + "</b><br>" + esc(b.d) + "</div>";
+        }).join("") +
+        "<div style=\"font-size:11px;color:#8A5A5A;margin-top:6px\">" +
+        (isEN ? "This product is old stock or a non-EU import." : "Ce produit est un stock ancien ou un import hors UE.") + "</div></div>";
+    }
+    if (an.conflits.length) {
+      inciBloc += "<div style=\"background:#FCEEEE;border:1px solid #F0C7C7;border-radius:12px;padding:12px;margin-bottom:10px\">" +
+        "<div style=\"font-size:12px;font-weight:700;color:#C02B2B;margin-bottom:4px\">⚠️ " +
+        (isEN ? "Contains an allergen you declared" : "Contient un allergène que tu as déclaré") + "</div>" +
+        "<div style=\"font-size:11.5px;color:#7A3030\">" +
+        an.conflits.map(function(a){ return esc(a.l); }).join(", ") + "</div></div>";
+    }
+    if (an.allergenes.length) {
+      inciBloc += "<div style=\"background:#FBF6F4;border:1px solid var(--bdr);border-radius:12px;padding:12px;margin-bottom:14px\">" +
+        "<div style=\"font-size:11px;font-weight:700;color:var(--mut);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px\">" +
+        (isEN ? "Declarable fragrance allergens" : "Allergènes parfum à déclaration obligatoire") + " · " + an.allergenes.length + "</div>" +
+        "<div style=\"display:flex;flex-wrap:wrap;gap:5px\">" +
+        an.allergenes.map(function(a){
+          var neuf = a.n === 1;
+          return "<span style=\"font-size:10.5px;padding:4px 8px;border-radius:20px;background:" +
+            (neuf ? "#EDF1FC;color:#2B4FC0" : "#F4EEEC;color:#8B6F5E") + "\">" + esc(a.l) + (neuf ? " •" : "") + "</span>";
+        }).join("") + "</div>" +
+        (an.nouveaux.length ? "<div style=\"font-size:10.5px;color:var(--mut);margin-top:8px;line-height:1.45\">• " +
+          an.nouveaux.length + " " + (isEN
+            ? "of them became declarable on 31/07/2026 (Reg. EU 2023/1545)."
+            : "d'entre eux sont devenus déclarables le 31/07/2026 (règl. UE 2023/1545).") + "</div>" : "") +
+        "</div>";
+    } else {
+      inciBloc += "<div style=\"background:#E9F4EF;border:1px solid #C2E0D2;border-radius:12px;padding:12px;margin-bottom:14px\">" +
+        "<div style=\"font-size:12px;font-weight:700;color:#1E6B4E\">✓ " +
+        (isEN ? "No listed fragrance allergen detected" : "Aucun allergène parfum listé détecté") + "</div>" +
+        "<div style=\"font-size:11px;color:#3E7A62;margin-top:3px\">" + an.total + " " +
+        (isEN ? "ingredients analysed." : "ingrédients analysés.") + "</div></div>";
+    }
+  }
+
   resultDiv.style.display = "block";
   resultDiv.innerHTML =
     "<div style=\"background:#fff;border:1px solid var(--bdr);border-radius:16px;padding:20px\">" +
@@ -6872,6 +7117,7 @@ function showBarcodeExternalResult(code, name, brand) {
           (brand ? "<div style=\"font-size:12px;color:#8B6F5E\">" + brand + "</div>" : "") +
         "</div>" +
       "</div>" +
+      inciBloc +
       "<div style=\"background:#FDF0E6;border-radius:12px;padding:12px;margin-bottom:14px\">" +
         "<div style=\"font-size:12px;color:#C4726A;font-weight:600\">" + 
           (isEN ? "ℹ️ This product was found in the Open Beauty Facts database, but is not yet in our personalized routine system." : 
@@ -7225,7 +7471,7 @@ function displayScanResult(data) {
     concerns.forEach(function(c) {
       if (c === "acne" || c === "imperfections") {
         if (ak.includes("salicylique") || ak.includes("niacinamide") || ak.includes("zinc") || ak.includes("bha")) {
-          ans.push("✅ Acné : actifs anti-acné cliniquement prouvés présents — ce produit cible directement tes imperfections.");
+          ans.push("✅ Imperfections : contient des actifs reconnus pour aider à en réduire la visibilité.");
         } else {
           ans.push("⚠️ Acné : les actifs anti-acné spécifiques sont limités. Ce produit complète ta routine mais ne la remplace pas.");
         }
@@ -8733,6 +8979,14 @@ function renderDashboard() {
       tabCommunaute.appendChild(box);
     })();
 
+    // ════════════ CARTE CYCLE (module hormonal) ════════════
+    if (typeof buildCycleDashCard === "function") {
+      try {
+        var _cycCard = buildCycleDashCard(isEN);
+        if (_cycCard) tabRoutine.appendChild(_cycCard);
+      } catch(e) { /* le module cycle ne doit jamais bloquer le dashboard */ }
+    }
+
     // ════════════ ONGLET ROUTINE ════════════
     if (ST.result && ST.result.steps && ST.result.steps.length > 0) {
       var _amSteps = ST.result.steps.filter(function(s){ return s.moment === "AM" || s.moment === "AM+PM"; });
@@ -8768,8 +9022,8 @@ function renderDashboard() {
       emptyRoutine.style.cssText = "text-align:center;padding:40px 20px;background:var(--surf);border-radius:18px;border:1px solid var(--bdr)";
       emptyRoutine.innerHTML = "<div style='font-size:42px;margin-bottom:12px'>🌸</div>" +
         "<div style='font-family:Georgia,serif;font-size:18px;font-weight:700;color:var(--pri);margin-bottom:8px'>" + (isEN?"No routine yet":"Pas encore de routine") + "</div>" +
-        "<div style='font-size:13px;color:var(--mut);line-height:1.6;margin-bottom:20px'>" + (isEN?"Complete the diagnosis to get your personalized routine.":"Complète le diagnostic pour obtenir ta routine personnalisée.") + "</div>" +
-        "<button onclick=\"go('q1')\" style='padding:12px 24px;border-radius:50px;background:#C4726A;color:#fff;border:none;font-weight:700;font-size:14px;cursor:pointer;font-family:inherit'>" + (isEN?"Start the diagnosis →":"Démarrer le diagnostic →") + "</button>";
+        "<div style='font-size:13px;color:var(--mut);line-height:1.6;margin-bottom:20px'>" + (isEN?"Complete the analysis to get your personalized routine.":"Complète ton analyse pour obtenir ta routine personnalisée.") + "</div>" +
+        "<button onclick=\"go('q1')\" style='padding:12px 24px;border-radius:50px;background:#C4726A;color:#fff;border:none;font-weight:700;font-size:14px;cursor:pointer;font-family:inherit'>" + (isEN?"Start the analysis →":"Démarrer mon analyse →") + "</button>";
       tabRoutine.appendChild(emptyRoutine);
     }
 
@@ -10289,7 +10543,7 @@ window.onFirebaseUserReady = function(user) {
     if (connBadge) connBadge.style.display = 'flex';
     if (connLabel) connLabel.textContent = (isEN ? 'Connected as ' : 'Connecté en tant que ') + shortName;
     // Adapter le texte du bouton diagnostic (plus "sans compte" puisque déjà connecté)
-    if (btnStartTopText) btnStartTopText.textContent = isEN ? 'Start my diagnosis' : 'Faire mon diagnostic';
+    if (btnStartTopText) btnStartTopText.textContent = isEN ? 'Start my skin analysis' : 'Faire mon analyse';
     // Charger routine sauvegardée
     loadSavedRoutine(user);
   } else {
@@ -10297,7 +10551,7 @@ window.onFirebaseUserReady = function(user) {
     if (btnReg) { btnReg.style.display = ''; btnReg.textContent = isEN ? 'Create a free account' : 'Créer un compte gratuit'; }
     if (connBadge) connBadge.style.display = 'none';
     // Texte par défaut quand pas connecté
-    if (btnStartTopText) btnStartTopText.textContent = isEN ? 'Take the diagnosis, no account' : 'Faire le diagnostic sans compte';
+    if (btnStartTopText) btnStartTopText.textContent = isEN ? 'Analyse my skin, no account' : 'Analyser ma peau sans compte';
   }
 };
 
@@ -10358,8 +10612,8 @@ function renderProfile() {
     html += '<div style="background:var(--blush);border-radius:16px;border:1px solid var(--rose);padding:20px;margin-bottom:14px;text-align:center">';
     html += '<div style="font-size:32px;margin-bottom:10px">🌸</div>';
     html += '<div style="font-size:13px;font-weight:600;color:var(--pri);margin-bottom:6px">' + (LANG==="en" ? "No routine saved yet" : "Pas encore de routine sauvegardée") + '</div>';
-    html += '<div style="font-size:12px;color:var(--mut);margin-bottom:14px">' + (LANG==="en" ? "Take your diagnosis to generate your first routine." : "Fais ton diagnostic pour générer ta première routine.") + '</div>';
-    html += '<button onclick="startDiagFromProfile()" style="padding:11px 24px;border-radius:50px;border:none;background:#C4726A;color:#fff;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">' + (LANG==="en" ? "Start diagnosis" : "Commencer le diagnostic") + '</button>';
+    html += '<div style="font-size:12px;color:var(--mut);margin-bottom:14px">' + (LANG==="en" ? "Analyse your skin to generate your first routine." : "Fais ton analyse pour générer ta première routine.") + '</div>';
+    html += '<button onclick="startDiagFromProfile()" style="padding:11px 24px;border-radius:50px;border:none;background:#C4726A;color:#fff;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">' + (LANG==="en" ? "Start analysis" : "Commencer mon analyse") + '</button>';
     html += '</div>';
   }
   
@@ -10868,7 +11122,7 @@ function renderAbonnement() {
   html += _featLine("check", "<strong>1</strong> " + (isEN ? "skin scan" : "scan peau") + " / " + (isEN ? "month" : "mois"));
   html += _featLine("check", "<strong>5</strong> " + (isEN ? "product scans" : "scans produits") + " / " + (isEN ? "month" : "mois"));
   html += _featLine("check", "<strong>5</strong> " + (isEN ? "Skin Coach tips" : "conseils Skin Coach") + " / " + (isEN ? "month" : "mois"));
-  html += _featLine("check", (isEN ? "Diagnosis + personalized routine" : "Diagnostic + routine personnalisée"));
+  html += _featLine("check", (isEN ? "Analysis + personalized routine" : "Analyse + routine personnalisée"));
   html += '</ul>';
   if (isFree) {
     html += '<button style="width:100%;padding:14px;border-radius:50px;background:#F5EEE8;color:#3D2B1F;border:none;font-size:13px;font-weight:700;font-family:inherit;cursor:default">' + (isEN ? "Current plan" : "Plan actuel") + '</button>';
@@ -11770,7 +12024,7 @@ var _skinFilter=null;
       <div id="content-privacy" style="display:none">
         <h3 style="font-size:15px;font-weight:700;color:#3D2B1F;margin-bottom:10px">Politique de confidentialité</h3>
         <p style="font-size:12px;color:#5A4A42;line-height:1.7;margin-bottom:10px"><strong>1. Qui sommes-nous ?</strong><br>SkinMatch est une application web de conseil skincare personnalisé. Notre mission est d'aider chaque utilisateur à trouver les produits les mieux adaptés à son profil de peau.</p>
-        <p style="font-size:12px;color:#5A4A42;line-height:1.7;margin-bottom:10px"><strong>2. Données collectées</strong><br>Nous collectons : votre type de peau, âge, problèmes cutanés et budget (données de diagnostic) ; votre région géographique ; les produits consultés dans l'application.</p>
+        <p style="font-size:12px;color:#5A4A42;line-height:1.7;margin-bottom:10px"><strong>2. Données collectées</strong><br>Nous collectons : votre type de peau, âge, problèmes cutanés et budget (données de profil peau) ; votre région géographique ; les produits consultés dans l'application.</p>
         <p style="font-size:12px;color:#5A4A42;line-height:1.7;margin-bottom:10px"><strong>3. Utilisation des données</strong><br>Vos données sont utilisées exclusivement pour générer votre routine personnalisée et améliorer nos recommandations. Elles ne sont jamais vendues à des tiers.</p>
         <p style="font-size:12px;color:#5A4A42;line-height:1.7;margin-bottom:10px"><strong>4. Stockage local</strong><br>SkinMatch utilise le stockage local de votre navigateur pour mémoriser vos préférences. Ces données restent sur votre appareil.</p>
         <p style="font-size:12px;color:#5A4A42;line-height:1.7"><strong>5. Vos droits (RGPD)</strong><br>Conformément au RGPD, vous disposez d'un droit d'accès, de rectification et d'effacement de vos données. Contact : contact@skinmatch.app</p>
@@ -11784,7 +12038,7 @@ var _skinFilter=null;
     </label>
 
     <button id="terms-confirm-btn" onclick="confirmTerms()" disabled style="width:100%;padding:14px;border-radius:50px;border:none;background:#EDD9D4;color:#fff;font-size:15px;font-weight:700;cursor:not-allowed;font-family:inherit;transition:all .3s;flex-shrink:0">
-      Commencer mon diagnostic
+      Commencer mon analyse
     </button>
   </div>
 </div>
@@ -13089,6 +13343,457 @@ window.addEventListener('load', function() {
   setTimeout(showCookieBanner, 1500);
 });
 
+</script>
+
+<script>
+/* ══════════════════════════════════════════════════════════════════
+   MODULE CYCLE HORMONAL — SkinMatch
+   Recommandations adaptées à la phase du cycle menstruel.
+
+   RGPD : les dates de cycle sont une donnée de santé (art. 9 RGPD).
+   Elles sont stockées EXCLUSIVEMENT en localStorage sur l'appareil,
+   jamais envoyées à Firestore ni à aucun serveur. Consentement
+   explicite requis, effacement possible à tout moment.
+   ══════════════════════════════════════════════════════════════════ */
+(function(){
+"use strict";
+
+var CYCLE_KEY = "skinmatch_cycle_v1";
+var _memFallback = null;   // si localStorage indisponible (mode privé)
+
+function cycGet(){
+  try { var r = localStorage.getItem(CYCLE_KEY); return r ? JSON.parse(r) : _memFallback; }
+  catch(e){ return _memFallback; }
+}
+function cycSet(v){
+  _memFallback = v;
+  try { localStorage.setItem(CYCLE_KEY, JSON.stringify(v)); } catch(e){}
+}
+function cycClear(){
+  _memFallback = null;
+  try { localStorage.removeItem(CYCLE_KEY); } catch(e){}
+}
+
+/* ── Définition des 5 phases ── */
+var PHASES = {
+  menstruelle: {
+    k:"menstruelle", nom:"Phase menstruelle", emoji:"🌑",
+    c:"#A8474F", soft:"#F9ECEC", deep:"#6E2C32",
+    obj:"Réparer la barrière, hydrater, apaiser",
+    why:"Œstrogènes et progestérone sont au plus bas. La barrière cutanée retient moins l'eau : la peau devient plus sèche, plus terne et plus réactive. Le seuil de douleur est aussi plus bas — ce n'est pas le moment d'agresser.",
+    oui:["Céramides","Acide hyaluronique","Panthénol","Nettoyant doux"],
+    non:["Acides exfoliants","Rétinol","Gommage"],
+    boost:["ceramide","céramide","hyaluron","panthenol","panthénol","glycerin","glycérine","squalane","madecassoside","cica","allantoin","apais","bisabolol","avoine","karité","beurre","urea","urée","réparateur","reparateur","nourrissant","hydratant"],
+    avoid:["retinol","rétinol","retinal","glycolique","salicylique","lactique","mandelique","mandélique","peeling","gommage","exfoli","ascorbic","aha","bha"]
+  },
+  folliculaire: {
+    k:"folliculaire", nom:"Phase folliculaire", emoji:"🌱",
+    c:"#5F8465", soft:"#EDF3EE", deep:"#37503B",
+    obj:"Introduire les actifs forts, traiter taches et grain",
+    why:"Les œstrogènes remontent et stimulent collagène et acide hyaluronique. La peau cicatrise mieux et tolère mieux les actifs puissants. C'est ta fenêtre pour traiter.",
+    oui:["Rétinol","AHA / BHA","Vitamine C","Acide azélaïque"],
+    non:[],
+    boost:["retinol","rétinol","retinal","glycolique","lactique","mandelique","mandélique","salicylique","azelaique","azélaïque","vitamine c","ascorbic","exfoli","peeling","acide","éclat","eclat","tache"],
+    avoid:[]
+  },
+  ovulation: {
+    k:"ovulation", nom:"Ovulation", emoji:"☀️",
+    c:"#B5843D", soft:"#FBF2E4", deep:"#7A5623",
+    obj:"Protéger, matifier légèrement, entretenir l'éclat",
+    why:"Pic d'œstrogènes : la peau est à son meilleur, lumineuse et bien hydratée. Le sébum commence à remonter légèrement. Le bon moment pour protéger ce capital.",
+    oui:["Antioxydants","SPF 50","Vitamine C","Fluide matifiant"],
+    non:[],
+    boost:["antioxyd","vitamine c","ascorbic","vitamine e","ferulique","férulique","spf","solaire","protection","matifi","fluide","thé vert","resveratrol","resvératrol","éclat","eclat"],
+    avoid:[]
+  },
+  luteale: {
+    k:"luteale", nom:"Phase lutéale", emoji:"🌘",
+    c:"#7A8BA8", soft:"#EEF1F6", deep:"#465468",
+    obj:"Réguler le sébum avant les imperfections",
+    why:"La progestérone domine et la testostérone devient relativement plus active. Les glandes sébacées s'emballent : le sébum augmente et les pores se chargent. Tout se joue maintenant, pas la semaine prochaine.",
+    oui:["Niacinamide","Zinc","Acide salicylique","Texture légère"],
+    non:["Textures très riches"],
+    boost:["niacinamide","zinc","salicylique","bha","argile","kaolin","charbon","sebo","sébo","matifi","purifiant","gel nettoyant","azelaique","azélaïque","pore","imperfection"],
+    avoid:["huile de coco","très riche","baume riche"]
+  },
+  premenstruelle: {
+    k:"premenstruelle", nom:"Phase prémenstruelle", emoji:"🌗",
+    c:"#96709E", soft:"#F4EEF6", deep:"#5C4363",
+    obj:"Cibler les imperfections sans décaper",
+    why:"Le sébum est au maximum et l'inflammation monte : c'est le pic de l'acné hormonale, typiquement sur le menton et la mâchoire. Environ deux tiers des personnes sujettes à l'acné constatent une poussée ici.",
+    oui:["Acide salicylique","Niacinamide","Soin local ciblé","Argile"],
+    non:["Gommage mécanique","Nettoyant décapant"],
+    boost:["salicylique","bha","niacinamide","zinc","soufre","argile","kaolin","imperfection","anti-imperfection","local","azelaique","azélaïque","peroxyde","purifiant","sebo","sébo"],
+    avoid:["gommage","grain","scrub","abrasif"]
+  }
+};
+var PHASE_ORDER = ["menstruelle","folliculaire","ovulation","luteale","premenstruelle"];
+
+/* ── Calcul de la phase ── */
+function phaseFor(jour, L, P){
+  var ov = L - 14;
+  if (jour <= P)                    return PHASES.menstruelle;
+  if (jour >  L - 7)                return PHASES.premenstruelle;
+  if (Math.abs(jour - ov) <= 1)     return PHASES.ovulation;
+  if (jour <  ov)                   return PHASES.folliculaire;
+  return PHASES.luteale;
+}
+function jourDuCycle(startISO, L, offset){
+  var start = new Date(startISO + "T00:00:00");
+  var now = new Date(); now.setHours(0,0,0,0);
+  if (offset) now.setDate(now.getDate() + offset);
+  var diff = Math.floor((now - start) / 86400000);
+  return ((diff % L) + L) % L + 1;
+}
+
+/* ── Moteur de recommandation ──
+   Réutilise getCompat() : renvoie ≤15 en cas d'allergène déclaré,
+   ≤10 en cas d'incompatibilité grossesse. On exclut donc sous 50. */
+function recoPourPhase(phase, limite){
+  if (typeof DB === "undefined") return [];
+  var sk  = (typeof ST !== "undefined" ? ST.skinType : null);
+  var cc  = (typeof ST !== "undefined" && ST.concerns && ST.concerns.length) ? ST.concerns[0] : null;
+  var age = (typeof ST !== "undefined" ? ST.ageGroup : null);
+  var alg = (typeof ST !== "undefined" ? (ST.allergies || []) : []);
+  var out = [];
+
+  Object.keys(DB).forEach(function(key){
+    var p = DB[key];
+    if (!p || !p.nom) return;
+
+    // Filtre de sécurité : allergènes déclarés + grossesse/allaitement
+    var compat = 70;
+    try { compat = getCompat(key, sk, cc, age, alg); } catch(e){}
+    if (compat < 50) return;
+
+    var hay = ((p.ak||[]).join(" ") + " " + (p.comp||[]).join(" ") + " " +
+               (p.usage||"") + " " + (p.texture||"") + " " + (p.nom||"") + " " +
+               (p.pq||"") + " " + (p.ben||"")).toLowerCase();
+
+    var score = 0, hits = [];
+    phase.boost.forEach(function(m){
+      if (hay.indexOf(m) > -1 && hits.length < 4) { score += 3; hits.push(m); }
+      else if (hay.indexOf(m) > -1) score += 3;
+    });
+    if (score === 0) return;
+    phase.avoid.forEach(function(m){ if (hay.indexOf(m) > -1) score -= 8; });
+    if (score <= 0) return;
+
+    score += Math.round((compat - 70) / 4);
+    out.push({ key:key, p:p, score:score, hits:hits });
+  });
+
+  out.sort(function(a,b){ return b.score - a.score; });
+  return out.slice(0, limite || 3);
+}
+
+/* ── Notifications : 3 par cycle maximum ── */
+function notifEnAttente(jour, L, P, data){
+  var declencheurs = [
+    { j:1,     k:"menstruelle",
+      t:"Ta peau change aujourd'hui",
+      b:"Tes hormones sont au plus bas et ta barrière cutanée est fragilisée. On passe en mode réparation cette semaine." },
+    { j:P+1,   k:"folliculaire",
+      t:"Ta bonne fenêtre s'ouvre",
+      b:"Les œstrogènes remontent. C'est maintenant que ta peau tolère le mieux le rétinol et les acides." },
+    { j:L-6,   k:"premenstruelle",
+      t:"Anticipe la poussée",
+      b:"Le sébum va grimper dans les jours qui viennent. En agissant maintenant, tu évites les imperfections." }
+  ];
+  var cycleId = (data.startDate || "") + "-" + Math.floor(jour / L);
+  var vus = data.notified || {};
+  for (var i = 0; i < declencheurs.length; i++) {
+    var d = declencheurs[i];
+    if (jour === d.j && vus[d.k + cycleId] !== true) {
+      return { t:d.t, b:d.b, marquer:function(){
+        vus[d.k + cycleId] = true; data.notified = vus; cycSet(data);
+      }};
+    }
+  }
+  return null;
+}
+function pushNatif(n){
+  // iOS : ne fonctionne que si la PWA est installée sur l'écran d'accueil (iOS 16.4+)
+  try {
+    if (typeof Notification !== "undefined" && Notification.permission === "granted") {
+      new Notification("SkinMatch — " + n.t, { body:n.b, tag:"sm-cycle" });
+    }
+  } catch(e){}
+}
+
+/* ── Cadran SVG ── */
+function polar(cx, cy, r, deg){
+  var a = (deg - 90) * Math.PI / 180;
+  return [cx + r * Math.cos(a), cy + r * Math.sin(a)];
+}
+function arcPath(cx, cy, r, a0, a1){
+  var p0 = polar(cx, cy, r, a0), p1 = polar(cx, cy, r, a1);
+  return "M " + p0[0].toFixed(2) + " " + p0[1].toFixed(2) +
+         " A " + r + " " + r + " 0 " + ((a1 - a0 > 180) ? 1 : 0) + " 1 " +
+         p1[0].toFixed(2) + " " + p1[1].toFixed(2);
+}
+function cadranSVG(jour, L, P){
+  var C = 145, R = 112, step = 360 / L, gap = step * 0.18, segs = "";
+  for (var d = 1; d <= L; d++) {
+    var ph = phaseFor(d, L, P), actif = (d === jour);
+    segs += '<path d="' + arcPath(C, C, R, (d-1)*step + gap/2, d*step - gap/2) +
+            '" stroke="' + ph.c + '" stroke-width="' + (actif ? 18 : 9) +
+            '" stroke-opacity="' + (actif ? 1 : 0.32) +
+            '" fill="none" stroke-linecap="round" style="cursor:pointer" ' +
+            'onclick="window._cycleJump(' + d + ')"></path>';
+  }
+  var php = phaseFor(jour, L, P), m = polar(C, C, R + 17, (jour - 0.5) * step);
+  return '<svg viewBox="0 0 290 290" style="display:block;width:100%;max-width:260px;margin:0 auto" ' +
+         'role="img" aria-label="Jour ' + jour + ' du cycle">' + segs +
+         '<circle cx="' + m[0].toFixed(2) + '" cy="' + m[1].toFixed(2) + '" r="4.5" fill="' + php.c + '"></circle>' +
+         '<text x="' + C + '" y="' + (C + 8) + '" text-anchor="middle" ' +
+         'style="font-family:Georgia,serif;font-weight:700;font-size:44px;fill:#3D2B1F">J' + jour + '</text>' +
+         '<text x="' + C + '" y="' + (C + 28) + '" text-anchor="middle" ' +
+         'style="font-family:Outfit,sans-serif;font-size:10px;letter-spacing:1.5px;fill:#B0958F">SUR ' + L + ' JOURS</text>' +
+         '</svg>';
+}
+
+/* ── État d'affichage ── */
+var _offset = 0, _notifFermee = false;
+window._cycleJump = function(jourCible){
+  var d = cycGet(); if (!d) return;
+  _offset = jourCible - jourDuCycle(d.startDate, d.length, 0);
+  _notifFermee = true;
+  renderCycle();
+};
+
+function esc(s){
+  return String(s).replace(/[&<>"]/g, function(c){
+    return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c];
+  });
+}
+
+/* ── Écran de configuration ── */
+function renderSetup(el){
+  var maxDate = new Date().toISOString().slice(0,10);
+  var opts = function(min, max, def){
+    var s = "";
+    for (var i = min; i <= max; i++) s += '<option value="' + i + '"' + (i === def ? " selected" : "") + ">" + i + " jours</option>";
+    return s;
+  };
+  el.innerHTML =
+    '<div style="background:linear-gradient(135deg,#C4726A,#A85A52);border-radius:18px;padding:18px;margin-bottom:14px;color:#fff">' +
+      '<div style="font-size:10px;font-weight:700;color:rgba(255,255,255,.75);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">🌙 NOUVEAU</div>' +
+      '<div style="font-size:14px;line-height:1.5">Ta peau ne réagit pas de la même façon selon la semaine de ton cycle. Deux informations suffisent pour adapter tes recommandations.</div>' +
+    '</div>' +
+    '<div style="background:var(--surf);border:1px solid var(--bdr);border-radius:18px;padding:18px;margin-bottom:14px">' +
+      '<div style="font-size:12px;font-weight:700;color:var(--pri);margin-bottom:6px">Premier jour de tes dernières règles</div>' +
+      '<input type="date" id="cyc-start" max="' + maxDate + '" style="width:100%;padding:12px;border-radius:12px;border:2px solid #EDD9D4;font-size:15px;font-family:inherit;box-sizing:border-box;outline:none;background:#fff;color:#3D2B1F">' +
+      '<div style="font-size:12px;font-weight:700;color:var(--pri);margin:14px 0 6px">Durée moyenne de ton cycle</div>' +
+      '<select id="cyc-len" style="width:100%;padding:12px;border-radius:12px;border:2px solid #EDD9D4;font-size:15px;font-family:inherit;box-sizing:border-box;outline:none;background:#fff;color:#3D2B1F">' + opts(21,39,28) + '</select>' +
+      '<div style="font-size:12px;font-weight:700;color:var(--pri);margin:14px 0 6px">Durée de tes règles</div>' +
+      '<select id="cyc-dur" style="width:100%;padding:12px;border-radius:12px;border:2px solid #EDD9D4;font-size:15px;font-family:inherit;box-sizing:border-box;outline:none;background:#fff;color:#3D2B1F">' + opts(2,9,5) + '</select>' +
+      '<label style="display:flex;gap:10px;align-items:flex-start;background:#FBF6F4;border:1px solid var(--bdr);border-radius:12px;padding:13px;margin:16px 0;cursor:pointer">' +
+        '<input type="checkbox" id="cyc-ok" style="margin-top:2px;width:18px;height:18px;flex:0 0 18px;accent-color:#C4726A">' +
+        '<span style="font-size:12px;color:var(--mut);line-height:1.5"><b style="color:var(--pri)">Ces dates restent sur ton téléphone.</b> Elles ne sont jamais envoyées sur nos serveurs, ni associées à ton compte. Tu peux les effacer à tout moment depuis cet écran.</span>' +
+      '</label>' +
+      '<button id="cyc-save" disabled style="width:100%;padding:14px;border-radius:50px;border:none;background:#C4726A;color:#fff;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;opacity:.4">Activer le suivi</button>' +
+    '</div>';
+
+  var ok = document.getElementById("cyc-ok"),
+      st = document.getElementById("cyc-start"),
+      bt = document.getElementById("cyc-save");
+  var maj = function(){
+    var pret = ok.checked && st.value;
+    bt.disabled = !pret;
+    bt.style.opacity = pret ? "1" : ".4";
+  };
+  ok.addEventListener("change", maj);
+  st.addEventListener("change", maj);
+  st.addEventListener("input", maj);
+  bt.addEventListener("click", function(){
+    cycSet({
+      consent: true,
+      startDate: st.value,
+      length: parseInt(document.getElementById("cyc-len").value, 10),
+      duration: parseInt(document.getElementById("cyc-dur").value, 10),
+      notified: {}
+    });
+    try {
+      if (typeof Notification !== "undefined" && Notification.permission === "default") Notification.requestPermission();
+    } catch(e){}
+    if (window._logEvent) { try { window._logEvent("cycle_optin", {}); } catch(e){} }
+    _offset = 0; _notifFermee = false;
+    renderCycle();
+  });
+}
+
+/* ── Écran principal ── */
+function renderMain(el, data){
+  var L = data.length, P = data.duration;
+  var jour = jourDuCycle(data.startDate, L, _offset);
+  var ph = phaseFor(jour, L, P);
+  var reco = recoPourPhase(ph, 3);
+  var notif = _notifFermee ? null : notifEnAttente(jour, L, P, data);
+  if (notif && _offset === 0) { pushNatif(notif); notif.marquer(); }
+
+  var bornes = {
+    menstruelle:  "J1 – J" + P,
+    folliculaire: "J" + (P+1) + " – J" + (L-15),
+    ovulation:    "J" + (L-15) + " – J" + (L-13),
+    luteale:      "J" + (L-12) + " – J" + (L-7),
+    premenstruelle: "J" + (L-6) + " – J" + L
+  }[ph.k];
+
+  var html = "";
+
+  if (notif) {
+    html += '<div style="background:' + ph.c + ';border-radius:18px;padding:16px;margin-bottom:14px;color:#fff;display:flex;gap:12px;align-items:flex-start">' +
+      '<div style="font-size:20px;line-height:1">' + ph.emoji + '</div>' +
+      '<div style="flex:1"><div style="font-size:14px;font-weight:700;margin-bottom:3px">' + esc(notif.t) + '</div>' +
+      '<div style="font-size:12.5px;opacity:.9;line-height:1.5">' + esc(notif.b) + '</div></div>' +
+      '<button onclick="window._cycleCloseNotif()" style="background:none;border:none;color:#fff;opacity:.7;font-size:20px;line-height:1;cursor:pointer;padding:0 2px">×</button></div>';
+  }
+
+  html += '<div style="background:var(--surf);border:1px solid var(--bdr);border-radius:22px;padding:14px 12px 12px;margin-bottom:14px">' +
+    cadranSVG(jour, L, P) +
+    '<div style="display:flex;flex-wrap:wrap;gap:5px 10px;justify-content:center;margin-top:8px">' +
+    PHASE_ORDER.map(function(k){
+      var p = PHASES[k];
+      return '<span style="display:flex;align-items:center;gap:4px;font-size:9.5px;color:var(--mut);letter-spacing:.3px">' +
+        '<i style="width:7px;height:7px;border-radius:2px;background:' + p.c + ';display:block"></i>' +
+        p.nom.replace("Phase ","").toUpperCase() + '</span>';
+    }).join("") +
+    '</div>' +
+    '<div style="text-align:center;font-size:10.5px;color:var(--mut);margin-top:8px">Touche un jour pour explorer ton cycle</div>' +
+    '</div>';
+
+  html += '<div style="background:var(--surf);border:1px solid var(--bdr);border-radius:22px;overflow:hidden;margin-bottom:14px">' +
+    '<div style="padding:18px 18px 14px;border-bottom:1px solid var(--bdr);border-left:4px solid ' + ph.c + '">' +
+      '<div style="font-family:Georgia,serif;font-size:24px;font-weight:700;color:var(--pri);line-height:1.15;margin-bottom:4px">' + ph.emoji + " " + esc(ph.nom) + '</div>' +
+      '<div style="font-size:10.5px;font-weight:700;color:' + ph.c + ';text-transform:uppercase;letter-spacing:.8px">' + bornes + ' · ' + esc(ph.obj) + '</div>' +
+    '</div>' +
+    '<div style="padding:16px 18px">' +
+      '<div style="font-size:13.5px;color:var(--pri);line-height:1.55;margin-bottom:14px">' + esc(ph.why) + '</div>' +
+      '<div style="display:flex;flex-wrap:wrap;gap:5px">' +
+        ph.oui.map(function(o){
+          return '<span style="font-size:11px;padding:5px 10px;border-radius:20px;background:' + ph.soft + ';color:' + ph.deep + ';font-weight:600">' + esc(o) + '</span>';
+        }).join("") +
+        ph.non.map(function(o){
+          return '<span style="font-size:11px;padding:5px 10px;border-radius:20px;background:#F4F0EE;color:#A89690;text-decoration:line-through">' + esc(o) + '</span>';
+        }).join("") +
+      '</div>' +
+    '</div></div>';
+
+  if (reco.length) {
+    html += '<div style="font-size:10px;font-weight:700;color:var(--mut);text-transform:uppercase;letter-spacing:1px;margin:20px 0 10px">Sélection pour cette phase</div>';
+    html += reco.map(function(r, i){
+      var img = "";
+      try { if (typeof imgHtml === "function") img = imgHtml(r.key, r.p.marque, 48); } catch(e){}
+      return '<div onclick="window._cycleOpenProduct(\'' + r.key + '\')" style="display:flex;gap:12px;align-items:center;background:var(--surf);border:1px solid var(--bdr);border-radius:16px;padding:13px;margin-bottom:9px;cursor:pointer">' +
+        (img || '<div style="width:48px;height:48px;border-radius:12px;background:' + ph.soft + ';flex-shrink:0"></div>') +
+        '<div style="flex:1;min-width:0">' +
+          '<div style="font-size:13px;font-weight:700;color:var(--pri)">' + esc(r.p.nom) + '</div>' +
+          '<div style="font-size:11px;color:var(--mut)">' + esc(r.p.marque || "") + '</div>' +
+          (r.hits.length ? '<div style="font-size:10.5px;color:' + ph.c + ';margin-top:3px">Retenu pour : ' + esc(r.hits.slice(0,3).join(", ")) + '</div>' : "") +
+        '</div>' +
+        (r.p.prix ? '<div style="font-size:13px;font-family:Georgia,serif;font-weight:700;color:#C4726A;flex-shrink:0">' + esc(r.p.prix) + '</div>' : "") +
+      '</div>';
+    }).join("");
+  } else {
+    html += '<div style="background:var(--surf);border:1px solid var(--bdr);border-radius:16px;padding:18px;text-align:center;font-size:13px;color:var(--mut);line-height:1.5">Aucun produit du catalogue ne correspond à cette phase avec tes contraintes actuelles (allergies déclarées, grossesse).</div>';
+  }
+
+  html += '<div style="background:#FBF6F4;border:1px solid var(--bdr);border-radius:14px;padding:13px;margin-top:16px;font-size:11.5px;color:var(--mut);line-height:1.5">' +
+    '🔒 Tes dates de cycle sont enregistrées uniquement sur cet appareil. Elles ne sont pas envoyées sur nos serveurs.</div>';
+
+  html += '<button onclick="window._cycleReset()" style="width:100%;padding:12px;border-radius:50px;border:1.5px solid var(--bdr);background:transparent;color:var(--mut);font-size:12.5px;font-weight:600;cursor:pointer;font-family:inherit;margin-top:10px">Effacer mes données de cycle</button>';
+
+  if (_offset !== 0) {
+    html += '<button onclick="window._cycleToday()" style="width:100%;padding:12px;border-radius:50px;border:none;background:#C4726A;color:#fff;font-size:12.5px;font-weight:700;cursor:pointer;font-family:inherit;margin-top:8px">← Revenir à aujourd\'hui</button>';
+  }
+
+  el.innerHTML = html;
+
+  var sub = document.getElementById("cycle-sub");
+  if (sub) sub.textContent = _offset === 0
+    ? "Jour " + jour + " de ton cycle"
+    : "Aperçu : jour " + jour + " (simulation)";
+}
+
+window._cycleCloseNotif = function(){ _notifFermee = true; renderCycle(); };
+window._cycleToday = function(){ _offset = 0; _notifFermee = true; renderCycle(); };
+window._cycleReset = function(){
+  if (confirm("Effacer définitivement tes dates de cycle de cet appareil ?")) {
+    cycClear(); _offset = 0; _notifFermee = false; renderCycle();
+  }
+};
+window._cycleOpenProduct = function(key){
+  try {
+    if (typeof simulateScanWithKey === "function") { simulateScanWithKey(key); return; }
+  } catch(e){}
+  try { if (typeof go === "function") go("result"); } catch(e){}
+};
+
+/* ── Point d'entrée de l'écran ── */
+function renderCycle(){
+  var el = document.getElementById("cycle-content");
+  if (!el) return;
+  var data = cycGet();
+  if (data && data.consent) renderMain(el, data);
+  else { _offset = 0; renderSetup(el); }
+}
+window.renderCycle = renderCycle;
+
+/* ── Carte d'accès depuis Mon espace › Routine ── */
+window.buildCycleDashCard = function(isEN){
+  var data = cycGet();
+  var box = document.createElement("div");
+  box.style.cssText = "cursor:pointer;border-radius:18px;padding:15px 16px;margin-bottom:14px;display:flex;align-items:center;gap:13px";
+  box.onclick = function(){ if (typeof go === "function") { go("cycle"); renderCycle(); } };
+
+  if (data && data.consent) {
+    var jour = jourDuCycle(data.startDate, data.length, 0);
+    var ph = phaseFor(jour, data.length, data.duration);
+    box.style.background = ph.soft;
+    box.style.border = "1px solid " + ph.c + "33";
+    box.innerHTML =
+      '<div style="font-size:26px;line-height:1">' + ph.emoji + '</div>' +
+      '<div style="flex:1;min-width:0">' +
+        '<div style="font-size:9.5px;font-weight:700;color:' + ph.c + ';text-transform:uppercase;letter-spacing:1px">Jour ' + jour + ' · ' + ph.nom.replace("Phase ","") + '</div>' +
+        '<div style="font-size:13.5px;font-weight:700;color:var(--pri);margin-top:2px">' + (isEN ? "Your skin this week" : "Ta peau cette semaine") + '</div>' +
+        '<div style="font-size:11.5px;color:' + ph.deep + ';opacity:.8;margin-top:1px">' + ph.obj + '</div>' +
+      '</div>' +
+      '<div style="font-size:18px;color:' + ph.c + ';flex-shrink:0">›</div>';
+  } else {
+    box.style.background = "linear-gradient(135deg,#F6EEF8,#FBF3F0)";
+    box.style.border = "1px solid #EDD9D4";
+    box.innerHTML =
+      '<div style="font-size:26px;line-height:1">🌙</div>' +
+      '<div style="flex:1;min-width:0">' +
+        '<div style="font-size:9.5px;font-weight:700;color:#96709E;text-transform:uppercase;letter-spacing:1px">Nouveau</div>' +
+        '<div style="font-size:13.5px;font-weight:700;color:var(--pri);margin-top:2px">' + (isEN ? "Sync with your cycle" : "Synchroniser avec mon cycle") + '</div>' +
+        '<div style="font-size:11.5px;color:var(--mut);margin-top:1px">' + (isEN ? "Recommendations that follow your hormones" : "Des conseils qui suivent tes hormones") + '</div>' +
+      '</div>' +
+      '<div style="font-size:18px;color:#96709E;flex-shrink:0">›</div>';
+  }
+  return box;
+};
+
+/* ── Rendu automatique à l'ouverture de l'écran ── */
+if (typeof window.navTo === "function") {
+  var _navToOrig = window.navTo;
+  window.navTo = function(screen){
+    var r = _navToOrig.apply(this, arguments);
+    if (screen === "cycle") renderCycle();
+    return r;
+  };
+}
+if (typeof window.go === "function") {
+  var _goOrig = window.go;
+  window.go = function(screen){
+    var r = _goOrig.apply(this, arguments);
+    if (screen === "cycle") renderCycle();
+    return r;
+  };
+}
+
+})();
 </script>
 
 </body>
