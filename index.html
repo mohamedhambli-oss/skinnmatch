@@ -2665,53 +2665,198 @@ function detectFineAllergens(key, allergies) {
   return res;
 }
 
-function getCompat(key,skin,concern,age,allergies){
-  var p = DB[key];
-  if (!p) return 70;
+// ════════════ MOTEUR DE COMPATIBILITÉ ════════════
+// Échelle réelle 30–99. Un produit peut être franchement déconseillé :
+// c'est ce qui rend la note informative. Les malus sont aussi importants
+// que les bonus.
+//
+// scoreCompat() renvoie la note ET la liste des raisons, pour que la fiche
+// produit puisse expliquer précisément pourquoi c'est adapté ou non.
 
-  // Vérifier allergies via INCI_DB
+// Types de peau reconnus dans le champ "pq" de chaque produit.
+var SKIN_PATTERNS = {
+  grasse:   /grasse/i,
+  mixte:    /mixte/i,
+  seche:    /s[èe]che/i,
+  sensible: /sensible|r[ée]active/i,
+  normale:  /normale/i
+};
+var SKIN_UNIVERSAL = /tous types|toutes peaux|tout type/i;
+var SKIN_LABELS = { grasse:"grasses", mixte:"mixtes", seche:"sèches", sensible:"sensibles", normale:"normales" };
+// Forme au singulier, pour les tournures du type « ta peau sèche ».
+var SKIN_LABELS_SING = { grasse:"grasse", mixte:"mixte", seche:"sèche", sensible:"sensible", normale:"normale" };
+// Types antagonistes : proposer un soin pour peau sèche à une peau grasse
+// est une erreur plus lourde qu'une simple inadéquation.
+var SKIN_OPPOSED = { grasse:["seche"], seche:["grasse"] };
+
+// Renvoie les types de peau ciblés par un produit, d'après son champ "pq".
+function productSkinTargets(key) {
+  var p = DB[key]; if (!p) return { types:[], universel:false, cible:false };
+  var pq = (p.pq || "") + " " + (p.usage || "");
+  var types = Object.keys(SKIN_PATTERNS).filter(function(t){ return SKIN_PATTERNS[t].test(pq); });
+  var uni = SKIN_UNIVERSAL.test(pq);
+  return { types:types, universel:uni, cible:(types.length > 0 || uni) };
+}
+
+// Cœur du calcul. Renvoie { score, raisons:[{t:'plus'|'moins'|'stop', txt}] }
+function scoreCompat(key, skin, concern, age, allergies) {
+  var p = DB[key];
+  if (!p) return { score:55, raisons:[] };
+  var R = [], s = 55;
+  var add = function(t, txt, pts){ R.push({ t:t, txt:txt, pts:pts||0 }); s += (pts||0); };
+
+  // ── 1. Exclusions de sécurité (elles écrasent tout le reste) ──
+  var inciProd = (typeof INCI_DB !== "undefined") ? INCI_DB[key] : null;
   var AMAP = {
     'Parfums / Fragrances':'parfum','Fragrances / Perfumes':'parfum',
-    'Parabènes':'paraben','Parabens':'paraben',
-    'Alcool':'alcohol','Alcohol':'alcohol',
+    'Parabènes':'paraben','Parabens':'paraben','Alcool':'alcohol','Alcohol':'alcohol',
     'Sulfates (SLS/SLES)':'sulfate','Silicones':'silicone',
-    'Rétinol':'retinol','Retinol':'retinol',
-    'Vitamine C':'vitc','Vitamin C':'vitc',
+    'Rétinol':'retinol','Retinol':'retinol','Vitamine C':'vitc','Vitamin C':'vitc',
     'Acide salicylique':'salicylic','Salicylic acid':'salicylic',
     'Acides (AHA/BHA)':'aha_bha','Acids (AHA/BHA)':'aha_bha',
-    'Huiles essentielles':'parfum','Essential oils':'parfum',
+    'Huiles essentielles':'parfum','Essential oils':'parfum'
   };
-  var inciProd = INCI_DB[key];
-  var hasAllergenInProduct = (allergies||[]).some(function(allergy) {
-    if (allergy === 'Aucune allergie connue' || allergy === 'No known allergies') return false;
-    if (inciProd) {
-      var field = AMAP[allergy];
-      return field && inciProd[field] === true;
-    }
-    // Fallback
-    var allText = ((p.comp||[]).join(' ')+(p.ak||[]).join(' ')).toLowerCase();
-    var FALLBACK = {'Rétinol':['retinol','retinyl'],'Vitamine C':['ascorbic acid'],'Acide salicylique':['salicylic acid'],'Parfums / Fragrances':['parfum','fragrance']};
-    return (FALLBACK[allergy]||[]).some(function(ing){return allText.includes(ing);});
+  var bloquants = [];
+  (allergies || []).forEach(function(a){
+    if (!a || a === 'Aucune allergie connue' || a === 'No known allergies') return;
+    if (inciProd && AMAP[a] && inciProd[AMAP[a]] === true) bloquants.push(a);
   });
-  if (hasAllergenInProduct) return 15;
+  var fine = { detected:[], uncertain:[], hit:false };
+  try { fine = detectFineAllergens(key, allergies || []); } catch(e){}
+  fine.detected.forEach(function(d){ if (bloquants.indexOf(d) === -1) bloquants.push(d); });
 
-  // Complément : détection fine (allergènes parfum réglementés, conservateurs, "Autre:")
-  var fine = detectFineAllergens(key, allergies);
-  if (fine.hit) return 15;
+  if (bloquants.length) {
+    return { score:15, raisons:[{ t:'stop', pts:0,
+      txt:"Contient " + bloquants.join(", ") + " — tu as déclaré y être allergique." }] };
+  }
+  if (typeof isPregnancyMode === 'function' && isPregnancyMode()) {
+    var pf = [];
+    try { pf = pregnancyFlags(key) || []; } catch(e){}
+    if (pf.length) {
+      return { score:10, raisons:[{ t:'stop', pts:0,
+        txt:"Déconseillé pendant la grossesse ou l'allaitement (" + pf.join(", ") + ")." }] };
+    }
+  }
 
-  // Grossesse / allaitement : un produit contenant un actif déconseillé est écarté,
-  // au même titre qu'un allergène. La sécurité prime sur la pertinence cosmétique.
-  if (typeof isPregnancyMode === 'function' && isPregnancyMode() && pregnancyFlags(key).length > 0) return 10;
+  // ── 2. Adéquation au type de peau (signal le plus fort) ──
+  var tg = productSkinTargets(key);
+  if (skin && tg.cible) {
+    if (tg.types.indexOf(skin) > -1) {
+      add('plus', "Formulé pour les peaux " + (SKIN_LABELS[skin] || skin) + ".", 22);
+    } else if (tg.universel) {
+      add('plus', "Convient à tous les types de peau.", 8);
+    } else {
+      var opp = (SKIN_OPPOSED[skin] || []).some(function(o){ return tg.types.indexOf(o) > -1; });
+      var cibles = tg.types.map(function(t){ return SKIN_LABELS[t] || t; }).join(", ");
+      if (opp) add('moins', "Conçu pour les peaux " + cibles + " — l'opposé de ta peau " + (SKIN_LABELS_SING[skin] || skin) + ".", -28);
+      else     add('moins', "Conçu pour les peaux " + cibles + ", pas pour les peaux " + (SKIN_LABELS[skin] || skin) + ".", -18);
+    }
+  } else if (skin && !tg.cible) {
+    add('neutre', "Ce produit cible une problématique précise plutôt qu'un type de peau.", 0);
+  }
 
-  var s = 72;
-  if (p.clean) s += 8;
-  if (skin === 'sensible' && p.yuka >= 75) s += 8;
-  if (skin === 'grasse' && (p.ak||[]).some(function(a){return a.toLowerCase().includes('niacinamide');})) s += 7;
-  if (skin === 'seche' && (p.ak||[]).some(function(a){return a.toLowerCase().includes('hyaluronique') || a.toLowerCase().includes('ceramide');})) s += 7;
-  if (age === '46+' && (p.ak||[]).some(function(a){return a.includes('ride')||a.includes('Proxylane')||a.includes('retinol');})) s += 7;
-  if (concern === 'acne' && (p.ak||[]).some(function(a){return a.toLowerCase().includes('salicylique')||a.toLowerCase().includes('niacinamide');})) s += 8;
-  if (concern === 'taches' && (p.ak||[]).some(function(a){return a.toLowerCase().includes('vitamine c')||a.toLowerCase().includes('niacinamide');})) s += 8;
-  return Math.min(99, Math.max(72, s));
+  // ── 3. Réponse à la problématique déclarée ──
+  if (concern && typeof CONCERN_DEF !== "undefined" && typeof _matchConcernActives === "function") {
+    try {
+      var def = CONCERN_DEF.find(function(c){ return c.id === concern; });
+      if (def) {
+        var act = _matchConcernActives(key, def) || [];
+        if (act.length) {
+          add('plus', "Contient " + act.slice(0,2).join(" et ") + ", qui cible " +
+              (def.fr || concern).toLowerCase() + ".", Math.min(18, 9 * act.length));
+        } else {
+          add('moins', "Aucun actif de ce produit ne cible " + (def.fr || concern).toLowerCase() + ".", -7);
+        }
+      }
+    } catch(e){}
+  }
+
+  // ── 4. Tranche d'âge ──
+  var pqTxt = ((p.pq || "") + " " + (p.usage || "")).toLowerCase();
+  var akTxt = (p.ak || []).join(" ").toLowerCase();
+  if (age === '46+') {
+    if (/matur|rides|anti-âge|anti-age/.test(pqTxt) || /retinol|rétinol|proxylane|peptide|collagène/.test(akTxt))
+      add('plus', "Formulé pour les besoins des peaux matures.", 10);
+  } else if (age === '18-25' && /matur|rides profondes/.test(pqTxt)) {
+    add('moins', "Formulé pour les peaux matures, au-delà de tes besoins actuels.", -10);
+  }
+
+  // ── 5. Tolérance : parfum et alcool sur peau sensible ──
+  if (skin === 'sensible' && inciProd) {
+    if (inciProd.parfum === true) add('moins', "Contient du parfum, à éviter sur une peau réactive.", -14);
+    if (inciProd.alcohol === true) add('moins', "Contient de l'alcool, desséchant pour une peau sensible.", -10);
+  }
+
+  // ── 6. Qualité de formule ──
+  if (p.clean) add('plus', "Formule sans ingrédients controversés.", 6);
+  if (typeof p.yuka === 'number') {
+    if (p.yuka >= 85)      add('plus',  "Composition très bien notée (" + p.yuka + "/100).", 8);
+    else if (p.yuka >= 75) add('plus',  "Bonne composition (" + p.yuka + "/100).", 4);
+    else if (p.yuka < 60)  add('moins', "Composition moyennement notée (" + p.yuka + "/100).", -10);
+  }
+
+  // ── 7. Allergènes présents mais non déclarés par l'utilisateur : information ──
+  if (fine.uncertain && fine.uncertain.length) {
+    add('neutre', "Produit parfumé : présence possible de " + fine.uncertain.slice(0,3).join(", ") + ".", 0);
+  }
+
+  s = Math.max(18, Math.min(99, Math.round(s)));
+  return { score:s, raisons:R };
+}
+
+// Compatibilité avec l'existant : même signature, renvoie uniquement la note.
+function getCompat(key, skin, concern, age, allergies) {
+  if (!DB[key]) return 55;
+  return scoreCompat(key, skin, concern, age, allergies).score;
+}
+
+// Libellé et couleur associés à une note.
+function compatLabel(score, isEN) {
+  if (score < 25)  return isEN ? "Not for you" : "À éviter pour toi";
+  if (score >= 85) return isEN ? "Excellent match" : "Très adapté à ta peau";
+  if (score >= 70) return isEN ? "Good match" : "Bien adapté";
+  if (score >= 55) return isEN ? "Acceptable" : "Correct sans plus";
+  if (score >= 40) return isEN ? "Poor match" : "Peu adapté";
+  return isEN ? "Not recommended" : "Déconseillé pour toi";
+}
+function compatColor(score) {
+  return score >= 85 ? "#5E8C6A" : score >= 70 ? "#7B8F77"
+       : score >= 55 ? "#C4726A" : score >= 40 ? "#C4885A" : "#B4544B";
+}
+
+// Bloc HTML expliquant la note — utilisé sur toutes les fiches produit.
+function compatExplainHTML(key, skin, concern, age, allergies, isEN) {
+  var r = scoreCompat(key, skin, concern, age, allergies);
+  var col = compatColor(r.score);
+  var ICO = { plus:"✓", moins:"×", stop:"⛔", neutre:"·" };
+  var COL = { plus:"#5E8C6A", moins:"#B4544B", stop:"#B4544B", neutre:"#B0958F" };
+
+  var lignes = r.raisons.map(function(x){
+    return '<div style="display:flex;gap:9px;align-items:flex-start;padding:7px 0">' +
+      '<span style="color:' + COL[x.t] + ';font-weight:700;flex-shrink:0;width:13px;text-align:center;font-size:13px">' + ICO[x.t] + '</span>' +
+      '<span style="flex:1;font-size:12.5px;color:#5A4A44;line-height:1.45">' + x.txt + '</span>' +
+      (x.pts ? '<span style="font-size:11px;font-family:Georgia,serif;font-weight:700;color:' + COL[x.t] + ';flex-shrink:0">' +
+        (x.pts > 0 ? "+" : "") + x.pts + '</span>' : '') +
+      '</div>';
+  }).join('');
+
+  if (!lignes) {
+    lignes = '<div style="font-size:12.5px;color:#B0958F;padding:7px 0">' +
+      (isEN ? "Complete your skin profile to get a personalized score."
+            : "Complète ton profil peau pour obtenir une note personnalisée.") + '</div>';
+  }
+
+  return '<div style="background:#fff;border:1px solid var(--bdr);border-radius:16px;padding:16px;margin:12px 0">' +
+    '<div style="display:flex;align-items:center;gap:12px;margin-bottom:10px">' +
+      '<div style="width:46px;height:46px;border-radius:50%;border:3px solid ' + col + ';display:flex;align-items:center;justify-content:center;font-family:Georgia,serif;font-size:16px;font-weight:700;color:' + col + ';flex-shrink:0">' + r.score + '</div>' +
+      '<div><div style="font-size:14px;font-weight:700;color:var(--pri)">' + compatLabel(r.score, isEN) + '</div>' +
+      '<div style="font-size:11px;color:var(--mut)">' + (isEN ? "Why this score" : "Pourquoi cette note") + '</div></div>' +
+    '</div>' +
+    '<div style="border-top:1px solid var(--bdr);padding-top:4px">' + lignes + '</div>' +
+    '<div style="font-size:10.5px;color:var(--mut);margin-top:8px;line-height:1.45">' +
+      (isEN ? "Score based on your skin profile. Informational only — not medical advice."
+            : "Note calculée à partir de ton profil peau. À titre informatif, ne remplace pas l'avis d'un professionnel de santé.") +
+    '</div></div>';
 }
 
 
@@ -2881,8 +3026,70 @@ function build(){
     ) || null;
   };
 
+  // ── Correction d'inadéquation ──
+  // La table ROUTE associe un produit par (type de peau × budget), mais certaines
+  // entrées visent un autre type de peau que celui de l'utilisateur : la routine
+  // affichait alors un produit noté 34/100. On cherche, parmi les produits déjà
+  // sélectionnés pour la même étape et le même budget, celui qui colle vraiment.
+  // Budgets acceptables : on autorise moins cher que demandé, jamais plus cher.
+  const BUD_OK = b === "low" ? ["low"] : b === "mid" ? ["low","mid"] : ["low","mid","high"];
+  const fromRoute = (table) => {
+    const out = [];
+    Object.keys(table).forEach(function(s){
+      BUD_OK.forEach(function(bu){ if (table[s] && table[s][bu]) out.push(table[s][bu]); });
+    });
+    return out;
+  };
+  // Plafond de prix correspondant au budget choisi (on n'impose jamais plus cher).
+  const PRIX_MAX = b === "low" ? 15 : b === "mid" ? 50 : 1e9;
+  // Un candidat doit avoir une fiche complète : les produits importés d'Open Beauty
+  // Facts n'ont pas encore de prix et sont écartés plus loin dans la chaîne — les
+  // retenir ici ferait disparaître l'étape de la routine.
+  const prixOk = (key) => {
+    const p = DB[key] || {};
+    if (!p.nom || !p.prix) return false;
+    const m = String(p.prix).replace(",", ".").match(/[\d.]+/);
+    return !!m && parseFloat(m[0]) <= PRIX_MAX;
+  };
+  // Vivier = toute la catégorie, dans la limite du budget, complété par les
+  // produits pré-sélectionnés de la table ROUTE.
+  const parCategorie = (cat) => Object.keys(DB).filter(function(k){
+    return typeof categorizeProduct === "function" && categorizeProduct(k) === cat && prixOk(k);
+  });
+  const ETAPE_POOL = {
+    "Nettoyant":          () => parCategorie("nettoyant").concat(fromRoute(ROUTE.net)),
+    "Hydratant":          () => parCategorie("creme").concat(fromRoute(ROUTE.hyd)),
+    "Protection solaire": () => parCategorie("spf")
+  };
+  // Pour un sérum, la problématique traitée ne doit pas changer : on ne compare
+  // que les variantes de la MÊME problématique, tous budgets autorisés confondus.
+  const poolSerum = (key) => {
+    const cible = Object.keys(ROUTE.ser).find(function(cc){
+      return BUD_OK.concat(["low","mid","high"]).some(function(bu){ return ROUTE.ser[cc] && ROUTE.ser[cc][bu] === key; });
+    });
+    if (!cible) return [];
+    return BUD_OK.map(function(bu){ return ROUTE.ser[cible][bu]; }).filter(Boolean);
+  };
+
+  const bestForStep = (key, etape) => {
+    const pool = (etape === "Sérum principal" || etape === "Sérum soir" || etape === "Soin ciblé")
+      ? function(){ return poolSerum(key); }
+      : ETAPE_POOL[etape];
+    if (!pool) return key;
+    const base = getCompat(key, sk, c[0], ST.ageGroup, ST.allergies);
+    let best = key, bestScore = base;
+    (pool() || []).forEach(function(cand){
+      if (!cand || cand === key || usedKeys.has(cand) || !safeAvail(cand)) return;
+      const s = getCompat(cand, sk, c[0], ST.ageGroup, ST.allergies);
+      if (s > bestScore) { best = cand; bestScore = s; }
+    });
+    // On ne remplace que si le gain est net, pour ne pas bouleverser une sélection correcte.
+    return (bestScore - base >= 10) ? best : key;
+  };
+
   const addStep=(key,etape,moment)=>{
     if(!key||!DB[key])return;
+    key = bestForStep(key, etape);
     // Vérifier allergènes et contre-indications grossesse - chercher une alternative
     if(hasAllergen(key) || !isPregnancySafe(key)){
       const safeAlt = findSafeAlt(etape, key);
@@ -3516,7 +3723,7 @@ function renderFindConcernResults() {
     return {
       key:k, p:DB[k], actives:actives,
       cat: categorizeProduct(k),
-      compat: getCompat(k, FP.skin, FP.concern, null, []),
+      compat: getCompat(k, FP.skin, FP.concern, ST.ageGroup, ST.allergies||[]),
       // Pertinence = nombre d'actifs qui traitent le problème, bonus si sélection éditoriale.
       rel: actives.length + (curated.indexOf(k) > -1 ? 2 : 0)
     };
@@ -3578,7 +3785,7 @@ function renderFindResults() {
     if (FP.cat === 'serum' && FP.subtype) return getSerumActiveType(k).id === FP.subtype;
     return true;
   }).map(function(k){
-    return { key:k, p:DB[k], compat: getCompat(k, FP.skin, null, null, []), serumType: FP.cat === 'serum' ? getSerumActiveType(k) : null };
+    return { key:k, p:DB[k], compat: getCompat(k, FP.skin, null, ST.ageGroup, ST.allergies||[]), serumType: FP.cat === 'serum' ? getSerumActiveType(k) : null };
   }).sort(function(a,b){ return b.compat - a.compat; });
 
   // Un filtre d'actif est actif → l'actif est déjà annoncé dans le titre. Le répéter sur
@@ -3626,9 +3833,9 @@ function openFindDetail(key) {
   var isEN = LANG === 'en';
   var p = DB[key];
   if (!p) return;
-  var compat = getCompat(key, FP.skin, FP.concern, null, []);
-  var color = compat>=85?'#7B8F77':compat>=70?'#C4726A':'#9C8078';
-  var bg = compat>=85?'#EFF3EE':compat>=70?'#FBE8E4':'#F4EDEA';
+  var compat = getCompat(key, FP.skin, FP.concern, ST.ageGroup, ST.allergies||[]);
+  var color = compatColor(compat);
+  var bg = compat>=85?'#EFF3EE':compat>=70?'#F2F5F1':compat>=55?'#FBE8E4':'#F7EDEB';
   var serumType = (categorizeProduct(key) === 'serum') ? getSerumActiveType(key) : null;
   // En mode "problème", on explique explicitement pourquoi ce produit est proposé.
   var concernDefSel = FP.concern ? CONCERN_DEF.find(function(c){ return c.id === FP.concern; }) : null;
@@ -3641,10 +3848,7 @@ function openFindDetail(key) {
     + '<div style="flex:1"><div style="font-family:Georgia,serif;font-size:17px;font-weight:700;color:#3D2B1F">'+(p.nom||'')+'</div><div style="font-size:12px;color:#8B6F5E">'+(p.marque||'')+' · '+(p.prix||'')+'</div></div>'
     + '</div>'
     + (serumType ? '<div style="display:inline-block;background:#C4726A;color:#fff;font-size:11px;font-weight:700;border-radius:20px;padding:5px 12px;margin-bottom:14px">'+(isEN?serumType.en:serumType.fr)+'</div>' : '')
-    + '<div style="display:flex;align-items:center;gap:10px;background:'+bg+';border-radius:12px;padding:12px 14px;margin-bottom:14px">'
-    + '<div style="font-size:22px;font-weight:900;color:'+color+'">'+compat+'%</div>'
-    + '<div style="font-size:12px;color:'+color+';font-weight:600">'+(isEN?'Match for your skin':'Compatibilité avec ta peau')+'</div>'
-    + '</div>'
+    + compatExplainHTML(key, FP.skin, FP.concern, ST.ageGroup, ST.allergies||[], isEN)
     + '<div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px">'
       + (p.texture ? '<span style="background:#FAF0ED;color:#7A6259;font-size:11px;font-weight:600;border-radius:20px;padding:4px 10px">'+p.texture+'</span>' : '')
       + (momentLabel ? '<span style="background:#FAF0ED;color:#7A6259;font-size:11px;font-weight:600;border-radius:20px;padding:4px 10px">'+momentLabel+'</span>' : '')
@@ -6116,9 +6320,9 @@ function showWhyAI(key, nom, marque) {
 
   // Compatibilité globale
   var compat = getCompat(key, ST.skinType, ST.concerns[0]||"", ST.ageGroup, ST.allergies||[]);
-  var compatColor = compat >= 75 ? "#2E7D32" : compat >= 50 ? "#E65100" : "#C62828";
-  var compatBg = compat >= 75 ? "#E8F5E9" : compat >= 50 ? "#FFF3E0" : "#FFEBEE";
-  var compatLabel = compat >= 80 ? "Excellent pour toi" : compat >= 65 ? "Bien adapté" : compat >= 50 ? "Moyen" : "Peu recommandé";
+  var _whyCol = compatColor(compat);
+  var compatBg = compat >= 70 ? "#EFF3EE" : compat >= 55 ? "#FBE8E4" : "#F9EDEB";
+  var _whyLbl = compatLabel(compat, LANG === "en");
 
   var skinExplain = {
     grasse: "Peau à tendance grasse, zone T brillante. Ce produit régule le sébum sans dessécher.",
@@ -6131,13 +6335,13 @@ function showWhyAI(key, nom, marque) {
   var html = "";
 
   // ── HERO SCORE ──
-  var scoreGradient = compat >= 75 ? "linear-gradient(135deg,#1a4731,#2E7D32)" : compat >= 50 ? "linear-gradient(135deg,#7a3500,#E65100)" : "linear-gradient(135deg,#7a0000,#C62828)";
+  var scoreGradient = compat >= 70 ? "linear-gradient(135deg,#3E5E48,#5E8C6A)" : compat >= 55 ? "linear-gradient(135deg,#8A4A44,#C4726A)" : "linear-gradient(135deg,#7A3530,#B4544B)";
   html += "<div style=\"background:" + scoreGradient + ";border-radius:20px;padding:20px;margin-bottom:16px;position:relative;overflow:hidden\">";
   html += "<div style=\"position:absolute;top:-30px;right:-30px;width:120px;height:120px;border-radius:50%;background:rgba(255,255,255,.06)\"></div>";
   html += "<div style=\"display:flex;align-items:center;gap:16px\">";
   html += "<div style=\"text-align:center;flex-shrink:0\">";
   html += "<div style=\"font-size:48px;font-weight:900;color:#fff;font-family:Georgia,serif;line-height:1\">" + compat + "</div>";
-  html += "<div style=\"font-size:11px;color:rgba(255,255,255,.75);font-weight:600;letter-spacing:.5px\">/100 · " + compatLabel.toUpperCase() + "</div></div>";
+  html += "<div style=\"font-size:11px;color:rgba(255,255,255,.75);font-weight:600;letter-spacing:.5px\">/100 · " + _whyLbl.toUpperCase() + "</div></div>";
   html += "<div style=\"flex:1;border-left:1px solid rgba(255,255,255,.2);padding-left:16px\">";
   html += "<div style=\"font-size:13px;font-weight:700;color:#fff;margin-bottom:6px\">Compatibilité peau " + skinLabel + (age ? " · " + age + " ans" : "") + "</div>";
   html += "<div style=\"font-size:11px;color:rgba(255,255,255,.7);line-height:1.5\">" + (skinExplain[ST.skinType] || "") + "</div></div></div>";
@@ -6149,6 +6353,9 @@ function showWhyAI(key, nom, marque) {
     html += "</div>";
   }
   html += "</div>";
+
+  // ── DÉTAIL DE LA NOTE : pourquoi ce produit est adapté ou non ──
+  html += compatExplainHTML(key, ST.skinType, ST.concerns[0] || "", ST.ageGroup, ST.allergies || [], LANG === "en");
 
   // ── ALERTE ALLERGIE ──
   if (allergenWarning) {
@@ -6314,6 +6521,94 @@ function startDiagnostic() {
     return;
   }
   ST.user = {name:'', email:''};
+  // Utilisateur connecté avec un profil déjà enregistré : on ne repose pas les questions,
+  // on lui demande simplement de confirmer que rien n'a changé.
+  if (window._currentUser && window._savedRoutine && window._savedRoutine.skinType) {
+    showProfileConfirm();
+    return;
+  }
+  go('q1');
+}
+
+// Écran de confirmation du profil enregistré (évite de reposer 5 questions
+// à quelqu'un dont on connaît déjà les réponses).
+function prefillFromSaved() {
+  var sv = window._savedRoutine; if (!sv) return false;
+  ST.skinType  = sv.skinType  || ST.skinType;
+  ST.ageGroup  = sv.ageGroup  || ST.ageGroup;
+  ST.concerns  = sv.concerns  || ST.concerns  || [];
+  ST.allergies = sv.allergies || ST.allergies || [];
+  ST.budget    = sv.budget    || ST.budget;
+  ST.routine   = sv.routine   || ST.routine;
+  ST.phototype = sv.phototype || ST.phototype;
+  ST.pregnancy = sv.pregnancy || ST.pregnancy;
+  return !!(ST.skinType && ST.budget && ST.routine);
+}
+
+function showProfileConfirm() {
+  var isEN = LANG === 'en';
+  var sv = window._savedRoutine || {};
+  var SKIN = { grasse:'Grasse', seche:'Sèche', mixte:'Mixte', sensible:'Sensible', normale:'Normale' };
+  var ligne = function(lbl, val){
+    if (!val) return '';
+    return '<div style="display:flex;justify-content:space-between;gap:12px;padding:9px 0;border-bottom:1px solid var(--bdr)">' +
+      '<span style="font-size:12.5px;color:var(--mut)">' + lbl + '</span>' +
+      '<span style="font-size:12.5px;font-weight:700;color:var(--pri);text-align:right">' + val + '</span></div>';
+  };
+  var alg = (sv.allergies || []).filter(function(a){
+    return a && a !== 'Aucune allergie connue' && a !== 'No known allergies';
+  });
+  var html =
+    '<div style="background:var(--surf);border:1px solid var(--bdr);border-radius:18px;padding:18px;margin-bottom:14px">' +
+      '<div style="font-family:Georgia,serif;font-size:19px;font-weight:700;color:var(--pri);margin-bottom:4px">' +
+        (isEN ? 'Still accurate?' : 'Toujours d\'actualité ?') + '</div>' +
+      '<div style="font-size:13px;color:var(--mut);line-height:1.5;margin-bottom:14px">' +
+        (isEN ? 'We already have your skin profile. Confirm it and we go straight to your routine.'
+              : 'On a déjà ton profil peau. Confirme-le et on passe directement à ta routine.') + '</div>' +
+      ligne(isEN ? 'Skin type' : 'Type de peau', SKIN[sv.skinType] || sv.skinType) +
+      ligne(isEN ? 'Age' : 'Tranche d\'âge', sv.ageGroup) +
+      ligne(isEN ? 'Concerns' : 'Problématiques', (sv.concerns || []).join(', ')) +
+      ligne(isEN ? 'Allergies' : 'Allergies', alg.length ? alg.join(', ') : (isEN ? 'None declared' : 'Aucune déclarée')) +
+      ligne(isEN ? 'Budget' : 'Budget', sv.budget) +
+    '</div>' +
+    '<button onclick="confirmSavedProfile()" style="width:100%;padding:14px;border-radius:50px;border:none;background:#C4726A;color:#fff;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit;margin-bottom:9px">' +
+      (isEN ? 'Yes, show my routine' : 'Oui, voir ma routine') + '</button>' +
+    '<button onclick="restartFullQuestionnaire()" style="width:100%;padding:13px;border-radius:50px;border:1.5px solid var(--bdr);background:transparent;color:var(--mut);font-size:13.5px;font-weight:600;cursor:pointer;font-family:inherit">' +
+      (isEN ? 'Something changed, redo it' : 'Quelque chose a changé, tout refaire') + '</button>';
+
+  var sc = document.getElementById('sc-profile-confirm');
+  if (!sc) {
+    sc = document.createElement('div');
+    sc.id = 'sc-profile-confirm';
+    sc.className = 'hidden';
+    sc.innerHTML = '<div class="topbar"><button class="btn-back" onclick="go(\'welcome\')">← Retour</button>' +
+      '<div class="logo"><div class="logo-icon">SM</div>Skin<span>Match</span></div></div>' +
+      '<div class="content"><div style="margin:8px 0 20px"><div class="step-lbl">Mon profil</div>' +
+      '<h2 style="margin-bottom:4px" id="pc-title"></h2></div><div id="pc-body"></div></div>';
+    (document.querySelector('.app') || document.body).appendChild(sc);
+    if (typeof SCREENS !== 'undefined' && SCREENS.indexOf('profile-confirm') === -1) SCREENS.push('profile-confirm');
+  }
+  document.getElementById('pc-title').textContent = isEN ? 'Your skin profile' : 'Ton profil peau';
+  document.getElementById('pc-body').innerHTML = html;
+  go('profile-confirm');
+}
+
+function confirmSavedProfile() {
+  if (prefillFromSaved()) {
+    try { ST.result = build(); } catch(e) { ST.result = null; }
+    if (ST.result && ST.result.steps && ST.result.steps.length) {
+      window._resultOrigin = 'welcome';
+      go('result');
+      if (typeof renderResult === 'function') { try { renderResult(); } catch(e){} }
+      return;
+    }
+  }
+  go('q1');
+}
+
+function restartFullQuestionnaire() {
+  ST.skinType = null; ST.ageGroup = null; ST.concerns = [];
+  ST.allergies = []; ST.budget = null; ST.routine = null; ST.result = null;
   go('q1');
 }
 
